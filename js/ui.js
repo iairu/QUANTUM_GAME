@@ -264,6 +264,12 @@ const UI = {
     this.dialog.classList.add('show');
   },
 
+  // zruší rozbehnutý dialóg/kvíz bez pokračovania (odchod z levelu uprostred rozhovoru)
+  cancelDialog() {
+    this.dialog.classList.remove('show'); this.dialog.innerHTML = '';
+    this.busy = false; this._next = this._prev = null; this.refreshDialog = null;
+  },
+
   // séria kvízov za sebou; cb(počet chýb)
   quizSeries(list, cb) {
     let i = 0, mistakes = 0;

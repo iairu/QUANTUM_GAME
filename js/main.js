@@ -298,10 +298,10 @@ const Game = {
       if ((e.code === 'ArrowLeft' || e.code === 'Backspace') && UI.busy && UI._prev) { e.preventDefault(); UI._prev(); return; }
       if (e.code === 'KeyL') { UI.toggleLog(); return; }
       if (e.code === 'KeyV') { Views.toggle(); return; } // pohľady aj počas dialógu
+      if (e.code === 'KeyM') { this.toggleMap(); return; } // mapa (a teleport) aj počas dialógu
       if (UI.busy) return;
       if (e.code === 'KeyE' && this.scene === Hub) Hub.interact();
       if (e.code === 'KeyC') UI.toggleCodex();
-      if (e.code === 'KeyM') this.toggleMap();
       if (e.code === 'KeyO') UI.toggleSettings();
       if (e.code === 'KeyH' || e.code === 'F1') { e.preventDefault(); UI.toggleHelp(); }
       if (e.code === 'Escape') { UI.toggleCodex(false); UI.toggleHelp(false); UI.toggleLog(false); this.toggleMap(false); }
@@ -335,8 +335,9 @@ const Game = {
     this.save();
   },
   backToHub() {
-    if (this.scene === Hub || UI.busy) return;
+    if (this.scene === Hub) return;
     const from = this.scene.num;
+    UI.cancelDialog(); // aj uprostred rozhovoru alebo kvízu
     this.scene.exit();
     UI.labelsClear();
     this.scene = Hub;
@@ -453,11 +454,11 @@ const Game = {
     if (!pt) return;
     const L = pt.L;
     if (!this.isUnlocked(L.num)) { UI.toast(tr(`🔒 Najprv dokonči level ${L.num - 1}.`, `🔒 Complete level ${L.num - 1} first.`)); return; }
-    if (UI.busy) { UI.toast(tr('Najprv dokonči aktuálny dialóg.', 'Finish the current dialogue first.')); return; }
     if (this.scene === this.levels[L.num - 1]) { this.toggleMap(false); return; }
     if (this.scene !== Hub && !confirm(tr(`Presunúť sa do levelu ${L.num}: ${L.title}? Postup v aktuálnom leveli (${this.scene.num} · ${this.scene.title}) sa neuloží.`,
       `Teleport to level ${L.num}: ${L.title}? Progress in the current level (${this.scene.num} · ${this.scene.title}) will not be saved.`))) return;
     this.toggleMap(false);
+    UI.cancelDialog();
     this.enterLevel(L.num);
   },
   drawMap() {

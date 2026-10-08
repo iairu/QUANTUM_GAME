@@ -280,6 +280,7 @@ const LAYMAN_INTRO = tr([
   'Trik kvantových počítačov: každá možná odpoveď nesie <b>malú šípku</b>. Šípky sa môžu <b>navzájom vyrušiť</b>. Dobrý kvantový program zariadi, aby sa zlé odpovede vyrušili a správna posilnila.',
   'Na ostrove je 8 portálov a za každým mentor. Pred každou úlohou ti ju najprv <b>vysvetlím po ľudsky</b>. Odborné slová majú <b>preklad v zátvorke</b> a po prejdení myšou jednoduchú vysvetlivku.',
   'Ovládanie: <b>WASD</b> pohyb, <b>ťahanie myšou</b> kamera, <b>E</b> vstúpiť/hovoriť, <b>M</b> mapa. Začni portálom <b>1</b>!',
+  'Keď sa budeš cítiť istejšie, vpravo hore môžeš kedykoľvek prepnúť na ťažšiu obťažnosť s odbornejším jazykom.',
 ], [
   'Hi! I am <b>Amplitude</b>, your guide. No formulas needed — I will use <b>everyday words</b>.',
   'Ordinary computers use <b>bits</b>: each is 0 or 1. Quantum computers use <b>qubits</b>: until you look at one, a qubit can be <b>a blend of 0 and 1</b>.',
@@ -287,4 +288,5 @@ const LAYMAN_INTRO = tr([
   'The trick of quantum computers: every possible answer carries <b>a little arrow</b>. Arrows can <b>cancel each other out</b>. A good quantum program makes the wrong answers cancel and the right one grow.',
   'There are 8 portals on the island, each with a mentor. Before every task I will first <b>explain it in plain words</b>. Technical words get <b>a translation in brackets</b> and a simple explanation when you hover them.',
   'Controls: <b>WASD</b> move, <b>mouse drag</b> camera, <b>E</b> enter/talk, <b>M</b> map. Start with portal <b>1</b>!',
+  'Once you feel more confident, you can switch to a harder difficulty with more technical language at any time (top right).',
 ]);

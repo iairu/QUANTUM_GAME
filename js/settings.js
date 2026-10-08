@@ -4,7 +4,7 @@
 
 const DIFFS = ['layman', 'easy', 'normal', 'hard', 'ancient'];
 const Settings = {
-  diff: 'normal',
+  diff: 'layman', // nová hra začína laickou obťažnosťou
   // ťažká aj prastará (prastará = ťažká + starobylé zvitky s históriou)
   get hard() { return this.diff === 'hard' || this.diff === 'ancient'; },
   // ľahká aj laická (laická = ľahká + všetko bežnými slovami)
