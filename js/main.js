@@ -92,11 +92,26 @@ const Hub = {
   portals: [],
   crystals: [],
   init() {
-    const n = LEVELS.length;
-    this.portals = LEVELS.map((L, i) => {
-      const a = -Math.PI / 2 + (i / n) * Math.PI * 2, p = [Math.cos(a) * 20, 0, Math.sin(a) * 20];
+    // osem portálov v kruhu (sever ostáva voľný), záverečný Dračí štít na severnom okraji pod horou
+    const ring = LEVELS.filter((L) => !L.boss), n = ring.length;
+    this.portals = LEVELS.map((L) => {
+      if (L.boss) { const p = [0, 0, -29]; return { L, p, dir: [0, 0, 1], npc: [3.6, 0, -27.5], boss: true }; }
+      const a = -Math.PI / 2 + ((ring.indexOf(L) + 0.5) / n) * Math.PI * 2, p = [Math.cos(a) * 20, 0, Math.sin(a) * 20];
       return { L, p, dir: V3.norm(V3.scale(p, -1)), npc: V3.add(p, V3.scale(V3.norm([-Math.sin(a), 0, Math.cos(a)]), 3.2)) };
     });
+    // severská krajina: borovice a balvany (deterministicky, mimo portálov a stredu)
+    let seed = 7;
+    const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    const free = (p, d) => V3.len(p) > 6 && this.portals.every((pt) => V3.len(V3.sub(pt.p, p)) > d) && Math.abs(p[0]) + Math.max(0, -p[2] - 14) * 0.2 > 2.5;
+    this.pines = []; this.rocks = [];
+    for (let k = 0; this.pines.length < 46 && k < 600; k++) {
+      const a = rnd() * Math.PI * 2, rad = rnd() < 0.7 ? 24 + rnd() * 9 : 9 + rnd() * 6, p = [Math.cos(a) * rad, 0, Math.sin(a) * rad];
+      if (free(p, 5.5) && this.pines.every((q) => V3.len(V3.sub(q.p, p)) > 2.2)) this.pines.push({ p, h: 3.5 + rnd() * 3, k: rnd() });
+    }
+    for (let k = 0; this.rocks.length < 18 && k < 400; k++) {
+      const a = rnd() * Math.PI * 2, rad = 7 + rnd() * 26, p = [Math.cos(a) * rad, 0, Math.sin(a) * rad];
+      if (free(p, 4.5)) this.rocks.push({ p, s: [0.6 + rnd() * 1.4, 0.4 + rnd() * 0.9, 0.6 + rnd() * 1.2], rot: rnd() * 6 });
+    }
     const syms = ['ψ', 'ħ', '⟨φ|ψ⟩', '⊗', 'ρ', 'Σ', 'e<sup>iφ</sup>', '|0⟩', '|1⟩', '†', 'Ĥ', '|Φ⁺⟩'];
     this.crystals = syms.map((s, i) => {
       const a = (i / syms.length) * Math.PI * 2 + 0.26, r = i % 2 ? 11 : 30;
@@ -104,7 +119,7 @@ const Hub = {
     });
   },
   enter(fromLevel) {
-    Game.r.fog = 0.012;
+    Game.r.fog = 0.012; Game.r.fogColor = [0.29, 0.34, 0.4];
     UI.setHud(tr('Hilbertov ostrov', 'Hilbert Island'), Game.nextQuestText());
     if (fromLevel) {
       const pt = this.portals[fromLevel - 1];
@@ -140,6 +155,10 @@ const Hub = {
           const d = V3.sub(np, pt.p);
           if (V3.len(d) < 1.6) np = V3.add(pt.p, V3.scale(V3.norm(d), 1.6));
         }
+        for (const pn of this.pines) { // ani do kmeňa borovice
+          const d = V3.sub(np, pn.p);
+          if (V3.len(d) < 0.8) np = V3.add(pn.p, V3.scale(V3.norm(d), 0.8));
+        }
         pl.p = np;
         pl.heading = Math.atan2(dir[0], dir[2]);
         if (!Game.progress.moved) { Game.progress.moved = true; Game.save(); }
@@ -164,11 +183,20 @@ const Hub = {
   draw(r) {
     const pl = this.player, t = r.time;
     r.begin(this.cam.eye(), this.cam.target);
-    r.draw('disk', M4.trs([0, -0.35, 0], 0, 200), [0.07, 0.2, 0.42], { pattern: 2 });          // more
-    r.draw('cylinder', M4.trs([0, -1.2, 0], 0, [35, 1.2, 35]), [0.22, 0.3, 0.5]);              // ostrov
-    r.draw('disk', M4.trs([0, 0.001, 0], 0, 35), [0.16, 0.24, 0.4], { pattern: 1 });
-    // centrálna plošina so sprievodkyňou
-    r.draw('cylinder', M4.trs([0, 0, 0], 0, [2.6, 0.12, 2.6]), [0.35, 0.42, 0.7]);
+    r.draw('disk', M4.trs([0, -0.35, 0], 0, 200), [0.08, 0.16, 0.2], { pattern: 2 });          // studené more
+    r.draw('cylinder', M4.trs([0, -1.2, 0], 0, [35, 1.2, 35]), [0.38, 0.37, 0.36], { pattern: 4 }); // skalnatý ostrov
+    r.draw('disk', M4.trs([0, 0.001, 0], 0, 35), [0.33, 0.35, 0.26], { pattern: 3 });           // tundra so snehom
+    // hory na obzore a Dračí štít na severe
+    for (const [x, z, s, h] of [[0, -58, 22, 36], [-34, -60, 16, 24], [36, -56, 17, 26], [-66, -18, 18, 22], [68, -6, 15, 20], [-52, 44, 16, 18], [58, 46, 14, 16]])
+      r.draw('cone', M4.trs([x, -2, z], 0, [s, h, s]), [0.42, 0.42, 0.44], { pattern: 4 });
+    // borovice a balvany
+    for (const pn of this.pines) {
+      r.draw('cylinder', M4.trs(pn.p, 0, [0.18, pn.h * 0.35, 0.18]), [0.3, 0.22, 0.15], { pattern: 5 });
+      for (let k = 0; k < 3; k++) r.draw('cone', M4.trs(V3.add(pn.p, [0, pn.h * (0.25 + k * 0.22), 0]), pn.k * 6 + k, [1.3 - k * 0.32, pn.h * 0.42, 1.3 - k * 0.32]), [0.12, 0.22 + pn.k * 0.06, 0.15], { pattern: 7 });
+    }
+    for (const rk of this.rocks) r.draw('lowSphere', M4.trs(rk.p, rk.rot, rk.s), [0.45, 0.44, 0.42], { pattern: 4 });
+    // centrálna kamenná plošina so sprievodkyňou
+    r.draw('cylinder', M4.trs([0, 0, 0], 0, [2.6, 0.18, 2.6]), [0.5, 0.48, 0.45], { pattern: 4 });
     const gy = 1.6 + Math.sin(t * 1.3) * 0.15;
     r.sphere([0, gy, 0], 0.55, [1, 0.75, 0.3], { emissive: 0.6 });
     r.draw('torus', M4.orient([0, gy, 0], [Math.sin(t), 1, Math.cos(t)], 0.9), [1, 0.85, 0.5], { emissive: 0.4 });
@@ -177,7 +205,10 @@ const Hub = {
     for (const pt of this.portals) {
       const L = pt.L, open = Game.isUnlocked(L.num), done = Game.progress.stars[L.num];
       const col = open ? L.color : [0.35, 0.35, 0.4], c = V3.add(pt.p, [0, 2.6, 0]);
-      r.draw('cylinder', M4.trs(pt.p, 0, [1.4, 0.4, 1.4]), [0.3, 0.33, 0.45]);
+      r.draw('cylinder', M4.trs(pt.p, 0, [1.4, 0.4, 1.4]), [0.46, 0.45, 0.43], { pattern: 4 });
+      const side = V3.norm(V3.cross(pt.dir, [0, 1, 0])), hh = pt.boss ? 6.5 : 4.6;           // menhiry po stranách
+      for (const s of [-1, 1]) r.draw('box', M4.trs(V3.add(pt.p, V3.add(V3.scale(side, s * 2.7), [0, hh / 2, 0])), Math.atan2(pt.dir[0], pt.dir[2]), [0.8, hh, 0.6]), [0.48, 0.47, 0.45], { pattern: 4 });
+      if (pt.boss) r.draw('box', M4.trs(V3.add(pt.p, [0, hh + 0.3, 0]), Math.atan2(pt.dir[0], pt.dir[2]), [6.4, 0.8, 0.8]), [0.48, 0.47, 0.45], { pattern: 4 });
       r.draw('torus', M4.orient(c, pt.dir, 2.1), col, { emissive: open ? 0.5 : 0 });
       r.draw('disk', M4.orient(c, pt.dir, 2.0), col, { alpha: open ? 0.35 + 0.1 * Math.sin(t * 2 + L.num) : 0.15, emissive: 0.8, unlit: 1 });
       // mentor
@@ -192,10 +223,21 @@ const Hub = {
     // plávajúce kryštály so symbolmi
     for (const c of this.crystals) {
       const p = V3.add(c.p, [0, Math.sin(t * 0.8 + c.k) * 0.3, 0]);
-      r.draw('box', M4.mul(M4.trs(p, t * 0.5 + c.k, 0.55), M4.trs([0, 0, 0], 0, [1, 1.6, 1])), [0.5, 0.8, 1], { emissive: 0.3, alpha: 0.75 });
+      r.draw('box', M4.mul(M4.trs(p, t * 0.5 + c.k, 0.55), M4.trs([0, 0, 0], 0, [1, 1.6, 1])), [0.72, 0.55, 1], { emissive: 0.35, alpha: 0.75 }); // duševné kamene
       UI.label('cr' + c.k, V3.add(p, [0, 1.2, 0]), c.s, 'sym', CRYSTAL_TIPS[c.s]);
       UI.hot(p, CRYSTAL_TIPS[c.s], 30);
     }
+    // drak Ketvarr: krúži nad ostrovom, po porážke sedí na Dračom štíte
+    if (Game.progress.stars[9] === undefined) {
+      const w = t * 0.11, dp = [Math.cos(w) * 46, 27 + Math.sin(t * 0.5) * 3, Math.sin(w) * 46];
+      Dragon.draw(r, dp, Math.atan2(-Math.sin(w), Math.cos(w)), { scale: 2.4, bank: 0.35, t });
+      UI.hot(dp, tr('<b>Ketvarr</b> — kvantový drak. Porazíš ho na Dračom štíte (portál 9), keď sa naučíš všetkých 8 slov moci.', '<b>Ketvarr</b> — the quantum dragon. You will defeat him on Dragon’s Peak (portal 9) once you learn all 8 Words of Power.'), 60);
+    } else {
+      const dp = [0, 35.6, -52];
+      Dragon.draw(r, dp, 0, { scale: 2.2, landed: true, t });
+      UI.hot(dp, tr('<b>Ketvarr</b> — porazený drak teraz stráži ostrov pred zlými prirovnaniami.', '<b>Ketvarr</b> — the defeated dragon now guards the island against bad analogies.'), 60);
+    }
+    Snow.draw(r, pl.p, 26);
     // hráč: „Psíčko“ — kvantový stav ψ s rotujúcou (nepozorovateľnou) globálnou fázou
     const bob = Math.sin(t * 3) * 0.08, pc = V3.add(pl.p, [0, 1 + bob, 0]);
     r.sphere(pc, 0.42, [0.3, 0.95, 1], { emissive: 0.8 });
@@ -227,6 +269,7 @@ const LEVEL_TIPS = tr({
   6: 'NMR: B₀, Zeemanove hladiny, precesia, Rabiho oscilácie, π-impulz, T₂.',
   7: 'Previazanosť, Bellov stav, nemožnosť signalizácie, CHSH hra.',
   8: 'Jazyk a realita: Bohr, Kant, Wittgenstein, Stodola, Bohm, kolaps.',
+  9: '🐉 Záverečný súboj s drakom Ketvarrom: ťahová bitka, štít = qubit, úder = meranie, cieľ P(zásah) ≥ prah.',
 }, {
   1: 'Complex numbers: amplitude as a clock hand, phase, i² = −1, interference.',
   2: 'Spin measurement: two spots, ±ħ/2, the measurement basis is part of the question.',
@@ -236,6 +279,7 @@ const LEVEL_TIPS = tr({
   6: 'NMR: B₀, Zeeman levels, precession, Rabi oscillations, π pulse, T₂.',
   7: 'Entanglement, Bell state, no-signalling, the CHSH game.',
   8: 'Language and reality: Bohr, Kant, Wittgenstein, Stodola, Bohm, collapse.',
+  9: '🐉 The final battle with the dragon Ketvarr: turn-based, ward = qubit, strike = measurement, aim for P(hit) ≥ the threshold.',
 });
 const CRYSTAL_TIPS = tr({
   'ψ': 'ψ — kvantový stav (vlnová funkcia).', 'ħ': 'ħ = h/2π — redukovaná Planckova konštanta.',
@@ -387,7 +431,14 @@ const Game = {
     if (this.scene === Hub) UI.setHud(tr('Hilbertov ostrov', 'Hilbert Island'), this.nextQuestText());
   },
   completeLevel(n, stars) {
+    const fresh = this.progress.stars[n] === undefined;
     this.progress.stars[n] = Math.max(stars, this.progress.stars[n] || 0);
+    if (fresh && !LEVELS[n - 1].boss) { // každý mentor naučí jedno slovo moci proti drakovi
+      const ring = LEVELS.filter((L) => !L.boss), k = ring.filter((L) => this.progress.stars[L.num] !== undefined).length;
+      setTimeout(() => UI.toast(k < ring.length
+        ? tr(`🐉 Slovo moci ${k}/${ring.length} — Ketvarr nad ostrovom nepokojne krúži.`, `🐉 Word of Power ${k}/${ring.length} — Ketvarr circles the island restlessly.`)
+        : tr('🐉 Všetkých 8 slov moci! Dračí štít (portál 9) je otvorený.', '🐉 All 8 Words of Power! Dragon’s Peak (portal 9) is open.'), 4200), 1200);
+    }
     const rank = (d) => DIFFS.indexOf(d);
     if (!this.progress.diff[n] || rank(Settings.diff) > rank(this.progress.diff[n])) this.progress.diff[n] = Settings.diff;
     this.unlock(CODEX.filter((c) => c.level === n).map((c) => c.id));
@@ -408,8 +459,9 @@ const Game = {
   },
   nextQuestText() {
     const n = LEVELS.find((L) => this.progress.stars[L.num] === undefined);
+    if (n && n.boss) return tr(`Vystúp na Dračí štít (portál ${n.num}) a poraz draka Ketvarra!`, `Climb Dragon’s Peak (portal ${n.num}) and defeat the dragon Ketvarr!`);
     return n ? tr(`Choď k portálu ${n.num}: ${n.title} (${n.mentor})`, `Go to portal ${n.num}: ${n.title} (${n.mentor})`)
-      : tr('Všetky levely hotové! Skús zlepšiť hviezdičky.', 'All levels done! Try to improve your stars.');
+      : tr('Ketvarr je porazený a ostrov zachránený! Skús zlepšiť hviezdičky.', 'Ketvarr is defeated and the island is saved! Try to improve your stars.');
   },
   guideTalk() {
     const A = (text) => ({ who: tr('Amplitúda (sprievodkyňa)', 'Amplitude (your guide)'), face: '✨', text });
@@ -425,6 +477,7 @@ const Game = {
       A('A ty si <b>Psíčko</b> — kvantový stav <b>ψ</b>. Nie si guľôčka s polohou a rýchlosťou. Si <i>pravidlo pre predpovede</i>: hovoríš, aké výsledky dostane ten, kto sa ťa niečo opýta (zmeria).'),
       A('Vidíš tú zlatú ručičku, ktorá sa okolo teba točí? To je tvoja <b>globálna fáza</b>. Točí sa, ale nikto na svete ju nevie zmerať. Zapamätaj si: <b>globálna fáza je nepozorovateľná, relatívna fáza áno</b>.'),
       A('Okolo ostrova je 8 portálov. Za každým čaká mentor — Euler, Stern, Bloch, Feynman, Dirac, Rabi, Bell a Bohr. Naučia ťa <b>jazyk</b>, <b>symboly</b> a <b>správne obrazy</b> kvantového sveta.'),
+      A('Nad ostrovom krúži <b>Ketvarr</b>, kvantový drak. Každý mentor ťa naučí jedno <b>slovo moci</b>. Keď ich budeš mať všetkých osem, vystúp na <b>Dračí štít</b> na severe a poraz ho.'),
       A('Cieľ nie je počítať integrály. Cieľ je <b>intuícia</b>: vedieť, čo je amplitúda, čo je pravdepodobnosť, čo robí meranie a kde klasické prirovnania prestávajú platiť.'),
       A('Ovládanie: <b>WASD</b> pohyb, <b>ťahanie myšou</b> kamera, <b>E</b> vstúpiť/hovoriť, <b>C</b> Kódex symbolov, <b>M</b> mapa, <b>H</b> pomoc. Začni portálom <b>1</b>!'),
       A('Si v kvantovom svete nováčik? Vpravo hore prepni obťažnosť na <b>🫶 Laická</b> — všetko ti vysvetlím bežnými slovami.'),
@@ -433,6 +486,7 @@ const Game = {
       A('And you are <b>Little Psi</b> — the quantum state <b>ψ</b>. You are not a little ball with a position and a velocity. You are a <i>rule for predictions</i>: you tell what outcomes anyone who asks you something (measures you) will get.'),
       A('See that golden hand turning around you? That is your <b>global phase</b>. It turns, but nobody in the world can measure it. Remember: <b>the global phase is unobservable, the relative phase is not</b>.'),
       A('There are 8 portals around the island. Behind each one a mentor is waiting — Euler, Stern, Bloch, Feynman, Dirac, Rabi, Bell and Bohr. They will teach you the <b>language</b>, the <b>symbols</b> and the <b>right pictures</b> of the quantum world.'),
+      A('Above the island circles <b>Ketvarr</b>, the quantum dragon. Each mentor will teach you one <b>Word of Power</b>. Once you have all eight, climb <b>Dragon’s Peak</b> in the north and defeat him.'),
       A('The goal is not to compute integrals. The goal is <b>intuition</b>: knowing what an amplitude is, what a probability is, what a measurement does and where classical analogies stop working.'),
       A('Controls: <b>WASD</b> move, <b>mouse drag</b> camera, <b>E</b> enter/talk, <b>C</b> Codex of symbols, <b>M</b> map, <b>H</b> help. Start with portal <b>1</b>!'),
       A('New to the quantum world? Switch the difficulty (top right) to <b>🫶 Layman</b> — I will explain everything in everyday words.'),
@@ -468,9 +522,10 @@ const Game = {
     const hover = this.mapHover && this.mapPortalAt(...this.mapHover);
     cv.style.cursor = hover && this.isUnlocked(hover.L.num) ? 'pointer' : '';
     g.clearRect(0, 0, W, H);
-    g.fillStyle = '#0d2347'; g.beginPath(); g.arc(cx, cy, 38 * s, 0, 7); g.fill();
-    g.fillStyle = '#2a3c66'; g.beginPath(); g.arc(cx, cy, 35 * s, 0, 7); g.fill();
-    g.font = `${Math.max(11, s * 1.6)}px system-ui`; g.textAlign = 'center';
+    g.fillStyle = '#1b2a33'; g.beginPath(); g.arc(cx, cy, 38 * s, 0, 7); g.fill();
+    g.fillStyle = '#4a4c42'; g.beginPath(); g.arc(cx, cy, 35 * s, 0, 7); g.fill();
+    g.fillStyle = '#26402c'; for (const pn of Hub.pines) { const [x, y] = P(pn.p); g.beginPath(); g.arc(x, y, s * 0.9, 0, 7); g.fill(); }
+    g.font = `${Math.max(11, s * 1.6)}px Cinzel, Georgia, serif`; g.textAlign = 'center';
     for (const pt of Hub.portals) {
       const [x, y] = P(pt.p), open = this.isUnlocked(pt.L.num), st = this.progress.stars[pt.L.num];
       g.fillStyle = open ? `rgb(${pt.L.color.map((c) => c * 255).join(',')})` : '#555';

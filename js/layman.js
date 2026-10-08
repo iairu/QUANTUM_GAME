@@ -97,6 +97,18 @@ const LAYMAN_STEPS = {
       'A cooperation game: Alice and Bob can’t talk, but they can share entangled pairs. With ordinary strategies they win <b>at most 75 %</b> of rounds, with entanglement <b>about 85 %</b>.'],
     ['Nakláňaj uhly meraní, kým neprekonáš 75 %.', 'Tilt the measurement angles until you beat 75 %.']],
   },
+  9: {
+    intro: [['Finále! Drak Ketvarr má <b>štít, ktorý je qubit</b> — šípka v guli vpravo. Tvoj meč je <b>meranie</b>: udrieš a buď zasiahneš, alebo nie.',
+      'The finale! The dragon Ketvarr has <b>a ward that is a qubit</b> — the arrow in the ball on the right. Your sword is <b>measurement</b>: you strike and either hit or miss.'],
+    ['Šanca na zásah je tým väčšia, čím <b>bližšie mieri šípka štítu k zlatej šípke</b>. Bojuje sa na ťahy: ty jedno slovo (otočenie šípky), potom drak jeden ťah, ktorý ti <b>vopred prezradí</b>.',
+      'The chance of a hit grows the <b>closer the ward’s arrow points to the golden arrow</b>. It’s turn-based: you say one word (a turn of the arrow), then the dragon makes one move, which he <b>announces in advance</b>.']],
+    phase1: [['Čísla na tlačidlách ukazujú <b>šancu na zásah v ďalšom ťahu</b> — už aj s drakovým ťahom. Stačí vyberať to, čo je zelené, a potom udrieť.',
+      'The numbers on the buttons show <b>the chance of a hit next turn</b> — already including the dragon’s move. Just pick whatever is green, then strike.']],
+    phase2: [['Drak teraz fúka <b>hmlu</b>, ktorá šípku na rovníku skracuje — kratšia šípka = horšia muška. Na póloch hmla neškodí. Nový posuvník θ určuje, o koľko šípku otočíš.',
+      'Now the dragon blows <b>fog</b> that shortens the arrow on the equator — a shorter arrow = worse aim. At the poles the fog does no harm. The new slider θ sets how far you turn the arrow.']],
+    phase3: [['Zlatá šípka (srdce draka) je naklonená a drak ju presúva. Posuvníkmi θ a φ nastavuj, kým tlačidlo impulzu nezozelenie — potom ho vykríkni a v ďalšom ťahu udri.',
+      'The golden arrow (the dragon’s heart) is tilted and the dragon moves it. Adjust the θ and φ sliders until the pulse button turns green — then shout it and strike next turn.']],
+  },
   8: {
     intro: [['Žiadne gombíky — tento level je o tom, <b>čo teória znamená</b>. Fyzici sa zhodnú na výpočtoch aj predpovediach, ale dodnes sa hádajú, čo sa „naozaj“ deje.',
       'No more knobs — this level is about <b>what the theory means</b>. Physicists agree on the maths and the predictions but still argue about what is “really” going on.']],
@@ -261,6 +273,7 @@ const LAYMAN_LEVEL_TIPS = tr({
   6: 'Magnetická rezonancia: rádiom preklápame qubity — ako prvé kvantové počítače.',
   7: 'Prepojené qubity a hra, ktorú s nimi vyhráš častejšie.',
   8: 'Čo to celé vlastne znamená? Rozhovory s mysliteľmi.',
+  9: '🐉 Súboj s drakom: natoč šípku jeho štítu k zlatej a udri.',
 }, {
   1: 'Arrows on answers: length = chance, direction = timing. How arrows team up or cancel.',
   2: 'Atoms as tiny magnets: always just “up” or “down” — the first qubit.',
@@ -270,6 +283,7 @@ const LAYMAN_LEVEL_TIPS = tr({
   6: 'Magnetic resonance: flipping qubits with radio — like the first quantum computers.',
   7: 'Linked qubits and a game you win more often with them.',
   8: 'What does it all mean? Conversations with thinkers.',
+  9: '🐉 The dragon battle: turn his ward’s arrow towards the golden one and strike.',
 });
 
 // úvod sprievodkyne bežnou rečou (zobrazí sa pri prvom stretnutí v laickej obťažnosti alebo po jej zapnutí)
@@ -278,6 +292,7 @@ const LAYMAN_INTRO = tr([
   'Obyčajné počítače používajú <b>bity</b>: každý je 0 alebo 1. Kvantové počítače používajú <b>qubity</b>: kým sa na qubit nepozrieš, môže byť <b>prelínaním 0 aj 1</b>.',
   'Ty si <b>Psíčko (ψ)</b> — stav qubitu. Nie si guľôčka, ale <b>recept na šance</b>: hovoríš, aké odpovede dostane ten, kto sa na teba pozrie.',
   'Trik kvantových počítačov: každá možná odpoveď nesie <b>malú šípku</b>. Šípky sa môžu <b>navzájom vyrušiť</b>. Dobrý kvantový program zariadi, aby sa zlé odpovede vyrušili a správna posilnila.',
+  'Nad ostrovom krúži <b>Ketvarr, kvantový drak</b>. Každý mentor ťa naučí jedno slovo moci; s ôsmimi ho porazíš na Dračom štíte.',
   'Na ostrove je 8 portálov a za každým mentor. Pred každou úlohou ti ju najprv <b>vysvetlím po ľudsky</b>. Odborné slová majú <b>preklad v zátvorke</b> a po prejdení myšou jednoduchú vysvetlivku.',
   'Ovládanie: <b>WASD</b> pohyb, <b>ťahanie myšou</b> kamera, <b>E</b> vstúpiť/hovoriť, <b>M</b> mapa. Začni portálom <b>1</b>!',
   'Keď sa budeš cítiť istejšie, vpravo hore môžeš kedykoľvek prepnúť na ťažšiu obťažnosť s odbornejším jazykom.',
@@ -286,6 +301,7 @@ const LAYMAN_INTRO = tr([
   'Ordinary computers use <b>bits</b>: each is 0 or 1. Quantum computers use <b>qubits</b>: until you look at one, a qubit can be <b>a blend of 0 and 1</b>.',
   'You are <b>Little Psi (ψ)</b> — the state of a qubit. You are not a little ball but <b>a recipe for chances</b>: you say what answers anyone who looks at you will get.',
   'The trick of quantum computers: every possible answer carries <b>a little arrow</b>. Arrows can <b>cancel each other out</b>. A good quantum program makes the wrong answers cancel and the right one grow.',
+  'Above the island circles <b>Ketvarr, the quantum dragon</b>. Each mentor teaches you one Word of Power; with all eight you will defeat him on Dragon’s Peak.',
   'There are 8 portals on the island, each with a mentor. Before every task I will first <b>explain it in plain words</b>. Technical words get <b>a translation in brackets</b> and a simple explanation when you hover them.',
   'Controls: <b>WASD</b> move, <b>mouse drag</b> camera, <b>E</b> enter/talk, <b>M</b> map. Start with portal <b>1</b>!',
   'Once you feel more confident, you can switch to a harder difficulty with more technical language at any time (top right).',

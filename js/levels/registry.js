@@ -9,4 +9,5 @@ const LEVELS = [
   { num: 6, title: tr('Rabiho rezonátor (NMR)', 'Rabi’s Resonator (NMR)'), mentor: 'I. I. Rabi', face: '📻', color: [1, 0.8, 0.3], cls: L6Rabi },
   { num: 7, title: tr('Bellov most', 'Bell’s Bridge'), mentor: 'John Bell', face: '🔔', color: [1, 0.45, 0.7], cls: L7Bell },
   { num: 8, title: tr('Sieň výkladov', 'Hall of Interpretations'), mentor: 'Niels Bohr', face: '☯', color: [0.6, 0.9, 0.4], cls: L8Philo },
+  { num: 9, title: tr('Dračí štít', 'Dragon’s Peak'), mentor: 'Erwin Schrödinger', face: '🐱', color: [1, 0.42, 0.15], cls: L9Dragon, boss: true },
 ];

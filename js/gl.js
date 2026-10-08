@@ -4,38 +4,81 @@
 const VS = `#version 300 es
 in vec3 aPos; in vec3 aNor;
 uniform mat4 uModel, uView, uProj;
-out vec3 vNor; out vec3 vWorld;
+out vec3 vNor; out vec3 vWorld; out vec3 vObj;
 void main() {
   vec4 w = uModel * vec4(aPos, 1.0);
-  vWorld = w.xyz;
+  vWorld = w.xyz; vObj = aPos;
   vNor = mat3(transpose(inverse(uModel))) * aNor;
   gl_Position = uProj * uView * w;
 }`;
 
 const FS = `#version 300 es
 precision highp float;
-in vec3 vNor; in vec3 vWorld;
+in vec3 vNor; in vec3 vWorld; in vec3 vObj;
 uniform vec4 uColor; uniform vec3 uCam; uniform vec3 uLight;
 uniform float uUnlit, uEmissive, uPattern, uFog, uTime;
 uniform vec3 uFogColor;
 out vec4 o;
+// procedurálny šum pre severské textúry (sneh, kameň, drevo, šupiny)
+float h21(vec2 p) { p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }
+float vnoise(vec2 p) {
+  vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
+  return mix(mix(h21(i), h21(i + vec2(1, 0)), f.x), mix(h21(i + vec2(0, 1)), h21(i + vec2(1, 1)), f.x), f.y);
+}
+float fbm(vec2 p) { float s = 0.0, a = 0.5; for (int i = 0; i < 5; i++) { s += a * vnoise(p); p = p * 2.03 + 17.0; a *= 0.5; } return s; }
+// rovina podľa dominantnej osi normály (lacné „triplanárne“ mapovanie)
+vec2 plane(vec3 p, vec3 n) { vec3 a = abs(n); return a.y > max(a.x, a.z) ? p.xz : (a.x > a.z ? p.zy : p.xy); }
+const vec3 SNOW = vec3(0.86, 0.9, 0.96);
 void main() {
   vec3 base = uColor.rgb;
+  vec3 n = normalize(vNor); if (!gl_FrontFacing) n = -n;
+  float matte = 1.0;
   if (uPattern > 0.5 && uPattern < 1.5) {          // mriežka na zemi
     vec2 g = abs(fract(vWorld.xz / 2.0) - 0.5);
     float line = smoothstep(0.46, 0.5, max(g.x, g.y));
     base = mix(base, base * 1.4 + 0.04, line * 0.55);
-  } else if (uPattern > 1.5) {                     // vlniaca sa voda
-    float w = sin(vWorld.x * 0.35 + uTime) * sin(vWorld.z * 0.31 - uTime * 0.8);
-    base *= 0.9 + 0.12 * w;
+  } else if (uPattern > 1.5 && uPattern < 2.5) {   // studené more
+    float w = sin(vWorld.x * 0.35 + uTime) * sin(vWorld.z * 0.31 - uTime * 0.8) + fbm(vWorld.xz * 0.25 + uTime * 0.15) - 0.5;
+    base *= 0.88 + 0.14 * w;
+  } else if (uPattern > 2.5 && uPattern < 3.5) {   // tundra so snehom
+    float f = fbm(vWorld.xz * 0.12), d = fbm(vWorld.xz * 1.7);
+    vec3 grass = mix(base * 0.8, base * vec3(1.15, 1.05, 0.8), d);
+    float snow = smoothstep(0.48, 0.62, f + 0.12 * d);
+    base = mix(grass, SNOW * (0.92 + 0.08 * d), snow);
+    base = mix(base, vec3(0.36, 0.35, 0.33), smoothstep(0.62, 0.7, fbm(vWorld.xz * 0.4 + 9.0)) * (1.0 - snow) * 0.6); // kamene
+    matte = 0.3;
+  } else if (uPattern > 3.5 && uPattern < 4.5) {   // kameň (svet), sneh na vrchných plochách
+    vec2 q = plane(vWorld, n) * 1.3;
+    float f = fbm(q), big = fbm(q * 0.23 + 3.0), r = 1.0 - abs(2.0 * vnoise(q * 1.7) - 1.0);
+    base *= (0.68 + 0.45 * f) * (0.82 + 0.36 * big);
+    base *= mix(1.0, 0.72, smoothstep(0.95, 0.995, r));
+    base = mix(base, SNOW, smoothstep(0.55, 0.85, n.y + 0.25 * (f - 0.5)) * 0.85);
+    matte = 0.25;
+  } else if (uPattern > 4.5 && uPattern < 5.5) {   // drevo (objekt)
+    vec2 q = plane(vObj, n);
+    float g = sin(q.y * 40.0 + fbm(q * vec2(3.0, 18.0)) * 6.0);
+    base *= 0.78 + 0.16 * g + 0.1 * fbm(q * 9.0);
+    matte = 0.3;
+  } else if (uPattern > 5.5 && uPattern < 6.5) {   // dračie šupiny (objekt)
+    vec2 q = vec2(atan(vObj.z, vObj.x) * 3.0, vObj.y * 9.0);
+    q.x += 0.5 * mod(floor(q.y), 2.0);
+    vec2 c = fract(q) - vec2(0.5, 0.2);
+    float sc = smoothstep(0.55, 0.15, length(c * vec2(1.0, 1.4)));
+    base *= 0.55 + 0.6 * sc + 0.15 * vnoise(q * 3.0);
+    matte = 0.8;
+  } else if (uPattern > 6.5) {                     // ihličie s poprašeným snehom (objekt)
+    float f = fbm(vObj.xz * 6.0 + vObj.y * 4.0);
+    base *= 0.7 + 0.6 * f;
+    base = mix(base, SNOW, smoothstep(0.55, 0.9, n.y) * smoothstep(0.45, 0.7, f) * 0.8);
+    matte = 0.2;
   }
   if (uUnlit > 0.5) { o = vec4(base, uColor.a); return; }
-  vec3 n = normalize(vNor); if (!gl_FrontFacing) n = -n;
   vec3 l = normalize(uLight), v = normalize(uCam - vWorld), h = normalize(l + v);
-  float d = max(dot(n, l), 0.0), amb = 0.38 + 0.14 * n.y;
-  float spec = pow(max(dot(n, h), 0.0), 48.0) * 0.45;
+  float d = max(dot(n, l), 0.0);
+  vec3 amb = mix(vec3(0.3, 0.28, 0.26), vec3(0.42, 0.47, 0.56), n.y * 0.5 + 0.5); // zem vs. studená obloha
+  float spec = pow(max(dot(n, h), 0.0), 48.0) * 0.45 * matte;
   float rim = pow(1.0 - max(dot(n, v), 0.0), 3.0) * 0.35;
-  vec3 c = base * (amb + 0.72 * d) + vec3(spec) + base * rim + base * uEmissive;
+  vec3 c = base * (amb + 0.72 * d * vec3(1.0, 0.95, 0.86)) + vec3(spec) + base * rim + base * uEmissive;
   if (uFog > 0.0) c = mix(c, uFogColor, clamp(1.0 - exp(-uFog * length(uCam - vWorld)), 0.0, 0.8));
   o = vec4(c, uColor.a);
 }`;

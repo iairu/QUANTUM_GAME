@@ -61,6 +61,8 @@ const M4 = {
     m[12] = p[0]; m[13] = p[1]; m[14] = p[2]; m[15] = 1;
     return m;
   },
+  rotX(t) { const m = M4.ident(), c = Math.cos(t), n = Math.sin(t); m[5] = c; m[6] = n; m[9] = -n; m[10] = c; return m; },
+  rotZ(t) { const m = M4.ident(), c = Math.cos(t), n = Math.sin(t); m[0] = c; m[1] = n; m[4] = -n; m[5] = c; return m; },
   // matica, ktorá otočí rovinu xz tak, aby jej normála (os y) mala smer d
   orient(p, d, s) { return M4.alignY(p, d, s, s); },
   transform(m, v) {
