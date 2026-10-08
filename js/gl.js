@@ -16,7 +16,7 @@ const FS = `#version 300 es
 precision highp float;
 in vec3 vNor; in vec3 vWorld; in vec3 vObj;
 uniform vec4 uColor; uniform vec3 uCam; uniform vec3 uLight;
-uniform float uUnlit, uEmissive, uPattern, uFog, uTime;
+uniform float uUnlit, uEmissive, uPattern, uFog, uTime, uDetail;
 uniform vec3 uFogColor;
 out vec4 o;
 // procedurálny šum pre severské textúry (sneh, kameň, drevo, šupiny)
@@ -25,14 +25,31 @@ float vnoise(vec2 p) {
   vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
   return mix(mix(h21(i), h21(i + vec2(1, 0)), f.x), mix(h21(i + vec2(0, 1)), h21(i + vec2(1, 1)), f.x), f.y);
 }
-float fbm(vec2 p) { float s = 0.0, a = 0.5; for (int i = 0; i < 5; i++) { s += a * vnoise(p); p = p * 2.03 + 17.0; a *= 0.5; } return s; }
+// uDetail = 1: vysoké rozlíšenie textúr (viac oktáv, jemné detaily, reliéf); 0 = pôvodné lacné textúry
+float fbm(vec2 p) {
+  int oct = uDetail > 0.5 ? 8 : 5;
+  float s = 0.0, a = 0.5;
+  for (int i = 0; i < 8; i++) { if (i >= oct) break; s += a * vnoise(p); p = p * 2.03 + 17.0; a *= 0.5; }
+  return s;
+}
+// jemný detail zmizne tam, kde by sa zlieval do šumu (ďaleko / šikmo)
+float lod(vec2 p) { vec2 w = fwidth(p); return 1.0 - smoothstep(0.25, 0.9, max(w.x, w.y)); }
+// reliéf bez UV (Mikkelsen 2010): normála sa nakloní podľa gradientu výšky h v obrazovke
+vec3 bump(vec3 n, float h, float k) {
+  vec3 dpdx = dFdx(vWorld), dpdy = dFdy(vWorld);
+  vec3 r1 = cross(dpdy, n), r2 = cross(n, dpdx);
+  float det = dot(dpdx, r1);
+  vec3 g = sign(det) * (dFdx(h) * r1 + dFdy(h) * r2);
+  return normalize(abs(det) * n - k * g);
+}
 // rovina podľa dominantnej osi normály (lacné „triplanárne“ mapovanie)
 vec2 plane(vec3 p, vec3 n) { vec3 a = abs(n); return a.y > max(a.x, a.z) ? p.xz : (a.x > a.z ? p.zy : p.xy); }
 const vec3 SNOW = vec3(0.86, 0.9, 0.96);
 void main() {
   vec3 base = uColor.rgb;
   vec3 n = normalize(vNor); if (!gl_FrontFacing) n = -n;
-  float matte = 1.0;
+  float matte = 1.0, hgt = 0.0, bk = 0.0, sparkle = 0.0;
+  bool hi = uDetail > 0.5;
   if (uPattern > 0.5 && uPattern < 1.5) {          // mriežka na zemi
     vec2 g = abs(fract(vWorld.xz / 2.0) - 0.5);
     float line = smoothstep(0.46, 0.5, max(g.x, g.y));
@@ -40,25 +57,43 @@ void main() {
   } else if (uPattern > 1.5 && uPattern < 2.5) {   // studené more
     float w = sin(vWorld.x * 0.35 + uTime) * sin(vWorld.z * 0.31 - uTime * 0.8) + fbm(vWorld.xz * 0.25 + uTime * 0.15) - 0.5;
     base *= 0.88 + 0.14 * w;
+    if (hi) { hgt = fbm(vWorld.xz * 0.6 + vec2(uTime * 0.2, -uTime * 0.13)); bk = 0.35; }
   } else if (uPattern > 2.5 && uPattern < 3.5) {   // tundra so snehom
     float f = fbm(vWorld.xz * 0.12), d = fbm(vWorld.xz * 1.7);
     vec3 grass = mix(base * 0.8, base * vec3(1.15, 1.05, 0.8), d);
     float snow = smoothstep(0.48, 0.62, f + 0.12 * d);
     base = mix(grass, SNOW * (0.92 + 0.08 * d), snow);
-    base = mix(base, vec3(0.36, 0.35, 0.33), smoothstep(0.62, 0.7, fbm(vWorld.xz * 0.4 + 9.0)) * (1.0 - snow) * 0.6); // kamene
+    float rock = smoothstep(0.62, 0.7, fbm(vWorld.xz * 0.4 + 9.0)) * (1.0 - snow);
+    base = mix(base, vec3(0.36, 0.35, 0.33), rock * 0.6); // kamene
     matte = 0.3;
+    if (hi) {
+      vec2 gp = vWorld.xz * 38.0; float m = fbm(vWorld.xz * 9.0), g = mix(0.5, vnoise(gp), lod(gp));
+      base *= mix(0.86 + 0.28 * m * (0.7 + 0.6 * g), 0.95 + 0.08 * m, snow); // tráva / jemné zrno snehu
+      base = mix(base, base * vec3(1.12, 0.95, 0.7), smoothstep(0.55, 0.75, fbm(vWorld.xz * 0.9 + 4.0)) * (1.0 - snow) * 0.5); // suchá tráva
+      hgt = f * 0.6 + d * 0.3 + m * 0.18 + rock * 0.4; bk = 0.07;
+      sparkle = snow * step(0.992, h21(floor(vWorld.xz * 45.0))) * lod(vWorld.xz * 45.0);
+    }
   } else if (uPattern > 3.5 && uPattern < 4.5) {   // kameň (svet), sneh na vrchných plochách
     vec2 q = plane(vWorld, n) * 1.3;
     float f = fbm(q), big = fbm(q * 0.23 + 3.0), r = 1.0 - abs(2.0 * vnoise(q * 1.7) - 1.0);
     base *= (0.68 + 0.45 * f) * (0.82 + 0.36 * big);
     base *= mix(1.0, 0.72, smoothstep(0.95, 0.995, r));
-    base = mix(base, SNOW, smoothstep(0.55, 0.85, n.y + 0.25 * (f - 0.5)) * 0.85);
+    float cover = smoothstep(0.55, 0.85, n.y + 0.25 * (f - 0.5));
+    base = mix(base, SNOW, cover * 0.85);
     matte = 0.25;
+    if (hi) {
+      float m = fbm(q * 7.0), l = smoothstep(0.6, 0.72, fbm(q * 0.7 + 5.0)) * (1.0 - cover);
+      base *= 0.84 + 0.3 * m;
+      base = mix(base, vec3(0.5, 0.52, 0.32) * (0.8 + 0.4 * m), l * 0.45); // lišajník
+      hgt = f * 0.8 + m * 0.25 - smoothstep(0.95, 0.995, r) * 0.35; bk = 0.12;
+      sparkle = cover * step(0.993, h21(floor(q * 30.0))) * lod(q * 30.0);
+    }
   } else if (uPattern > 4.5 && uPattern < 5.5) {   // drevo (objekt)
     vec2 q = plane(vObj, n);
     float g = sin(q.y * 40.0 + fbm(q * vec2(3.0, 18.0)) * 6.0);
     base *= 0.78 + 0.16 * g + 0.1 * fbm(q * 9.0);
     matte = 0.3;
+    if (hi) { float gr = fbm(q * vec2(2.0, 60.0)); base *= 0.86 + 0.26 * gr; hgt = gr * 0.5 + g * 0.1; bk = 0.03; }
   } else if (uPattern > 5.5 && uPattern < 6.5) {   // dračie šupiny (objekt)
     vec2 q = vec2(atan(vObj.z, vObj.x) * 3.0, vObj.y * 9.0);
     q.x += 0.5 * mod(floor(q.y), 2.0);
@@ -66,19 +101,34 @@ void main() {
     float sc = smoothstep(0.55, 0.15, length(c * vec2(1.0, 1.4)));
     base *= 0.55 + 0.6 * sc + 0.15 * vnoise(q * 3.0);
     matte = 0.8;
+    if (hi) {
+      float e = smoothstep(0.2, 0.05, abs(length(c * vec2(1.0, 1.4)) - 0.42)); // tmavý okraj šupiny
+      base *= 1.0 - 0.35 * e;
+      base += vec3(0.08, 0.04, 0.0) * sc * vnoise(q * 11.0);
+      hgt = sc * 0.6 + fbm(q * 6.0) * 0.1; bk = 0.06;
+    }
   } else if (uPattern > 6.5) {                     // ihličie s poprašeným snehom (objekt)
     float f = fbm(vObj.xz * 6.0 + vObj.y * 4.0);
     base *= 0.7 + 0.6 * f;
-    base = mix(base, SNOW, smoothstep(0.55, 0.9, n.y) * smoothstep(0.45, 0.7, f) * 0.8);
+    float cover = smoothstep(0.55, 0.9, n.y) * smoothstep(0.45, 0.7, f);
+    base = mix(base, SNOW, cover * 0.8);
     matte = 0.2;
+    if (hi) {
+      vec2 np = vec2(atan(vObj.z, vObj.x) * 24.0, vObj.y * 50.0); float nd = mix(0.5, vnoise(np), lod(np)); // ihličie
+      base *= 0.8 + 0.4 * nd;
+      hgt = nd * 0.4 + f * 0.3; bk = 0.03;
+      sparkle = cover * step(0.99, h21(floor(vObj.xz * 60.0 + vObj.y * 30.0))) * lod(vObj.xz * 60.0);
+    }
   }
   if (uUnlit > 0.5) { o = vec4(base, uColor.a); return; }
+  if (bk > 0.0) n = bump(n, hgt, bk);
   vec3 l = normalize(uLight), v = normalize(uCam - vWorld), h = normalize(l + v);
   float d = max(dot(n, l), 0.0);
   vec3 amb = mix(vec3(0.3, 0.28, 0.26), vec3(0.42, 0.47, 0.56), n.y * 0.5 + 0.5); // zem vs. studená obloha
   float spec = pow(max(dot(n, h), 0.0), 48.0) * 0.45 * matte;
   float rim = pow(1.0 - max(dot(n, v), 0.0), 3.0) * 0.35;
   vec3 c = base * (amb + 0.72 * d * vec3(1.0, 0.95, 0.86)) + vec3(spec) + base * rim + base * uEmissive;
+  if (sparkle > 0.0) c += vec3(0.9, 0.95, 1.0) * sparkle * (0.4 + 0.6 * sin(uTime * 3.0 + dot(vWorld, vec3(13.0, 7.0, 11.0))) * 0.5 + 0.3); // trblietanie snehu
   if (uFog > 0.0) c = mix(c, uFogColor, clamp(1.0 - exp(-uFog * length(uCam - vWorld)), 0.0, 0.8));
   o = vec4(c, uColor.a);
 }`;
@@ -89,8 +139,9 @@ class Renderer {
     if (!gl) throw new Error(tr('WebGL2 nie je dostupné', 'WebGL2 is not available'));
     this.gl = gl; this.canvas = canvas;
     this.prog = this.program(VS, FS);
+    try { const ext = gl.getExtension('WEBGL_debug_renderer_info'); Settings.gpuName = ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER); } catch (e) { /* neznáme GPU */ }
     this.loc = {};
-    for (const n of ['uModel', 'uView', 'uProj', 'uColor', 'uCam', 'uLight', 'uUnlit', 'uEmissive', 'uPattern', 'uFog', 'uFogColor', 'uTime'])
+    for (const n of ['uModel', 'uView', 'uProj', 'uColor', 'uCam', 'uLight', 'uUnlit', 'uEmissive', 'uPattern', 'uFog', 'uFogColor', 'uTime', 'uDetail'])
       this.loc[n] = gl.getUniformLocation(this.prog, n);
     this.aPos = gl.getAttribLocation(this.prog, 'aPos');
     this.aNor = gl.getAttribLocation(this.prog, 'aNor');
@@ -270,6 +321,7 @@ class Renderer {
     gl.uniform1f(this.loc.uFog, this.fog);
     gl.uniform3fv(this.loc.uFogColor, this.fogColor);
     gl.uniform1f(this.loc.uTime, this.time);
+    gl.uniform1f(this.loc.uDetail, Settings.texHigh ? 1 : 0);
   }
 
   // o: { emissive, unlit, pattern, alpha }

@@ -257,12 +257,14 @@ class L9Dragon extends Level {
     const [ax, ang] = this.toolRot(tool), word = tool === 'pulse' ? 'RABI-RA' : SHOUTS[tool].word;
     this.addLog(`🗣 <b>${word}!</b> ${tool === 'pulse' ? `(θ = ${this.thetaDeg}°)` : `(${tool})`}`);
     this.shout = { word, t: 0 };
+    Sound.sfx('shout');
     this.animate({ axis: ax, ang }, () => this.dragonTurn());
   }
 
   strike() {
     const p = this.hitP(), hit = rand() < p, aimed = p >= this.thr - 1e-9;
     this.fx.push({ kind: 'slash', t: 0, hit: hit && aimed });
+    Sound.sfx(hit && aimed ? 'clang' : hit ? 'glance' : 'whiff');
     if (!aimed) this.mistakes++;
     if (hit && aimed) {
       this.dhp--;
@@ -275,7 +277,7 @@ class L9Dragon extends Level {
       if (this.dhp <= 0) return this.phaseWon();
       if (!(hit && aimed)) return this.dragonTurn();
       // zranený drak si štít prekuje: nový náhodný čistý stav (inak by stačilo udierať znova a znova)
-      this.addLog(`🛡 ${tr('Ketvarr prekoval štít', 'Ketvarr reforges his ward')}`);
+      this.addLog(`🛡 ${tr('Ketvarr prekoval štít', 'Ketvarr reforges his ward')}`); Sound.sfx('rune');
       const a = rand() * Math.PI * 2, z = this.phase === 0 ? 0 : rand() * 1.4 - 0.7, s = Math.sqrt(1 - z * z);
       this.animate({ to: [Math.cos(a) * s, Math.sin(a) * s, z], slerp: true }, () => this.dragonTurn(), 0.6);
     }, 0.45);
@@ -286,7 +288,7 @@ class L9Dragon extends Level {
     this.addLog(`🐉 ${D.icon} ${D.name}`);
     const done = () => {
       // oheň
-      this.hp--; this.fx.push({ kind: 'fire', t: 0 });
+      this.hp--; this.fx.push({ kind: 'fire', t: 0 }); Sound.sfx('fire');
       this.addLog(`🔥 ${tr('Ketvarr chrlí oheň', 'Ketvarr breathes fire')} (−1 ❤)`);
       if (this.hp <= 0) return this.defeated();
       this.tele = this.pickMove(); this.lock = false; this.buildPanel();
@@ -296,7 +298,7 @@ class L9Dragon extends Level {
   }
 
   phaseWon() {
-    UI.panelHide(); this.anim = null;
+    UI.panelHide(); this.anim = null; Sound.sfx('roar');
     const k = this.phase;
     const msg = tr([
       ['Ketvarr zareve a jeho kamenné šupiny popraskajú! „Póly… ty si stál na póloch, kde mi fáza nič nezmôže!“', 'Výborne. Rotácie okolo z menia len fázu — na pólach |0⟩, |1⟩ sú neškodné.'],

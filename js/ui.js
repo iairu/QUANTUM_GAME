@@ -22,6 +22,7 @@ const UI = {
       ['#btn-views', '👁', tr('Pohľady: ten istý stav ako obrázky — ručičky, Blochove rezy, bázy, matica ρ (V)', 'Views: the same state as pictures — hands, Bloch cuts, bases, ρ matrix (V)')],
       ['#btn-settings', '⚙', tr('Nastavenia: vizualizácie a geometria (O)', 'Settings: visualizations and geometry (O)')],
       ['#btn-help', '❔', tr('Pomoc (H)', 'Help (H)')],
+      ['#btn-sound', Settings.audio.muted ? '🔇' : '🔊', tr('Hudba a zvuky: zapnúť / stlmiť (N). Hlasitosť nájdeš v nastaveniach.', 'Music and sounds: on / mute (N). Volume is in the settings.')],
     ]) { $(id).textContent = text; $(id).title = title; }
     const ls = $('#lang-select');
     ls.value = LANG;
@@ -53,6 +54,7 @@ const UI = {
     $('#btn-codex').onclick = () => this.toggleCodex();
     $('#btn-map').onclick = () => Game.toggleMap();
     $('#btn-help').onclick = () => this.toggleHelp();
+    $('#btn-sound').onclick = () => Sound.toggleMute();
     $('#btn-hub').onclick = () => Game.backToHub();
     $('#btn-log').onclick = () => this.toggleLog();
     $('#codex .close').onclick = () => this.toggleCodex(false);
@@ -134,6 +136,7 @@ const UI = {
     $('#hud-quest').className = Settings.diff + (Settings.layman ? ' easy' : '');
   },
   toast(html, ms = 2600) {
+    Sound.sfx('toast');
     const t = el('div', 'toast', html);
     $('#toasts').appendChild(t);
     setTimeout(() => t.classList.add('out'), ms);
@@ -149,6 +152,7 @@ const UI = {
   },
   toggleLog(force) {
     const j = $('#journal'), show = force ?? !j.classList.contains('show');
+    if (show !== j.classList.contains('show')) Sound.sfx(show ? 'journal' : 'close');
     j.classList.toggle('show', show);
     if (show) this.renderLog();
   },
@@ -191,8 +195,10 @@ const UI = {
     lines = TextMode.lines(orig);
     let i = 0;
     this.busy = true;
+    let opened = false;
     const show = () => {
       const l = lines[i];
+      Sound.sfx(l.cls === 'scroll' ? 'scroll' : !opened ? 'dialog' : 'page'); opened = true;
       this.dialog.innerHTML = '';
       this.dialog.appendChild(el('div', 'who', (l.face || '💬') + ' ' + (l.who || '') + (opts.replay ? ` <small>(${tr('opakovanie', 'replay')})</small>` : '')));
       this.dialog.appendChild(el('div', 'txt', l.raw ? l.text : TextMode.render(l.text)));
@@ -231,6 +237,7 @@ const UI = {
     this.busy = true;
     this._next = null; this._prev = null;
     this.dialog.innerHTML = '';
+    Sound.sfx('dialog');
     this.dialog.appendChild(el('div', 'who', (q.face || '❓') + ' ' + (q.who || tr('Otázka', 'Question'))));
     this.dialog.appendChild(el('div', 'txt', annotate(q.q, true)));
     const box = el('div', 'choices');
@@ -246,6 +253,7 @@ const UI = {
       b.dataset.ok = i === q.correct ? '1' : '0';
       b.onclick = () => {
         const ok = i === q.correct;
+        Sound.sfx(ok ? 'good' : 'bad');
         this.record({ kind: 'quiz', q: q.q, answer: q.options[q.correct], why: q.why, ok });
         [...box.children].forEach((c) => (c.disabled = true));
         b.classList.add(ok ? 'good' : 'bad');
@@ -380,6 +388,7 @@ const UI = {
   // ---------- nastavenia ----------
   toggleSettings(force) {
     const o = $('#settings'), show = force ?? !o.classList.contains('show');
+    if (show !== o.classList.contains('show')) Sound.sfx(show ? 'page' : 'close');
     o.classList.toggle('show', show);
     if (show) this.renderSettings();
   },
@@ -407,6 +416,28 @@ const UI = {
       ['charts', tr('grafy v paneli levelu (teória vs. meranie)', 'charts in the level panel (theory vs. measurement)'), tr('Zmena sa prejaví pri ďalšom otvorení panelu.', 'Takes effect the next time a panel opens.')],
     ]) g1.appendChild(this.checkbox(label, V[k], (v) => { V[k] = v; ch(); }, tip));
     body.appendChild(g1);
+    body.appendChild(el('h3', null, tr('🎵 Hudba a zvuky', '🎵 Music and sounds')));
+    const A = Settings.audio, ga = el('div', 'grid2'), chA = () => { Settings.save(); Sound.apply(); };
+    ga.append(
+      this.slider(tr('hlasitosť hudby (pokojná, pre sústredenie)', 'music volume (calm, for focus)'), 0, 1, 0.05, A.music, (v) => { A.music = v; chA(); return v ? Math.round(v * 100) + ' %' : tr('vypnutá', 'off'); }),
+      this.slider(tr('hlasitosť zvukových efektov', 'sound effects volume'), 0, 1, 0.05, A.sfx, (v) => { A.sfx = v; chA(); return v ? Math.round(v * 100) + ' %' : tr('vypnuté', 'off'); }),
+      this.checkbox(tr('stlmiť všetko (N)', 'mute everything (N)'), A.muted, (v) => { A.muted = v; Sound.init(); chA(); Sound.muteUi(); }),
+    );
+    body.appendChild(ga);
+    body.appendChild(el('h3', null, tr('🖼 Textúry', '🖼 Textures')));
+    const tx = el('div', 'diffs');
+    for (const [k, name, desc] of [
+      ['auto', tr('automaticky', 'automatic'), tr(`podľa výkonu počítača — teraz: ${Settings.view.tex === 'auto' && Settings.texHigh ? 'vysoké' : 'pôvodné'}`, `by computer performance — now: ${Settings.view.tex === 'auto' && Settings.texHigh ? 'high' : 'original'}`)],
+      ['low', tr('pôvodné', 'original'), tr('lacné procedurálne textúry, vhodné pre slabšie počítače a notebooky', 'cheap procedural textures, suited to weaker computers and laptops')],
+      ['high', tr('vysoké rozlíšenie', 'high resolution'), tr('viac detailov, reliéf kameňa a snehu, lišajník, trblietanie snehu — náročnejšie na grafiku', 'more detail, relief on stone and snow, lichen, snow sparkle — heavier on the graphics card')],
+    ]) {
+      const l = el('label'), r = el('input');
+      r.type = 'radio'; r.name = 'tex'; r.checked = Settings.view.tex === k;
+      r.onchange = () => { Settings.view.tex = k; ch(); this.renderSettings(); };
+      l.append(r, el('b', null, name), el('small', null, desc));
+      tx.appendChild(l);
+    }
+    body.appendChild(tx);
     body.appendChild(el('h3', null, tr('📐 Geometria zobrazenia', '📐 View geometry')));
     const g2 = el('div', 'grid2');
     const deg = (v) => Math.round(v * 180 / Math.PI) + '°';
@@ -424,6 +455,7 @@ const UI = {
   // ---------- kódex ----------
   toggleCodex(force) {
     const c = $('#codex'), show = force ?? !c.classList.contains('show');
+    if (show !== c.classList.contains('show')) Sound.sfx(show ? 'codex' : 'close');
     c.classList.toggle('show', show);
     if (show) this.renderCodex();
   },
@@ -459,7 +491,11 @@ const UI = {
       list.appendChild(card);
     }
   },
-  toggleHelp(force) { const h = $('#help'); h.classList.toggle('show', force ?? !h.classList.contains('show')); },
+  toggleHelp(force) {
+    const h = $('#help'), show = force ?? !h.classList.contains('show');
+    if (show !== h.classList.contains('show')) Sound.sfx(show ? 'page' : 'close');
+    h.classList.toggle('show', show);
+  },
 };
 
 // vysvetlivky k posuvníkom

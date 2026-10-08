@@ -20,6 +20,12 @@ Texty sú v kóde ako `tr('slovensky', 'English')` (`js/i18n.js`); väčšie tab
 - **Metrika:** draka zraní len úder s P(zásah) ≥ prah (ľahká/laická 80 %, normálna 90 %, ťažká 95 %). Tlačidlá ukazujú P(zásah) v ďalšom ťahu už aj s drakovým ťahom; po zranení drak štít prekuje. Na záver 3 otázky o tom, *prečo* si vyhral.
 - Severský vzhľad: procedurálne textúry v shaderi (tundra so snehom, kameň, drevo, ihličie, dračie šupiny), borovice, menhiry, hory, sneženie, súmračná obloha s polárnou žiarou, písmo Cinzel.
 
+## Zvuk a grafika
+- **Hudba** (`js/audio.js`): generatívna, bez zvukových súborov — tichý bordún D + A, pomalé akordy v d mol (≈ 9 s na akord), riedka harfa v pentatonike s ozvenou, vzdialený roh a vietor. Bez bicích a náhlych zmien, aby pomáhala sústredeniu. Spustí sa pri prvom kliknutí alebo klávese (pravidlo prehliadačov).
+- **Zvukové efekty**: tlačidlá, dialógy, listovanie, zvitky, mapa, denník, kódex, toasty, správna/nesprávna odpoveď, portál, dokončenie levelu a súboj s drakom (výkrik, čepeľ, oheň, rev).
+- **🔊 / N** stlmí všetko; hlasitosť hudby a efektov je v nastaveniach (⚙).
+- **Textúry** (nastavenia → 🖼): *automaticky* (vysoké len na výkonnejších počítačoch — aspoň 8 jadier a 8 GB, nie softvérové/mobilné GPU), *pôvodné*, alebo *vysoké rozlíšenie* (viac oktáv šumu, reliéf normál bez UV, lišajník, trblietanie snehu).
+
 ## Obťažnosť, nastavenia, ukladanie
 - **Obťažnosť** (rozbaľovací zoznam vpravo hore, dá sa meniť kedykoľvek):
   - *🫶 Laická* (predvolená v novej hre) — mechanika ako ľahká, ale všetko bežnými slovami: pred každou úlohou kartička „po ľudsky“, odborné slová s prekladom v zátvorke, jednoduché vysvetlivky, úvod sprievodkyne o kvantových počítačoch (`js/layman.js`).

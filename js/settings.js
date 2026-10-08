@@ -23,6 +23,16 @@ const Settings = {
     autoRotate: 0,    // automatické otáčanie kamery v leveloch (rad/s)
     viewsOpen: false, // plávajúci panel „👁 Pohľady“ (rôzne obrazy toho istého stavu)
     viewsTab: 'all',
+    tex: 'auto',      // textúry: 'auto' (podľa výkonu), 'low' (pôvodné), 'high' (vysoké rozlíšenie)
+  },
+  audio: { music: 0.35, sfx: 0.6, muted: false },
+  gpuName: '',
+  // vysoké rozlíšenie textúr: ručne, alebo automaticky len na výkonnejších počítačoch
+  get texHigh() {
+    if (this.view.tex !== 'auto') return this.view.tex === 'high';
+    const weakGpu = /swiftshader|llvmpipe|software|mali|adreno|powervr|intel\(r\) (hd|uhd) graphics [2-6]/i.test(this.gpuName);
+    const mobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+    return !weakGpu && !mobile && (navigator.hardwareConcurrency || 2) >= 8 && (navigator.deviceMemory ?? 8) >= 8;
   },
   load() {
     try {
@@ -30,10 +40,11 @@ const Settings = {
       if (!d) return;
       if (DIFFS.includes(d.diff)) this.diff = d.diff;
       for (const k of Object.keys(this.view)) if (typeof d.view?.[k] === typeof this.view[k]) this.view[k] = d.view[k];
+      for (const k of Object.keys(this.audio)) if (typeof d.audio?.[k] === typeof this.audio[k]) this.audio[k] = d.audio[k];
     } catch (e) { /* predvolené nastavenia */ }
   },
   save() {
-    try { localStorage.setItem('kvantp-game1-settings', JSON.stringify({ diff: this.diff, view: this.view })); } catch (e) { /* bez ukladania */ }
+    try { localStorage.setItem('kvantp-game1-settings', JSON.stringify({ diff: this.diff, view: this.view, audio: this.audio })); } catch (e) { /* bez ukladania */ }
   },
 };
 Settings.load();

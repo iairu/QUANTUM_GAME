@@ -342,6 +342,7 @@ const Game = {
       if ((e.code === 'ArrowLeft' || e.code === 'Backspace') && UI.busy && UI._prev) { e.preventDefault(); UI._prev(); return; }
       if (e.code === 'KeyL') { UI.toggleLog(); return; }
       if (e.code === 'KeyV') { Views.toggle(); return; } // pohľady aj počas dialógu
+      if (e.code === 'KeyN') { Sound.toggleMute(); return; }
       if (e.code === 'KeyM') { this.toggleMap(); return; } // mapa (a teleport) aj počas dialógu
       if (UI.busy) return;
       if (e.code === 'KeyE' && this.scene === Hub) Hub.interact();
@@ -372,6 +373,7 @@ const Game = {
     canvas.addEventListener('wheel', (e) => { e.preventDefault(); this.scene.cam && this.scene.cam.zoom(e.deltaY); }, { passive: false });
   },
   enterLevel(num, resume) {
+    Sound.sfx('portal');
     this.scene.exit();
     UI.labelsClear();
     this.scene = this.levels[num - 1];
@@ -382,6 +384,7 @@ const Game = {
     if (this.scene === Hub) return;
     const from = this.scene.num;
     UI.cancelDialog(); // aj uprostred rozhovoru alebo kvízu
+    Sound.sfx('portal');
     this.scene.exit();
     UI.labelsClear();
     this.scene = Hub;
@@ -432,6 +435,7 @@ const Game = {
   },
   completeLevel(n, stars) {
     const fresh = this.progress.stars[n] === undefined;
+    Sound.sfx('fanfare');
     this.progress.stars[n] = Math.max(stars, this.progress.stars[n] || 0);
     if (fresh && !LEVELS[n - 1].boss) { // každý mentor naučí jedno slovo moci proti drakovi
       const ring = LEVELS.filter((L) => !L.boss), k = ring.filter((L) => this.progress.stars[L.num] !== undefined).length;
@@ -494,6 +498,7 @@ const Game = {
   },
   toggleMap(force) {
     const m = $('#map'), show = force ?? !m.classList.contains('show');
+    if (show !== m.classList.contains('show')) Sound.sfx(show ? 'map' : 'close');
     m.classList.toggle('show', show);
   },
   // portál na mape pod kurzorom (súradnice v pixeloch plátna)
