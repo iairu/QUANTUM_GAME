@@ -29,7 +29,7 @@ const Settings = {
     viewsTab: 'all',
     tex: 'auto',      // textúry: 'auto' (podľa výkonu), 'low' (pôvodné), 'high' (vysoké rozlíšenie)
   },
-  audio: { music: 0.35, sfx: 0.6, muted: false },
+  audio: { music: 0.15, sfx: 0.6, muted: false }, // hudba predvolene veľmi potichu (pozadie pre sústredenie)
   gpuName: '',
   // vysoké rozlíšenie textúr: ručne, alebo automaticky len na výkonnejších počítačoch
   get texHigh() {
@@ -47,6 +47,7 @@ const Settings = {
       if (THEMES.includes(d.theme)) this.theme = d.theme;
       for (const k of Object.keys(this.view)) if (typeof d.view?.[k] === typeof this.view[k]) this.view[k] = d.view[k];
       for (const k of Object.keys(this.audio)) if (typeof d.audio?.[k] === typeof this.audio[k]) this.audio[k] = d.audio[k];
+      if (d.audio?.music === 0.35) this.audio.music = 0.15; // staré predvolené (nezmenené hráčom) → nové tichšie
     } catch (e) { /* predvolené nastavenia */ }
   },
   save() {

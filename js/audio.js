@@ -16,10 +16,11 @@ const Sound = {
     this.music = c.createGain(); this.music.connect(comp);
     this.sfxBus = c.createGain(); this.sfxBus.connect(this.master);
     // dozvuk (veľká kamenná sieň): stereo impulz z doznievajúceho šumu
-    this.reverb = c.createConvolver(); this.reverb.buffer = this.impulse(4.2, 2.6);
-    this.revMusic = c.createGain(); this.revMusic.gain.value = 0.9; this.revMusic.connect(this.reverb);
-    this.revSfx = c.createGain(); this.revSfx.gain.value = 0.6; this.revSfx.connect(this.reverb);
-    this.revOut = c.createGain(); this.reverb.connect(this.revOut); this.revOut.connect(comp);
+    // dva dozvuky, každý ide cez svoju hlasitosť (inak by dozvuk hudby znel aj pri hlasitosti 0)
+    const ir = this.impulse(4.2, 2.6), revM = c.createConvolver(), revS = c.createConvolver();
+    revM.buffer = ir; revS.buffer = ir;
+    this.revMusic = c.createGain(); this.revMusic.gain.value = 0.9; this.revMusic.connect(revM); revM.connect(this.music);
+    this.revSfx = c.createGain(); this.revSfx.gain.value = 0.6; this.revSfx.connect(revS); revS.connect(this.sfxBus);
     // ozvena pre harfu
     this.echo = c.createDelay(1); this.echo.delayTime.value = 0.42;
     const fb = c.createGain(); fb.gain.value = 0.32; this.echo.connect(fb); fb.connect(this.echo);
