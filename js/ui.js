@@ -368,7 +368,7 @@ const UI = {
     const g = c.getContext('2d'), W = c.width, H = c.height, pl = 30, pr = 8, pt = 8, pb = o.xlabel ? 26 : 16;
     const X = (x) => pl + (x - o.x0) / (o.x1 - o.x0) * (W - pl - pr), Y = (y) => H - pb - (y - o.y0) / (o.y1 - o.y0) * (H - pt - pb);
     g.fillStyle = '#0b1020'; g.fillRect(0, 0, W, H);
-    g.font = '10px system-ui, sans-serif'; g.lineWidth = 1;
+    g.font = '12px system-ui, sans-serif'; g.lineWidth = 1; // graf sa zobrazí v šírke panelu → ≈ 15 px
     g.strokeStyle = '#2a3356'; g.fillStyle = '#8f9bc8';
     g.textAlign = 'right'; g.textBaseline = 'middle';
     for (const [y, t] of o.yticks || []) { g.beginPath(); g.moveTo(pl, Y(y)); g.lineTo(W - pr, Y(y)); g.stroke(); g.fillText(t, pl - 3, Y(y)); }

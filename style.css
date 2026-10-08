@@ -487,3 +487,28 @@ body.cam-rot, body.cam-rot * { cursor: none !important; }
 #dialog button.ask { font-size: 12px; padding: 4px 9px; opacity: 0.85; }
 #dialog button.ask:hover { opacity: 1; }
 #dialog > button.ask { float: left; margin-top: 10px; }
+/* ===== čitateľnosť: panel levelu a 👁 pohľady rovnako čitateľné ako tlačidlá vpravo hore (16 px) ===== */
+#panel { font-size: 16px; }
+#panel h3, html[data-theme="nordic"] #panel h3 { font-size: 18px; }
+#panel .info, #panel .slider, #panel .station, #panel .chk, #panel details.theory .th { font-size: 16px; line-height: 1.5; }
+#panel .info.tip { font-size: 15px; }
+#panel .info .expr { font-size: 28px; }
+#panel details summary { font-size: 16px; }
+#panel details.theory h4 { font-size: 15px; }
+#panel .eq { font-size: 18px; }
+#panel .legend { font-size: 14px; }
+#panel select { font-size: 16px; padding: 5px; }
+#panel button { font-size: 16px; }
+#panel button.gate { font-size: 22px; }
+#panel button.token { font-size: 20px; }
+#panel button.shout small { font-size: 12px; }
+#panel .bar, #panel .tele, #panel .battlelog { font-size: 15px; }
+#views .vh { font-size: 15px; }
+#views .vtabs button { font-size: 14px; padding: 3px 8px; }
+#views .vclose { font-size: 14px; padding: 3px 9px; }
+#views .vcap { font-size: 16px; max-height: 210px; }
+@media (min-width: 721px) {
+  #panel { width: 400px; }
+  #views { width: 506px; }
+  #views canvas { width: 494px; height: 325px; }
+}
