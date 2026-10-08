@@ -156,10 +156,7 @@ html[lang="sk"] [data-lang="en"], html[lang="en"] [data-lang="sk"] { display: no
 #dialog.plaincard { border-color: #9fdcae; }
 #dialog.plaincard .txt { color: #e8f6ec; }
 #diff-select.layman { border-color: #9fdcae; }
-#dialog.easy .keys { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
-#dialog.easy .key { background: rgba(255, 210, 90, 0.16); border: 1px solid var(--gold); color: var(--gold); border-radius: 999px; padding: 2px 10px; font-weight: 700; }
-#dialog.easy .rest { color: #b9c2e6; font-size: 15px; }
-#dialog.easy .rest b { color: var(--gold); }
+#dialog.easy .txt b { color: var(--gold); }
 #dialog.hard .txt { font-size: 14px; line-height: 1.45; }
 #hud-quest.easy { font-size: 16px; }
 #hud-quest.easy b { color: var(--gold); }

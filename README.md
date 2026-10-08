@@ -48,7 +48,7 @@ Dialógy, kvízy, levely, Kódex, Denník aj tlačidlá ostávajú rovnaké — 
 ## Obťažnosť, nastavenia, ukladanie
 - **Obťažnosť** (rozbaľovací zoznam vpravo hore, dá sa meniť kedykoľvek):
   - *🫶 Laická* (predvolená v novej hre) — mechanika ako ľahká, ale všetko bežnými slovami: pred každou úlohou kartička „po ľudsky“, odborné slová s prekladom v zátvorke, jednoduché vysvetlivky, úvod sprievodkyne o kvantových počítačoch (`js/layman.js`).
-  - *Ľahká* — väčšie tolerancie, menej meraní, nápovedy, v kvízoch o jednu nesprávnu možnosť menej, texty so zvýraznenými kľúčovými slovami.
+  - *Ľahká* — väčšie tolerancie, menej meraní, nápovedy, v kvízoch o jednu nesprávnu možnosť menej, väčšie písmo a zlaté kľúčové slová v texte.
   - *Normálna* — pôvodná hra; v paneli zbalený box „📐 Teória a rovnice“ s jadrom levelu.
   - *Ťažká* — viac poznatkov: rozbalená teória s rovnicami ku každej úlohe, 2 extra otázky s rovnicami na level, husté texty bez analógií; presnosť, náhodné ciele, bez nápovied, extra hádanky v leveli 3, prísnejšie hviezdičky.
   - *📜 Prastará* — ťažká + starobylé zvitky (história objavov: roky, autori, ich rozhovory a slávne výroky; zbierka v Kódexe → „📜 Zvitky“) a otázka z histórie v každom leveli.

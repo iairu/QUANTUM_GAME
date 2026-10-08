@@ -539,7 +539,7 @@ const SLIDER_TIPS = tr([
 ]);
 
 // ---------- čitateľnosť textu podľa obťažnosti ----------
-// ľahká: najdôležitejšie slová (zvýraznené kľúčové pojmy navrchu, zvyšok potlačený)
+// ľahká: pôvodný text, väčším písmom a so zlatými kľúčovými slovami (CSS)
 // normálna: pôvodný text
 // ťažká/prastará: husto a s viac poznatkami — bez analógií, repliky jedného hovoriaceho sa zlúčia; rovnice sú v paneli „📐“
 const TextMode = {
@@ -547,14 +547,6 @@ const TextMode = {
   sentences(html) { return String(html).split(/(?<=[.!?…])\s+(?=[„“(<|A-ZÁ-ŽÄÔ0-9])/u); },
   // ťažká: zachová všetky poznatky, vypustí len analógie („Prirovnanie: …“) — tie nahrádza teória s rovnicami v paneli
   condense(html) { return this.sentences(html).filter((t) => !this.ANALOGY.test(t)).join(' '); },
-  keywords(html) {
-    const out = [];
-    for (const m of String(html).matchAll(/<b>(.*?)<\/b>/g)) {
-      const k = m[1].replace(/<(?!\/?(sub|sup)\b)[^>]+>/g, '').trim();
-      if (k && !out.includes(k)) out.push(k);
-    }
-    return out.slice(0, 6);
-  },
   lines(lines) {
     lines = lines.map((l, i) => ({ ...l, src: [i] }));
     if (!Settings.hard) return lines;
@@ -571,11 +563,8 @@ const TextMode = {
     return out.length ? out : [lines[lines.length - 1]];
   },
   render(html) {
-    if (Settings.layman) return annotate(html, true); // laická: bez kľúčových slov (bývajú to odborné termíny), žargón s prekladom
-    if (Settings.diff !== 'easy') return annotate(html);
-    const keys = this.keywords(html);
-    if (!keys.length) return annotate(html);
-    return `<div class="keys">${keys.map((k) => `<span class="key">${k}</span>`).join('')}</div><div class="rest">${annotate(html)}</div>`;
+    if (Settings.layman) return annotate(html, true); // laická: žargón s prekladom
+    return annotate(html);
   },
 };
 // zvýrazní čísla, stavy a slová písané veľkými písmenami (pre ľahkú obťažnosť v úlohách)
