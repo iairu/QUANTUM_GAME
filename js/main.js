@@ -135,6 +135,7 @@ const Hub = {
         }
         pl.p = np;
         pl.heading = Math.atan2(dir[0], dir[2]);
+        if (!Game.progress.moved) { Game.progress.moved = true; Game.save(); }
       }
     }
     this.cam.target = V3.add(pl.p, [0, 1.2, 0]);
@@ -199,6 +200,10 @@ const Hub = {
     UI.hot(pc, tr('<b>Ty — Psíčko (stav ψ)</b>. Zlatá ručička je tvoja <b>globálna fáza</b>: točí sa, ale nedá sa zmerať.',
       '<b>You — Little Psi (the state ψ)</b>. The golden hand is your <b>global phase</b>: it turns, but it cannot be measured.'), 40);
     UI.hot([0, gy, 0], tr('<b>Amplitúda</b> — sprievodkyňa. Podíď k nej a stlač E.', '<b>Amplitude</b> — your guide. Walk up to her and press E.'), 40);
+    // nápoveda ovládania na začiatku hry — zmizne po prvom kroku
+    if (!Game.progress.moved && !UI.busy) {
+      UI.label('wasd', V3.add(pl.p, [0, -0.2, 0]), `<div class="wasd"><span>W</span><br><span>A</span><span>S</span><span>D</span></div><small>${tr('pohyb · ťahaj myšou = kamera', 'move · drag mouse = camera')}</small>`, 'hint', null);
+    }
     if (this.near) {
       const L = this.near.L;
       UI.label('prompt', V3.add(pl.p, [0, 2.4, 0]), Game.isUnlocked(L.num) ? tr(`[E] Vstúpiť: ${L.title}`, `[E] Enter: ${L.title}`) : tr('🔒 zamknuté', '🔒 locked'), 'prompt');
@@ -243,7 +248,7 @@ Object.assign(CRYSTAL_TIPS, { '|0⟩': TIPS['|0⟩'], '|1⟩': TIPS['|1⟩'], '�
 // ------------------------------------------------------------------
 const Game = {
   keys: {},
-  progress: { stars: {}, diff: {}, codex: new Set(), scrolls: new Set(), introSeen: false, allUnlocked: false, session: null },
+  progress: { stars: {}, diff: {}, codex: new Set(), scrolls: new Set(), introSeen: false, allUnlocked: false, session: null, moved: false },
   init() {
     const canvas = $('#gl');
     try { this.r = new Renderer(canvas); }
@@ -309,6 +314,10 @@ const Game = {
     canvas.addEventListener('pointerup', () => { drag = null; this.dragging = false; });
     window.addEventListener('pagehide', () => this.save());
     document.addEventListener('visibilitychange', () => { if (document.hidden) this.save(); });
+    const mc = $('#map canvas'), mxy = (e) => { const b = mc.getBoundingClientRect(); return [e.clientX - b.left, e.clientY - b.top]; };
+    mc.addEventListener('click', (e) => this.mapClick(...mxy(e)));
+    mc.addEventListener('pointermove', (e) => { this.mapHover = mxy(e); });
+    mc.addEventListener('pointerleave', () => { this.mapHover = null; });
     canvas.addEventListener('wheel', (e) => { e.preventDefault(); this.scene.cam && this.scene.cam.zoom(e.deltaY); }, { passive: false });
   },
   enterLevel(num, resume) {
@@ -415,9 +424,31 @@ const Game = {
     const m = $('#map'), show = force ?? !m.classList.contains('show');
     m.classList.toggle('show', show);
   },
+  // portál na mape pod kurzorom (súradnice v pixeloch plátna)
+  mapPortalAt(x, y) {
+    const ml = this.mapLayout;
+    if (!ml) return null;
+    return Hub.portals.find((pt) => { const [px, py] = ml.P(pt.p); return Math.hypot(px - x, py - y) < ml.s * 3.2; }) || null;
+  },
+  // klik na portál v mape = okamžitý presun do odomknutého levelu
+  mapClick(x, y) {
+    const pt = this.mapPortalAt(x, y);
+    if (!pt) return;
+    const L = pt.L;
+    if (!this.isUnlocked(L.num)) { UI.toast(tr(`🔒 Najprv dokonči level ${L.num - 1}.`, `🔒 Complete level ${L.num - 1} first.`)); return; }
+    if (UI.busy) { UI.toast(tr('Najprv dokonči aktuálny dialóg.', 'Finish the current dialogue first.')); return; }
+    if (this.scene === this.levels[L.num - 1]) { this.toggleMap(false); return; }
+    if (this.scene !== Hub && !confirm(tr(`Presunúť sa do levelu ${L.num}: ${L.title}? Postup v aktuálnom leveli (${this.scene.num} · ${this.scene.title}) sa neuloží.`,
+      `Teleport to level ${L.num}: ${L.title}? Progress in the current level (${this.scene.num} · ${this.scene.title}) will not be saved.`))) return;
+    this.toggleMap(false);
+    this.enterLevel(L.num);
+  },
   drawMap() {
     const cv = $('#map canvas'), g = cv.getContext('2d'), W = cv.width = cv.clientWidth, H = cv.height = cv.clientHeight;
     const s = Math.min(W, H) / 80, cx = W / 2, cy = H / 2, P = (p) => [cx + p[0] * s, cy + p[2] * s];
+    this.mapLayout = { s, P };
+    const hover = this.mapHover && this.mapPortalAt(...this.mapHover);
+    cv.style.cursor = hover && this.isUnlocked(hover.L.num) ? 'pointer' : '';
     g.clearRect(0, 0, W, H);
     g.fillStyle = '#0d2347'; g.beginPath(); g.arc(cx, cy, 38 * s, 0, 7); g.fill();
     g.fillStyle = '#2a3c66'; g.beginPath(); g.arc(cx, cy, 35 * s, 0, 7); g.fill();
@@ -426,6 +457,8 @@ const Game = {
       const [x, y] = P(pt.p), open = this.isUnlocked(pt.L.num), st = this.progress.stars[pt.L.num];
       g.fillStyle = open ? `rgb(${pt.L.color.map((c) => c * 255).join(',')})` : '#555';
       g.beginPath(); g.arc(x, y, s * 1.8, 0, 7); g.fill();
+      if (pt === hover && open) { g.strokeStyle = '#fff'; g.lineWidth = 2; g.beginPath(); g.arc(x, y, s * 2.4, 0, 7); g.stroke(); }
+      if (this.scene === this.levels[pt.L.num - 1]) { g.strokeStyle = '#5ff'; g.lineWidth = 3; g.beginPath(); g.arc(x, y, s * 2.4, 0, 7); g.stroke(); }
       g.fillStyle = '#fff';
       g.fillText(`${pt.L.num} ${pt.L.title}`, x, y - s * 2.6);
       g.fillText(open ? (st !== undefined && st > 0 ? '★'.repeat(st) : pt.L.mentor) : '🔒', x, y + s * 3.6);
@@ -445,7 +478,7 @@ const Game = {
   load() {
     try {
       const d = JSON.parse(localStorage.getItem('kvantp-game1') || 'null');
-      if (d) this.progress = { stars: d.stars || {}, diff: d.diff || {}, codex: new Set(d.codex || []), scrolls: new Set(d.scrolls || []), introSeen: !!d.introSeen, allUnlocked: !!d.allUnlocked, session: d.session || null };
+      if (d) this.progress = { stars: d.stars || {}, diff: d.diff || {}, codex: new Set(d.codex || []), scrolls: new Set(d.scrolls || []), introSeen: !!d.introSeen, moved: !!d.moved, allUnlocked: !!d.allUnlocked, session: d.session || null };
     } catch (e) { /* čistý začiatok */ }
   },
 };
