@@ -93,20 +93,22 @@ const Fmt = {
     const known = [[0, '0'], [1, '1'], [0.5, '½'], [Math.SQRT1_2, '1/√2'], [0.25, '¼'], [0.75, '¾']];
     const a = Math.abs(x), sg = x < 0 ? '−' : '';
     for (const [v, s] of known) if (Math.abs(a - v) < 5e-4) return v === 0 ? '0' : sg + s;
+    if (+a.toFixed(d) === 0) return '0'; // zaokrúhlené na nulu: bez „−0“
     return sg + a.toFixed(d).replace(/0+$/, '').replace(/\.$/, '').replace('.', tr(',', '.'));
   },
-  complex(c) {
+  complex(c, d = 3) {
     const re = Math.abs(c[0]) < 5e-4 ? 0 : c[0], im = Math.abs(c[1]) < 5e-4 ? 0 : c[1];
-    if (im === 0) return Fmt.num(re);
-    const imS = (Math.abs(Math.abs(im) - 1) < 5e-4 ? '' : Fmt.num(Math.abs(im))) + 'i';
-    if (re === 0) return (im < 0 ? '−' : '') + imS;
-    return '(' + Fmt.num(re) + (im < 0 ? ' − ' : ' + ') + imS + ')';
+    const z = (v) => Fmt.num(v, d) === '0'; // časť, ktorá sa pri d desatinných miestach zaokrúhli na nulu
+    if (im === 0 || z(im)) return Fmt.num(re, d);
+    const imS = (Math.abs(Math.abs(im) - 1) < 5e-4 ? '' : Fmt.num(Math.abs(im), d)) + 'i';
+    if (re === 0 || z(re)) return (im < 0 ? '−' : '') + imS;
+    return '(' + Fmt.num(re, d) + (im < 0 ? ' − ' : ' + ') + imS + ')';
   },
   pct: (p) => Math.round(p * 100) + ' %',
-  angle(t) {
+  angle(t, d = 2) {
     const k = t / Math.PI, known = [[0, '0'], [1, 'π'], [0.5, 'π/2'], [0.25, 'π/4'], [0.75, '3π/4'], [1.5, '3π/2'], [2, '2π'], [-0.5, '−π/2'], [-1, '−π'], [-0.25, '−π/4']];
     for (const [v, s] of known) if (Math.abs(k - v) < 0.01) return s;
-    return Fmt.num(k, 2) + 'π';
+    return Fmt.num(k, d) + 'π';
   },
 };
 

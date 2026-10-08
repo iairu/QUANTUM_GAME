@@ -7,6 +7,14 @@
 const VC = { a: '#4f8cff', b: '#ff6b7d', w: '#e8ecff', m: '#8f9bc8', grid: '#2a3356', gold: '#ffd25a', A: '#ffb44f', B: '#5fe08a' };
 const phaseColor = (ph, a = 1) => `hsla(${((ph * 180 / Math.PI) % 360 + 360) % 360}, 85%, 62%, ${a})`;
 
+// čísla v pohľadoch sa zaokrúhľujú na jedno desatinné miesto, aby sa pri pohybe nemenili príliš rýchlo
+// (len zobrazenie; presné hodnoty ostávajú v hre a v paneli). Presné tvary ½, 1/√2, π/2 … sa zachovajú.
+const VF = {
+  num: (x) => Fmt.num(x, 1),
+  angle: (t) => Fmt.angle(t, 1),
+  complex: (z) => Fmt.complex(z, 1),
+  pct: (p) => Math.round(p * 10) * 10 + ' %',
+};
 const Views = {
   TABS: ['hands', 'bloch2d', 'bases', 'rho', 'notation', 'all'],
   init() {
@@ -113,8 +121,8 @@ const Views = {
     g.globalAlpha = 1;
     g.fillStyle = col; g.font = (small ? 'bold 13px' : 'bold 15px') + ' system-ui'; g.fillText(label, cx, cy - R - (small ? 8 : 10));
     g.font = '12px system-ui'; g.fillStyle = VC.w;
-    if (!small) g.fillText(`|${label}| = ${Fmt.num(m, 2)}${m > 0.01 ? ', ' + tr('fáza', 'phase') + ' ' + Fmt.angle((ph + 2 * Math.PI) % (2 * Math.PI)) : ''}`, cx, cy + R + 11);
-    if (!small) g.fillText(`P = |${label}|² = ${Fmt.num(m * m, 2)}`, cx, cy + R + 24);
+    if (!small) g.fillText(`|${label}| = ${VF.num(m)}${m > 0.01 ? ', ' + tr('fáza', 'phase') + ' ' + VF.angle((ph + 2 * Math.PI) % (2 * Math.PI)) : ''}`, cx, cy + R + 11);
+    if (!small) g.fillText(`P = |${label}|² = ${VF.num(m * m)}`, cx, cy + R + 24);
   },
 
   // ---------- pohľad: ručičky ----------
@@ -130,11 +138,11 @@ const Views = {
         this.clock(g, x + w * 0.28, cy, R, C.of(Math.sqrt(p0)), VC.a, 'α', small);
         this.clock(g, x + w * 0.72, cy, R, C.scale(C.exp(Math.atan2(st.r[1], st.r[0])), Math.sqrt(p1)), VC.b, 'β', small, 0.15 + 0.85 * k);
         g.fillStyle = VC.gold; g.font = '12px system-ui';
-        g.fillText(small ? tr(`zmes · koherencia ${Math.round(k * 100)} %`, `mixture · coherence ${Math.round(k * 100)} %`) : tr(`zmes: fáza β je určená len na ${Math.round(k * 100)} %`, `mixture: the phase of β is only ${Math.round(k * 100)} % defined`), x + w / 2, y + h - 7);
+        g.fillText(small ? tr(`zmes · koherencia ${Math.round(k * 10) * 10} %`, `mixture · coherence ${Math.round(k * 10) * 10} %`) : tr(`zmes: fáza β je určená len na ${Math.round(k * 10) * 10} %`, `mixture: the phase of β is only ${Math.round(k * 10) * 10} % defined`), x + w / 2, y + h - 7);
       }
       if (st.pure && !small) {
         let d = C.arg(st.psi[1]) - C.arg(st.psi[0]); d = ((d % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
-        g.fillStyle = VC.gold; g.fillText(`${tr('relatívna fáza', 'relative phase')} φ = arg β − arg α = ${Fmt.angle(d)}`, x + w / 2, y + h - 8);
+        g.fillStyle = VC.gold; g.fillText(`${tr('relatívna fáza', 'relative phase')} φ = arg β − arg α = ${VF.angle(d)}`, x + w / 2, y + h - 8);
       }
     } else if (st.kind === 'amps') {
       const R = Math.min(w * 0.3, h * 0.36), cx = x + w / 2, cy = y + h * 0.52;
@@ -145,7 +153,7 @@ const Views = {
         let px = cx, py = cy, sx = 0, sy = 0;
         st.amps.forEach((a, i) => { const nx = px + a.z[0] * R, ny = py - a.z[1] * R; this.arrow(g, px, py, nx, ny, cols[i]); g.fillStyle = cols[i]; g.fillText(a.label, (px + nx) / 2 + 9, (py + ny) / 2 - 9); px = nx; py = ny; sx += a.z[0]; sy += a.z[1]; });
         this.arrow(g, cx, cy, cx + sx * R, cy - sy * R, VC.gold, 3.5);
-        g.fillStyle = VC.gold; g.fillText(`A₁+A₂: P = ${Fmt.num(sx * sx + sy * sy, 2)}`, x + w / 2, y + h - 8);
+        g.fillStyle = VC.gold; g.fillText(`A₁+A₂: P = ${VF.num(sx * sx + sy * sy)}`, x + w / 2, y + h - 8);
       } else st.amps.forEach((a, i) => this.clock(g, cx, cy, R, a.z, cols[i], a.label, small));
     } else { // dva qubity: 4 amplitúdy
       const R = Math.min(w * 0.09, h * 0.22), cy = y + h * 0.52;
@@ -188,7 +196,7 @@ const Views = {
       g.fillStyle = VC.m; g.font = '12px system-ui';
       const L = st.kind === 'qubit' ? V3.len(st.r) : null;
       g.fillText(L === null ? tr('previazané qubity: šípky A a B sa skrátia do stredu', 'entangled qubits: arrows A and B shrink to the centre')
-        : `|r| = ${Fmt.num(L, 2)} → ${L > 0.99 ? tr('čistý stav (na povrchu)', 'pure state (on the surface)') : L < 0.02 ? tr('maximálne zmiešaný (stred)', 'maximally mixed (centre)') : tr('zmiešaný (vnútri)', 'mixed (inside)')}`, x + w / 2, y + h - 8);
+        : `|r| = ${VF.num(L)} → ${L > 0.99 ? tr('čistý stav (na povrchu)', 'pure state (on the surface)') : L < 0.02 ? tr('maximálne zmiešaný (stred)', 'maximally mixed (centre)') : tr('zmiešaný (vnútri)', 'mixed (inside)')}`, x + w / 2, y + h - 8);
     }
   },
 
@@ -224,7 +232,7 @@ const Views = {
         g.fillStyle = VC.w; g.font = '12px system-ui';
         if (g.measureText(l).width > bw * 0.85) g.font = '10px system-ui'; // úzke stĺpce: menší popisok, aby sa neprekrýval
         g.fillText(l, bx + bw * 0.35, base + 8);
-        if (bw > 30) g.fillText(Fmt.pct(p), bx + bw * 0.35, base - hh - 7);
+        if (bw > 30) g.fillText(VF.pct(p), bx + bw * 0.35, base - hh - 7);
         k++;
       }
       g.fillStyle = VC.gold; g.font = 'bold 12px system-ui'; g.fillText(name, (gx + x + 15 + k * bw) / 2, y + (small ? 24 : 30)); // pod nadpisom, nad percentami
@@ -248,7 +256,7 @@ const Views = {
       if (S > 34) { // |ρᵢⱼ| ∠ fáza (kratšie než a + bi)
         const ph = C.arg(v);
         g.fillStyle = VC.w; g.font = '12px system-ui';
-        g.fillText(Fmt.num(m, 2) + (m > 5e-3 && Math.abs(ph) > 0.01 ? ` ∠${Fmt.angle(ph)}` : ''), cx, cy);
+        g.fillText(VF.num(m) + (m > 5e-3 && Math.abs(ph) > 0.01 ? ` ∠${VF.angle(ph)}` : ''), cx, cy);
       }
     }
     g.fillStyle = VC.m; g.font = '12px system-ui';
@@ -258,35 +266,35 @@ const Views = {
       for (let a = 0; a < 36; a++) { g.fillStyle = phaseColor(a * Math.PI / 18); g.beginPath(); g.moveTo(cx, cy); g.arc(cx, cy, 16, -(a + 1) * Math.PI / 18, -a * Math.PI / 18); g.fill(); }
       g.fillStyle = VC.m; g.fillText('0', cx + 24, cy); g.fillText('π', cx - 24, cy); g.fillText('π/2', cx, cy - 24);
       g.fillText(tr('fáza', 'phase'), cx, cy + 26);
-      if (st.kind === 'qubit') g.fillText(`Tr ρ² = ${Fmt.num((1 + V3.dot(st.r, st.r)) / 2, 2)}`, x + w / 2 - 18, y + h - 8);
+      if (st.kind === 'qubit') g.fillText(`Tr ρ² = ${VF.num((1 + V3.dot(st.r, st.r)) / 2)}`, x + w / 2 - 18, y + h - 8);
     }
   },
 
   // ---------- zápis (HTML pod obrázkom) ----------
   notation(st, full) {
-    const A = (s) => `<span class="ca">${s}</span>`, B = (s) => `<span class="cb">${s}</span>`, f = (z) => Fmt.complex(z);
+    const A = (s) => `<span class="ca">${s}</span>`, B = (s) => `<span class="cb">${s}</span>`, f = (z) => VF.complex(z);
     const note = st.note ? `<div class="vnote">${st.note}</div>` : '';
     if (st.kind === 'amps') {
       const cols = [A, B, (s) => `<span class="cg">${s}</span>`];
-      return note + st.amps.map((a, i) => `${cols[i](a.label)} = ${f(a.z)} = ${Fmt.num(C.abs(a.z), 2)}·e<sup>i·${Fmt.angle((C.arg(a.z) + 2 * Math.PI) % (2 * Math.PI))}</sup>`).join('<br>')
+      return note + st.amps.map((a, i) => `${cols[i](a.label)} = ${f(a.z)} = ${VF.num(C.abs(a.z))}·e<sup>i·${VF.angle((C.arg(a.z) + 2 * Math.PI) % (2 * Math.PI))}</sup>`).join('<br>')
         + (full ? `<br>P = |${tr('amplitúda', 'amplitude')}|²` : '');
     }
     if (st.kind === 'two') {
       const det = C.sub(C.mul(st.psi[0], st.psi[3]), C.mul(st.psi[1], st.psi[2])), ent = C.abs(det) > 1e-3;
       let s = `|Ψ⟩ = ${Q2.ketString(st.psi)}`;
       if (full) s += `<br>ψ₀₀ψ₁₁ − ψ₀₁ψ₁₀ = ${f(det)} → <b>${ent ? tr('previazaný', 'entangled') : tr('produktový stav', 'product state')}</b>`
-        + `<br>r<sub>A</sub> = (${Q2.reducedBloch(st.psi, 0).map((v) => Fmt.num(v, 2)).join(', ')}), r<sub>B</sub> = (${Q2.reducedBloch(st.psi, 1).map((v) => Fmt.num(v, 2)).join(', ')})`;
+        + `<br>r<sub>A</sub> = (${Q2.reducedBloch(st.psi, 0).map((v) => VF.num(v)).join(', ')}), r<sub>B</sub> = (${Q2.reducedBloch(st.psi, 1).map((v) => VF.num(v)).join(', ')})`;
       return note + s;
     }
     const [rx, ry, rz] = st.r, L = V3.len(st.r);
-    let s = st.pure ? `|ψ⟩ = ${A(f(st.psi[0]))}|0⟩ + ${B(f(st.psi[1]))}|1⟩` : `ρ = ½(I + r·σ), |r| = ${Fmt.num(L, 2)} (${tr('zmes', 'mixture')})`;
+    let s = st.pure ? `|ψ⟩ = ${A(f(st.psi[0]))}|0⟩ + ${B(f(st.psi[1]))}|1⟩` : `ρ = ½(I + r·σ), |r| = ${VF.num(L)} (${tr('zmes', 'mixture')})`;
     if (full) {
       const th = Math.acos(clamp(rz / (L || 1), -1, 1)), ph = (Math.atan2(ry, rx) + 2 * Math.PI) % (2 * Math.PI);
       if (st.pure) s += `<br>${tr('stĺpec', 'column')}: (${A(f(st.psi[0]))}, ${B(f(st.psi[1]))})<sup>T</sup> · ${A('α')} = cos(θ/2), ${B('β')} = e<sup>iφ</sup> sin(θ/2)`
-        + `<br>θ = ${Fmt.angle(th)}, φ = ${Fmt.angle(ph)}`;
-      s += `<br>r = (⟨X⟩, ⟨Y⟩, ⟨Z⟩) = (${Fmt.num(rx, 2)}, ${Fmt.num(ry, 2)}, ${Fmt.num(rz, 2)})`
-        + `<br>ρ = [[${A(Fmt.num(st.rho[0][0], 2))}, ${f(st.rho[0][1])}], [${f(st.rho[1][0])}, ${B(Fmt.num(st.rho[1][1], 2))}]]`
-        + `<br>P(0) = ${A(Fmt.pct(st.rho[0][0]))}, P(1) = ${B(Fmt.pct(st.rho[1][1]))} · Tr ρ² = ${Fmt.num((1 + L * L) / 2, 2)}`;
+        + `<br>θ = ${VF.angle(th)}, φ = ${VF.angle(ph)}`;
+      s += `<br>r = (⟨X⟩, ⟨Y⟩, ⟨Z⟩) = (${VF.num(rx)}, ${VF.num(ry)}, ${VF.num(rz)})`
+        + `<br>ρ = [[${A(VF.num(st.rho[0][0]))}, ${f(st.rho[0][1])}], [${f(st.rho[1][0])}, ${B(VF.num(st.rho[1][1]))}]]`
+        + `<br>P(0) = ${A(VF.pct(st.rho[0][0]))}, P(1) = ${B(VF.pct(st.rho[1][1]))} · Tr ρ² = ${VF.num((1 + L * L) / 2)}`;
     }
     return note + s;
   },
