@@ -407,7 +407,7 @@ const Wow = {
     s.mana -= sp.mana || 0;
     if (sp.cd) this.cd[sp.id] = sp.cd;
     this.combatT = Math.min(this.combatT, sp.self ? this.combatT : 0);
-    const orb = this.orbPos || V3.add(pl.p, [0, 1.9, 0]);
+    const h = pl.heading, orb = V3.add(pl.p, [Math.cos(h) * 0.4 + Math.sin(h) * 0.18, 1.95 + (pl.y || 0) + (this.mounted ? 0.95 : 0), -Math.sin(h) * 0.4 + Math.cos(h) * 0.18]); // guľôčka na palici
     switch (sp.id) {
       case 'heal': { const h = Math.round(this.maxHp * 0.4 + this.sp); s.hp = Math.min(this.maxHp, s.hp + h); this.playerFct(`+${h}`, 'heal'); this.fx.push({ kind: 'heal', t: 0 }); Sound.sfx('heal'); break; }
       case 'blink': {
@@ -531,6 +531,18 @@ const Wow = {
     this.target = list[(i + 1) % Math.min(list.length, 5)];
     this.auto = false;
     Sound.sfx('target');
+  },
+  // kurzor nad 3D svetom: meč nad omylom, bublina nad postavou, s ktorou sa dá hovoriť
+  hoverCursor(x, y) {
+    const gl = Game.r && Game.r.canvas;
+    if (!gl) return;
+    let c = '';
+    if (this.inHub()) {
+      const near = (p, r) => { const q = Game.r.project(p); return q && Math.hypot(q[0] - x, q[1] - y) < r; };
+      if (this.mobs.some((m) => m.state !== 'dead' && near(V3.add(m.p, [0, 0.9, 0]), 46))) c = 'c-attack';
+      else if (near(V3.add(VENDOR_POS, [0, 1.4, 0]), 50) || near([0, 1.6, 0], 50) || Hub.portals.some((pt) => near(V3.add(pt.npc, [0, 1.2, 0]), 34))) c = 'c-talk';
+    }
+    if (gl._cur !== c) { gl.classList.remove('c-attack', 'c-talk'); if (c) gl.classList.add(c); gl._cur = c; }
   },
   // klik do 3D sveta: ľavý = zamerať, pravý = zamerať a útočiť / hovoriť s postavou
   click(x, y, button) {
@@ -726,7 +738,7 @@ const Wow = {
     if (this.uiT > 0.08) { this.uiT = 0; this.renderFrames(); this.renderBar(); }
   },
   updateMobs(dt) {
-    const pl = this.pl(), s = this.S, safe = this.safe(pl.p);
+    const pl = this.pl(), safe = this.safe(pl.p);
     for (const m of this.mobs) {
       m.flash = Math.max(0, m.flash - dt);
       if (m.state === 'dead') {
@@ -744,9 +756,7 @@ const Wow = {
         m.p = V3.add(m.p, V3.scale(d, st / L)); m.face = Math.atan2(d[0], d[2]); m.walk += st * 3;
         return L < 0.1;
       };
-      if (m.state === 'idle') {
-        const gray = m.lvl - s.lvl <= -5, radius = clamp(6 + (m.lvl - s.lvl) * 0.4, 3.5, 8);
-        if (!this.dead && !gray && !safe && dp < radius) { this.aggro(m); continue; }
+      if (m.state === 'idle') { // neutrálni: nevšímajú si hráča, kým na nich nezaútočí
         m.t -= dt;
         if (m.t <= 0) { m.t = rr(3, 7); const a = rand() * 6.28, r = rand() * 2.5; m.wander = [m.home[0] + Math.cos(a) * r, 0, m.home[2] + Math.sin(a) * r]; }
         if (m.wander && moveTo(m.wander, 1.6)) m.wander = null;
@@ -895,12 +905,12 @@ const Wow = {
         const T = MOB_TYPES[m.type], hpw = Math.round(100 * m.hp / m.max);
         UI.label('mob' + m.id, V3.add(m.p, [0, m.type === 'cultist' ? 2.5 : 2, 0]),
           `<div class="np${m === this.target ? ' tg' : ''}"><span style="color:${this.con(m.lvl)}">${m.lvl}</span> ${T.name}<i><b style="width:${hpw}%"></b></i>${m === this.target ? `<u><b style="width:${Math.round(50 * (1 - m.r[2]))}%"></b></u>` : ''}</div>`, 'nameplate', null);
-        UI.hot(V3.add(m.p, [0, 0.9, 0]), `<b>${T.name}</b> (${tr('úroveň', 'level')} ${m.lvl})<br>${T.tip}<br><small>${tr('Ľavý klik = zamerať · pravý = útok · Tab = ďalší cieľ', 'Left click = target · right = attack · Tab = next target')}</small>`, 36);
+        UI.hot(V3.add(m.p, [0, 0.9, 0]), `<b>${T.name}</b> (${tr('úroveň', 'level')} ${m.lvl})<br>${T.tip}<br><small>${tr('Neutrálny — zaútočí, až keď ho napadneš. Ľavý klik = zamerať · pravý = útok · Tab = ďalší cieľ', 'Neutral — fights back only once you attack it. Left click = target · right = attack · Tab = next target')}</small>`, 36);
       }
     }
     // kruh pod cieľom
     const tg = this.target;
-    if (tg && tg.p && !tg.npc) r.draw('torus', M4.trs([tg.p[0], 0.05, tg.p[2]], t, [1.05, 0.25, 1.05]), tg.state === 'dead' ? [0.5, 0.5, 0.5] : [1, 0.15, 0.1], { emissive: 0.9, alpha: 0.85 });
+    if (tg && tg.p && !tg.npc) r.draw('torus', M4.trs([tg.p[0], 0.05, tg.p[2]], t, [1.05, 0.25, 1.05]), tg.state === 'dead' ? [0.5, 0.5, 0.5] : [1, 0.85, 0.1], { emissive: 0.9, alpha: 0.85 }); // žltý kruh = neutrálny
     // projektily a efekty
     for (const pr of this.proj) {
       r.sphere(pr.p, pr.sp.id === 'shoot' ? 0.12 : 0.2, pr.col, { emissive: 1.5 });
@@ -984,7 +994,7 @@ const Wow = {
     q('#wow-death button').textContent = tr('Uvoľniť ducha', 'Release Spirit');
     q('#wow-death button').onclick = () => this.release();
     q('#wow-mini canvas').onclick = () => Game.toggleMap(true);
-    q('#wow-mini canvas').dataset.tip = tr('Minimapa — klik otvorí mapu (M). Žltá ! = úloha, červené bodky = nepriatelia, 💰 = obchodník.', 'Minimap — click to open the map (M). Yellow ! = quest, red dots = enemies, 💰 = merchant.');
+    q('#wow-mini canvas').dataset.tip = tr('Minimapa — klik otvorí mapu (M). Žltá ! = úloha, žlté bodky = neutrálne omyly, 💰 = obchodník.', 'Minimap — click to open the map (M). Yellow ! = quest, yellow dots = neutral misconceptions, 💰 = merchant.');
     this.ui.pf.dataset.tip = '';
     // lišta kúziel
     for (const sp of SPELLS) {
@@ -1097,7 +1107,7 @@ const Wow = {
       g.fillStyle = open ? `rgb(${pt.L.color.map((c) => c * 255).join(',')})` : '#555'; g.beginPath(); g.arc(x, y, 2.2 * sc, 0, 7); g.fill();
       g.fillStyle = '#fff'; g.font = `bold ${Math.round(3 * sc)}px sans-serif`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(pt.L.num, x, y);
     }
-    for (const m of this.mobs) if (m.state !== 'dead') { const [x, y] = P(m.p); g.fillStyle = m === this.target ? '#ffd100' : '#ff3030'; g.beginPath(); g.arc(x, y, 1.1 * sc, 0, 7); g.fill(); }
+    for (const m of this.mobs) if (m.state !== 'dead') { const [x, y] = P(m.p); g.fillStyle = m === this.target ? '#ffffff' : '#ffd100'; g.beginPath(); g.arc(x, y, 1.1 * sc, 0, 7); g.fill(); }
     g.font = `bold ${Math.round(5 * sc)}px sans-serif`; g.textAlign = 'center'; g.textBaseline = 'middle';
     const qm = this.questMark();
     if (qm) { g.fillStyle = qm === '…' ? '#aaa' : '#ffd100'; g.fillText(qm === '…' ? '?' : qm, cx, cy); }

@@ -453,12 +453,15 @@ const Game = {
       const cam = this.scene.cam;
       cam && cam.drag(e.clientX - drag[0], e.clientY - drag[1]);
       moved += Math.abs(e.clientX - drag[0]) + Math.abs(e.clientY - drag[1]);
+      if (moved >= 6) document.body.classList.add('cam-rot'); // počas otáčania kamery kurzor zmizne
       drag = [e.clientX, e.clientY];
     });
     canvas.addEventListener('pointerup', (e) => {
       if (drag && moved < 6 && Settings.wow) Wow.click(e.clientX, e.clientY, e.button); // klik bez ťahania = zameranie cieľa
       drag = null; this.dragging = false;
+      document.body.classList.remove('cam-rot');
     });
+    canvas.addEventListener('pointercancel', () => { drag = null; this.dragging = false; document.body.classList.remove('cam-rot'); });
     window.addEventListener('pagehide', () => this.save());
     document.addEventListener('visibilitychange', () => { if (document.hidden) this.save(); });
     const mc = $('#map canvas'), mxy = (e) => { const b = mc.getBoundingClientRect(); return [e.clientX - b.left, e.clientY - b.top]; };
@@ -634,7 +637,7 @@ const Game = {
     const s = Math.min(W, H) / 80, cx = W / 2, cy = H / 2, P = (p) => [cx + p[0] * s, cy + p[2] * s];
     this.mapLayout = { s, P };
     const hover = this.mapHover && this.mapPortalAt(...this.mapHover);
-    cv.style.cursor = hover && this.isUnlocked(hover.L.num) ? 'pointer' : '';
+    cv.classList.toggle('c-ptr', !!(hover && this.isUnlocked(hover.L.num))); // kurzor témy nad odomknutým portálom
     g.clearRect(0, 0, W, H);
     const N = Settings.nordic;
     const WW = Settings.wow;
@@ -654,8 +657,8 @@ const Game = {
       g.fillText(open ? (st !== undefined && st > 0 ? '★'.repeat(st) : pt.L.mentor) : '🔒', x, y + s * 3.6);
     }
     g.fillStyle = '#ffcf5a'; g.beginPath(); g.arc(cx, cy, s * 1.2, 0, 7); g.fill();
-    if (Settings.wow) { // MMO: nepriatelia a obchodník
-      g.fillStyle = '#ff3030'; for (const m of Wow.mobs) if (m.state !== 'dead') { const [x, y] = P(m.p); g.beginPath(); g.arc(x, y, s * 0.55, 0, 7); g.fill(); }
+    if (Settings.wow) { // MMO: neutrálne omyly a obchodník
+      g.fillStyle = '#ffd100'; for (const m of Wow.mobs) if (m.state !== 'dead') { const [x, y] = P(m.p); g.beginPath(); g.arc(x, y, s * 0.55, 0, 7); g.fill(); }
       const [vx, vy] = P(VENDOR_POS); g.fillStyle = '#ffd100'; g.fillText('💰 Planck', vx, vy);
     }
     if (this.scene === Hub) {

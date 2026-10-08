@@ -73,6 +73,7 @@ const UI = {
       const t = e.target.closest && e.target.closest('[data-tip]');
       if (t && t.dataset.tip) return this.showTip(t.dataset.tip, e.clientX, e.clientY);
       if (e.target.id === 'gl' && !e.buttons) {
+        if (Settings.wow) Wow.hoverCursor(e.clientX, e.clientY); // meč nad omylom, bublina nad postavou
         const h = this.hotAt(e.clientX, e.clientY);
         if (h) return this.showTip(h.tip, e.clientX, e.clientY);
       }
