@@ -2,8 +2,52 @@
 <html lang="sk">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Psíčko v kvantovom svete</title>
+<meta name="description" content="3D hra o jazyku, symboloch a správnych obrazoch kvantovej mechaniky: amplitúdy, spin, Blochova sféra, interferencia, bra-ket, NMR, previazanosť a interpretácie. 8 levelov, SK/EN, 4 obťažnosti. A 3D game about the language, symbols and right pictures of quantum mechanics.">
+<meta name="keywords" content="kvantová mechanika, quantum mechanics, qubit, Blochova sféra, Bloch sphere, amplitúda, spin, Stern-Gerlach, bra-ket, Dirac, NMR, Rabi, previazanosť, entanglement, Bell, CHSH, interferencia, hra, game, WebGL">
+<meta name="author" content="Ondrej Špánik">
+<meta name="generator" content="WebGL2 (OpenGL ES 3.0), bez knižníc / no libraries">
+<meta name="robots" content="index, follow">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0b1230">
+<meta name="application-name" content="Psíčko">
+<meta name="apple-mobile-web-app-title" content="Psíčko">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="format-detection" content="telephone=no">
+
+<!-- ikony -->
+<link rel="icon" href="favicon.ico" sizes="16x16 32x32 48x48">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="icon" href="assets/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="icon" href="assets/favicon-16.png" type="image/png" sizes="16x16">
+<link rel="icon" href="assets/icon-192.png" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png" sizes="180x180">
+<link rel="mask-icon" href="assets/icon.svg" color="#5fe3ff">
+<meta name="msapplication-TileColor" content="#0b1230">
+<meta name="msapplication-TileImage" content="assets/icon-192.png">
+
+<!-- zdieľanie (Open Graph, Twitter/X) — obrázok 1200×630 -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Psíčko v kvantovom svete">
+<meta property="og:title" content="Psíčko v kvantovom svete — Little Psi in the Quantum World">
+<meta property="og:description" content="3D hra o jazyku, symboloch a správnych obrazoch kvantovej mechaniky — od Eulera po Bella a Bohra. A 3D game about the language, symbols and right pictures of quantum mechanics.">
+<meta property="og:image" content="assets/banner.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Psíčko v kvantovom svete — kvantový stav ψ na Hilbertovom ostrove pred portálom Komplexný prístav">
+<meta property="og:locale" content="sk_SK">
+<meta property="og:locale:alternate" content="en_GB">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Psíčko v kvantovom svete — Little Psi in the Quantum World">
+<meta name="twitter:description" content="3D hra o jazyku, symboloch a obrazoch kvantovej mechaniky. A 3D game about the language and pictures of quantum mechanics.">
+<meta name="twitter:image" content="assets/banner.png">
+<meta name="twitter:image:alt" content="Psíčko v kvantovom svete — kvantový stav ψ na Hilbertovom ostrove">
+
+<!-- manifest len cez http(s): pri otvorení súboru dvojklikom (file://) by ho prehliadač zablokoval s chybou v konzole -->
+<script>if (/^https?:$/.test(location.protocol)) { const m = document.createElement('link'); m.rel = 'manifest'; m.href = 'site.webmanifest'; document.head.appendChild(m); }</script>
 <link rel="stylesheet" href="style.css">
 <script src="js/i18n.js"></script>
 <script src="js/settings.js"></script>

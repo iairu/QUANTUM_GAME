@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <title>Psíčko v kvantovom svete — ψ</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#26387a"/>
+      <stop offset="1" stop-color="#070b1a"/>
+    </linearGradient>
+    <radialGradient id="ball" cx="0.38" cy="0.32" r="0.75">
+      <stop offset="0" stop-color="#d8fbff"/>
+      <stop offset="0.45" stop-color="#5fe3ff"/>
+      <stop offset="1" stop-color="#1b7fa8"/>
+    </radialGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0.55" stop-color="#5fe3ff" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#5fe3ff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <circle cx="256" cy="268" r="210" fill="url(#glow)"/>
+  <!-- orbit (phase ring) behind the ball -->
+  <ellipse cx="256" cy="268" rx="205" ry="62" fill="none" stroke="#9feeff" stroke-width="12" opacity="0.55"/>
+  <circle cx="256" cy="268" r="140" fill="url(#ball)"/>
+  <!-- front half of the orbit -->
+  <path d="M51 268 A205 62 0 0 0 461 268" fill="none" stroke="#c8f6ff" stroke-width="12"/>
+  <!-- golden global-phase hand -->
+  <line x1="256" y1="268" x2="392" y2="168" stroke="#ffd25a" stroke-width="20" stroke-linecap="round"/>
+  <path d="M424 145 L366 157 L401 204 Z" fill="#ffd25a"/>
+  <text x="248" y="322" text-anchor="middle" font-family="'Cambria Math', Georgia, 'Times New Roman', serif" font-size="170" font-weight="700" fill="#0b1638">ψ</text>
+</svg>

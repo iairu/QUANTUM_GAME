@@ -1,0 +1,22 @@
+{
+  "name": "Psíčko v kvantovom svete — Little Psi in the Quantum World",
+  "short_name": "Psíčko",
+  "description": "3D hra o jazyku, symboloch a správnych obrazoch kvantovej mechaniky. A 3D game about the language, symbols and right pictures of quantum mechanics.",
+  "lang": "sk",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#070b1a",
+  "theme_color": "#0b1230",
+  "categories": ["education", "games"],
+  "icons": [
+    { "src": "assets/icon.svg", "sizes": "any", "type": "image/svg+xml" },
+    { "src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "assets/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "screenshots": [
+    { "src": "assets/banner.png", "sizes": "1200x630", "type": "image/png", "form_factor": "wide", "label": "Psíčko v kvantovom svete" }
+  ]
+}
