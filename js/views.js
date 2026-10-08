@@ -97,7 +97,7 @@ const Views = {
     g.lineWidth = 1;
   },
   circle(g, cx, cy, R, col = VC.grid, dash) { g.strokeStyle = col; if (dash) g.setLineDash(dash); g.beginPath(); g.arc(cx, cy, R, 0, 7); g.stroke(); g.setLineDash([]); },
-  title(g, x, y, w, t) { g.fillStyle = VC.m; g.textAlign = 'center'; g.fillText(t, x + w / 2, y + 9); },
+  title(g, x, y, w, t, small) { g.fillStyle = VC.m; g.textAlign = 'center'; g.font = (small ? '10px' : '11px') + ' system-ui'; g.fillText(t, x + w / 2, y + 9); },
   // jedna „hodinová ručička“ amplitúdy z (komplexné číslo) v kruhu polomeru R
   clock(g, cx, cy, R, z, col, label, small, alpha = 1) {
     this.circle(g, cx, cy, R);
@@ -116,7 +116,7 @@ const Views = {
 
   // ---------- pohľad: ručičky ----------
   hands(g, x, y, w, h, st, small) {
-    g.font = '11px system-ui'; this.title(g, x, y, w, tr('ručičky: dĺžka = veľkosť, uhol = fáza', 'hands: length = size, angle = phase'));
+    this.title(g, x, y, w, small ? tr('🕐 ručičky', '🕐 hands') : tr('ručičky: dĺžka = veľkosť, uhol = fáza', 'hands: length = size, angle = phase'), small);
     if (st.kind === 'qubit') {
       const R = Math.min(w * 0.2, h * (small ? 0.3 : 0.27)), cy = y + h * (small ? 0.56 : 0.47);
       if (st.pure) {
@@ -127,7 +127,7 @@ const Views = {
         this.clock(g, x + w * 0.28, cy, R, C.of(Math.sqrt(p0)), VC.a, 'α', small);
         this.clock(g, x + w * 0.72, cy, R, C.scale(C.exp(Math.atan2(st.r[1], st.r[0])), Math.sqrt(p1)), VC.b, 'β', small, 0.15 + 0.85 * k);
         g.fillStyle = VC.gold; g.font = '10px system-ui';
-        g.fillText(tr(`zmes: fáza β je určená len na ${Math.round(k * 100)} %`, `mixture: the phase of β is only ${Math.round(k * 100)} % defined`), x + w / 2, y + h - 7);
+        g.fillText(small ? tr(`zmes · koherencia ${Math.round(k * 100)} %`, `mixture · coherence ${Math.round(k * 100)} %`) : tr(`zmes: fáza β je určená len na ${Math.round(k * 100)} %`, `mixture: the phase of β is only ${Math.round(k * 100)} % defined`), x + w / 2, y + h - 7);
       }
       if (st.pure && !small) {
         let d = C.arg(st.psi[1]) - C.arg(st.psi[0]); d = ((d % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
@@ -159,7 +159,7 @@ const Views = {
       : st.kind === 'qubit' ? [[st.r, VC.w, 'r']] : null;
     if (!vecs) { this.title(g, x, y, w, 'Bloch 2D'); g.fillStyle = VC.m; g.fillText(tr('jedna amplitúda nemá Blochov vektor', 'a single amplitude has no Bloch vector'), x + w / 2, y + h / 2); return; }
     for (const [cx, name, i, j] of views) {
-      g.fillStyle = VC.m; g.fillText(name, cx, y + 10);
+      g.fillStyle = VC.m; g.font = '10px system-ui'; g.fillText(small ? (j === 2 ? 'x–z' : 'x–y') : name, cx, y + 10);
       this.circle(g, cx, cy, R, '#55628f');
       g.strokeStyle = VC.grid; g.beginPath(); g.moveTo(cx - R, cy); g.lineTo(cx + R, cy); g.moveTo(cx, cy - R); g.lineTo(cx, cy + R); g.stroke();
       g.font = '10px system-ui';
@@ -194,11 +194,11 @@ const Views = {
     if (st.kind === 'qubit') {
       const [rx, ry, rz] = st.r;
       groups = [['Z', [['0', (1 + rz) / 2, VC.a], ['1', (1 - rz) / 2, VC.b]]], ['X', [['+', (1 + rx) / 2, VC.a], ['−', (1 - rx) / 2, VC.b]]], ['Y', [['+i', (1 + ry) / 2, VC.a], ['−i', (1 - ry) / 2, VC.b]]]];
-      this.title(g, x, y, w, tr('ten istý stav, tri otázky (bázy)', 'the same state, three questions (bases)'));
+      this.title(g, x, y, w, small ? tr('📊 bázy Z, X, Y', '📊 bases Z, X, Y') : tr('ten istý stav, tri otázky (bázy)', 'the same state, three questions (bases)'), small);
     } else if (st.kind === 'two') {
       const p = st.psi.map(C.abs2), pa = p[0] + p[1], pb = p[0] + p[2];
       groups = [['Z⊗Z', [['00', p[0], VC.a], ['01', p[1], VC.b], ['10', p[2], VC.b], ['11', p[3], VC.a]]], [tr('Alica', 'Alice'), [['0', pa, VC.A], ['1', 1 - pa, VC.A]]], ['Bob', [['0', pb, VC.B], ['1', 1 - pb, VC.B]]]];
-      this.title(g, x, y, w, tr('páry vs. každý qubit sám', 'pairs vs. each qubit alone'));
+      this.title(g, x, y, w, small ? tr('📊 páry / sám', '📊 pairs / alone') : tr('páry vs. každý qubit sám', 'pairs vs. each qubit alone'), small);
     } else {
       const cols = [VC.a, VC.b, VC.gold];
       groups = [['|A|²', st.amps.map((a, i) => [a.label, C.abs2(a.z), cols[i]])]];
@@ -206,7 +206,7 @@ const Views = {
         const s = st.amps.reduce((acc, a) => C.add(acc, a.z), C.of(0));
         groups.push([tr('klasicky', 'classical'), [['Σ|A|²', st.amps.reduce((acc, a) => acc + C.abs2(a.z), 0), VC.m]]], [tr('kvantovo', 'quantum'), [['|ΣA|²', C.abs2(s), VC.gold]]]);
       }
-      this.title(g, x, y, w, tr('pravdepodobnosti', 'probabilities'));
+      this.title(g, x, y, w, tr('pravdepodobnosti', 'probabilities'), small);
     }
     const n = groups.reduce((s, gr) => s + gr[1].length, 0) + groups.length - 1, bw = (w - 30) / n, base = y + h - (small ? 20 : 26), top = y + 24, H = base - top;
     let k = 0;
@@ -217,7 +217,7 @@ const Views = {
         const bx = x + 15 + k * bw + bw * 0.15, hh = p * H;
         g.fillStyle = col; g.fillRect(bx, base - hh, bw * 0.7, hh);
         g.fillStyle = VC.w; g.font = '10px system-ui'; g.fillText(l, bx + bw * 0.35, base + 8);
-        if (!small || bars.length < 3) g.fillText(Fmt.pct(p), bx + bw * 0.35, base - hh - 7);
+        if (bw > 30) g.fillText(Fmt.pct(p), bx + bw * 0.35, base - hh - 7);
         k++;
       }
       g.fillStyle = VC.gold; g.font = 'bold 10px system-ui'; g.fillText(name, (gx + x + 15 + k * bw) / 2, top - 6);
@@ -232,13 +232,17 @@ const Views = {
     if (st.kind === 'qubit') { M = st.rho.map((row) => row.map((v) => (typeof v === 'number' ? [v, 0] : v))); labels = ['0', '1']; }
     else if (st.kind === 'two') { M = st.psi.map((a) => st.psi.map((b) => C.mul(a, C.conj(b)))); labels = ['00', '01', '10', '11']; }
     else { this.title(g, x, y, w, 'ρ'); g.fillStyle = VC.m; g.fillText(tr('ρ patrí stavu, nie jednej amplitúde', 'ρ belongs to a state, not to a single amplitude'), x + w / 2, y + h / 2); return; }
-    this.title(g, x, y, w, tr('ρ: plocha = |ρᵢⱼ|, farba = fáza', 'ρ: area = |ρᵢⱼ|, colour = phase'));
+    this.title(g, x, y, w, small ? '▦ ρ' : tr('ρ: plocha = |ρᵢⱼ|, farba = fáza', 'ρ: area = |ρᵢⱼ|, colour = phase'), small);
     const n = M.length, S = Math.min(w * 0.62, h - 34) / n, ox = x + (w - S * n) / 2 - (small ? 0 : 18), oy = y + 22;
     for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
       const v = M[i][j], m = C.abs(v), s = Math.sqrt(Math.min(1, m)) * S * 0.92, cx = ox + j * S + S / 2, cy = oy + i * S + S / 2;
       g.strokeStyle = i === j ? '#3d4a7a' : '#4a3a6a'; g.strokeRect(ox + j * S, oy + i * S, S, S);
       if (m > 1e-3) { g.fillStyle = phaseColor(C.arg(v), 0.9); g.fillRect(cx - s / 2, cy - s / 2, s, s); }
-      if (!small || n === 2) { g.fillStyle = VC.w; g.font = '10px system-ui'; g.fillText(Fmt.complex([Math.abs(v[0]) < 5e-3 ? 0 : v[0], Math.abs(v[1]) < 5e-3 ? 0 : v[1]]), cx, cy); }
+      if (S > 34) { // |ρᵢⱼ| ∠ fáza (kratšie než a + bi)
+        const ph = C.arg(v);
+        g.fillStyle = VC.w; g.font = '10px system-ui';
+        g.fillText(Fmt.num(m, 2) + (m > 5e-3 && Math.abs(ph) > 0.01 ? ` ∠${Fmt.angle(ph)}` : ''), cx, cy);
+      }
     }
     g.fillStyle = VC.m; g.font = '10px system-ui';
     labels.forEach((l, i) => { g.fillText(l, ox - 10, oy + i * S + S / 2); g.fillText(l, ox + i * S + S / 2, oy - 7); });
