@@ -347,6 +347,7 @@ const Game = {
   setDifficulty(d) {
     if (!DIFFS.includes(d) || d === Settings.diff) return;
     Settings.diff = d; Settings.save();
+    UI.labelsClear(); // 3D popisky si načítajú vysvetlivky pre novú obťažnosť (laická má vlastné)
     UI.diffUi && UI.diffUi();
     if (this.scene && this.scene !== Hub) this.scene.request(); else UI.setHud(tr('Hilbertov ostrov', 'Hilbert Island'), this.nextQuestText());
     UI.refreshDialog && UI.refreshDialog();
