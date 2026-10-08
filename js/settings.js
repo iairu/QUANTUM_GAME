@@ -3,8 +3,12 @@
 // oddelene od postupu, takže reset hry ich nezmaže.
 
 const DIFFS = ['layman', 'easy', 'normal', 'hard', 'ancient'];
+// témy: klasická (predvolená, 8 levelov) a severská (skyrimovský vzhľad + 9. level s drakom Ketvarrom)
+const THEMES = ['classic', 'nordic'];
 const Settings = {
   diff: 'layman', // nová hra začína laickou obťažnosťou
+  theme: 'classic',
+  get nordic() { return this.theme === 'nordic'; },
   // ťažká aj prastará (prastará = ťažká + starobylé zvitky s históriou)
   get hard() { return this.diff === 'hard' || this.diff === 'ancient'; },
   // ľahká aj laická (laická = ľahká + všetko bežnými slovami)
@@ -29,6 +33,7 @@ const Settings = {
   gpuName: '',
   // vysoké rozlíšenie textúr: ručne, alebo automaticky len na výkonnejších počítačoch
   get texHigh() {
+    if (!this.nordic) return false; // detailné textúry patria k severskej téme
     if (this.view.tex !== 'auto') return this.view.tex === 'high';
     const weakGpu = /swiftshader|llvmpipe|software|mali|adreno|powervr|intel\(r\) (hd|uhd) graphics [2-6]/i.test(this.gpuName);
     const mobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
@@ -39,15 +44,17 @@ const Settings = {
       const d = JSON.parse(localStorage.getItem('kvantp-game1-settings') || 'null');
       if (!d) return;
       if (DIFFS.includes(d.diff)) this.diff = d.diff;
+      if (THEMES.includes(d.theme)) this.theme = d.theme;
       for (const k of Object.keys(this.view)) if (typeof d.view?.[k] === typeof this.view[k]) this.view[k] = d.view[k];
       for (const k of Object.keys(this.audio)) if (typeof d.audio?.[k] === typeof this.audio[k]) this.audio[k] = d.audio[k];
     } catch (e) { /* predvolené nastavenia */ }
   },
   save() {
-    try { localStorage.setItem('kvantp-game1-settings', JSON.stringify({ diff: this.diff, view: this.view, audio: this.audio })); } catch (e) { /* bez ukladania */ }
+    try { localStorage.setItem('kvantp-game1-settings', JSON.stringify({ diff: this.diff, theme: this.theme, view: this.view, audio: this.audio })); } catch (e) { /* bez ukladania */ }
   },
 };
 Settings.load();
+document.documentElement.dataset.theme = Settings.theme;
 
 // hodnota podľa aktuálnej obťažnosti (číta sa vždy znova, takže zmena platí okamžite)
 const byDiff = (easy, normal, hard) => (Settings.easy ? easy : Settings.hard ? hard : normal);

@@ -424,6 +424,21 @@ const UI = {
       this.checkbox(tr('stlmiť všetko (N)', 'mute everything (N)'), A.muted, (v) => { A.muted = v; Sound.init(); chA(); Sound.muteUi(); }),
     );
     body.appendChild(ga);
+    body.appendChild(el('h3', null, tr('🎨 Téma', '🎨 Theme')));
+    const th = el('div', 'diffs');
+    for (const [k, name, desc] of [
+      ['classic', tr('Klasická', 'Classic'), tr('pôvodný modrý Hilbertov ostrov, 8 levelov', 'the original blue Hilbert Island, 8 levels')],
+      ['nordic', tr('🐉 Severská (Skyrim)', '🐉 Nordic (Skyrim)'), tr('zasnežený ostrov s borovicami a menhirmi, severské písmo a farby, detailné textúry a záverečný 9. level: ťahový súboj s kvantovým drakom Ketvarrom', 'a snowy island with pines and standing stones, Nordic lettering and colours, detailed textures and a final 9th level: a turn-based battle with the quantum dragon Ketvarr')],
+    ]) {
+      const l = el('label'), r = el('input');
+      r.type = 'radio'; r.name = 'theme'; r.checked = Settings.theme === k;
+      r.onchange = () => Game.setTheme(k);
+      l.append(r, el('b', null, name), el('small', null, desc));
+      th.appendChild(l);
+    }
+    body.appendChild(th);
+    body.appendChild(el('p', 'muted', tr('Zmena témy znovu načíta hru; postup, hudba a zvuky ostávajú.', 'Changing the theme reloads the game; progress, music and sounds stay.')));
+    if (Settings.nordic) {
     body.appendChild(el('h3', null, tr('🖼 Textúry', '🖼 Textures')));
     const tx = el('div', 'diffs');
     for (const [k, name, desc] of [
@@ -438,6 +453,7 @@ const UI = {
       tx.appendChild(l);
     }
     body.appendChild(tx);
+    }
     body.appendChild(el('h3', null, tr('📐 Geometria zobrazenia', '📐 View geometry')));
     const g2 = el('div', 'grid2');
     const deg = (v) => Math.round(v * 180 / Math.PI) + '°';

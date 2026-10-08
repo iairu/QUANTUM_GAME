@@ -14,7 +14,13 @@ Texty sú v kóde ako `tr('slovensky', 'English')` (`js/i18n.js`); väčšie tab
 
 *The game is in Slovak and English. Without a saved choice, Czech and Slovak browsers get SK, everyone else EN. Switch with the SK / EN selector in the top-right corner.*
 
-## Finále: drak Ketvarr (level 9)
+## Témy
+- V nastaveniach (⚙ → 🎨 Téma) sa volí **téma** hry; zmena znovu načíta hru, postup ostáva.
+  - *Klasická* (predvolená) — pôvodný modrý Hilbertov ostrov, 8 levelov.
+  - *🐉 Severská (Skyrim)* — zasnežený ostrov, severské farby a písmo, detailné textúry a 9. level s drakom (nižšie).
+- Hudba a zvukové efekty sú v oboch témach rovnaké.
+
+## Finále v severskej téme: drak Ketvarr (level 9)
 - Nad Hilbertovým ostrovom krúži kvantový drak **Ketvarr**. Každý z 8 levelov naučí jedno *slovo moci*; s ôsmimi sa otvorí **Dračí štít** (portál 9 na severe, mentor Erwin Schrödinger).
 - **Ťahová bitka** v 3 kolách: drakov štít je qubit (Blochova guľa), úder čepeľou je **meranie** pozdĺž zraniteľného miesta *n* — zásah s P = (1 + r·n)/2 a kolaps štítu. Hráč vykríkne jedno slovo (hradlá X, H, Z, S; od 2. kola impulz RABI-RA s uhlom θ, v 3. kole aj s osou φ), drak urobí **vopred ohlásený ťah** (rotácia okolo z, úder krídlom X, rev oblohy Y, hmla dekoherencie, presun srdca) a chrlí oheň.
 - **Metrika:** draka zraní len úder s P(zásah) ≥ prah (ľahká/laická 80 %, normálna 90 %, ťažká 95 %). Tlačidlá ukazujú P(zásah) v ďalšom ťahu už aj s drakovým ťahom; po zranení drak štít prekuje. Na záver 3 otázky o tom, *prečo* si vyhral.
@@ -24,7 +30,7 @@ Texty sú v kóde ako `tr('slovensky', 'English')` (`js/i18n.js`); väčšie tab
 - **Hudba** (`js/audio.js`): generatívna, bez zvukových súborov — tichý bordún D + A, pomalé akordy v d mol (≈ 9 s na akord), riedka harfa v pentatonike s ozvenou, vzdialený roh a vietor. Bez bicích a náhlych zmien, aby pomáhala sústredeniu. Spustí sa pri prvom kliknutí alebo klávese (pravidlo prehliadačov).
 - **Zvukové efekty**: tlačidlá, dialógy, listovanie, zvitky, mapa, denník, kódex, toasty, správna/nesprávna odpoveď, portál, dokončenie levelu a súboj s drakom (výkrik, čepeľ, oheň, rev).
 - **🔊 / N** stlmí všetko; hlasitosť hudby a efektov je v nastaveniach (⚙).
-- **Textúry** (nastavenia → 🖼): *automaticky* (vysoké len na výkonnejších počítačoch — aspoň 8 jadier a 8 GB, nie softvérové/mobilné GPU), *pôvodné*, alebo *vysoké rozlíšenie* (viac oktáv šumu, reliéf normál bez UV, lišajník, trblietanie snehu).
+- **Textúry** (len severská téma, nastavenia → 🖼): *automaticky* (vysoké len na výkonnejších počítačoch — aspoň 8 jadier a 8 GB, nie softvérové/mobilné GPU), *pôvodné*, alebo *vysoké rozlíšenie* (viac oktáv šumu, reliéf normál bez UV, lišajník, trblietanie snehu).
 
 ## Obťažnosť, nastavenia, ukladanie
 - **Obťažnosť** (rozbaľovací zoznam vpravo hore, dá sa meniť kedykoľvek):

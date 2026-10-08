@@ -16,7 +16,7 @@ const FS = `#version 300 es
 precision highp float;
 in vec3 vNor; in vec3 vWorld; in vec3 vObj;
 uniform vec4 uColor; uniform vec3 uCam; uniform vec3 uLight;
-uniform float uUnlit, uEmissive, uPattern, uFog, uTime, uDetail;
+uniform float uUnlit, uEmissive, uPattern, uFog, uTime, uDetail, uTheme;
 uniform vec3 uFogColor;
 out vec4 o;
 // procedurálny šum pre severské textúry (sneh, kameň, drevo, šupiny)
@@ -55,8 +55,13 @@ void main() {
     float line = smoothstep(0.46, 0.5, max(g.x, g.y));
     base = mix(base, base * 1.4 + 0.04, line * 0.55);
   } else if (uPattern > 1.5 && uPattern < 2.5) {   // studené more
-    float w = sin(vWorld.x * 0.35 + uTime) * sin(vWorld.z * 0.31 - uTime * 0.8) + fbm(vWorld.xz * 0.25 + uTime * 0.15) - 0.5;
-    base *= 0.88 + 0.14 * w;
+    if (uTheme < 0.5) {                            // klasická téma: pôvodná vlniaca sa voda
+      float w = sin(vWorld.x * 0.35 + uTime) * sin(vWorld.z * 0.31 - uTime * 0.8);
+      base *= 0.9 + 0.12 * w;
+    } else {
+      float w = sin(vWorld.x * 0.35 + uTime) * sin(vWorld.z * 0.31 - uTime * 0.8) + fbm(vWorld.xz * 0.25 + uTime * 0.15) - 0.5;
+      base *= 0.88 + 0.14 * w;
+    }
     if (hi) { hgt = fbm(vWorld.xz * 0.6 + vec2(uTime * 0.2, -uTime * 0.13)); bk = 0.35; }
   } else if (uPattern > 2.5 && uPattern < 3.5) {   // tundra so snehom
     float f = fbm(vWorld.xz * 0.12), d = fbm(vWorld.xz * 1.7);
@@ -124,10 +129,12 @@ void main() {
   if (bk > 0.0) n = bump(n, hgt, bk);
   vec3 l = normalize(uLight), v = normalize(uCam - vWorld), h = normalize(l + v);
   float d = max(dot(n, l), 0.0);
-  vec3 amb = mix(vec3(0.3, 0.28, 0.26), vec3(0.42, 0.47, 0.56), n.y * 0.5 + 0.5); // zem vs. studená obloha
+  // severská téma: zem vs. studená obloha a teplé slnko; klasická: pôvodné neutrálne svetlo
+  vec3 amb = uTheme > 0.5 ? mix(vec3(0.3, 0.28, 0.26), vec3(0.42, 0.47, 0.56), n.y * 0.5 + 0.5) : vec3(0.38 + 0.14 * n.y);
+  vec3 sun = uTheme > 0.5 ? vec3(1.0, 0.95, 0.86) : vec3(1.0);
   float spec = pow(max(dot(n, h), 0.0), 48.0) * 0.45 * matte;
   float rim = pow(1.0 - max(dot(n, v), 0.0), 3.0) * 0.35;
-  vec3 c = base * (amb + 0.72 * d * vec3(1.0, 0.95, 0.86)) + vec3(spec) + base * rim + base * uEmissive;
+  vec3 c = base * (amb + 0.72 * d * sun) + vec3(spec) + base * rim + base * uEmissive;
   if (sparkle > 0.0) c += vec3(0.9, 0.95, 1.0) * sparkle * (0.4 + 0.6 * sin(uTime * 3.0 + dot(vWorld, vec3(13.0, 7.0, 11.0))) * 0.5 + 0.3); // trblietanie snehu
   if (uFog > 0.0) c = mix(c, uFogColor, clamp(1.0 - exp(-uFog * length(uCam - vWorld)), 0.0, 0.8));
   o = vec4(c, uColor.a);
@@ -141,7 +148,7 @@ class Renderer {
     this.prog = this.program(VS, FS);
     try { const ext = gl.getExtension('WEBGL_debug_renderer_info'); Settings.gpuName = ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER); } catch (e) { /* neznáme GPU */ }
     this.loc = {};
-    for (const n of ['uModel', 'uView', 'uProj', 'uColor', 'uCam', 'uLight', 'uUnlit', 'uEmissive', 'uPattern', 'uFog', 'uFogColor', 'uTime', 'uDetail'])
+    for (const n of ['uModel', 'uView', 'uProj', 'uColor', 'uCam', 'uLight', 'uUnlit', 'uEmissive', 'uPattern', 'uFog', 'uFogColor', 'uTime', 'uDetail', 'uTheme'])
       this.loc[n] = gl.getUniformLocation(this.prog, n);
     this.aPos = gl.getAttribLocation(this.prog, 'aPos');
     this.aNor = gl.getAttribLocation(this.prog, 'aNor');
@@ -322,6 +329,7 @@ class Renderer {
     gl.uniform3fv(this.loc.uFogColor, this.fogColor);
     gl.uniform1f(this.loc.uTime, this.time);
     gl.uniform1f(this.loc.uDetail, Settings.texHigh ? 1 : 0);
+    gl.uniform1f(this.loc.uTheme, Settings.nordic ? 1 : 0);
   }
 
   // o: { emissive, unlit, pattern, alpha }
