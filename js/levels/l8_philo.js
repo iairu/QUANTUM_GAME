@@ -27,6 +27,33 @@ const PHILOSOPHERS = [
       'Prednáška hovorí: <b>pred meraním existuje spin ako symetria</b> — štruktúra možností; <b>po meraní ako fakt</b>. Symetria hovorí, čo sa <i>môže</i> stať, nie čo sa stane.'],
     q: { q: 'Pred meraním existuje spin podľa prednášky ako…', options: ['symetria — štruktúra možných odpovedí', 'konkrétna šípka hore alebo dole', 'nič, spin vôbec neexistuje'], correct: 0, why: 'Hodnota vzniká až v konkrétnom experimentálnom rámci.' } },
 ];
+const PHILOSOPHERS_EN = {
+  kant: {
+    lines: ['My <i>Critique of Pure Reason</i> says: “The conditions of the possibility of experience are at the same time conditions of the possibility of the objects of experience.”',
+      'Your quantum mechanics radicalises this: <b>the quantum state represents the conditions of possibility of an outcome</b>, not the outcome itself.'],
+    q: { q: 'According to the lecture, what does a quantum state represent?', options: ['the conditions of possibility of an outcome (the structure of possible answers)', 'a hidden list of the values of all quantities', 'the observer’s consciousness'], correct: 0, why: 'A state is a rule for predictions, not a list of classical properties.' } },
+  wittg: {
+    lines: ['“The limits of my language mean the limits of my world.” And later: “The meaning of a word is its use in the language.”',
+      'Phrases like “spin up” or “measurement along the z axis” are rules of the <b>grammar</b> of physical statements. By the way — I originally studied engineering, aeroplanes.'],
+    q: { q: 'According to the lecture, talking about “the value of the spin without a measurement” is…', options: ['a violation of the grammar of quantum theory', 'a deeper ontological description', 'forbidden by law'], correct: 0, why: 'The value of a spin has meaning only in the context of a measurement procedure.' } },
+  stodola: {
+    lines: ['Good day — I was born in Liptovský Mikuláš and became a professor at ETH Zürich: steam and gas turbines.',
+      'I judge theories by whether they can <b>reliably construct</b> relations between causes and effects. Quantum mechanics is a working design framework, not “a picture of the microworld as it is”.'],
+    q: { q: 'In quantum engineering, collapse is…', options: ['the physical readout process: amplification, coupling to the macroworld, writing to a register', 'a metaphysical jump without a cause', 'a consequence of a human looking at the qubit'], correct: 0, why: 'It is irreversible and dissipative — an engineering operation, not an extra axiom.' } },
+  bohm: {
+    lines: ['I claim that a particle <b>always has a precise position</b> and is guided by a <b>pilot wave</b>. The wave function never collapses. A measurement outcome is revealed, not created.',
+      'I pay a high price for it: my theory has to be <b>non-local</b>.'],
+    q: { q: 'What price does Bohmian mechanics pay for determinism?', options: ['non-locality', 'violation of energy conservation', 'disagreement with experiment'], correct: 0, why: 'Bell’s inequalities rule out LOCAL hidden variables; Bohm’s are non-local.' } },
+  heis: {
+    lines: ['On the island of Helgoland in 1925 I found matrix mechanics. In <i>Physics and Philosophy</i> I write: we do not observe nature in itself, but nature exposed to <b>our method of questioning</b>.',
+      'And about uncertainty: Δx · Δp ≥ ħ/2.'],
+    q: { q: 'What does Δx · Δp ≥ ħ/2 express?', options: ['a property of the state: position and momentum cannot both be sharply defined', 'only the imprecision of the measuring device', 'Δ = change of position over time'], correct: 0, why: 'Δ here means the standard deviation (uncertainty) of outcomes on identically prepared systems.' } },
+  noether: {
+    lines: ['My theorem: every continuous symmetry has a conservation law. Time → energy, rotation → angular momentum.',
+      'The lecture says: <b>before a measurement the spin exists as a symmetry</b> — a structure of possibilities; <b>after the measurement, as a fact</b>. Symmetry tells you what <i>can</i> happen, not what will happen.'],
+    q: { q: 'According to the lecture, before a measurement the spin exists as…', options: ['a symmetry — a structure of possible answers', 'a definite arrow up or down', 'nothing, spin does not exist at all'], correct: 0, why: 'The value arises only within a concrete experimental framework.' } },
+};
+if (LANG === 'en') for (const p of PHILOSOPHERS) Object.assign(p, PHILOSOPHERS_EN[p.id]);
 
 class L8Philo extends Level {
   get steps() { return [this.intro, this.statues, this.sorting]; }
@@ -37,23 +64,28 @@ class L8Philo extends Level {
   }
 
   intro() {
-    this.quest('Vypočuj si Bohra');
-    this.say([
+    this.quest(tr('Vypočuj si Bohra', 'Listen to Bohr'));
+    this.say(tr([
       'Velkommen! Som Niels Bohr. Na mojom erbe je jin-jang a nápis <i>Contraria sunt complementa</i> — protiklady sa dopĺňajú.',
       'Fyzik musí vedieť počítať. Ale musí vedieť aj <b>hovoriť</b> — a nehovoriť nezmysly. V tejto sieni stoja myslitelia, ktorých spomínajú vaše prednášky.',
       '<b>Komplementarita</b>: kvantový objekt nemožno opísať jedným klasickým obrazom. Vlna aj častica sú presné opisy, každý v rámci svojho experimentálneho usporiadania. Nie je to relativizmus!',
       'Porozprávaj sa so všetkými šiestimi. Každý ti položí otázku.',
-    ], () => this.next());
+    ], [
+      'Velkommen! I am Niels Bohr. My coat of arms bears the yin-yang and the motto <i>Contraria sunt complementa</i> — opposites are complementary.',
+      'A physicist must be able to calculate. But he must also be able to <b>speak</b> — and not speak nonsense. In this hall stand the thinkers your lectures mention.',
+      '<b>Complementarity</b>: a quantum object cannot be described by a single classical picture. Wave and particle are both precise descriptions, each within its own experimental arrangement. This is not relativism!',
+      'Talk to all six of them. Each will ask you a question.',
+    ]), () => this.next());
   }
 
   statues() {
-    this.quest('Porozprávaj sa so všetkými 6 mysliteľmi (tlačidlá vpravo).');
+    this.quest(tr('Porozprávaj sa so všetkými 6 mysliteľmi (tlačidlá vpravo).', 'Talk to all 6 thinkers (buttons on the right).'));
     this.buildPanel();
   }
   buildPanel() {
-    UI.panelSet('Sieň výkladov', [
+    UI.panelSet(tr('Sieň výkladov', 'Hall of Interpretations'), [
       ...PHILOSOPHERS.map((p) => UI.button(`${this.talked.has(p.id) ? '✅' : p.face} ${p.name}`, () => this.talk(p))),
-      UI.info(`Hotovo: ${this.talked.size} / ${PHILOSOPHERS.length}`),
+      UI.info(`${tr('Hotovo', 'Done')}: ${this.talked.size} / ${PHILOSOPHERS.length}`),
     ]);
   }
   talk(p) {
@@ -71,19 +103,27 @@ class L8Philo extends Level {
   sorting() {
     this.active = null;
     UI.panelHide();
-    this.quest('Záverečná úloha Bohra: tri roviny otázok a štyri otázky ku každému pojmu');
-    this.say([
+    this.quest(tr('Záverečná úloha Bohra: tri roviny otázok a štyri otázky ku každému pojmu', 'Bohr’s final task: three levels of questions and four questions for every concept'));
+    this.say(tr([
       'Výborne. Prednáška ťa varuje: nezamieňaj <b>tri otázky</b> — <b>ontológia</b> (Čo existuje?), <b>epistemológia</b> (Čo o tom môžeme vedieť?), <b>fenomenológia</b> (Ako sa nám jav ukazuje?).',
       'Zatrieď nasledujúce vety.',
-    ], () => UI.quizSeries([
+    ], [
+      'Excellent. The lecture warns you: don’t mix up <b>three questions</b> — <b>ontology</b> (What exists?), <b>epistemology</b> (What can we know about it?), <b>phenomenology</b> (How does the phenomenon appear to us?).',
+      'Classify the following sentences.',
+    ]), () => UI.quizSeries(tr([
       { who: 'Niels Bohr', face: '☯', q: '„Je vlnová funkcia ψ fyzikálna realita, alebo len nástroj predikcie?“ — Aká je to otázka?', options: ['ontologická', 'epistemologická', 'fenomenologická'], correct: 0, why: 'Pýta sa, čo existuje. Schrödingerova rovnica ani experimenty tento spor samy neuzatvárajú.' },
       { who: 'Niels Bohr', face: '☯', q: '„Čo o polohe a hybnosti elektrónu môžeme zároveň vedieť?“', options: ['epistemologická', 'ontologická', 'fenomenologická'], correct: 0, why: 'Otázka o hraniciach poznania.' },
       { who: 'Niels Bohr', face: '☯', q: '„Ako sa nám spin ukazuje v Sternovom–Gerlachovom pokuse — dve stopy na tienidle?“', options: ['fenomenologická', 'ontologická', 'epistemologická'], correct: 0, why: 'Otázka o tom, ako sa jav ukazuje v skúsenosti/experimente.' },
       { who: 'Niels Bohr', face: '☯', q: 'Ktorá z týchto NIE JE jedna zo „štyroch otázok“, ktoré si treba klásť pri každom novom kvantovom pojme?', options: ['Ktorý pozorovateľ má pravdu?', 'Aký systém sme pripravili?', 'Akým experimentom sa vlastnosti prejavia?', 'Čo z tohto opisu ešte nevyplýva?'], correct: 0, why: 'Štyri otázky: systém, rovnica a predpoklady, experiment, a čo z opisu (ne)vyplýva.' },
-    ], (m) => {
+    ], [
+      { who: 'Niels Bohr', face: '☯', q: '“Is the wave function ψ physical reality, or just a tool for prediction?” — What kind of question is this?', options: ['ontological', 'epistemological', 'phenomenological'], correct: 0, why: 'It asks what exists. Neither the Schrödinger equation nor experiments settle this dispute by themselves.' },
+      { who: 'Niels Bohr', face: '☯', q: '“What can we know at the same time about the position and momentum of an electron?”', options: ['epistemological', 'ontological', 'phenomenological'], correct: 0, why: 'A question about the limits of knowledge.' },
+      { who: 'Niels Bohr', face: '☯', q: '“How does spin appear to us in the Stern–Gerlach experiment — two spots on the screen?”', options: ['phenomenological', 'ontological', 'epistemological'], correct: 0, why: 'A question about how a phenomenon appears in experience/experiment.' },
+      { who: 'Niels Bohr', face: '☯', q: 'Which of these is NOT one of the “four questions” to ask about every new quantum concept?', options: ['Which observer is right?', 'What system have we prepared?', 'In what experiment do the properties show up?', 'What does this description still NOT imply?'], correct: 0, why: 'The four questions: the system, the equation and assumptions, the experiment, and what does (not) follow from the description.' },
+    ]), (m) => {
       this.mistakes += m;
       this.grant(['bohr', 'collapse', 'onto', 'four']);
-      this.say(['„Nie je potrebné prestať svet počítať. Je potrebné nezabudnúť, čo je to za svet, ktorý počítame.“ — tak končí prednáška o jazyku kvantovej mechaniky.'], () => this.next());
+      this.say([tr('„Nie je potrebné prestať svet počítať. Je potrebné nezabudnúť, čo je to za svet, ktorý počítame.“ — tak končí prednáška o jazyku kvantovej mechaniky.', '“There is no need to stop calculating the world. What we must not forget is what kind of world it is that we are calculating.” — so ends the lecture on the language of quantum mechanics.')], () => this.next());
     }));
   }
 

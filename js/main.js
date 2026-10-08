@@ -39,13 +39,16 @@ class Level {
   grant(ids) { Game.unlock(ids); }
   finale() {
     UI.panelHide();
-    this.quest('Záverečná skúška jazyka');
-    this.say(['Výborne! Ešte posledná skúška: <b>jazykové pasce</b>. Vyber správnu formuláciu — v kvantovom svete sa veľa chýb robí slovami, nie výpočtom.'], () => {
+    this.quest(tr('Záverečná skúška jazyka', 'Final language exam'));
+    this.say([tr('Výborne! Ešte posledná skúška: <b>jazykové pasce</b>. Vyber správnu formuláciu — v kvantovom svete sa veľa chýb robí slovami, nie výpočtom.',
+      'Excellent! One last exam: <b>language traps</b>. Pick the correct wording — in the quantum world many mistakes are made with words, not with calculations.')], () => {
       UI.quizSeries(TRAPS[this.num].map((q) => ({ who: this.mentor, face: this.face, ...q })), (m) => {
         this.mistakes += m;
         const stars = this.mistakes === 0 ? 3 : this.mistakes <= 2 ? 2 : 1;
         Game.completeLevel(this.num, stars);
-        this.say([`Level dokončený! Hodnotenie: <b>${'★'.repeat(stars)}${'☆'.repeat(3 - stars)}</b> (chyby: ${this.mistakes}).<br>Nové karty nájdeš v <b>Kódexe</b> (klávesa C).`], () => Game.backToHub());
+        const rating = '★'.repeat(stars) + '☆'.repeat(3 - stars);
+        this.say([tr(`Level dokončený! Hodnotenie: <b>${rating}</b> (chyby: ${this.mistakes}).<br>Nové karty nájdeš v <b>Kódexe</b> (klávesa C).`,
+          `Level complete! Rating: <b>${rating}</b> (mistakes: ${this.mistakes}).<br>You will find new cards in the <b>Codex</b> (key C).`)], () => Game.backToHub());
       });
     });
   }
@@ -73,7 +76,7 @@ const Hub = {
   },
   enter(fromLevel) {
     Game.r.fog = 0.012;
-    UI.setHud('Hilbertov ostrov', Game.nextQuestText());
+    UI.setHud(tr('Hilbertov ostrov', 'Hilbert Island'), Game.nextQuestText());
     if (fromLevel) {
       const pt = this.portals[fromLevel - 1];
       this.player.p = V3.add(pt.p, V3.scale(pt.dir, 4.5));
@@ -116,7 +119,7 @@ const Hub = {
     if (!this.near) return;
     const L = this.near.L;
     if (!Game.isUnlocked(L.num)) {
-      UI.toast(`🔒 Najprv dokonči level ${L.num - 1}.`);
+      UI.toast(tr(`🔒 Najprv dokonči level ${L.num - 1}.`, `🔒 Complete level ${L.num - 1} first.`));
       return;
     }
     Game.enterLevel(L.num);
@@ -132,7 +135,7 @@ const Hub = {
     const gy = 1.6 + Math.sin(t * 1.3) * 0.15;
     r.sphere([0, gy, 0], 0.55, [1, 0.75, 0.3], { emissive: 0.6 });
     r.draw('torus', M4.orient([0, gy, 0], [Math.sin(t), 1, Math.cos(t)], 0.9), [1, 0.85, 0.5], { emissive: 0.4 });
-    UI.label('guide', [0, gy + 1.1, 0], '✨ Amplitúda<br><small>sprievodkyňa</small>', 'npc');
+    UI.label('guide', [0, gy + 1.1, 0], tr('✨ Amplitúda<br><small>sprievodkyňa</small>', '✨ Amplitude<br><small>your guide</small>'), 'npc');
     // portály
     for (const pt of this.portals) {
       const L = pt.L, open = Game.isUnlocked(L.num), done = Game.progress.stars[L.num];
@@ -145,9 +148,9 @@ const Hub = {
       r.draw('cylinder', M4.trs(np, 0, [0.35, 1.1, 0.35]), V3.scale(L.color, 0.8));
       r.sphere(V3.add(np, [0, 1.45, 0]), 0.32, [0.95, 0.85, 0.75]);
       const st = done ? ' ' + '★'.repeat(done) + '☆'.repeat(3 - done) : '';
-      UI.hot(c, `<b>Portál ${L.num}: ${L.title}</b><br>${LEVEL_TIPS[L.num]}${open ? '' : '<br>🔒 Najprv dokonči predchádzajúci level.'}`, 60);
-      UI.hot(V3.add(np, [0, 1.2, 0]), `<b>${L.mentor}</b> — mentor levelu ${L.num}.`, 30);
-      UI.label('portal' + L.num, V3.add(c, [0, 2.9, 0]), `<b>${L.num} · ${L.title}</b>${st}<br><small>${open ? L.face + ' ' + L.mentor : '🔒 zamknuté'}</small>`, 'portal' + (open ? '' : ' locked'));
+      UI.hot(c, `<b>${tr('Portál', 'Portal')} ${L.num}: ${L.title}</b><br>${LEVEL_TIPS[L.num]}${open ? '' : tr('<br>🔒 Najprv dokonči predchádzajúci level.', '<br>🔒 Complete the previous level first.')}`, 60);
+      UI.hot(V3.add(np, [0, 1.2, 0]), tr(`<b>${L.mentor}</b> — mentor levelu ${L.num}.`, `<b>${L.mentor}</b> — mentor of level ${L.num}.`), 30);
+      UI.label('portal' + L.num, V3.add(c, [0, 2.9, 0]), `<b>${L.num} · ${L.title}</b>${st}<br><small>${open ? L.face + ' ' + L.mentor : tr('🔒 zamknuté', '🔒 locked')}</small>`, 'portal' + (open ? '' : ' locked'));
     }
     // plávajúce kryštály so symbolmi
     for (const c of this.crystals) {
@@ -164,16 +167,17 @@ const Hub = {
     r.arrow(pc, V3.add(pc, ph), [1, 0.85, 0.3], 0.035, { emissive: 0.5 });
     r.sphere(pc, 0.62, [0.4, 0.8, 1], { alpha: 0.18 });
     UI.label('player', V3.add(pc, [0, 0.95, 0]), 'ψ', 'player');
-    UI.hot(pc, '<b>Ty — Psíčko (stav ψ)</b>. Zlatá ručička je tvoja <b>globálna fáza</b>: točí sa, ale nedá sa zmerať.', 40);
-    UI.hot([0, gy, 0], '<b>Amplitúda</b> — sprievodkyňa. Podíď k nej a stlač E.', 40);
+    UI.hot(pc, tr('<b>Ty — Psíčko (stav ψ)</b>. Zlatá ručička je tvoja <b>globálna fáza</b>: točí sa, ale nedá sa zmerať.',
+      '<b>You — Little Psi (the state ψ)</b>. The golden hand is your <b>global phase</b>: it turns, but it cannot be measured.'), 40);
+    UI.hot([0, gy, 0], tr('<b>Amplitúda</b> — sprievodkyňa. Podíď k nej a stlač E.', '<b>Amplitude</b> — your guide. Walk up to her and press E.'), 40);
     if (this.near) {
       const L = this.near.L;
-      UI.label('prompt', V3.add(pl.p, [0, 2.4, 0]), Game.isUnlocked(L.num) ? `[E] Vstúpiť: ${L.title}` : '🔒 zamknuté', 'prompt');
-    } else if (this.nearGuide) UI.label('prompt', V3.add(pl.p, [0, 2.4, 0]), '[E] Hovoriť s Amplitúdou', 'prompt');
+      UI.label('prompt', V3.add(pl.p, [0, 2.4, 0]), Game.isUnlocked(L.num) ? tr(`[E] Vstúpiť: ${L.title}`, `[E] Enter: ${L.title}`) : tr('🔒 zamknuté', '🔒 locked'), 'prompt');
+    } else if (this.nearGuide) UI.label('prompt', V3.add(pl.p, [0, 2.4, 0]), tr('[E] Hovoriť s Amplitúdou', '[E] Talk to Amplitude'), 'prompt');
   },
 };
 
-const LEVEL_TIPS = {
+const LEVEL_TIPS = tr({
   1: 'Komplexné čísla: amplitúda ako ručička hodín, fáza, i² = −1, interferencia.',
   2: 'Meranie spinu: dve stopy, ±ħ/2, meracia báza je súčasťou otázky.',
   3: 'Blochova sféra: hradlá ako rotácie, relatívna vs. globálna fáza, meranie.',
@@ -182,24 +186,39 @@ const LEVEL_TIPS = {
   6: 'NMR: B₀, Zeemanove hladiny, precesia, Rabiho oscilácie, π-impulz, T₂.',
   7: 'Previazanosť, Bellov stav, nemožnosť signalizácie, CHSH hra.',
   8: 'Jazyk a realita: Bohr, Kant, Wittgenstein, Stodola, Bohm, kolaps.',
-};
-const CRYSTAL_TIPS = {
+}, {
+  1: 'Complex numbers: amplitude as a clock hand, phase, i² = −1, interference.',
+  2: 'Spin measurement: two spots, ±ħ/2, the measurement basis is part of the question.',
+  3: 'Bloch sphere: gates as rotations, relative vs. global phase, measurement.',
+  4: 'Superposition vs. mixture, density matrix ρ, coherences, decoherence.',
+  5: 'Bra-ket grammar: state, question, number, operator, probability.',
+  6: 'NMR: B₀, Zeeman levels, precession, Rabi oscillations, π pulse, T₂.',
+  7: 'Entanglement, Bell state, no-signalling, the CHSH game.',
+  8: 'Language and reality: Bohr, Kant, Wittgenstein, Stodola, Bohm, collapse.',
+});
+const CRYSTAL_TIPS = tr({
   'ψ': 'ψ — kvantový stav (vlnová funkcia).', 'ħ': 'ħ = h/2π — redukovaná Planckova konštanta.',
   '⟨φ|ψ⟩': '⟨φ|ψ⟩ — bra-ket: komplexné číslo (amplitúda prekrytia).', '⊗': '⊗ — tenzorový súčin: skladá systémy.',
   'ρ': 'ρ — matica hustoty.', 'Σ': 'Σ — suma (napr. rozvoj stavu do bázy).', 'e<sup>iφ</sup>': 'e^{iφ} — fázový faktor, bod na jednotkovej kružnici.',
-  '|0⟩': TIPS['|0⟩'], '|1⟩': TIPS['|1⟩'], '†': '† — dýka, hermitovské združenie.', 'Ĥ': TIPS['Ĥ'], '|Φ⁺⟩': '|Φ⁺⟩ — Bellov (maximálne previazaný) stav.',
-};
+  '†': '† — dýka, hermitovské združenie.', '|Φ⁺⟩': '|Φ⁺⟩ — Bellov (maximálne previazaný) stav.',
+}, {
+  'ψ': 'ψ — a quantum state (wave function).', 'ħ': 'ħ = h/2π — the reduced Planck constant.',
+  '⟨φ|ψ⟩': '⟨φ|ψ⟩ — bra-ket: a complex number (overlap amplitude).', '⊗': '⊗ — tensor product: combines systems.',
+  'ρ': 'ρ — the density matrix.', 'Σ': 'Σ — a sum (e.g. expanding a state in a basis).', 'e<sup>iφ</sup>': 'e^{iφ} — phase factor, a point on the unit circle.',
+  '†': '† — dagger, Hermitian conjugate.', '|Φ⁺⟩': '|Φ⁺⟩ — a Bell (maximally entangled) state.',
+});
+Object.assign(CRYSTAL_TIPS, { '|0⟩': TIPS['|0⟩'], '|1⟩': TIPS['|1⟩'], 'Ĥ': TIPS['Ĥ'] });
 
 // ------------------------------------------------------------------
 // Hra
 // ------------------------------------------------------------------
 const Game = {
   keys: {},
-  progress: { stars: {}, codex: new Set(), introSeen: false },
+  progress: { stars: {}, codex: new Set(), introSeen: false, allUnlocked: false },
   init() {
     const canvas = $('#gl');
     try { this.r = new Renderer(canvas); }
-    catch (e) { $('#fatal').style.display = 'flex'; $('#fatal').innerHTML = '<div>Tvoj prehliadač nepodporuje WebGL2 (OpenGL ES 3.0).<br><small>' + e.message + '</small></div>'; return; }
+    catch (e) { $('#fatal').style.display = 'flex'; $('#fatal').innerHTML = '<div>' + tr('Tvoj prehliadač nepodporuje WebGL2 (OpenGL ES 3.0).', 'Your browser does not support WebGL2 (OpenGL ES 3.0).') + '<br><small>' + e.message + '</small></div>'; return; }
     UI.init();
     this.load();
     this.levels = LEVELS.map((L) => new L.cls(L));
@@ -225,7 +244,7 @@ const Game = {
   },
   bindInput(canvas) {
     window.addEventListener('keydown', (e) => {
-      if (e.target.tagName === 'INPUT') return;
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
       this.keys[e.code] = true;
       if ((e.code === 'Enter' || e.code === 'Space') && UI.busy && UI._next) { e.preventDefault(); UI._next(); return; }
       if ((e.code === 'ArrowLeft' || e.code === 'Backspace') && UI.busy && UI._prev) { e.preventDefault(); UI._prev(); return; }
@@ -236,7 +255,7 @@ const Game = {
       if (e.code === 'KeyM') this.toggleMap();
       if (e.code === 'KeyH' || e.code === 'F1') { e.preventDefault(); UI.toggleHelp(); }
       if (e.code === 'Escape') { UI.toggleCodex(false); UI.toggleHelp(false); UI.toggleLog(false); this.toggleMap(false); }
-      if (e.code === 'F9') { e.preventDefault(); LEVELS.forEach((L) => (this.progress.stars[L.num] ??= 0)); this.save(); UI.toast('Všetky levely odomknuté (režim učiteľa).'); }
+      if (e.code === 'F9') { e.preventDefault(); this.unlockAll(); }
     });
     window.addEventListener('keyup', (e) => { this.keys[e.code] = false; });
     window.addEventListener('contextmenu', (e) => e.preventDefault()); // pravé tlačidlo slúži na otáčanie, nie na menu
@@ -266,7 +285,14 @@ const Game = {
     this.scene = Hub;
     Hub.enter(from);
   },
-  isUnlocked(n) { return n === 1 || this.progress.stars[n - 1] !== undefined || this.progress.stars[n] !== undefined; },
+  isUnlocked(n) { return n === 1 || this.progress.allUnlocked || this.progress.stars[n - 1] !== undefined || this.progress.stars[n] !== undefined; },
+  // odomkne všetky levely bez toho, aby ich označilo za dokončené (režim učiteľa / skákanie medzi levelmi)
+  unlockAll() {
+    this.progress.allUnlocked = true;
+    this.save();
+    UI.toast(tr('🔓 Všetky levely odomknuté — môžeš vstúpiť do ľubovoľného portálu.', '🔓 All levels unlocked — you can enter any portal.'));
+    if (this.scene === Hub) UI.setHud(tr('Hilbertov ostrov', 'Hilbert Island'), this.nextQuestText());
+  },
   completeLevel(n, stars) {
     this.progress.stars[n] = Math.max(stars, this.progress.stars[n] || 0);
     this.unlock(CODEX.filter((c) => c.level === n).map((c) => c.id));
@@ -277,26 +303,34 @@ const Game = {
     fresh.forEach((id) => this.progress.codex.add(id));
     if (fresh.length) {
       const names = fresh.map((id) => CODEX.find((c) => c.id === id)).filter(Boolean).map((c) => c.sym + ' ' + c.name);
-      UI.toast('📖 Nové v Kódexe: ' + names.join(', '), 3800);
+      UI.toast(tr('📖 Nové v Kódexe: ', '📖 New in the Codex: ') + names.join(', '), 3800);
       this.save();
     }
   },
   nextQuestText() {
     const n = LEVELS.find((L) => this.progress.stars[L.num] === undefined);
-    return n ? `Choď k portálu ${n.num}: ${n.title} (${n.mentor})` : 'Všetky levely hotové! Skús zlepšiť hviezdičky.';
+    return n ? tr(`Choď k portálu ${n.num}: ${n.title} (${n.mentor})`, `Go to portal ${n.num}: ${n.title} (${n.mentor})`)
+      : tr('Všetky levely hotové! Skús zlepšiť hviezdičky.', 'All levels done! Try to improve your stars.');
   },
   guideTalk() {
-    const A = (text) => ({ who: 'Amplitúda (sprievodkyňa)', face: '✨', text });
+    const A = (text) => ({ who: tr('Amplitúda (sprievodkyňa)', 'Amplitude (your guide)'), face: '✨', text });
     const first = !this.progress.introSeen;
     this.progress.introSeen = true; this.save();
-    UI.say(first ? [
+    UI.say(first ? tr([
       A('Ahoj! Vitaj na <b>Hilbertovom ostrove</b>. Ja som Amplitúda — komplexné číslo s veľkosťou aj fázou.'),
       A('A ty si <b>Psíčko</b> — kvantový stav <b>ψ</b>. Nie si guľôčka s polohou a rýchlosťou. Si <i>pravidlo pre predpovede</i>: hovoríš, aké výsledky dostane ten, kto sa ťa niečo opýta (zmeria).'),
       A('Vidíš tú zlatú ručičku, ktorá sa okolo teba točí? To je tvoja <b>globálna fáza</b>. Točí sa, ale nikto na svete ju nevie zmerať. Zapamätaj si: <b>globálna fáza je nepozorovateľná, relatívna fáza áno</b>.'),
       A('Okolo ostrova je 8 portálov. Za každým čaká mentor — Euler, Stern, Bloch, Feynman, Dirac, Rabi, Bell a Bohr. Naučia ťa <b>jazyk</b>, <b>symboly</b> a <b>správne obrazy</b> kvantového sveta.'),
       A('Cieľ nie je počítať integrály. Cieľ je <b>intuícia</b>: vedieť, čo je amplitúda, čo je pravdepodobnosť, čo robí meranie a kde klasické prirovnania prestávajú platiť.'),
       A('Ovládanie: <b>WASD</b> pohyb, <b>ťahanie myšou</b> kamera, <b>E</b> vstúpiť/hovoriť, <b>C</b> Kódex symbolov, <b>M</b> mapa, <b>H</b> pomoc. Začni portálom <b>1</b>!'),
-    ] : [A(this.nextQuestText() + '. Nezabudni: <i>amplitúdy interferujú, pravdepodobnosti sa len merajú.</i>')]);
+    ], [
+      A('Hi! Welcome to <b>Hilbert Island</b>. I am Amplitude — a complex number with both a magnitude and a phase.'),
+      A('And you are <b>Little Psi</b> — the quantum state <b>ψ</b>. You are not a little ball with a position and a velocity. You are a <i>rule for predictions</i>: you tell what outcomes anyone who asks you something (measures you) will get.'),
+      A('See that golden hand turning around you? That is your <b>global phase</b>. It turns, but nobody in the world can measure it. Remember: <b>the global phase is unobservable, the relative phase is not</b>.'),
+      A('There are 8 portals around the island. Behind each one a mentor is waiting — Euler, Stern, Bloch, Feynman, Dirac, Rabi, Bell and Bohr. They will teach you the <b>language</b>, the <b>symbols</b> and the <b>right pictures</b> of the quantum world.'),
+      A('The goal is not to compute integrals. The goal is <b>intuition</b>: knowing what an amplitude is, what a probability is, what a measurement does and where classical analogies stop working.'),
+      A('Controls: <b>WASD</b> move, <b>mouse drag</b> camera, <b>E</b> enter/talk, <b>C</b> Codex of symbols, <b>M</b> map, <b>H</b> help. Start with portal <b>1</b>!'),
+    ]) : [A(this.nextQuestText() + tr('. Nezabudni: <i>amplitúdy interferujú, pravdepodobnosti sa len merajú.</i>', '. Don’t forget: <i>amplitudes interfere, probabilities are only measured.</i>'))]);
   },
   toggleMap(force) {
     const m = $('#map'), show = force ?? !m.classList.contains('show');
@@ -321,7 +355,7 @@ const Game = {
     if (this.scene === Hub) {
       const [x, y] = P(Hub.player.p);
       g.fillStyle = '#5ff'; g.beginPath(); g.arc(x, y, s * 1.1, 0, 7); g.fill();
-      g.fillText('ψ (ty)', x, y - s * 1.8);
+      g.fillText(tr('ψ (ty)', 'ψ (you)'), x, y - s * 1.8);
     }
   },
   save() {
@@ -330,7 +364,7 @@ const Game = {
   load() {
     try {
       const d = JSON.parse(localStorage.getItem('kvantp-game1') || 'null');
-      if (d) this.progress = { stars: d.stars || {}, codex: new Set(d.codex || []), introSeen: !!d.introSeen };
+      if (d) this.progress = { stars: d.stars || {}, codex: new Set(d.codex || []), introSeen: !!d.introSeen, allUnlocked: !!d.allUnlocked };
     } catch (e) { /* čistý začiatok */ }
   },
 };

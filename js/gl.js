@@ -43,7 +43,7 @@ void main() {
 class Renderer {
   constructor(canvas) {
     const gl = canvas.getContext('webgl2', { antialias: true, alpha: true, premultipliedAlpha: false });
-    if (!gl) throw new Error('WebGL2 nie je dostupné');
+    if (!gl) throw new Error(tr('WebGL2 nie je dostupné', 'WebGL2 is not available'));
     this.gl = gl; this.canvas = canvas;
     this.prog = this.program(VS, FS);
     this.loc = {};
@@ -278,9 +278,12 @@ const Bloch = {
     r.sphere(center, radius, o.glass || [0.45, 0.6, 1], { alpha: 0.13 });
     if (typeof UI !== 'undefined' && UI.hot) {
       const L = vec ? V3.len(vec) : 0;
-      if (vec) UI.hot(L > 0.02 ? P(vec) : center, `<b>Blochov vektor</b> (šípka stavu). Dĺžka ${Fmt.num(L, 2)} → ${L > 0.99 ? '<b>čistý stav</b> (na povrchu)' : L < 0.02 ? '<b>maximálne zmiešaný stav</b> I/2 (stred)' : '<b>zmiešaný stav</b> (vnútri gule)'}.<br>Smer hore = |0⟩, dole = |1⟩, rovník = superpozície.`, 26);
-      if (o.target) UI.hot(P(o.target), '<b>Cieľ</b> — sem dostaň šípku stavu.', 22);
-      UI.hot(center, '<b>Blochova sféra</b>: obraz stavu qubitu (nie priestor laboratória!). Povrch = čisté stavy, vnútro = zmiešané. Hradlá sú rotácie gule.', 70);
+      if (vec) UI.hot(L > 0.02 ? P(vec) : center, tr(
+        `<b>Blochov vektor</b> (šípka stavu). Dĺžka ${Fmt.num(L, 2)} → ${L > 0.99 ? '<b>čistý stav</b> (na povrchu)' : L < 0.02 ? '<b>maximálne zmiešaný stav</b> I/2 (stred)' : '<b>zmiešaný stav</b> (vnútri gule)'}.<br>Smer hore = |0⟩, dole = |1⟩, rovník = superpozície.`,
+        `<b>Bloch vector</b> (the state arrow). Length ${Fmt.num(L, 2)} → ${L > 0.99 ? '<b>pure state</b> (on the surface)' : L < 0.02 ? '<b>maximally mixed state</b> I/2 (centre)' : '<b>mixed state</b> (inside the ball)'}.<br>Up = |0⟩, down = |1⟩, equator = superpositions.`), 26);
+      if (o.target) UI.hot(P(o.target), tr('<b>Cieľ</b> — sem dostaň šípku stavu.', '<b>Target</b> — get the state arrow here.'), 22);
+      UI.hot(center, tr('<b>Blochova sféra</b>: obraz stavu qubitu (nie priestor laboratória!). Povrch = čisté stavy, vnútro = zmiešané. Hradlá sú rotácie gule.',
+        '<b>Bloch sphere</b>: a picture of the qubit state (not laboratory space!). Surface = pure states, interior = mixed. Gates are rotations of the ball.'), 70);
     }
     if (o.labels !== false && o.labelFn) {
       const L = [[[0, 0, 1], '|0⟩'], [[0, 0, -1], '|1⟩'], [[1, 0, 0], '|+⟩'], [[-1, 0, 0], '|−⟩'], [[0, 1, 0], '|+i⟩'], [[0, -1, 0], '|−i⟩']];

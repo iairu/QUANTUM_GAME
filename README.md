@@ -7,6 +7,13 @@ jazykové vyjadrenia, symboly, správne obrazy a typické omyly — nie výpočt
 Dvojklik na `index.html` (Chrome, Edge alebo Firefox). Netreba server ani inštaláciu.
 Postup sa ukladá v prehliadači (localStorage).
 
+## Jazyk / Language
+Hra je po slovensky a po anglicky. Bez uloženej voľby sa jazyk určí podľa prehliadača: čeština a slovenčina → SK, všetky ostatné → EN.
+Prepínač **SK / EN** je vpravo hore (zmena znovu načíta stránku, postup zostane uložený).
+Texty sú v kóde ako `tr('slovensky', 'English')` (`js/i18n.js`); väčšie tabuľky majú anglickú verziu vedľa slovenskej (`CODEX_EN`, `TRAPS_EN`, `TIPS_EN`, …).
+
+*The game is in Slovak and English. Without a saved choice, Czech and Slovak browsers get SK, everyone else EN. Switch with the SK / EN selector in the top-right corner.*
+
 ## Ovládanie
 | kláves | akcia |
 |---|---|
@@ -18,7 +25,7 @@ Postup sa ukladá v prehliadači (localStorage).
 | L | Denník — všetky rozhovory a vysvetlenia (prečítať / prehrať znova) |
 | C | Kódex symbolov, osobností a pojmov |
 | M | mapa · H pomoc · Esc zavrieť okná |
-| F9 | odomknúť všetky levely (režim učiteľa) |
+| F9 | odomknúť všetky levely (režim učiteľa) — aj tlačidlom na konci okna Pomoc (H) |
 
 Prejdením myšou nad čímkoľvek (tlačidlo, symbol, 3D objekt, podčiarknutý pojem v texte) sa zobrazí krátka vysvetlivka.
 
@@ -37,5 +44,5 @@ Každý level končí **jazykovými pascami** (kvíz o správnych formuláciách
 ## Štruktúra kódu
 - `js/math.js` vektory, matice, komplexné čísla · `js/quantum.js` simulátor 1 a 2 qubitov
 - `js/gl.js` renderer (shader, procedurálne siete, Blochova sféra) · `js/ui.js` dialógy, kvízy, denník, vysvetlivky
-- `js/tips.js` slovník vysvetliviek · `js/content.js` kódex a jazykové pasce · `js/main.js` hub, kamera, hra
+- `js/i18n.js` voľba jazyka a `tr()` · `js/tips.js` slovník vysvetliviek · `js/content.js` kódex a jazykové pasce · `js/main.js` hub, kamera, hra
 - `js/levels/*.js` jednotlivé levely, `registry.js` ich poradie

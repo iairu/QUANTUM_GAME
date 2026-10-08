@@ -13,6 +13,25 @@ const UI = {
   init() {
     this.labelsRoot = $('#labels'); this.labelPool = new Map(); this.labelUsed = new Set();
     this.dialog = $('#dialog'); this.panel = $('#panel'); this.hud = $('#hud'); this.tip = $('#tip');
+    document.title = tr('Psíčko v kvantovom svete', 'Little Psi in the Quantum World');
+    for (const [id, text, title] of [
+      ['#btn-hub', tr('🏝 Ostrov', '🏝 Island'), tr('Späť na ostrov', 'Back to the island')],
+      ['#btn-map', tr('🗺 Mapa', '🗺 Map'), tr('Mapa (M)', 'Map (M)')],
+      ['#btn-codex', tr('📖 Kódex', '📖 Codex'), tr('Kódex symbolov (C)', 'Codex of symbols (C)')],
+      ['#btn-log', tr('📜 Denník', '📜 Journal'), tr('Denník rozhovorov (L)', 'Conversation journal (L)')],
+      ['#btn-help', '❔', tr('Pomoc (H)', 'Help (H)')],
+    ]) { $(id).textContent = text; $(id).title = title; }
+    const ls = $('#lang-select');
+    ls.value = LANG;
+    ls.dataset.tip = tr('Jazyk / Language — zmena znovu načíta hru (postup zostane uložený).', 'Language / Jazyk — switching reloads the game (your progress stays saved).');
+    ls.onchange = () => setLang(ls.value);
+    const ua = $('#btn-unlock-all');
+    ua.textContent = tr('🔓 Odomknúť všetky levely', '🔓 Unlock all levels');
+    ua.onclick = () => {
+      if (!confirm(tr('Naozaj odomknúť všetky levely? Preskočíš postupný výklad.', 'Really unlock all levels? You will skip the step-by-step explanations.'))) return;
+      Game.unlockAll();
+      this.toggleHelp(false);
+    };
     $('#btn-codex').onclick = () => this.toggleCodex();
     $('#btn-map').onclick = () => Game.toggleMap();
     $('#btn-help').onclick = () => this.toggleHelp();
@@ -103,7 +122,7 @@ const UI = {
   },
 
   // ---------- denník ----------
-  scene() { return Game.scene && Game.scene !== Hub ? `${Game.scene.num} · ${Game.scene.title}` : 'Hilbertov ostrov'; },
+  scene() { return Game.scene && Game.scene !== Hub ? `${Game.scene.num} · ${Game.scene.title}` : tr('Hilbertov ostrov', 'Hilbert Island'); },
   record(entry) {
     this.log.push({ scene: this.scene(), ...entry });
     if (this.log.length > 400) this.log.splice(0, this.log.length - 400);
@@ -117,7 +136,7 @@ const UI = {
   renderLog() {
     const list = $('#journal .list');
     list.innerHTML = '';
-    if (!this.log.length) { list.appendChild(el('p', 'muted', 'Zatiaľ prázdny. Každý rozhovor a vysvetlenie z kvízu sa sem uloží.')); return; }
+    if (!this.log.length) { list.appendChild(el('p', 'muted', tr('Zatiaľ prázdny. Každý rozhovor a vysvetlenie z kvízu sa sem uloží.', 'Empty so far. Every conversation and quiz explanation will be saved here.'))); return; }
     let lastScene = null;
     [...this.log].reverse().forEach((en, idx) => {
       if (en.scene !== lastScene) { list.appendChild(el('h3', null, en.scene)); lastScene = en.scene; }
@@ -126,15 +145,15 @@ const UI = {
         const first = en.lines[0];
         box.appendChild(el('summary', null, `💬 <b>${first.who || ''}</b>: ${first.text.replace(/<[^>]+>/g, '').slice(0, 90)}…`));
         for (const l of en.lines) box.appendChild(el('div', 'line', `<span class="who">${l.face || ''} ${l.who || ''}</span> ${annotate(l.text)}`));
-        const rb = el('button', null, '▶ Prehrať znova');
+        const rb = el('button', null, tr('▶ Prehrať znova', '▶ Replay'));
         rb.onclick = () => {
-          if (this.busy) { this.toast('Najprv dokonči aktuálny dialóg — text si však môžeš prečítať tu.'); return; }
+          if (this.busy) { this.toast(tr('Najprv dokonči aktuálny dialóg — text si však môžeš prečítať tu.', 'Finish the current dialogue first — but you can read the text here.')); return; }
           this.toggleLog(false);
           this.say(en.lines, null, { replay: true });
         };
         box.appendChild(rb);
       } else {
-        box.appendChild(el('summary', null, `${en.ok ? '✅' : '❌'} <b>Otázka:</b> ${en.q.replace(/<[^>]+>/g, '').slice(0, 90)}`));
+        box.appendChild(el('summary', null, `${en.ok ? '✅' : '❌'} <b>${tr('Otázka', 'Question')}:</b> ${en.q.replace(/<[^>]+>/g, '').slice(0, 90)}`));
         box.appendChild(el('div', 'line', annotate(en.q)));
         box.appendChild(el('div', 'line good', '✔ ' + en.answer));
         if (en.why) box.appendChild(el('div', 'line', annotate(en.why)));
@@ -154,14 +173,14 @@ const UI = {
     const show = () => {
       const l = lines[i];
       this.dialog.innerHTML = '';
-      this.dialog.appendChild(el('div', 'who', (l.face || '💬') + ' ' + (l.who || '') + (opts.replay ? ' <small>(opakovanie)</small>' : '')));
+      this.dialog.appendChild(el('div', 'who', (l.face || '💬') + ' ' + (l.who || '') + (opts.replay ? ` <small>(${tr('opakovanie', 'replay')})</small>` : '')));
       this.dialog.appendChild(el('div', 'txt', annotate(l.text)));
       const nav = el('div', 'nav');
-      const back = el('button', null, '◂ Späť');
-      back.disabled = i === 0; back.onclick = prev; back.dataset.tip = 'Predchádzajúca replika (← alebo Backspace). Celé rozhovory nájdeš v Denníku (L).';
+      const back = el('button', null, tr('◂ Späť', '◂ Back'));
+      back.disabled = i === 0; back.onclick = prev; back.dataset.tip = tr('Predchádzajúca replika (← alebo Backspace). Celé rozhovory nájdeš v Denníku (L).', 'Previous line (← or Backspace). Full conversations are in the Journal (L).');
       nav.appendChild(back);
-      nav.appendChild(el('span', 'hint', `${i + 1} / ${lines.length} · Enter = ďalej, ← = späť`));
-      const b = el('button', 'primary', i < lines.length - 1 ? 'Ďalej ▸' : 'Rozumiem ✓');
+      nav.appendChild(el('span', 'hint', `${i + 1} / ${lines.length} · ${tr('Enter = ďalej, ← = späť', 'Enter = next, ← = back')}`));
+      const b = el('button', 'primary', i < lines.length - 1 ? tr('Ďalej ▸', 'Next ▸') : tr('Rozumiem ✓', 'Got it ✓'));
       b.onclick = next;
       nav.appendChild(b);
       this.dialog.appendChild(nav);
@@ -183,7 +202,7 @@ const UI = {
     this.busy = true;
     this._next = null; this._prev = null;
     this.dialog.innerHTML = '';
-    this.dialog.appendChild(el('div', 'who', (q.face || '❓') + ' ' + (q.who || 'Otázka')));
+    this.dialog.appendChild(el('div', 'who', (q.face || '❓') + ' ' + (q.who || tr('Otázka', 'Question'))));
     this.dialog.appendChild(el('div', 'txt', annotate(q.q)));
     const box = el('div', 'choices');
     const order = q.options.map((_, i) => i);
@@ -197,9 +216,9 @@ const UI = {
         [...box.children].forEach((c) => (c.disabled = true));
         b.classList.add(ok ? 'good' : 'bad');
         if (!ok) box.children[order.indexOf(q.correct)].classList.add('good');
-        const fb = el('div', 'why ' + (ok ? 'ok' : 'no'), (ok ? '✅ Správne. ' : '❌ Nie celkom. ') + annotate(q.why || ''));
+        const fb = el('div', 'why ' + (ok ? 'ok' : 'no'), (ok ? tr('✅ Správne. ', '✅ Correct. ') : tr('❌ Nie celkom. ', '❌ Not quite. ')) + annotate(q.why || ''));
         this.dialog.appendChild(fb);
-        const c = el('button', 'primary', 'Pokračovať ▸');
+        const c = el('button', 'primary', tr('Pokračovať ▸', 'Continue ▸'));
         c.onclick = () => { this.dialog.classList.remove('show'); this.busy = false; this._next = null; cb && cb(ok); };
         this.dialog.appendChild(c);
         this._next = c.onclick;
@@ -261,19 +280,19 @@ const UI = {
     const list = $('#codex .list'), got = Game.progress.codex;
     list.innerHTML = '';
     const tabs = $('#codex .tabs'); tabs.innerHTML = '';
-    for (const [k, n] of [['all', 'Všetko'], ['symbol', '🔣 Symboly'], ['osobnost', '👤 Osobnosti'], ['pojem', '💡 Pojmy']]) {
+    for (const [k, n] of [['all', tr('Všetko', 'All')], ['symbol', tr('🔣 Symboly', '🔣 Symbols')], ['osobnost', tr('👤 Osobnosti', '👤 People')], ['pojem', tr('💡 Pojmy', '💡 Concepts')]]) {
       const b = el('button', filter === k ? 'on' : '', n); b.onclick = () => this.renderCodex(k); tabs.appendChild(b);
     }
     const entries = CODEX.filter((e) => filter === 'all' || e.type === filter);
-    $('#codex .count').textContent = `${got.size} / ${CODEX.length} odomknutých`;
+    $('#codex .count').textContent = `${got.size} / ${CODEX.length} ${tr('odomknutých', 'unlocked')}`;
     for (const e of entries) {
       const have = got.has(e.id), card = el('div', 'card ' + (have ? '' : 'locked'));
       card.innerHTML = have
         ? `<div class="sym">${e.sym}</div><div class="nm">${e.name}</div><div class="ds">${annotate(e.text)}</div>`
           + (e.do ? `<div class="do">✅ ${e.do}</div>` : '') + (e.dont ? `<div class="dont">❌ ${e.dont}</div>` : '')
           + `<div class="src">Level ${e.level}</div>`
-        : `<div class="sym">?</div><div class="nm">zamknuté</div><div class="ds">Odomkneš v leveli ${e.level}.</div>`;
-      if (!have) card.dataset.tip = `Dokonči level ${e.level} (${LEVELS[e.level - 1].title}).`;
+        : `<div class="sym">?</div><div class="nm">${tr('zamknuté', 'locked')}</div><div class="ds">${tr(`Odomkneš v leveli ${e.level}.`, `Unlocked in level ${e.level}.`)}</div>`;
+      if (!have) card.dataset.tip = tr(`Dokonči level ${e.level} (${LEVELS[e.level - 1].title}).`, `Complete level ${e.level} (${LEVELS[e.level - 1].title}).`);
       list.appendChild(card);
     }
   },
@@ -281,7 +300,7 @@ const UI = {
 };
 
 // vysvetlivky k posuvníkom
-const SLIDER_TIPS = [
+const SLIDER_TIPS = tr([
   [/veľkosť/, 'Dĺžka ručičky |α|. Pravdepodobnosť je jej štvorec.'],
   [/fáza φ/, 'Uhol ručičky (fáza). Na pravdepodobnosť |α|² nemá vplyv — až pri interferencii.'],
   [/fáza cesty/, 'Relatívna fáza druhej cesty voči prvej. π = proti sebe (vyrušenie), 0 = spolu (zosilnenie).'],
@@ -290,4 +309,13 @@ const SLIDER_TIPS = [
   [/plocha impulzu/, 'Ω_R·t = uhol, o ktorý impulz otočí Blochov vektor. π = preklopenie, π/2 = rovník.'],
   [/frekvencia RF/, 'Frekvencia generátora. V rezonancii sa spin otáča okolo osi v rovine xy a dá sa úplne preklopiť.'],
   [/Alica|Bob/, 'Uhol osi merania v rovine xz Blochovej sféry (0° = z, 90° = x).'],
-];
+], [
+  [/magnitude/, 'Length of the hand |α|. The probability is its square.'],
+  [/phase φ/, 'Angle of the hand (phase). It has no effect on the probability |α|² — only in interference.'],
+  [/phase of path/, 'Relative phase of the second path with respect to the first. π = opposite (cancellation), 0 = together (reinforcement).'],
+  [/^axis/, 'Rotation of the magnet around the beam: 0° = measuring S_z, 90° = measuring S_x.'],
+  [/strength p/, 'Decoherence strength: coherences (off-diagonal elements of ρ) are multiplied by (1 − p).'],
+  [/pulse area/, 'Ω_R·t = the angle by which the pulse rotates the Bloch vector. π = flip, π/2 = equator.'],
+  [/RF frequency/, 'Generator frequency. At resonance the spin rotates about an axis in the xy plane and can be fully flipped.'],
+  [/Alice|Bob/, 'Angle of the measurement axis in the xz plane of the Bloch sphere (0° = z, 90° = x).'],
+]);

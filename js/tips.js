@@ -2,7 +2,7 @@
 // Krátke vysvetlivky pri prejdení myšou: symboly, tlačidlá, 3D popisky a pojmy v dialógoch.
 
 // Presné zhody (text popisky alebo tlačidla bez HTML)
-const TIPS = {
+const TIPS_SK = {
   // stavy a symboly
   '|0⟩': 'Bázový stav |0⟩ ≡ |+z⟩ („spin hore“). Severný pól Blochovej sféry. Nie je to nulový vektor!',
   '|1⟩': 'Bázový stav |1⟩ ≡ |−z⟩ („spin dole“). Južný pól. S |0⟩ je ortogonálny (v Hilbertovom priestore kolmý, na sfére protiľahlý).',
@@ -63,7 +63,7 @@ const TIPS = {
 };
 
 // Tlačidlá a popisky podľa obsiahnutého textu
-const TIP_PATTERNS = [
+const TIP_PATTERNS_SK = [
   [/^SG/, 'Sternov–Gerlachov magnet: nehomogénne pole rozdelí zväzok podľa projekcie spinu do svojej osi. Os vyberá OTÁZKU.'],
   [/^pec/, 'Pec: odparuje striebro. Atómy letia nepolarizované — maximálne zmiešaný stav (žiadna preferovaná os).'],
   [/Klasický model/, 'Čo by sme čakali, keby magnetíky mali náhodnú klasickú orientáciu: spojitý pás.'],
@@ -102,7 +102,7 @@ const TIP_PATTERNS = [
 ];
 
 // Pojmy, ktoré sa v dialógoch podčiarknu (kmeň slova → vysvetlivka)
-const GLOSS = [
+const GLOSS_SK = [
   ['amplitúd', 'Amplitúda: komplexné číslo pri výsledku; pravdepodobnosť je jej |…|².'],
   ['superpozíci', 'Superpozícia: lineárna kombinácia stavov. Nie je to „nevieme, v ktorom je“ ani paralelné počítanie.'],
   ['dekoherenci', 'Dekoherencia: prostredie ničí fázové vzťahy (koherencie); šípka sa zmršťuje dovnútra gule.'],
@@ -134,6 +134,141 @@ const GLOSS = [
   ['skryt\\p{L}* premenn', 'Skryté premenné: hypotetické hodnoty určené pred meraním (Bohm). Lokálne vylúčil Bell.'],
   ['hradl', 'Hradlo: elementárna kvantová operácia (unitárna rotácia).'],
 ];
+// ---------- English ----------
+const TIPS_EN = {
+  '|0⟩': 'Basis state |0⟩ ≡ |+z⟩ (“spin up”). North pole of the Bloch sphere. It is not the zero vector!',
+  '|1⟩': 'Basis state |1⟩ ≡ |−z⟩ (“spin down”). South pole. Orthogonal to |0⟩ (perpendicular in Hilbert space, antipodal on the sphere).',
+  '|+⟩': '|+⟩ = (|0⟩ + |1⟩)/√2 — equator, +x axis. 50/50 in the Z basis, always “+” in the X basis.',
+  '|−⟩': '|−⟩ = (|0⟩ − |1⟩)/√2 — −x axis. Differs from |+⟩ only by the relative phase π.',
+  '|+i⟩': '|+i⟩ = (|0⟩ + i|1⟩)/√2 — +y axis. Relative phase π/2; proof that amplitudes must be complex.',
+  '|−i⟩': '|−i⟩ = (|0⟩ − i|1⟩)/√2 — −y axis. Relative phase −π/2.',
+  'ψ': 'ψ (psi) — a quantum state. That’s you, Little Psi: not a little ball, but a rule for predicting measurement outcomes.',
+  'x': 'The x axis of the Bloch sphere — direction of the state |+⟩. Not a direction in the lab!',
+  'y': 'The y axis of the Bloch sphere — direction of the state |+i⟩.',
+  'z': 'The z axis of the Bloch sphere — direction of the state |0⟩. Measuring “in the Z basis” = asking “|0⟩ or |1⟩?”.',
+  'Re': 'Real part of a complex number (horizontal axis of the complex plane).',
+  'Im': 'Imaginary part of a complex number (vertical axis). Don’t throw it away in QM — it carries the phase.',
+  '1': 'The number 1 in the complex plane (phase 0).',
+  'i': 'Imaginary unit: i² = −1. Multiplying by i = rotating by 90°.',
+  '−1': '−1 = e^{iπ}: rotation by 180°. This “minus” distinguishes |+⟩ from |−⟩.',
+  '−i': '−i = e^{−iπ/2} = i³: rotation by 270°.',
+  'α': 'Amplitude α — a complex number with a magnitude and a phase. The probability is |α|², not α.',
+  'A₁': 'Amplitude of the first path.',
+  'A₂': 'Amplitude of the second path — you change its phase with the slider.',
+  'A₁+A₂': 'Total amplitude: first the amplitudes add, only then we square → interference.',
+  'P = |α|²': 'Born rule: probability = squared absolute value of the amplitude. It does not “see” the phase.',
+  'B₀': 'Static magnetic field of the NMR magnet. Splits the spin energy into two Zeeman levels = a qubit.',
+  '+ħ/2': 'Outcome of measuring S_z = +ħ/2 (“spin up”, state |0⟩). ħ = h/2π.',
+  '−ħ/2': 'Outcome of measuring S_z = −ħ/2 (“spin down”, state |1⟩).',
+  'screen': 'Atoms land here. Each atom = one measurement outcome (one dot).',
+  'final state': 'Bloch sphere of the qubit after the track: an arrow = pure state, a point in the centre = maximally mixed state I/2.',
+  'density matrix ρ': 'ρ (rho): complete description of the state including mixtures. Diagonal = populations, off-diagonal = coherences.',
+  '(empty)': 'The centre of the temple is empty — nothing disturbs the coherence.',
+  'H': 'Hadamard gate: 180° rotation about the axis between x and z. Swaps the axes x ↔ z. H·H = I.',
+  'X': 'Pauli X: 180° rotation about the x axis — bit flip (quantum NOT).',
+  'Y': 'Pauli Y: 180° rotation about the y axis. Y|0⟩ = i|1⟩ ∼ |1⟩.',
+  'Z': 'Pauli Z: 180° rotation about the z axis — phase flip. P(0), P(1) in the Z basis don’t change.',
+  'S': 'Phase gate S: 90° rotation about the z axis (adds the phase i to |1⟩).',
+  'T': 'T gate: 45° rotation about the z axis (phase e^{iπ/4}).',
+  '|ψ⟩': 'Ket — an abstract state (column vector). 3D shape: an arrow.',
+  '|φ⟩': 'Ket — another state φ.',
+  '|a⟩': 'Ket — eigenstate a (e.g. a measurement outcome).',
+  '⟨ψ|': 'Bra — the dual (Hermitian-conjugate) vector, a row. It “asks a question”. Shape: a plank.',
+  '⟨φ|': 'Bra of the state φ.',
+  '⟨a|': 'Bra of the state a — the question “is it state a?”.',
+  'Â': 'Operator (hat) — an observable, a “machine” that transforms kets. Shape: a cube.',
+  'Ĥ': 'Hamiltonian — the energy operator; it governs the time evolution of the state.',
+  '⊗': 'Tensor product — combines two systems into one: |0⟩ ⊗ |1⟩ = |01⟩.',
+  '|…|²': 'Squared absolute value: turns an amplitude (a number) into a probability. Cannot be applied to kets or operators.',
+  '⌫': 'Deletes the last token.',
+  'Alice': 'Alice — owner of qubit A. She measures locally, with no link to Bob.',
+  'Bob': 'Bob — owner of qubit B. His statistics are always 50/50, whatever Alice does.',
+  'a₀': 'Alice’s measurement angle when she gets x = 0.', 'a₁': 'Alice’s measurement angle when she gets x = 1.',
+  'b₀': 'Bob’s measurement angle when he gets y = 0.', 'b₁': 'Bob’s measurement angle when he gets y = 1.',
+  'rotating frame': 'Coordinates rotating at the Larmor frequency — the fast precession “stops”. A mathematical trick.',
+  'laboratory frame': 'The view from the lab: the spin precesses about B₀ (the phase changes, not P(0), P(1)).',
+  'RF coil': 'Radio-frequency coil: sends pulses that rotate the Bloch vector (the gates of NMR).',
+  'RF pulse!': 'A resonant pulse is running: the state rotates about an axis in the xy plane (Rabi oscillation).',
+  'sample (ensemble of molecules)': 'In NMR we measure a huge number of molecules at once → signal = expectation value.',
+  '🔗 correlations (not a signal!)': 'Entanglement: the outcomes are correlated, but you cannot send a message with it.',
+  '[E] Talk to Amplitude': 'Your guide will remind you of the goal and the next step.',
+};
+
+const TIP_PATTERNS_EN = [
+  [/^SG/, 'Stern–Gerlach magnet: the inhomogeneous field splits the beam by the spin projection onto its axis. The axis chooses the QUESTION.'],
+  [/^furnace/, 'Furnace: evaporates silver. The atoms fly out unpolarised — a maximally mixed state (no preferred axis).'],
+  [/Classical model/, 'What we would expect if the little magnets had random classical orientations: a continuous band.'],
+  [/Reality/, 'Real (quantum) behaviour: only two spots.'],
+  [/Fire/, 'Sends atoms from the furnace through the magnets onto the screen.'],
+  [/Setup A/, 'Z+ → Z: the first magnet lets only “+” through, the second measures Z again.'],
+  [/Setup B/, 'Z+ → X+ → Z: we insert an X measurement between two Z measurements.'],
+  [/^Magnet \d/, 'Turn the magnet on/off. Slider = measurement axis (0° = z, 90° = x), filter = which beam passes.'],
+  [/× i/, 'Multiply the amplitude by i = turn the hand 90° counter-clockwise.'],
+  [/Again/, 'Restart the puzzle.'],
+  [/Measure 1×/, 'One measurement in the Z basis: gives one bit and the state “collapses” to |0⟩ or |1⟩.'],
+  [/Measure 100 copies/, '100 identically prepared copies, each measured once — that is how probabilities are found.'],
+  [/Prepare/, 'Prepare a new state (a new copy of the qubit).'],
+  [/Send 1/, 'Send one qubit slowly — watch how the Bloch arrow and the matrix ρ change at each station.'],
+  [/Send 100/, 'Send 100 qubits at once and look at the detector statistics.'],
+  [/Clear/, 'Resets the counters / the expression.'],
+  [/Check/, 'Check whether the built expression matches the task.'],
+  [/Pulse from/, 'Resets the spin to |0⟩ and fires an RF pulse with the chosen area (= rotation angle).'],
+  [/Reset/, 'Returns the state to the start.'],
+  [/CNOT/, 'Controlled NOT: if A is |1⟩, it flips B. After H on A it produces an entangled Bell state.'],
+  [/H on [AB]/, 'Hadamard on one qubit.'], [/X on [AB]/, 'Bit flip of one qubit.'],
+  [/Measure 200/, 'Measures 200 entangled pairs in the chosen bases.'],
+  [/Play 400/, 'Plays 400 rounds of the CHSH game with your angles and an entangled pair.'],
+  [/Classically/, 'Best classical strategy: always answer 0 → 75 %.'],
+  [/Hint/, 'Shows the optimal angles.'],
+  [/Laboratory frame/, 'You look from the lab: the spin precesses about B₀.'], [/Rotating frame/, 'You rotate along with the spin — the precession disappears.'],
+  [/Island/, 'Back to Hilbert Island (a level in progress will restart).'],
+  [/Map/, 'Island map with the portals (M).'], [/Codex/, 'Unlocked symbols, people and concepts (C).'], [/Journal/, 'All dialogues and explanations — read or replay (L).'],
+  [/Amplitude/, 'Your guide Amplitude — a complex number leading you around the island.'],
+  [/^ρ|^\|ρ/, 'Density-matrix element: ρ₀₀, ρ₁₁ = probabilities (populations), |ρ₀₁| = coherence (memory of the phase).'],
+  [/^\d: \d+/, 'Number of outcomes 0 or 1 at the detector.'],
+  [/preparation/, 'The qubit always starts in the state |0⟩.'],
+  [/Z measurement/, 'Z-basis measurement with a FORGOTTEN result — destroys coherence, leaves a mixture.'],
+  [/environment/, 'Decoherence: the environment partly “measures” the phase; coherences shrink by the factor (1 − p).'],
+  [/^axis /, 'Rotation axis of the gate being applied.'],
+];
+
+const GLOSS_EN = [
+  ['amplitude', 'Amplitude: a complex number attached to an outcome; the probability is its |…|².'],
+  ['superposition', 'Superposition: a linear combination of states. Not “we don’t know which one it is in”, nor parallel computing.'],
+  ['decoheren', 'Decoherence: the environment destroys phase relations (coherences); the arrow shrinks into the ball.'],
+  ['coheren', 'Coherence: a fixed phase relation between the components of a state — it enables interference.'],
+  ['interfer', 'Interference: adding amplitudes before squaring; reinforcement or cancellation depending on the phase.'],
+  ['entangle', 'Entanglement: the state of the whole cannot be written as a product of states of the parts.'],
+  ['relative phase', 'Relative phase: the phase difference between α and β; observable via a measurement in another basis.'],
+  ['global phase', 'Global phase: a common factor of the whole state; unobservable.'],
+  ['Bloch sphere', 'Bloch sphere: a picture of a qubit state; surface = pure, interior = mixed states.'],
+  ['density matri', 'Density matrix ρ: describes states including mixtures; diagonal = populations, off-diagonal = coherences.'],
+  ['Born rule', 'Born rule: P = |amplitude|².'],
+  ['collaps', 'Collapse: the transition from a quantum possibility to a classical fact during measurement (readout).'],
+  ['Hamiltonian', 'Hamiltonian Ĥ: the energy operator that governs time evolution.'],
+  ['unitar', 'Unitary operation: reversible, preserves the norm; a rotation on the Bloch sphere.'],
+  ['(?:basis|bases)', 'Basis: a set of orthogonal states = the “question” a measurement asks (e.g. Z: |0⟩ or |1⟩?).'],
+  ['operator', 'Operator: a “machine” that transforms states; observables are Hermitian operators.'],
+  ['expectation value', 'Expectation value ⟨A⟩: the average of many measurements, not the result of one.'],
+  ['precess', 'Precession: evolution of the relative phase in the field B₀; P(0), P(1) don’t change.'],
+  ['resonan', 'Resonance: the driving frequency matches the natural frequency of the system.'],
+  ['complementarit', 'Complementarity (Bohr): wave and particle descriptions complement each other depending on the experiment; not relativism.'],
+  ['mixture', 'Mixture: statistical (classical) ignorance; it has no coherences and does not interfere.'],
+  ['mixed', 'Mixed state: |r| < 1, inside the Bloch sphere.'],
+  ['orthogonal', 'Orthogonal states: inner product 0, perfectly distinguishable by measurement.'],
+  ['spin', 'Spin: the quantum form of intrinsic angular momentum — not a spinning ball.'],
+  ['qubit', 'Qubit: a quantum system with a two-dimensional complex state space.'],
+  ['ket', 'Ket |ψ⟩: notation for a state (column vector).'],
+  ['ensemble', 'Ensemble: a large collection of identically prepared systems; NMR measures its average.'],
+  ['non-?local', 'Non-locality: influence between distant places without mediation through space.'],
+  ['hidden variable', 'Hidden variables: hypothetical values fixed before measurement (Bohm). Bell ruled out local ones.'],
+  ['gate', 'Gate: an elementary quantum operation (a unitary rotation).'],
+];
+
+const TIPS = tr(TIPS_SK, TIPS_EN);
+const TIP_PATTERNS = tr(TIP_PATTERNS_SK, TIP_PATTERNS_EN);
+const GLOSS = tr(GLOSS_SK, GLOSS_EN);
+
 const GLOSS_RE = GLOSS.map(([stem, tip]) => [new RegExp(`(?<![\\p{L}\u0002])(${stem}\\p{L}*)`, 'iu'), tip]);
 
 function tipFor(html) {

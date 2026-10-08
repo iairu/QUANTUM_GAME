@@ -14,12 +14,12 @@ class L1Complex extends Level {
   W(z, y = 0.03) { return [z[0] * 2, y, -z[1] * 2]; } // komplexné číslo → bod v rovine
 
   intro() {
-    this.quest('Vypočuj si Eulera');
+    this.quest(tr('Vypočuj si Eulera', 'Listen to Euler'));
     this.say([
-      'Vitaj v <b>Komplexnom prístave</b>! Ja som Leonhard Euler. Zaviedol som písmenká <b>e</b> a <b>i</b> — a v kvantovej mechanike ich uvidíš na každom kroku.',
-      'Prirovnanie: <b>amplitúda je ako ručička na hodinách</b>. Má <b>dĺžku</b> (veľkosť) a <b>uhol</b> (fázu). V kvantovom svete každý možný výsledok nesie takúto ručičku.',
-      'Pravdepodobnosť je <b>štvorec dĺžky</b> ručičky: |α|². Uhol jej je ukradnutý! Prečo teda fáza vôbec existuje? To zistíš v treťej úlohe. 😉',
-      'Pod tebou je <b>komplexná rovina</b>: vodorovne <b>Re</b> (reálna časť), zvislo <b>Im</b> (imaginárna časť). Kruh je jednotková kružnica.',
+      tr('Vitaj v <b>Komplexnom prístave</b>! Ja som Leonhard Euler. Zaviedol som písmenká <b>e</b> a <b>i</b> — a v kvantovej mechanike ich uvidíš na každom kroku.', 'Welcome to the <b>Complex Harbour</b>! I am Leonhard Euler. I introduced the letters <b>e</b> and <b>i</b> — and in quantum mechanics you will see them at every step.'),
+      tr('Prirovnanie: <b>amplitúda je ako ručička na hodinách</b>. Má <b>dĺžku</b> (veľkosť) a <b>uhol</b> (fázu). V kvantovom svete každý možný výsledok nesie takúto ručičku.', 'An analogy: <b>an amplitude is like the hand of a clock</b>. It has a <b>length</b> (magnitude) and an <b>angle</b> (phase). In the quantum world every possible outcome carries such a hand.'),
+      tr('Pravdepodobnosť je <b>štvorec dĺžky</b> ručičky: |α|². Uhol jej je ukradnutý! Prečo teda fáza vôbec existuje? To zistíš v treťej úlohe. 😉', 'The probability is the <b>square of the length</b> of the hand: |α|². It doesn’t care about the angle at all! So why does phase exist? You’ll find out in the third task. 😉'),
+      tr('Pod tebou je <b>komplexná rovina</b>: vodorovne <b>Re</b> (reálna časť), zvislo <b>Im</b> (imaginárna časť). Kruh je jednotková kružnica.', 'Beneath you is the <b>complex plane</b>: horizontally <b>Re</b> (real part), vertically <b>Im</b> (imaginary part). The circle is the unit circle.'),
     ], () => this.next());
   }
 
@@ -27,26 +27,26 @@ class L1Complex extends Level {
   setHand() {
     this.mode = 'set';
     this.target = C.scale(C.exp(3 * Math.PI / 4), 0.7);
-    this.quest('Nastav ručičku amplitúdy α na zlatý cieľ (veľkosť aj fázu).');
+    this.quest(tr('Nastav ručičku amplitúdy α na zlatý cieľ (veľkosť aj fázu).', 'Set the amplitude hand α onto the golden target (both magnitude and phase).'));
     let r = 1, ph = 0;
     const info = UI.info('');
     const upd = () => {
       this.z = C.scale(C.exp(ph), r);
       info.innerHTML = `α = ${Fmt.num(r, 2)} · e<sup>i·${Fmt.angle(ph)}</sup> = ${Fmt.complex(this.z)}<br>`
         + `Re α = ${Fmt.num(this.z[0], 2)}, Im α = ${Fmt.num(this.z[1], 2)}<br>`
-        + `<b>P = |α|² = ${Fmt.num(r * r, 2)}</b> &nbsp;<small>(fáza na P nemá vplyv!)</small>`;
+        + tr(`<b>P = |α|² = ${Fmt.num(r * r, 2)}</b> &nbsp;<small>(fáza na P nemá vplyv!)</small>`, `<b>P = |α|² = ${Fmt.num(r * r, 2)}</b> &nbsp;<small>(the phase has no effect on P!)</small>`);
       if (!this.done1 && C.abs(C.sub(this.z, this.target)) < 0.06) {
         this.done1 = true;
         this.grant(['euler', 'eiphi', 'amp']);
-        this.say(['Presne! Všimni si: kým si menil iba <b>fázu</b>, stĺpec pravdepodobnosti sa nepohol. Menil sa len pri zmene <b>veľkosti</b>.'], () =>
-          this.ask({ q: 'Dve amplitúdy: 0,7 a 0,7·e<sup>iπ/2</sup> (= 0,7i). Majú rovnakú pravdepodobnosť?', options: ['Áno, obe 0,49', 'Nie, druhá má −0,49', 'Nie, druhá má 0,7'], correct: 0, why: '|0,7i|² = 0,7i · (−0,7i) = 0,49. Fáza sa v |α|² stratí.' }, () => this.next()));
+        this.say([tr('Presne! Všimni si: kým si menil iba <b>fázu</b>, stĺpec pravdepodobnosti sa nepohol. Menil sa len pri zmene <b>veľkosti</b>.', 'Exactly! Notice: while you changed only the <b>phase</b>, the probability bar didn’t move. It changed only when you changed the <b>magnitude</b>.')], () =>
+          this.ask(tr({ q: 'Dve amplitúdy: 0,7 a 0,7·e<sup>iπ/2</sup> (= 0,7i). Majú rovnakú pravdepodobnosť?', options: ['Áno, obe 0,49', 'Nie, druhá má −0,49', 'Nie, druhá má 0,7'], correct: 0, why: '|0,7i|² = 0,7i · (−0,7i) = 0,49. Fáza sa v |α|² stratí.' }, { q: 'Two amplitudes: 0.7 and 0.7·e<sup>iπ/2</sup> (= 0.7i). Do they have the same probability?', options: ['Yes, both 0.49', 'No, the second has −0.49', 'No, the second has 0.7'], correct: 0, why: '|0.7i|² = 0.7i · (−0.7i) = 0.49. The phase is lost in |α|².' }), () => this.next()));
       }
     };
-    UI.panelSet('Ručička amplitúdy α', [
-      UI.slider('veľkosť |α|', 0, 1, 0.01, 1, (v) => { r = v; upd(); return Fmt.num(v, 2); }),
-      UI.slider('fáza φ', 0, 6.28, 0.01, 0, (v) => { ph = v; upd(); return Fmt.angle(v); }),
+    UI.panelSet(tr('Ručička amplitúdy α', 'Amplitude hand α'), [
+      UI.slider(tr('veľkosť |α|', 'magnitude |α|'), 0, 1, 0.01, 1, (v) => { r = v; upd(); return Fmt.num(v, 2); }),
+      UI.slider(tr('fáza φ', 'phase φ'), 0, 6.28, 0.01, 0, (v) => { ph = v; upd(); return Fmt.angle(v); }),
       info,
-      UI.info('💡 Tip: zlatý cieľ má veľkosť 0,7 a fázu 3π/4 (135°).', 'tip'),
+      UI.info(tr('💡 Tip: zlatý cieľ má veľkosť 0,7 a fázu 3π/4 (135°).', '💡 Tip: the golden target has magnitude 0.7 and phase 3π/4 (135°).'), 'tip'),
     ]);
   }
 
@@ -54,36 +54,38 @@ class L1Complex extends Level {
   timesI() {
     this.mode = 'mul'; this.ang = 0; this.angShown = 0; this.mag = 1; this.presses = 0;
     this.target = C.of(-1);
-    this.quest('Iba tlačidlom „× i“ dostaň ručičku z bodu 1 do bodu −1.');
-    const info = UI.info('Stlačenia: 0');
+    this.quest(tr('Iba tlačidlom „× i“ dostaň ručičku z bodu 1 do bodu −1.', 'Using only the “× i” button, get the hand from the point 1 to the point −1.'));
+    const info = UI.info(tr('Stlačenia: 0', 'Presses: 0'));
     const press = (k, label) => {
       this.ang += k; this.presses++;
-      info.innerHTML = `Stlačenia: ${this.presses} &nbsp; (posledné: ${label})<br>α = ${Fmt.complex(C.exp(this.ang))}`;
+      info.innerHTML = tr(`Stlačenia: ${this.presses} &nbsp; (posledné: ${label})`, `Presses: ${this.presses} &nbsp; (last: ${label})`) + `<br>α = ${Fmt.complex(C.exp(this.ang))}`;
       if (!this.done2 && Math.abs(Math.cos(this.ang) + 1) < 1e-6) {
         this.done2 = true;
         setTimeout(() => {
           this.grant(['i']);
-          this.say([`Hotovo za ${this.presses} ${this.presses === 2 ? 'stlačenia' : 'stlačení'}. <b>Násobenie i = otočenie o 90°</b>. Dve otočenia = 180°, teda <b>i · i = i² = −1</b>. Žiadna mágia, len geometria!`,
-            'A ešte: e<sup>iπ</sup> = −1. Fáza π (otočenie o 180°) je presne to <b>znamienko mínus</b>, ktoré odlišuje stavy |+⟩ a |−⟩. Stretneš ich v Blochovom observatóriu.'], () =>
-            this.ask({ q: 'Koľkokrát treba vynásobiť číslo 1 číslom i, aby sme sa dostali do −i?', options: ['3-krát (270°)', '1-krát', '4-krát'], correct: 0, why: '1 → i → −1 → −i. Štyri stlačenia by nás vrátili späť na 1.' }, () => this.next()));
+          this.say(tr([`Hotovo za ${this.presses} ${this.presses === 2 ? 'stlačenia' : 'stlačení'}. <b>Násobenie i = otočenie o 90°</b>. Dve otočenia = 180°, teda <b>i · i = i² = −1</b>. Žiadna mágia, len geometria!`,
+            'A ešte: e<sup>iπ</sup> = −1. Fáza π (otočenie o 180°) je presne to <b>znamienko mínus</b>, ktoré odlišuje stavy |+⟩ a |−⟩. Stretneš ich v Blochovom observatóriu.'],
+            [`Done in ${this.presses} presses. <b>Multiplying by i = rotating by 90°</b>. Two rotations = 180°, so <b>i · i = i² = −1</b>. No magic, just geometry!`,
+            'And one more thing: e<sup>iπ</sup> = −1. The phase π (a 180° rotation) is exactly the <b>minus sign</b> that distinguishes the states |+⟩ and |−⟩. You will meet them in the Bloch Observatory.']), () =>
+            this.ask(tr({ q: 'Koľkokrát treba vynásobiť číslo 1 číslom i, aby sme sa dostali do −i?', options: ['3-krát (270°)', '1-krát', '4-krát'], correct: 0, why: '1 → i → −1 → −i. Štyri stlačenia by nás vrátili späť na 1.' }, { q: 'How many times must we multiply the number 1 by i to get to −i?', options: ['3 times (270°)', 'once', '4 times'], correct: 0, why: '1 → i → −1 → −i. Four presses would bring us back to 1.' }), () => this.next()));
         }, 700);
       }
     };
-    UI.panelSet('Násobenie komplexným číslom', [
-      UI.row(UI.button('× i', () => press(Math.PI / 2, '× i'), 'big'), UI.button('Späť na 1', () => { this.ang = 0; this.presses = 0; info.innerHTML = 'Stlačenia: 0'; })),
+    UI.panelSet(tr('Násobenie komplexným číslom', 'Multiplying by a complex number'), [
+      UI.row(UI.button('× i', () => press(Math.PI / 2, '× i'), 'big'), UI.button(tr('Späť na 1', 'Back to 1'), () => { this.ang = 0; this.presses = 0; info.innerHTML = tr('Stlačenia: 0', 'Presses: 0'); })),
       info,
-      UI.info('Pozoruj: veľkosť ručičky sa nemení, mení sa len smer (fáza).', 'tip'),
+      UI.info(tr('Pozoruj: veľkosť ručičky sa nemení, mení sa len smer (fáza).', 'Watch: the length of the hand doesn’t change, only its direction (phase).'), 'tip'),
     ]);
   }
 
   // --- úloha 3: interferencia dvoch ciest ---
   interference() {
     this.mode = 'int'; this.ph2 = 0; this.gotZero = false; this.gotMax = false;
-    this.quest('Dve cesty k tomu istému výsledku. Nájdi fázu, pri ktorej sa amplitúdy úplne VYRUŠIA (P = 0), aj fázu, pri ktorej je P maximálne.');
+    this.quest(tr('Dve cesty k tomu istému výsledku. Nájdi fázu, pri ktorej sa amplitúdy úplne VYRUŠIA (P = 0), aj fázu, pri ktorej je P maximálne.', 'Two paths to the same outcome. Find the phase at which the amplitudes fully CANCEL (P = 0), and the phase at which P is maximal.'));
     this.say([
-      'Teraz to najdôležitejšie. Do toho istého výsledku vedú <b>dve cesty</b>, každá má svoju amplitúdu A₁ a A₂ (dĺžka 0,5).',
-      'Kvantové pravidlo: <b>najprv sčítaj ručičky (amplitúdy), až potom umocni</b>: P = |A₁ + A₂|². Klasické pravidlo pre vylučujúce sa alternatívy by sčítalo pravdepodobnosti: |A₁|² + |A₂|² = 0,5 vždy.',
-      'Prirovnanie: dvaja ľudia tlačia hojdačku. Ak tlačia <b>v rytme</b>, hojdačka letí vysoko. Ak <b>proti sebe</b>, nepohne sa. Tu ide o rytmus — teda <b>relatívnu fázu</b>.',
+      tr('Teraz to najdôležitejšie. Do toho istého výsledku vedú <b>dve cesty</b>, každá má svoju amplitúdu A₁ a A₂ (dĺžka 0,5).', 'Now the most important part. <b>Two paths</b> lead to the same outcome, each with its own amplitude A₁ and A₂ (length 0.5).'),
+      tr('Kvantové pravidlo: <b>najprv sčítaj ručičky (amplitúdy), až potom umocni</b>: P = |A₁ + A₂|². Klasické pravidlo pre vylučujúce sa alternatívy by sčítalo pravdepodobnosti: |A₁|² + |A₂|² = 0,5 vždy.', 'The quantum rule: <b>first add the hands (amplitudes), only then square</b>: P = |A₁ + A₂|². The classical rule for mutually exclusive alternatives would add probabilities: |A₁|² + |A₂|² = 0.5 always.'),
+      tr('Prirovnanie: dvaja ľudia tlačia hojdačku. Ak tlačia <b>v rytme</b>, hojdačka letí vysoko. Ak <b>proti sebe</b>, nepohne sa. Tu ide o rytmus — teda <b>relatívnu fázu</b>.', 'An analogy: two people push a swing. If they push <b>in rhythm</b>, the swing flies high. If they push <b>against each other</b>, it doesn’t move. What matters is the rhythm — the <b>relative phase</b>.'),
     ]);
     const info = UI.info('');
     const upd = (v) => {
@@ -91,23 +93,23 @@ class L1Complex extends Level {
       const A1 = C.of(0.5), A2 = C.scale(C.exp(v), 0.5), S = C.add(A1, A2), P = C.abs2(S);
       const term = 2 * C.mul(A1, C.conj(A2))[0];
       info.innerHTML = `A₁ = ½, A₂ = ½·e<sup>i·${Fmt.angle(v)}</sup><br>`
-        + `<b>kvantovo: P = |A₁ + A₂|² = ${Fmt.num(P, 2)}</b><br>klasicky: |A₁|² + |A₂|² = ½<br>`
-        + `interferenčný člen 2·Re(A₁A₂*) = ${Fmt.num(term, 2)}<br>`
-        + `${this.gotZero ? '✅' : '⬜'} deštruktívna (P = 0) &nbsp; ${this.gotMax ? '✅' : '⬜'} konštruktívna (P = 1)`;
-      if (P < 0.01 && !this.gotZero) { this.gotZero = true; UI.toast('✅ Deštruktívna interferencia: ručičky smerujú proti sebe!'); }
-      if (P > 0.99 && !this.gotMax && this.gotZero) { this.gotMax = true; UI.toast('✅ Konštruktívna interferencia!'); }
+        + tr(`<b>kvantovo: P = |A₁ + A₂|² = ${Fmt.num(P, 2)}</b><br>klasicky: |A₁|² + |A₂|² = ½<br>`, `<b>quantum: P = |A₁ + A₂|² = ${Fmt.num(P, 2)}</b><br>classical: |A₁|² + |A₂|² = ½<br>`)
+        + tr(`interferenčný člen 2·Re(A₁A₂*) = ${Fmt.num(term, 2)}<br>`, `interference term 2·Re(A₁A₂*) = ${Fmt.num(term, 2)}<br>`)
+        + tr(`${this.gotZero ? '✅' : '⬜'} deštruktívna (P = 0) &nbsp; ${this.gotMax ? '✅' : '⬜'} konštruktívna (P = 1)`, `${this.gotZero ? '✅' : '⬜'} destructive (P = 0) &nbsp; ${this.gotMax ? '✅' : '⬜'} constructive (P = 1)`);
+      if (P < 0.01 && !this.gotZero) { this.gotZero = true; UI.toast(tr('✅ Deštruktívna interferencia: ručičky smerujú proti sebe!', '✅ Destructive interference: the hands point against each other!')); }
+      if (P > 0.99 && !this.gotMax && this.gotZero) { this.gotMax = true; UI.toast(tr('✅ Konštruktívna interferencia!', '✅ Constructive interference!')); }
       if (this.gotZero && this.gotMax && !this.done3) {
         this.done3 = true;
         setTimeout(() => {
           this.grant(['interf', 'abs2', 'ReIm', 'conj']);
-          this.say(['Výborne! Pri fáze π je P = 0, hoci každá cesta sama by dala ¼. <b>Toto je jadro kvantovej mechaniky</b>: fáza je neviditeľná v jednej amplitúde, ale rozhoduje, keď sa amplitúdy stretnú.',
-            'Kvantové algoritmy robia presne toto: usporiadajú fázy tak, aby sa zlé odpovede vyrušili a dobré zosilnili.'], () => this.next());
+          this.say([tr('Výborne! Pri fáze π je P = 0, hoci každá cesta sama by dala ¼. <b>Toto je jadro kvantovej mechaniky</b>: fáza je neviditeľná v jednej amplitúde, ale rozhoduje, keď sa amplitúdy stretnú.', 'Excellent! At phase π, P = 0, even though each path alone would give ¼. <b>This is the core of quantum mechanics</b>: the phase is invisible in a single amplitude, but it decides when amplitudes meet.'),
+            tr('Kvantové algoritmy robia presne toto: usporiadajú fázy tak, aby sa zlé odpovede vyrušili a dobré zosilnili.', 'Quantum algorithms do exactly this: they arrange the phases so that wrong answers cancel and right ones are reinforced.')], () => this.next());
         }, 500);
       }
       return Fmt.angle(v);
     };
-    UI.panelSet('Interferencia dvoch ciest', [UI.slider('fáza cesty 2', 0, 6.28, 0.01, 0, upd), info,
-      UI.info('Najprv nájdi P = 0, potom P = 1.', 'tip')]);
+    UI.panelSet(tr('Interferencia dvoch ciest', 'Interference of two paths'), [UI.slider(tr('fáza cesty 2', 'phase of path 2'), 0, 6.28, 0.01, 0, upd), info,
+      UI.info(tr('Najprv nájdi P = 0, potom P = 1.', 'First find P = 0, then P = 1.'), 'tip')]);
   }
 
   update(dt) {
@@ -134,9 +136,9 @@ class L1Complex extends Level {
       r.rod(this.W([this.z[0], 0]), this.W(this.z), [0.6, 0.8, 1], 0.01);
       r.rod(this.W([0, this.z[1]]), this.W(this.z), [0.6, 0.8, 1], 0.01);
       UI.label('alpha', V3.add(this.W(this.z), [0, 0.35, 0]), 'α', 'player');
-      UI.hot(this.W(this.z), `<b>Amplitúda α</b> = ${Fmt.complex(this.z)}<br>dĺžka ${Fmt.num(C.abs(this.z), 2)}, fáza ${Fmt.angle(C.arg(this.z))}`, 30);
-      UI.hot(this.W(this.target), '<b>Zlatý cieľ</b>: veľkosť 0,7, fáza 3π/4.', 26);
-      UI.hot([3.4, 1.2, -1.6], `<b>Stĺpec pravdepodobnosti</b> P = |α|² = ${Fmt.num(C.abs2(this.z), 2)}. Mení sa len s dĺžkou ručičky.`, 40);
+      UI.hot(this.W(this.z), tr(`<b>Amplitúda α</b> = ${Fmt.complex(this.z)}<br>dĺžka ${Fmt.num(C.abs(this.z), 2)}, fáza ${Fmt.angle(C.arg(this.z))}`, `<b>Amplitude α</b> = ${Fmt.complex(this.z)}<br>length ${Fmt.num(C.abs(this.z), 2)}, phase ${Fmt.angle(C.arg(this.z))}`), 30);
+      UI.hot(this.W(this.target), tr('<b>Zlatý cieľ</b>: veľkosť 0,7, fáza 3π/4.', '<b>Golden target</b>: magnitude 0.7, phase 3π/4.'), 26);
+      UI.hot([3.4, 1.2, -1.6], tr(`<b>Stĺpec pravdepodobnosti</b> P = |α|² = ${Fmt.num(C.abs2(this.z), 2)}. Mení sa len s dĺžkou ručičky.`, `<b>Probability bar</b> P = |α|² = ${Fmt.num(C.abs2(this.z), 2)}. It changes only with the length of the hand.`), 40);
       // stĺpec pravdepodobnosti
       const P = C.abs2(this.z);
       r.draw('cylinder', M4.trs([3.4, 0, -1.6], 0, [0.25, Math.max(P * 2.5, 0.01), 0.25]), [0.4, 1, 0.6], { emissive: 0.3 });
@@ -155,14 +157,14 @@ class L1Complex extends Level {
       UI.label('A1', V3.add(this.W(C.scale(A1, 0.5)), [0, 0.3, 0.2]), 'A₁', 'ket');
       UI.label('A2', V3.add(this.W(C.add(A1, C.scale(A2, 0.5))), [0, 0.35, 0]), 'A₂', 'ket');
       UI.label('S', V3.add(this.W(S), [0, 0.5, 0]), 'A₁+A₂', 'player');
-      UI.hot(this.W(S), `<b>Súčet amplitúd</b> A₁ + A₂ = ${Fmt.complex(S)}. Kvantovo umocňujeme až tento súčet.`, 30);
-      UI.hot([3.4, 1, -0.6], '<b>Kvantová pravdepodobnosť</b> |A₁ + A₂|² — závisí od relatívnej fázy.', 36);
-      UI.hot([3.4, 0.6, 0.6], '<b>Klasická predpoveď</b> |A₁|² + |A₂|² = ½ — bez interferencie, nezávisí od fázy.', 36);
+      UI.hot(this.W(S), tr(`<b>Súčet amplitúd</b> A₁ + A₂ = ${Fmt.complex(S)}. Kvantovo umocňujeme až tento súčet.`, `<b>Sum of amplitudes</b> A₁ + A₂ = ${Fmt.complex(S)}. Quantum mechanically we square only this sum.`), 30);
+      UI.hot([3.4, 1, -0.6], tr('<b>Kvantová pravdepodobnosť</b> |A₁ + A₂|² — závisí od relatívnej fázy.', '<b>Quantum probability</b> |A₁ + A₂|² — depends on the relative phase.'), 36);
+      UI.hot([3.4, 0.6, 0.6], tr('<b>Klasická predpoveď</b> |A₁|² + |A₂|² = ½ — bez interferencie, nezávisí od fázy.', '<b>Classical prediction</b> |A₁|² + |A₂|² = ½ — no interference, independent of the phase.'), 36);
       const P = C.abs2(S);
       r.draw('cylinder', M4.trs([3.4, 0, -0.6], 0, [0.25, Math.max(P * 2.5, 0.01), 0.25]), [1, 0.5, 0.6], { emissive: 0.3 });
       r.draw('cylinder', M4.trs([3.4, 0, 0.6], 0, [0.25, 0.5 * 2.5, 0.25]), [0.6, 0.6, 0.7]);
-      UI.label('Pq', [3.4, 2.9, -0.6], 'kvantovo<br>|A₁+A₂|²', 'axis');
-      UI.label('Pc', [3.4, 1.7, 0.6], 'klasicky<br>|A₁|²+|A₂|²', 'axis');
+      UI.label('Pq', [3.4, 2.9, -0.6], tr('kvantovo<br>|A₁+A₂|²', 'quantum<br>|A₁+A₂|²'), 'axis');
+      UI.label('Pc', [3.4, 1.7, 0.6], tr('klasicky<br>|A₁|²+|A₂|²', 'classical<br>|A₁|²+|A₂|²'), 'axis');
     }
   }
 }

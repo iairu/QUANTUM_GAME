@@ -91,7 +91,7 @@ const Fmt = {
     const known = [[0, '0'], [1, '1'], [0.5, '½'], [Math.SQRT1_2, '1/√2'], [0.25, '¼'], [0.75, '¾']];
     const a = Math.abs(x), sg = x < 0 ? '−' : '';
     for (const [v, s] of known) if (Math.abs(a - v) < 5e-4) return v === 0 ? '0' : sg + s;
-    return sg + a.toFixed(d).replace(/0+$/, '').replace(/\.$/, '').replace('.', ',');
+    return sg + a.toFixed(d).replace(/0+$/, '').replace(/\.$/, '').replace('.', tr(',', '.'));
   },
   complex(c) {
     const re = Math.abs(c[0]) < 5e-4 ? 0 : c[0], im = Math.abs(c[1]) < 5e-4 ? 0 : c[1];
