@@ -266,3 +266,200 @@ html[data-theme="nordic"] button .no { color: #f0a090; }
 html[data-theme="nordic"] .battlelog { font-size: 12px; line-height: 1.5; color: var(--muted); border-top: 1px solid var(--line); margin-top: 8px; padding-top: 6px; min-height: 40px; }
 html[data-theme="nordic"] .battlelog div:last-child { color: var(--text); }
 html[data-theme="nordic"] .lbl.shoutlbl { font-family: var(--rune); font-size: 30px; font-weight: 700; letter-spacing: 0.2em; color: #f6e2b0; text-shadow: 0 0 12px #e2b65e, 0 0 30px #c4473a, 0 2px 4px #000; }
+/* ===== téma: MMO (World of Warcraft) — rámy jednotiek, lišta kúziel, minimapa, okná, menovky ===== */
+.theme-wow { display: none; }
+html[data-theme="wow"] tr.theme-wow { display: table-row; }
+html[data-theme="wow"] .theme-nordic { display: inline; } /* drak Ketvarr je aj v MMO téme */
+html[data-theme="wow"] {
+  --bg: #0a0d18; --panel: rgba(8, 10, 22, 0.9); --line: rgba(200, 165, 80, 0.45);
+  --text: #f4ecd8; --muted: #b5ab92; --accent: #ffd100; --gold: #ffd100; --good: #1eff00; --bad: #ff3b30;
+  --wowfont: "Cinzel", "Friz Quadrata", Georgia, serif;
+}
+html[data-theme="wow"], html[data-theme="wow"] body {
+  background: radial-gradient(ellipse 30% 22% at 78% 18%, rgba(255, 244, 200, 0.75), transparent 70%),
+    linear-gradient(180deg, #4f8fd0 0%, #7fb6e6 38%, #bfdcf0 62%, #d9e8ef 70%, #5b7f4a 100%); }
+html[data-theme="wow"] body[data-scene="inst"] {
+  background: radial-gradient(ellipse at 50% 30%, #2b1d4a 0%, #120c26 55%, #06050d 100%); }
+html[data-theme="wow"] button { background: linear-gradient(#8e1b12, #4c0c07); border: 1px solid #c9a24a; color: #ffd100; border-radius: 4px;
+  font-family: var(--wowfont); font-size: 13px; text-shadow: 0 1px 2px #000; box-shadow: inset 0 1px 0 rgba(255, 220, 150, 0.25); }
+html[data-theme="wow"] button:hover:not(:disabled) { background: linear-gradient(#b0281c, #63100a); border-color: #ffe08a; color: #fff3b0; }
+html[data-theme="wow"] button.primary, html[data-theme="wow"] button.big { background: linear-gradient(#a42316, #5a0f08); border-color: #ffd100; }
+html[data-theme="wow"] button.gate, html[data-theme="wow"] button.token, html[data-theme="wow"] .choice { font-family: "Cambria Math", Georgia, serif; }
+html[data-theme="wow"] .choice { background: linear-gradient(#1d2442, #10142a); color: var(--text); text-shadow: none; font-size: 15px; }
+html[data-theme="wow"] .choice:hover:not(:disabled) { background: linear-gradient(#2a3460, #161c3a); color: #fff; }
+html[data-theme="wow"] .choice.good { background: #1d5a36; } html[data-theme="wow"] .choice.bad { background: #5a1d28; }
+html[data-theme="wow"] #lang-select, html[data-theme="wow"] #diff-select { background: linear-gradient(#2a2418, #14110b); border-color: #c9a24a; color: #ffd100; font-family: var(--wowfont); font-size: 13px; border-radius: 4px; }
+html[data-theme="wow"] #hud-title { font-family: var(--wowfont); color: #ffd100; font-size: 22px; letter-spacing: 0.04em; text-shadow: 0 2px 4px #000, 0 0 2px #000; }
+html[data-theme="wow"] #hud-quest { background: rgba(8, 10, 22, 0.75); border-left-color: #ffd100; }
+html[data-theme="wow"] #panel, html[data-theme="wow"] #views, html[data-theme="wow"] .overlay .box { border: 2px solid #8a7240; border-radius: 6px; box-shadow: inset 0 0 0 1px #2a2212, 0 8px 30px #000a; }
+html[data-theme="wow"] #panel h3, html[data-theme="wow"] .overlay h2, html[data-theme="wow"] #settings .body h3, html[data-theme="wow"] #journal h3 { font-family: var(--wowfont); color: #ffd100; }
+html[data-theme="wow"] #dialog { bottom: 108px; border: 2px solid #8a7240; border-radius: 6px; background: linear-gradient(rgba(14, 12, 24, 0.96), rgba(8, 8, 16, 0.96));
+  box-shadow: inset 0 0 0 1px #2a2212, 0 10px 40px #000c; }
+html[data-theme="wow"] #dialog .who { font-family: var(--wowfont); color: #ffd100; letter-spacing: 0.04em; }
+html[data-theme="wow"] #dialog.scroll { background: linear-gradient(#f3e6c4, #e8d6a8); }
+html[data-theme="wow"] #dialog.scroll button { color: #3b2a12; background: #e0c88f; text-shadow: none; }
+html[data-theme="wow"] .toast { background: rgba(8, 10, 22, 0.94); border-color: #c9a24a; font-family: var(--wowfont); font-size: 14px; }
+html[data-theme="wow"] #toasts { top: 96px; }
+html[data-theme="wow"] #tip { background: rgba(6, 8, 24, 0.96); color: #fff; border: 1px solid #8a8fa8; border-radius: 4px; }
+html[data-theme="wow"] .lbl.portal, html[data-theme="wow"] .lbl.npc { background: rgba(0, 0, 0, 0.55); border-color: #8a7240; font-family: var(--wowfont); color: #ffd100; }
+html[data-theme="wow"] .lbl.npc.friendly { background: none; border: none; color: #3fe03f; font-size: 13px; padding: 0; }
+html[data-theme="wow"] .lbl.npc.friendly small { color: #3fe03f; }
+html[data-theme="wow"] .lbl.npc.small { font-size: 12px; }
+html[data-theme="wow"] .lbl.prompt { background: rgba(0, 0, 0, 0.7); color: #ffd100; border: 1px solid #c9a24a; font-family: var(--wowfont); }
+html[data-theme="wow"] .lbl.player { font-size: 18px; }
+.lbl .pname { font-family: var(--wowfont); font-size: 13px; color: #fff; font-weight: 600; }
+.lbl.qmark { font-family: var(--wowfont); font-size: 40px; font-weight: 700; color: #ffd100; text-shadow: 0 0 3px #000, 0 0 3px #000, 0 2px 4px #000; animation: qbob 1.4s ease-in-out infinite; }
+.lbl.qmark.gray { color: #a8a8a8; }
+@keyframes qbob { 50% { margin-top: -6px; } }
+/* menovky nepriateľov */
+.lbl.nameplate { font-family: var(--wowfont); font-size: 12px; }
+.np { color: #ff6060; text-shadow: 0 1px 2px #000, 0 0 3px #000; }
+.np i { display: block; width: 92px; height: 7px; margin: 2px auto 0; background: #1a0505; border: 1px solid #000; }
+.np i b, .np u b { display: block; height: 100%; background: linear-gradient(#e33, #a11); }
+.np u { display: block; width: 92px; height: 4px; margin: 1px auto 0; background: linear-gradient(90deg, #2a4a9a, #9a2a2a); border: 1px solid #000; text-decoration: none; }
+.np u b { background: rgba(255, 255, 255, 0.85); }
+.np.tg i { box-shadow: 0 0 0 1px #ffd100; }
+/* plávajúci text boja */
+.lbl.fct { font-family: var(--wowfont); font-weight: 700; font-size: 20px; color: #fff; text-shadow: 0 0 3px #000, 0 2px 3px #000; pointer-events: none; }
+.lbl.fct.crit { font-size: 30px; color: #ffd100; }
+.lbl.fct.hurt { color: #ff3030; }
+.lbl.fct.heal { color: #3fff5f; }
+.lbl.fct.mana { color: #5fa8ff; }
+.lbl.fct.miss { color: #c0c0c0; font-size: 16px; }
+.lbl.fct.gate { color: #9fdcff; font-size: 16px; font-family: "Cambria Math", Georgia, serif; }
+/* rámy jednotiek */
+#wow-frames { position: fixed; left: 14px; bottom: 14px; display: flex; flex-direction: column; gap: 8px; z-index: 6; }
+.uf { position: relative; display: flex; align-items: center; gap: 8px; width: 250px; padding: 6px 8px 6px 6px; background: linear-gradient(rgba(10, 10, 20, 0.88), rgba(4, 4, 10, 0.88));
+  border: 2px solid #8a7240; border-radius: 34px 8px 8px 34px; box-shadow: 0 4px 14px #0009; }
+.uf.tf { display: none; } .uf.tf.show { display: flex; }
+.uf.hit { box-shadow: 0 0 0 2px #ff2020, 0 4px 14px #0009; }
+.uf .por { position: relative; flex: 0 0 56px; height: 56px; border-radius: 50%; border: 2px solid #c9a24a; background: radial-gradient(circle at 40% 35%, #3a5ea8, #0e1430);
+  display: flex; align-items: center; justify-content: center; font: 700 28px "Cambria Math", Georgia, serif; color: #ffd100; }
+.uf .por.boss { background: radial-gradient(circle at 40% 35%, #7a2a2a, #200808); font-size: 26px; }
+.uf .por .lv { position: absolute; bottom: -6px; left: -6px; min-width: 22px; height: 22px; border-radius: 50%; background: #1a1408; border: 2px solid #c9a24a; font: 700 11px system-ui; color: #ffd100; display: flex; align-items: center; justify-content: center; }
+.uf .info { flex: 1; min-width: 0; }
+.uf .nm { font-family: var(--wowfont); font-size: 13px; color: #ffd100; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
+.uf .nm.elite { color: #ff8040; }
+.uf .nm .cmb { color: #ff4040; }
+.uf .sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
+.ubar { position: relative; height: 14px; background: #0a0a0a; border: 1px solid #000; margin: 2px 0; overflow: hidden; }
+.ubar b { position: absolute; left: 0; top: 0; bottom: 0; transition: width 0.25s; }
+.ubar span { position: relative; display: block; text-align: center; font-size: 10px; line-height: 13px; color: #fff; text-shadow: 0 1px 1px #000; }
+.ubar.hp b { background: linear-gradient(#3ee03e, #138a13); }
+.ubar.mp b { background: linear-gradient(#3e7cff, #1a3fa8); }
+.uf .qb { position: relative; height: 10px; background: linear-gradient(90deg, #233a80, #6a2340); border: 1px solid #000; margin-top: 2px; }
+.uf .qb i { position: absolute; left: 0; top: 0; bottom: 0; background: rgba(255, 210, 90, 0.55); border-right: 2px solid #ffd100; }
+.uf .qb span { position: relative; display: block; font-size: 9px; line-height: 9px; text-align: center; color: #fff; font-family: "Cambria Math", Georgia, serif; }
+.wow-ffct { position: absolute; left: 60%; top: -6px; font: 700 22px var(--wowfont); color: #fff; text-shadow: 0 0 3px #000, 0 2px 3px #000; pointer-events: none; animation: ffct 1.3s ease-out forwards; }
+.wow-ffct.crit { color: #ffd100; font-size: 26px; } .wow-ffct.hurt { color: #ff3030; }
+@keyframes ffct { to { transform: translateY(-46px); opacity: 0; } }
+.wow-proj { position: fixed; width: 18px; height: 18px; border-radius: 50%; background: radial-gradient(#fff, #6cf 45%, rgba(80, 160, 255, 0)); box-shadow: 0 0 18px #6cf; z-index: 7; pointer-events: none; transition: transform 0.45s ease-in, opacity 0.45s ease-in; }
+/* lišta kúziel, skúsenosti, zosielanie */
+#wow-bar { position: fixed; left: 50%; bottom: 10px; transform: translateX(-50%); z-index: 6; padding: 5px 6px 4px; background: linear-gradient(rgba(20, 16, 10, 0.92), rgba(6, 5, 3, 0.92)); border: 2px solid #8a7240; border-radius: 6px; box-shadow: 0 4px 16px #000a; }
+#wow-bar .ab { display: flex; gap: 4px; }
+.abtn { position: relative; width: 46px; height: 46px; padding: 0 !important; border-radius: 4px !important; background: radial-gradient(circle at 35% 30%, #4b5fa0, #151a36) !important; border: 1px solid #5a5040 !important; overflow: hidden; }
+.abtn .ic { font: 700 22px "Cambria Math", "Segoe UI Emoji", Georgia, serif; color: #fff; text-shadow: 0 0 6px rgba(120, 200, 255, 0.9); }
+.abtn.flip { background: radial-gradient(circle at 35% 30%, #b04040, #3a0c0c) !important; }
+.abtn.had { background: radial-gradient(circle at 35% 30%, #3a9a50, #0c2a14) !important; }
+.abtn.measure { background: radial-gradient(circle at 35% 30%, #b08a30, #3a2a08) !important; }
+.abtn.heal { background: radial-gradient(circle at 35% 30%, #48b070, #0c2a18) !important; }
+.abtn.nova { background: radial-gradient(circle at 35% 30%, #8a50c0, #230c3a) !important; }
+.abtn.blink { background: radial-gradient(circle at 35% 30%, #7050c0, #180c3a) !important; }
+.abtn.pot_hp, .abtn.pot_mana, .abtn.mount, .abtn.hearth { background: radial-gradient(circle at 35% 30%, #5a4a30, #1a140a) !important; }
+.abtn .kb { position: absolute; right: 3px; top: 1px; font: 700 11px system-ui; color: #ddd; text-shadow: 0 1px 1px #000; }
+.abtn .cnt { position: absolute; right: 3px; bottom: 1px; font: 700 11px system-ui; color: #fff; text-shadow: 0 1px 1px #000; }
+.abtn .cdw { position: absolute; inset: 0; pointer-events: none; }
+.abtn .cdt { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font: 700 17px system-ui; color: #ffd100; text-shadow: 0 0 3px #000; pointer-events: none; }
+.abtn.lvl .ic, .abtn.none .ic, .abtn.inst .ic { filter: grayscale(1) brightness(0.5); }
+.abtn.lvl::after { content: "🔒"; position: absolute; left: 2px; bottom: 0; font-size: 11px; }
+.abtn.oom { box-shadow: inset 0 0 0 46px rgba(30, 60, 200, 0.45); }
+.abtn.range .kb { color: #ff3030; }
+.abtn.on { border-color: #ffd100 !important; box-shadow: inset 0 0 10px #ffd100, 0 0 6px #ffd100; }
+.abtn.press { transform: scale(0.92); filter: brightness(1.6); }
+#wow-bar .xp { position: relative; height: 10px; margin-top: 4px; background: #120a1a; border: 1px solid #000; }
+#wow-bar .xp i { position: absolute; left: 0; top: 0; bottom: 0; background: linear-gradient(#b05ae0, #5a1f8a); transition: width 0.4s; }
+#wow-bar .xp span { position: relative; display: block; font-size: 9px; line-height: 9px; text-align: center; color: #fff; text-shadow: 0 1px 1px #000; }
+#wow-cast { position: fixed; left: 50%; bottom: 88px; transform: translateX(-50%); width: 260px; height: 18px; background: #0a0a0a; border: 2px solid #8a7240; border-radius: 3px; z-index: 6; display: none; overflow: hidden; }
+#wow-cast.show { display: block; }
+#wow-cast i { position: absolute; left: 0; top: 0; bottom: 0; background: linear-gradient(#ffd23a, #c08a10); }
+#wow-cast span { position: relative; display: block; text-align: center; font: 600 11px/14px var(--wowfont); color: #fff; text-shadow: 0 1px 2px #000; }
+html[data-theme="wow"] #dialog.show ~ #wow-ui #wow-cast { display: none; }
+/* peniaze, taška, informačný kanál, chyby, nápisy */
+#wow-bagbar { position: fixed; right: 14px; bottom: 12px; display: flex; align-items: center; gap: 8px; z-index: 6; padding: 4px 6px 4px 10px; background: rgba(6, 5, 3, 0.85); border: 2px solid #8a7240; border-radius: 6px; }
+#wow-bagbar .bagbtn { font-size: 22px; padding: 2px 8px; }
+.money { white-space: nowrap; font: 600 13px system-ui; color: #fff; }
+.coin { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-left: 2px; vertical-align: -1px; box-shadow: inset -2px -2px 2px rgba(0, 0, 0, 0.4); }
+.coin.g { background: #ffd100; } .coin.s { background: #c8c8d4; } .coin.c { background: #c06a2a; }
+#wow-feed { position: fixed; right: 14px; bottom: 62px; width: 330px; display: flex; flex-direction: column; align-items: flex-end; gap: 2px; z-index: 5; pointer-events: none; font-size: 12px; text-shadow: 0 1px 2px #000, 0 0 3px #000; }
+#wow-feed div { transition: opacity 1s; color: #e8e8e8; text-align: right; }
+#wow-feed div.out { opacity: 0; }
+#wow-feed .xpt { color: #c47cff; font-weight: 700; } #wow-feed .qp { color: #ffd100; }
+#wow-err { position: fixed; left: 50%; top: 150px; transform: translateX(-50%); font: 700 16px var(--wowfont); color: #ff2020; text-shadow: 0 0 3px #000, 0 1px 2px #000; z-index: 25; pointer-events: none; opacity: 0; white-space: nowrap; }
+#wow-err.show { animation: werr 2.2s ease-out; }
+@keyframes werr { 0%, 60% { opacity: 1; } 100% { opacity: 0; } }
+#wow-banner { position: fixed; left: 50%; top: 22%; transform: translateX(-50%); text-align: center; z-index: 24; pointer-events: none; opacity: 0; }
+#wow-banner b { display: block; font: 700 46px var(--wowfont); color: #ffd100; text-shadow: 0 0 4px #000, 0 3px 6px #000; white-space: nowrap; }
+#wow-banner small { display: block; font: 600 16px var(--wowfont); color: #fff; text-shadow: 0 1px 3px #000; }
+#wow-banner.show { animation: wban 3.6s ease-out forwards; }
+#wow-banner.ding b { font-size: 60px; color: #fff3a0; text-shadow: 0 0 20px #ffd100, 0 3px 6px #000; }
+#wow-banner.boss b { color: #ff8040; }
+@keyframes wban { 0% { opacity: 0; transform: translate(-50%, 10px); } 12%, 70% { opacity: 1; transform: translate(-50%, 0); } 100% { opacity: 0; } }
+/* minimapa a sledovanie úloh (len na ostrove) */
+#wow-mini { position: fixed; right: 16px; top: 58px; width: 168px; z-index: 4; text-align: center; }
+#wow-mini .zone { font: 600 12px var(--wowfont); color: #ffd100; text-shadow: 0 1px 2px #000, 0 0 3px #000; margin-bottom: 3px; }
+#wow-mini .zone small { color: #3fe03f; font-size: 10px; }
+#wow-mini canvas { width: 160px; height: 160px; border-radius: 50%; border: 3px solid #8a7240; box-shadow: 0 0 0 2px #1a1408, 0 4px 14px #0009; cursor: pointer; }
+#wow-track { position: fixed; right: 16px; top: 262px; width: 230px; z-index: 4; display: none; font-size: 12px; text-shadow: 0 1px 2px #000, 0 0 3px #000; text-align: right; }
+#wow-track.show { display: block; }
+#wow-track .qt { font-family: var(--wowfont); color: #ffd100; font-size: 13px; margin-top: 6px; }
+#wow-track .qo { color: #fff; } #wow-track .qo.done { color: #3fe03f; }
+body[data-scene="inst"] #wow-mini, body[data-scene="inst"] #wow-track { display: none !important; }
+/* okná: taška, obchodník, korisť */
+.wowwin { position: fixed; z-index: 15; display: none; width: 300px; padding: 10px 12px; background: linear-gradient(rgba(16, 14, 10, 0.97), rgba(6, 5, 3, 0.97)); border: 2px solid #8a7240; border-radius: 6px; box-shadow: 0 8px 30px #000c; }
+.wowwin.show { display: block; }
+.wowwin h3 { margin: 0 0 8px; font: 700 15px var(--wowfont); color: #ffd100; } .wowwin h3 small { color: var(--muted); font-size: 11px; }
+.wowwin .x { position: absolute; right: 8px; top: 8px; padding: 1px 7px; }
+.wowwin .foot { margin-top: 8px; font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+#wow-bags { right: 14px; bottom: 64px; }
+#wow-vendor { left: 14px; top: 120px; width: 340px; }
+#wow-loot { left: 50%; top: 30%; transform: translateX(-50%); }
+.wowwin .eq { display: flex; gap: 5px; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.wowwin .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+.wowwin .slot { position: relative; width: 52px; height: 52px; padding: 0; display: inline-flex; align-items: center; justify-content: center; font-size: 26px; background: radial-gradient(circle at 35% 30%, #3a3428, #121008) !important; border: 2px solid #4a4232; border-radius: 4px; text-shadow: none; }
+.wowwin .slot.empty { opacity: 0.45; font-size: 10px; }
+.wowwin .slot small { font: 9px system-ui; color: var(--muted); }
+.wowwin .slot .cnt { position: absolute; right: 3px; bottom: 1px; font: 700 11px system-ui; color: #fff; text-shadow: 0 1px 1px #000; }
+.vrow { display: flex; align-items: center; gap: 8px; width: 100%; margin: 4px 0; padding: 3px !important; text-align: left; background: rgba(255, 255, 255, 0.03) !important; border: 1px solid transparent !important; border-radius: 4px; }
+.vrow:hover { border-color: #8a7240 !important; }
+.vrow .slot { flex: 0 0 40px; width: 40px; height: 40px; font-size: 20px; }
+.vrow .vn { flex: 1; font: 600 13px var(--wowfont); text-shadow: 0 1px 2px #000; }
+.vrow .vp { font-size: 12px; }
+.vrow.poor { opacity: 0.55; }
+.itip b { font-size: 14px; } .itip .r { float: right; color: #aaa; margin-left: 12px; } .itip .g { color: #1eff00; } .itip .fl { color: #ffd100; font-style: italic; } .itip .bad { color: #ff3030; }
+.itip div { margin-top: 2px; }
+#wow-death { position: fixed; inset: 0; z-index: 28; display: none; align-items: center; justify-content: center; background: radial-gradient(ellipse, rgba(40, 40, 50, 0.3), rgba(0, 0, 0, 0.75)); backdrop-filter: grayscale(1); }
+#wow-death.show { display: flex; }
+#wow-death > div { text-align: center; padding: 18px 26px; background: rgba(6, 5, 3, 0.92); border: 2px solid #8a7240; border-radius: 6px; max-width: 380px; }
+#wow-death h2 { margin: 0 0 8px; font: 700 30px var(--wowfont); color: #ff3030; }
+/* drakov panel (pruhy) aj v MMO téme */
+html[data-theme="wow"] .bar { display: grid; position: relative; margin: 6px 0; font-family: var(--wowfont); font-size: 12px; }
+html[data-theme="wow"] .bar span { margin-bottom: 3px; }
+html[data-theme="wow"] .bar i { display: block; height: 12px; border: 1px solid #000; transition: width 0.4s; }
+html[data-theme="wow"] .bar b { position: absolute; right: 0; top: 0; color: var(--muted); }
+html[data-theme="wow"] .bar.you i { background: linear-gradient(#3ee03e, #138a13); }
+html[data-theme="wow"] .bar.drg i { background: linear-gradient(#e33, #a11); }
+html[data-theme="wow"] .tele { border: 1px solid #8a7240; background: rgba(90, 20, 10, 0.3); padding: 6px 8px; border-radius: 4px; }
+html[data-theme="wow"] button.strike { width: 100%; font-size: 15px; }
+html[data-theme="wow"] button.shout { min-width: 96px; }
+html[data-theme="wow"] button.shout small { display: block; font-size: 10px; color: #ddd; }
+html[data-theme="wow"] button.big.shout { width: 100%; }
+html[data-theme="wow"] button .ok { color: var(--good); font-weight: 700; } html[data-theme="wow"] button .no { color: #ff9a8a; }
+html[data-theme="wow"] .battlelog { font-size: 12px; line-height: 1.5; color: var(--muted); border-top: 1px solid var(--line); margin-top: 8px; padding-top: 6px; }
+html[data-theme="wow"] .lbl.shoutlbl { font-family: var(--wowfont); font-size: 30px; font-weight: 700; color: #ffd100; text-shadow: 0 0 12px #ff8000, 0 2px 4px #000; }
+@media (max-width: 900px) { #wow-track, #wow-feed { display: none !important; } #wow-mini { transform: scale(0.75); transform-origin: top right; } }
+@media (max-width: 720px) {
+  .uf { width: 190px; } .uf .por { flex-basis: 40px; height: 40px; font-size: 20px; }
+  #wow-bar { bottom: 6px; } .abtn { width: 30px; height: 34px; } .abtn .ic { font-size: 15px; }
+  #wow-frames { bottom: 70px; } #wow-mini { display: none; }
+  html[data-theme="wow"] #dialog { bottom: 64px; }
+}

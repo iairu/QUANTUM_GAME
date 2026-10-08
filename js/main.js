@@ -29,6 +29,7 @@ class Level {
       this.keepSub = true;
     }
     UI.setHud(`${this.num} · ${this.title}`, '');
+    Settings.wow && Wow.onEnterLevel(this);
     this.next();
   }
   exit() { UI.panelHide(); }
@@ -46,6 +47,7 @@ class Level {
     if (!this.keepSub) this.sub = {}; // sub = rozpracovaný stav kroku (napr. číslo hádanky), ukladá sa
     this.keepSub = false;
     Game.save();
+    Settings.wow && Wow.onStep(this); // MMO: dokončený krok = zásah bossa
     const s = this.steps[this.stepIdx], run = () => (s ? s.call(this) : this.finale()), name = s ? s.name : 'finale';
     const pre = [];
     // laická obťažnosť: pred krokom ho sprievodkyňa vysvetlí bežnými slovami
@@ -93,7 +95,7 @@ const Hub = {
   crystals: [],
   init() {
     // portály v kruhu; v severskej téme ostáva sever voľný pre Dračí štít na okraji pod horou
-    const ring = LEVELS.filter((L) => !L.boss), n = ring.length, off = Settings.nordic ? 0.5 : 0;
+    const ring = LEVELS.filter((L) => !L.boss), n = ring.length, off = Settings.dragon ? 0.5 : 0;
     this.portals = LEVELS.map((L) => {
       if (L.boss) { const p = [0, 0, -29]; return { L, p, dir: [0, 0, 1], npc: [3.6, 0, -27.5], boss: true }; }
       const a = -Math.PI / 2 + ((ring.indexOf(L) + off) / n) * Math.PI * 2, p = [Math.cos(a) * 20, 0, Math.sin(a) * 20];
@@ -102,13 +104,15 @@ const Hub = {
     // severská krajina: borovice a balvany (deterministicky, mimo portálov a stredu)
     let seed = 7;
     const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-    const free = (p, d) => V3.len(p) > 6 && this.portals.every((pt) => V3.len(V3.sub(pt.p, p)) > d) && Math.abs(p[0]) + Math.max(0, -p[2] - 14) * 0.2 > 2.5;
+    const free = (p, d) => V3.len(p) > (Settings.wow ? 8 : 6) && this.portals.every((pt) => V3.len(V3.sub(pt.p, p)) > d) && Math.abs(p[0]) + Math.max(0, -p[2] - 14) * 0.2 > 2.5
+      && (!Settings.wow || Math.abs(V3.len(p) - 20) > 2); // MMO: stromy nie na kruhovej ceste
     this.pines = []; this.rocks = [];
-    for (let k = 0; Settings.nordic && this.pines.length < 46 && k < 600; k++) {
+    const scenery = Settings.nordic || Settings.wow; // severská: borovice; MMO: listnaté stromy
+    for (let k = 0; scenery && this.pines.length < 46 && k < 600; k++) {
       const a = rnd() * Math.PI * 2, rad = rnd() < 0.7 ? 24 + rnd() * 9 : 9 + rnd() * 6, p = [Math.cos(a) * rad, 0, Math.sin(a) * rad];
       if (free(p, 5.5) && this.pines.every((q) => V3.len(V3.sub(q.p, p)) > 2.2)) this.pines.push({ p, h: 3.5 + rnd() * 3, k: rnd() });
     }
-    for (let k = 0; Settings.nordic && this.rocks.length < 18 && k < 400; k++) {
+    for (let k = 0; scenery && this.rocks.length < 18 && k < 400; k++) {
       const a = rnd() * Math.PI * 2, rad = 7 + rnd() * 26, p = [Math.cos(a) * rad, 0, Math.sin(a) * rad];
       if (free(p, 4.5)) this.rocks.push({ p, s: [0.6 + rnd() * 1.4, 0.4 + rnd() * 0.9, 0.6 + rnd() * 1.2], rot: rnd() * 6 });
     }
@@ -119,7 +123,7 @@ const Hub = {
     });
   },
   enter(fromLevel) {
-    Game.r.fog = 0.012; Game.r.fogColor = Settings.nordic ? [0.29, 0.34, 0.4] : [0.06, 0.08, 0.16];
+    Game.r.fog = Settings.wow ? 0.009 : 0.012; Game.r.fogColor = Settings.wow ? [0.62, 0.75, 0.88] : Settings.nordic ? [0.29, 0.34, 0.4] : [0.06, 0.08, 0.16];
     UI.setHud(tr('Hilbertov ostrov', 'Hilbert Island'), Game.nextQuestText());
     if (fromLevel) {
       const pt = this.portals[fromLevel - 1];
@@ -139,7 +143,9 @@ const Hub = {
   update(dt) {
     const pl = this.player;
     pl.phase += dt * 2.2;
-    if (!UI.busy) {
+    const W = Settings.wow;
+    if (W) Wow.moving = false;
+    if (!UI.busy && !(W && Wow.dead)) {
       let f = 0, s = 0;
       const k = Game.keys;
       if (k.KeyW || k.ArrowUp) f += 1;
@@ -148,7 +154,7 @@ const Hub = {
       if (k.KeyD || k.ArrowRight) s += 1;
       if (f || s) {
         const fw = [-Math.sin(this.cam.yaw), 0, -Math.cos(this.cam.yaw)], rt = [-fw[2], 0, fw[0]];
-        const dir = V3.norm(V3.add(V3.scale(fw, f), V3.scale(rt, s))), sp = (k.ShiftLeft ? 11 : 7) * dt;
+        const dir = V3.norm(V3.add(V3.scale(fw, f), V3.scale(rt, s))), sp = (k.ShiftLeft ? 11 : 7) * (W && Wow.mounted ? 1.6 : 1) * dt;
         let np = V3.add(pl.p, V3.scale(dir, sp));
         if (V3.len(np) > 33) np = V3.scale(V3.norm(np), 33);
         for (const pt of this.portals) { // nevojdi do podstavca portálu
@@ -159,18 +165,25 @@ const Hub = {
           const d = V3.sub(np, pn.p);
           if (V3.len(d) < 0.8) np = V3.add(pn.p, V3.scale(V3.norm(d), 0.8));
         }
+        if (W) for (const [c, rad] of [[[0, 0, 0], 2.95], [VENDOR_POS, 1.7]]) { // MMO: fontána a stánok obchodníka
+          const d = V3.sub(np, c);
+          if (V3.len(d) < rad) np = V3.add(c, V3.scale(V3.norm(d), rad));
+        }
         pl.p = np;
         pl.heading = Math.atan2(dir[0], dir[2]);
+        if (W) { Wow.moving = true; pl.walk = (pl.walk || 0) + sp * 1.7; }
         if (!Game.progress.moved) { Game.progress.moved = true; Game.save(); }
       }
     }
-    this.cam.target = V3.add(pl.p, [0, 1.2, 0]);
+    this.cam.target = V3.add(pl.p, [0, 1.2 + (W ? (pl.y || 0) * 0.5 + (Wow.mounted ? 0.9 : 0.3) : 0), 0]);
     // najbližší portál
     this.near = null;
     for (const pt of this.portals) if (V3.len(V3.sub(pt.p, pl.p)) < 4.2) this.near = pt;
-    this.nearGuide = V3.len(pl.p) < 3.6;
+    this.nearGuide = V3.len(pl.p) < (W ? 4.2 : 3.6);
+    this.nearVendor = W && V3.len(V3.sub(pl.p, VENDOR_POS)) < 3.6;
   },
   interact() {
+    if (this.nearVendor) return Wow.vendorOpen ? Wow.closeVendor() : Wow.openVendor();
     if (this.nearGuide) return Game.guideTalk();
     if (!this.near) return;
     const L = this.near.L;
@@ -183,8 +196,9 @@ const Hub = {
   draw(r) {
     const pl = this.player, t = r.time;
     r.begin(this.cam.eye(), this.cam.target);
-    const N = Settings.nordic;
-    if (!N) {
+    const N = Settings.nordic, WW = Settings.wow;
+    if (WW) this.drawWowLand(r);
+    else if (!N) {
       r.draw('disk', M4.trs([0, -0.35, 0], 0, 200), [0.07, 0.2, 0.42], { pattern: 2 });          // more
       r.draw('cylinder', M4.trs([0, -1.2, 0], 0, [35, 1.2, 35]), [0.22, 0.3, 0.5]);              // ostrov
       r.draw('disk', M4.trs([0, 0.001, 0], 0, 35), [0.16, 0.24, 0.4], { pattern: 1 });
@@ -213,6 +227,7 @@ const Hub = {
     for (const pt of this.portals) {
       const L = pt.L, open = Game.isUnlocked(L.num), done = Game.progress.stars[L.num];
       const col = open ? L.color : [0.35, 0.35, 0.4], c = V3.add(pt.p, [0, 2.6, 0]);
+      if (WW) { this.drawWowPortal(r, pt, open, c, t); continue; }
       if (!N) r.draw('cylinder', M4.trs(pt.p, 0, [1.4, 0.4, 1.4]), [0.3, 0.33, 0.45]);
       else {
       r.draw('cylinder', M4.trs(pt.p, 0, [1.4, 0.4, 1.4]), [0.46, 0.45, 0.43], { pattern: 4 });
@@ -239,7 +254,7 @@ const Hub = {
       UI.hot(p, CRYSTAL_TIPS[c.s], 30);
     }
     // drak Ketvarr (severská téma): krúži nad ostrovom, po porážke sedí na Dračom štíte
-    if (!N) { /* klasická téma: bez draka a snehu */ } else if (Game.progress.stars[9] === undefined) {
+    if (!Settings.dragon) { /* klasická téma: bez draka a snehu */ } else if (Game.progress.stars[9] === undefined) {
       const w = t * 0.11, dp = [Math.cos(w) * 46, 27 + Math.sin(t * 0.5) * 3, Math.sin(w) * 46];
       Dragon.draw(r, dp, Math.atan2(-Math.sin(w), Math.cos(w)), { scale: 2.4, bank: 0.35, t });
       UI.hot(dp, tr('<b>Ketvarr</b> — kvantový drak. Porazíš ho na Dračom štíte (portál 9), keď sa naučíš všetkých 8 slov moci.', '<b>Ketvarr</b> — the quantum dragon. You will defeat him on Dragon’s Peak (portal 9) once you learn all 8 Words of Power.'), 60);
@@ -250,13 +265,21 @@ const Hub = {
     }
     if (N) Snow.draw(r, pl.p, 26);
     // hráč: „Psíčko“ — kvantový stav ψ s rotujúcou (nepozorovateľnou) globálnou fázou
-    const bob = Math.sin(t * 3) * 0.08, pc = V3.add(pl.p, [0, 1 + bob, 0]);
+    const bob = Math.sin(t * 3) * 0.08;
+    let pc = V3.add(pl.p, [0, 1 + bob, 0]);
+    if (WW) { // MMO: Psíčko ako kvantový mág s palicou; zlatá ručička krúži okolo guľôčky na palici
+      Wow.drawWorld(r);
+      const head = Wow.drawPlayer(r);
+      pc = V3.add(pl.p, [0, 1.2 + (pl.y || 0), 0]);
+      UI.label('player', head, `ψ <small class="pname">${tr('Psíčko', 'Little Psi')}</small>`, 'player', null);
+    } else {
     r.sphere(pc, 0.42, [0.3, 0.95, 1], { emissive: 0.8 });
     r.draw('circle', M4.trs(pc, 0, 0.75), [0.6, 1, 1]);
     const ph = [Math.cos(pl.phase) * 0.75, 0, Math.sin(pl.phase) * 0.75];
     r.arrow(pc, V3.add(pc, ph), [1, 0.85, 0.3], 0.035, { emissive: 0.5 });
     r.sphere(pc, 0.62, [0.4, 0.8, 1], { alpha: 0.18 });
     UI.label('player', V3.add(pc, [0, 0.95, 0]), 'ψ', 'player');
+    }
     UI.hot(pc, tr('<b>Ty — Psíčko (stav ψ)</b>. Zlatá ručička je tvoja <b>globálna fáza</b>: točí sa, ale nedá sa zmerať.',
       '<b>You — Little Psi (the state ψ)</b>. The golden hand is your <b>global phase</b>: it turns, but it cannot be measured.'), 40);
     UI.hot([0, gy, 0], tr('<b>Amplitúda</b> — sprievodkyňa. Podíď k nej a stlač E.', '<b>Amplitude</b> — your guide. Walk up to her and press E.'), 40);
@@ -264,10 +287,62 @@ const Hub = {
     if (!Game.progress.moved && !UI.busy) {
       UI.label('wasd', V3.add(pl.p, [0, -0.2, 0]), `<div class="wasd"><span>W</span><br><span>A</span><span>S</span><span>D</span></div><small>${tr('pohyb · ťahaj myšou = kamera', 'move · drag mouse = camera')}</small>`, 'hint', null);
     }
-    if (this.near) {
+    const py = WW ? 3.3 + (pl.y || 0) : 2.4;
+    if (this.nearVendor && !UI.busy) UI.label('prompt', V3.add(pl.p, [0, py, 0]), tr('[E] Obchodovať s Planckom', '[E] Trade with Planck'), 'prompt');
+    else if (this.near) {
       const L = this.near.L;
-      UI.label('prompt', V3.add(pl.p, [0, 2.4, 0]), Game.isUnlocked(L.num) ? tr(`[E] Vstúpiť: ${L.title}`, `[E] Enter: ${L.title}`) : tr('🔒 zamknuté', '🔒 locked'), 'prompt');
-    } else if (this.nearGuide) UI.label('prompt', V3.add(pl.p, [0, 2.4, 0]), tr('[E] Hovoriť s Amplitúdou', '[E] Talk to Amplitude'), 'prompt');
+      UI.label('prompt', V3.add(pl.p, [0, py, 0]), Game.isUnlocked(L.num) ? tr(`[E] Vstúpiť: ${L.title}`, `[E] Enter: ${L.title}`) : tr('🔒 zamknuté', '🔒 locked'), 'prompt');
+    } else if (this.nearGuide) UI.label('prompt', V3.add(pl.p, [0, py, 0]), tr('[E] Hovoriť s Amplitúdou', '[E] Talk to Amplitude'), 'prompt');
+    if (WW) { // značky úloh nad Amplitúdou
+      const qm = Wow.questMark();
+      if (qm) UI.label('guideq', [0, gy + 2.3, 0], qm === '…' ? '?' : qm, 'qmark' + (qm === '…' ? ' gray' : ''),
+        qm === '!' ? tr('Amplitúda má pre teba úlohu.', 'Amplitude has a quest for you.') : qm === '?' ? tr('Úloha splnená — odovzdaj ju Amplitúde.', 'Quest complete — turn it in to Amplitude.') : tr('Úloha prebieha.', 'Quest in progress.'));
+    }
+  },
+
+  // ---------- MMO téma: krajina a portály inštancií ----------
+  drawWowLand(r) {
+    r.draw('disk', M4.trs([0, -0.35, 0], 0, 200), [0.12, 0.36, 0.6], { pattern: 2 });             // more
+    r.draw('cylinder', M4.trs([0, -1.2, 0], 0, [35, 1.2, 35]), [0.5, 0.42, 0.32], { pattern: 4 }); // útesy
+    r.draw('disk', M4.trs([0, 0.001, 0], 0, 35), [0.34, 0.58, 0.2], { pattern: 9 });              // lúka, cesty, námestie
+    for (const [x, z, s, h, c] of [[0, -58, 22, 36, [0.5, 0.5, 0.52]], [-34, -60, 16, 24, [0.36, 0.5, 0.3]], [36, -56, 17, 26, [0.36, 0.5, 0.3]], [-66, -18, 18, 22, [0.3, 0.48, 0.26]], [68, -6, 15, 20, [0.3, 0.48, 0.26]], [-52, 44, 16, 18, [0.32, 0.5, 0.28]], [58, 46, 14, 16, [0.32, 0.5, 0.28]]])
+      r.draw('cone', M4.trs([x, -2, z], 0, [s, h, s]), c, { pattern: 4 });
+    // stromy medzi kamerou a hráčom sa spriehľadnia (ako v MMO), aby nezakrývali postavu
+    const eye = r.cam, tgt = this.cam.target, seg = V3.sub(tgt, eye), sl = V3.len(seg) || 1;
+    const blocks = (q) => { const k = clamp(V3.dot(V3.sub(q, eye), seg) / (sl * sl), 0, 1); return V3.len(V3.sub(q, V3.add(eye, V3.scale(seg, k)))) < 2.4; };
+    for (const pn of this.pines) { // listnaté stromy s okrúhlymi korunami (niektoré jesenné)
+      const leaf = pn.k > 0.8 ? [0.85, 0.45, 0.12] : [0.2 + pn.k * 0.1, 0.48 + pn.k * 0.12, 0.14];
+      const crown = V3.add(pn.p, [0, pn.h * 0.7, 0]), o = blocks(crown) || blocks(V3.add(pn.p, [0, 1, 0])) ? { alpha: 0.28 } : {};
+      r.draw('cylinder', M4.trs(pn.p, pn.k * 6, [0.22, pn.h * 0.55, 0.22]), [0.38, 0.26, 0.16], { pattern: 5, ...o });
+      for (let k = 0; k < 3; k++) r.draw('lowSphere', M4.trs(V3.add(pn.p, [Math.sin(k * 2.1 + pn.k * 9) * 0.6, pn.h * (0.62 + k * 0.1), Math.cos(k * 2.1 + pn.k * 9) * 0.6]), pn.k * 6 + k, 1.25 - k * 0.2 + pn.k * 0.3), leaf, { pattern: 10, ...o });
+    }
+    for (const rk of this.rocks) r.draw('lowSphere', M4.trs(rk.p, rk.rot, rk.s), [0.52, 0.5, 0.46], { pattern: 4 });
+  },
+  drawWowPortal(r, pt, open, c, t) {
+    const L = pt.L, hd = Math.atan2(pt.dir[0], pt.dir[2]), side = V3.norm(V3.cross(pt.dir, [0, 1, 0])), hh = pt.boss ? 6.6 : 5.2, w = 2.75;
+    const stone = [0.62, 0.58, 0.52];
+    r.draw('cylinder', M4.trs(pt.p, 0, [2.2, 0.35, 2.2]), stone, { pattern: 11 });                          // schodík
+    for (const s of [-1, 1]) {                                                                                // piliere oblúka
+      const q = V3.add(pt.p, V3.scale(side, s * w));
+      r.draw('box', M4.trs(V3.add(q, [0, hh / 2, 0]), hd, [0.95, hh, 0.95]), stone, { pattern: 11 });
+      r.draw('box', M4.trs(V3.add(q, [0, hh + 0.2, 0]), hd, [1.25, 0.4, 1.25]), V3.scale(stone, 0.85), { pattern: 11 });
+      r.sphere(V3.add(q, [0, hh + 0.75, 0]), 0.28, open ? L.color : [0.4, 0.4, 0.45], { emissive: open ? 1 : 0 }); // ohnivé misy
+    }
+    r.draw('box', M4.trs(V3.add(pt.p, [0, hh + 0.6, 0]), hd, [2 * w + 1.4, 0.8, 1.1]), stone, { pattern: 11 }); // preklad
+    // vír inštancie
+    r.draw('disk', M4.orient(c, pt.dir, 2.15), open ? L.color : [0.3, 0.3, 0.35], { pattern: open ? 8 : 0, alpha: open ? 0.92 : 0.25, unlit: 1, emissive: 0.6 });
+    r.draw('torus', M4.orient(c, pt.dir, 2.15), open ? L.color : [0.35, 0.35, 0.4], { emissive: open ? 0.8 : 0 });
+    // mentor = zadávateľ úlohy
+    const done = Game.progress.stars[L.num], np = pt.npc, face = Math.atan2(-np[0], -np[2]);
+    Wow.humanoid(r, np, face, { robe: V3.scale(L.color, 0.75), trim: [0.92, 0.8, 0.45], hat: ['hood', 'top', 'wizard', null][L.num % 4], hatCol: V3.scale(L.color, 0.55), hair: [0.75, 0.72, 0.7], staff: L.num % 2 === 1, orb: L.color });
+    const next = open && done === undefined;
+    if (next) UI.label('qm' + L.num, V3.add(np, [0, 2.75, 0]), '!', 'qmark', tr(`${L.mentor} má pre teba úlohu: dokonči level ${L.num}.`, `${L.mentor} has a quest for you: complete level ${L.num}.`));
+    const dd = Game.progress.diff[L.num], st = (done ? ' ' + '★'.repeat(done) + '☆'.repeat(3 - done) : '') + (dd && dd !== 'normal' ? ` <small>(${DIFF_NAME[dd]})</small>` : '');
+    const rec = L.boss ? tr('Nájazd · úr. 16+', 'Raid · lvl 16+') : tr(`Dungeon · úr. ${L.num * 2 - 1}–${L.num * 2 + 1}`, `Dungeon · lvl ${L.num * 2 - 1}–${L.num * 2 + 1}`);
+    UI.hot(c, `<b>${tr('Inštancia', 'Instance')} ${L.num}: ${L.title}</b> <small>(${rec})</small><br>${(Settings.layman ? LAYMAN_LEVEL_TIPS : LEVEL_TIPS)[L.num]}<br>${tr('Boss', 'Boss')}: <b>${BOSSES[L.num].icon} ${BOSSES[L.num].name}</b>${open ? '' : tr('<br>🔒 Najprv dokonči predchádzajúci level.', '<br>🔒 Complete the previous level first.')}`, 60);
+    UI.hot(V3.add(np, [0, 1.2, 0]), tr(`<b>${L.mentor}</b> — mentor levelu ${L.num}.`, `<b>${L.mentor}</b> — mentor of level ${L.num}.`), 30);
+    UI.label('portal' + L.num, V3.add(pt.p, [0, hh + 2, 0]), `<b>${L.num} · ${L.title}</b>${st}<br><small>${open ? `${L.face} ${L.mentor} · ${rec}` : tr('🔒 zamknuté', '🔒 locked')}</small>`, 'portal' + (open ? '' : ' locked'));
+    UI.label('mentor' + L.num, V3.add(np, [0, 2.2, 0]), `${L.mentor}`, 'npc friendly small', null);
   },
 };
 
@@ -320,6 +395,7 @@ const Game = {
     this.load();
     this.levels = LEVELS.map((L) => new L.cls(L));
     Hub.init();
+    Wow.init(); // MMO téma: postava, nepriatelia, lišta kúziel (inak nič)
     this.scene = Hub; Hub.enter();
     this.restoreSession();
     this.bindInput(canvas);
@@ -333,6 +409,7 @@ const Game = {
     this.r.time += dt;
     if (Settings.view.autoRotate && this.scene !== Hub && this.scene.cam && !this.dragging) this.scene.cam.yaw += Settings.view.autoRotate * dt;
     this.scene.update(dt);
+    Wow.update(dt);
     this.saveAcc = (this.saveAcc || 0) + dt;
     if (this.saveAcc > 2) { this.saveAcc = 0; this.save(); } // stav hry (poloha, krok levelu) sa ukladá priebežne
     const pw = UI.panel.classList.contains('show') && window.innerWidth > 720 ? (UI.panel.offsetWidth + 14) / window.innerWidth : 0;
@@ -348,6 +425,7 @@ const Game = {
     window.addEventListener('keydown', (e) => {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
       if (e.code === 'Escape') UI.toggleSettings(false);
+      if (e.code === 'Tab') e.preventDefault(); // Tab = ďalší cieľ (MMO), nie presun fokusu
       this.keys[e.code] = true;
       if ((e.code === 'Enter' || e.code === 'Space') && UI.busy && UI._next) { e.preventDefault(); UI._next(); return; }
       if ((e.code === 'ArrowLeft' || e.code === 'Backspace') && UI.busy && UI._prev) { e.preventDefault(); UI._prev(); return; }
@@ -355,26 +433,32 @@ const Game = {
       if (e.code === 'KeyV') { Views.toggle(); return; } // pohľady aj počas dialógu
       if (e.code === 'KeyN') { Sound.toggleMute(); return; }
       if (e.code === 'KeyM') { this.toggleMap(); return; } // mapa (a teleport) aj počas dialógu
+      if (Settings.wow && UI.busy && /^Digit[89]$/.test(e.code)) { Wow.key(e); return; } // elixíry aj počas dialógu
       if (UI.busy) return;
+      if (Settings.wow && Wow.key(e)) return; // lišta kúziel 1 … =, Tab, B, skok
       if (e.code === 'KeyE' && this.scene === Hub) Hub.interact();
       if (e.code === 'KeyC') UI.toggleCodex();
       if (e.code === 'KeyO') UI.toggleSettings();
       if (e.code === 'KeyH' || e.code === 'F1') { e.preventDefault(); UI.toggleHelp(); }
-      if (e.code === 'Escape') { UI.toggleCodex(false); UI.toggleHelp(false); UI.toggleLog(false); this.toggleMap(false); }
+      if (e.code === 'Escape') { UI.toggleCodex(false); UI.toggleHelp(false); UI.toggleLog(false); this.toggleMap(false); Settings.wow && Wow.escape(); }
       if (e.code === 'F9') { e.preventDefault(); this.unlockAll(); }
     });
     window.addEventListener('keyup', (e) => { this.keys[e.code] = false; });
     window.addEventListener('contextmenu', (e) => e.preventDefault()); // pravé tlačidlo slúži na otáčanie, nie na menu
     window.addEventListener('blur', () => { this.keys = {}; });
-    let drag = null;
-    canvas.addEventListener('pointerdown', (e) => { drag = [e.clientX, e.clientY]; this.dragging = true; canvas.setPointerCapture(e.pointerId); });
+    let drag = null, moved = 0;
+    canvas.addEventListener('pointerdown', (e) => { drag = [e.clientX, e.clientY]; moved = 0; this.dragging = true; canvas.setPointerCapture(e.pointerId); });
     canvas.addEventListener('pointermove', (e) => {
       if (!drag) return;
       const cam = this.scene.cam;
       cam && cam.drag(e.clientX - drag[0], e.clientY - drag[1]);
+      moved += Math.abs(e.clientX - drag[0]) + Math.abs(e.clientY - drag[1]);
       drag = [e.clientX, e.clientY];
     });
-    canvas.addEventListener('pointerup', () => { drag = null; this.dragging = false; });
+    canvas.addEventListener('pointerup', (e) => {
+      if (drag && moved < 6 && Settings.wow) Wow.click(e.clientX, e.clientY, e.button); // klik bez ťahania = zameranie cieľa
+      drag = null; this.dragging = false;
+    });
     window.addEventListener('pagehide', () => this.save());
     document.addEventListener('visibilitychange', () => { if (document.hidden) this.save(); });
     const mc = $('#map canvas'), mxy = (e) => { const b = mc.getBoundingClientRect(); return [e.clientX - b.left, e.clientY - b.top]; };
@@ -400,6 +484,7 @@ const Game = {
     UI.labelsClear();
     this.scene = Hub;
     Hub.enter(from);
+    Settings.wow && Wow.onHub();
     this.save();
   },
   isUnlocked(n) { return n === 1 || this.progress.allUnlocked || this.progress.stars[n - 1] !== undefined || this.progress.stars[n] !== undefined; },
@@ -456,7 +541,8 @@ const Game = {
     const fresh = this.progress.stars[n] === undefined;
     Sound.sfx('fanfare');
     this.progress.stars[n] = Math.max(stars, this.progress.stars[n] || 0);
-    if (fresh && Settings.nordic && !LEVELS[n - 1].boss) { // každý mentor naučí jedno slovo moci proti drakovi
+    Settings.wow && Wow.onLevelComplete(n, stars); // MMO: boss padol, korisť, skúsenosti
+    if (fresh && Settings.dragon && !LEVELS[n - 1].boss) { // každý mentor naučí jedno slovo moci proti drakovi
       const ring = LEVELS.filter((L) => !L.boss), k = ring.filter((L) => this.progress.stars[L.num] !== undefined).length;
       setTimeout(() => UI.toast(k < ring.length
         ? tr(`🐉 Slovo moci ${k}/${ring.length} — Ketvarr nad ostrovom nepokojne krúži.`, `🐉 Word of Power ${k}/${ring.length} — Ketvarr circles the island restlessly.`)
@@ -484,7 +570,7 @@ const Game = {
     const n = LEVELS.find((L) => this.progress.stars[L.num] === undefined);
     if (n && n.boss) return tr(`Vystúp na Dračí štít (portál ${n.num}) a poraz draka Ketvarra!`, `Climb Dragon’s Peak (portal ${n.num}) and defeat the dragon Ketvarr!`);
     return n ? tr(`Choď k portálu ${n.num}: ${n.title} (${n.mentor})`, `Go to portal ${n.num}: ${n.title} (${n.mentor})`)
-      : Settings.nordic ? tr('Ketvarr je porazený a ostrov zachránený! Skús zlepšiť hviezdičky.', 'Ketvarr is defeated and the island is saved! Try to improve your stars.')
+      : Settings.dragon ? tr('Ketvarr je porazený a ostrov zachránený! Skús zlepšiť hviezdičky.', 'Ketvarr is defeated and the island is saved! Try to improve your stars.')
         : tr('Všetky levely hotové! Skús zlepšiť hviezdičky.', 'All levels done! Try to improve your stars.');
   },
   guideTalk() {
@@ -496,24 +582,27 @@ const Game = {
       return UI.say(LAYMAN_INTRO.map(A));
     }
     this.save();
+    if (Settings.wow && !first && Wow.guideQuest(A)) return; // MMO: úlohy od Amplitúdy
     UI.say((first ? tr([
       A('Ahoj! Vitaj na <b>Hilbertovom ostrove</b>. Ja som Amplitúda — komplexné číslo s veľkosťou aj fázou.'),
       A('A ty si <b>Psíčko</b> — kvantový stav <b>ψ</b>. Nie si guľôčka s polohou a rýchlosťou. Si <i>pravidlo pre predpovede</i>: hovoríš, aké výsledky dostane ten, kto sa ťa niečo opýta (zmeria).'),
       A('Vidíš tú zlatú ručičku, ktorá sa okolo teba točí? To je tvoja <b>globálna fáza</b>. Točí sa, ale nikto na svete ju nevie zmerať. Zapamätaj si: <b>globálna fáza je nepozorovateľná, relatívna fáza áno</b>.'),
       A('Okolo ostrova je 8 portálov. Za každým čaká mentor — Euler, Stern, Bloch, Feynman, Dirac, Rabi, Bell a Bohr. Naučia ťa <b>jazyk</b>, <b>symboly</b> a <b>správne obrazy</b> kvantového sveta.'),
-      Settings.nordic && A('Nad ostrovom krúži <b>Ketvarr</b>, kvantový drak. Každý mentor ťa naučí jedno <b>slovo moci</b>. Keď ich budeš mať všetkých osem, vystúp na <b>Dračí štít</b> na severe a poraz ho.'),
+      Settings.dragon && A('Nad ostrovom krúži <b>Ketvarr</b>, kvantový drak. Každý mentor ťa naučí jedno <b>slovo moci</b>. Keď ich budeš mať všetkých osem, vystúp na <b>Dračí štít</b> na severe a poraz ho.'),
       A('Cieľ nie je počítať integrály. Cieľ je <b>intuícia</b>: vedieť, čo je amplitúda, čo je pravdepodobnosť, čo robí meranie a kde klasické prirovnania prestávajú platiť.'),
       A('Ovládanie: <b>WASD</b> pohyb, <b>ťahanie myšou</b> kamera, <b>E</b> vstúpiť/hovoriť, <b>C</b> Kódex symbolov, <b>M</b> mapa, <b>H</b> pomoc. Začni portálom <b>1</b>!'),
       A('Si v kvantovom svete nováčik? Vpravo hore prepni obťažnosť na <b>🫶 Laická</b> — všetko ti vysvetlím bežnými slovami.'),
+      Settings.wow && A('A ešte: ostrov je plný <b>klasických omylov</b>. Bojuj s nimi kúzlami <b>1–7</b> (Tab = cieľ, pravý klik = útok), zbieraj skúsenosti a peniaze, nakupuj u <b>Plancka</b> pri fontáne (B = taška). Keď sa so mnou porozprávaš znova, dám ti prvú úlohu.'),
     ], [
       A('Hi! Welcome to <b>Hilbert Island</b>. I am Amplitude — a complex number with both a magnitude and a phase.'),
       A('And you are <b>Little Psi</b> — the quantum state <b>ψ</b>. You are not a little ball with a position and a velocity. You are a <i>rule for predictions</i>: you tell what outcomes anyone who asks you something (measures you) will get.'),
       A('See that golden hand turning around you? That is your <b>global phase</b>. It turns, but nobody in the world can measure it. Remember: <b>the global phase is unobservable, the relative phase is not</b>.'),
       A('There are 8 portals around the island. Behind each one a mentor is waiting — Euler, Stern, Bloch, Feynman, Dirac, Rabi, Bell and Bohr. They will teach you the <b>language</b>, the <b>symbols</b> and the <b>right pictures</b> of the quantum world.'),
-      Settings.nordic && A('Above the island circles <b>Ketvarr</b>, the quantum dragon. Each mentor will teach you one <b>Word of Power</b>. Once you have all eight, climb <b>Dragon’s Peak</b> in the north and defeat him.'),
+      Settings.dragon && A('Above the island circles <b>Ketvarr</b>, the quantum dragon. Each mentor will teach you one <b>Word of Power</b>. Once you have all eight, climb <b>Dragon’s Peak</b> in the north and defeat him.'),
       A('The goal is not to compute integrals. The goal is <b>intuition</b>: knowing what an amplitude is, what a probability is, what a measurement does and where classical analogies stop working.'),
       A('Controls: <b>WASD</b> move, <b>mouse drag</b> camera, <b>E</b> enter/talk, <b>C</b> Codex of symbols, <b>M</b> map, <b>H</b> help. Start with portal <b>1</b>!'),
       A('New to the quantum world? Switch the difficulty (top right) to <b>🫶 Layman</b> — I will explain everything in everyday words.'),
+      Settings.wow && A('One more thing: the island is full of <b>classical misconceptions</b>. Fight them with spells <b>1–7</b> (Tab = target, right-click = attack), gather experience and money, shop at <b>Planck’s</b> by the fountain (B = bags). Talk to me again and I will give you your first quest.'),
     ]) : [A(this.nextQuestText() + tr('. Nezabudni: <i>amplitúdy interferujú, pravdepodobnosti sa len merajú.</i>', '. Don’t forget: <i>amplitudes interfere, probabilities are only measured.</i>'))]).filter(Boolean));
   },
   toggleMap(force) {
@@ -548,10 +637,12 @@ const Game = {
     cv.style.cursor = hover && this.isUnlocked(hover.L.num) ? 'pointer' : '';
     g.clearRect(0, 0, W, H);
     const N = Settings.nordic;
-    g.fillStyle = N ? '#1b2a33' : '#0d2347'; g.beginPath(); g.arc(cx, cy, 38 * s, 0, 7); g.fill();
-    g.fillStyle = N ? '#4a4c42' : '#2a3c66'; g.beginPath(); g.arc(cx, cy, 35 * s, 0, 7); g.fill();
+    const WW = Settings.wow;
+    g.fillStyle = WW ? '#1d4f78' : N ? '#1b2a33' : '#0d2347'; g.beginPath(); g.arc(cx, cy, 38 * s, 0, 7); g.fill();
+    g.fillStyle = WW ? '#4c7a35' : N ? '#4a4c42' : '#2a3c66'; g.beginPath(); g.arc(cx, cy, 35 * s, 0, 7); g.fill();
+    if (WW) { g.strokeStyle = '#8a6c45'; g.lineWidth = s * 2; g.beginPath(); g.arc(cx, cy, 20 * s, 0, 7); g.stroke(); }
     g.fillStyle = '#26402c'; for (const pn of Hub.pines) { const [x, y] = P(pn.p); g.beginPath(); g.arc(x, y, s * 0.9, 0, 7); g.fill(); }
-    g.font = `${Math.max(11, s * 1.6)}px ${N ? 'Cinzel, Georgia, serif' : 'system-ui'}`; g.textAlign = 'center';
+    g.font = `${Math.max(11, s * 1.6)}px ${N || WW ? 'Cinzel, Georgia, serif' : 'system-ui'}`; g.textAlign = 'center';
     for (const pt of Hub.portals) {
       const [x, y] = P(pt.p), open = this.isUnlocked(pt.L.num), st = this.progress.stars[pt.L.num];
       g.fillStyle = open ? `rgb(${pt.L.color.map((c) => c * 255).join(',')})` : '#555';
@@ -563,6 +654,10 @@ const Game = {
       g.fillText(open ? (st !== undefined && st > 0 ? '★'.repeat(st) : pt.L.mentor) : '🔒', x, y + s * 3.6);
     }
     g.fillStyle = '#ffcf5a'; g.beginPath(); g.arc(cx, cy, s * 1.2, 0, 7); g.fill();
+    if (Settings.wow) { // MMO: nepriatelia a obchodník
+      g.fillStyle = '#ff3030'; for (const m of Wow.mobs) if (m.state !== 'dead') { const [x, y] = P(m.p); g.beginPath(); g.arc(x, y, s * 0.55, 0, 7); g.fill(); }
+      const [vx, vy] = P(VENDOR_POS); g.fillStyle = '#ffd100'; g.fillText('💰 Planck', vx, vy);
+    }
     if (this.scene === Hub) {
       const [x, y] = P(Hub.player.p);
       g.fillStyle = '#5ff'; g.beginPath(); g.arc(x, y, s * 1.1, 0, 7); g.fill();
@@ -577,7 +672,7 @@ const Game = {
   load() {
     try {
       const d = JSON.parse(localStorage.getItem('kvantp-game1') || 'null');
-      if (d) this.progress = { stars: d.stars || {}, diff: d.diff || {}, codex: new Set(d.codex || []), scrolls: new Set(d.scrolls || []), introSeen: !!d.introSeen, laymanSeen: !!d.laymanSeen, moved: !!d.moved, allUnlocked: !!d.allUnlocked, session: d.session || null };
+      if (d) this.progress = { stars: d.stars || {}, diff: d.diff || {}, codex: new Set(d.codex || []), scrolls: new Set(d.scrolls || []), introSeen: !!d.introSeen, laymanSeen: !!d.laymanSeen, moved: !!d.moved, allUnlocked: !!d.allUnlocked, session: d.session || null, wow: d.wow || null };
     } catch (e) { /* čistý začiatok */ }
   },
 };

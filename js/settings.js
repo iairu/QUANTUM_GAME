@@ -3,12 +3,15 @@
 // oddelene od postupu, takže reset hry ich nezmaže.
 
 const DIFFS = ['layman', 'easy', 'normal', 'hard', 'ancient'];
-// témy: klasická (predvolená, 8 levelov) a severská (skyrimovský vzhľad + 9. level s drakom Ketvarrom)
-const THEMES = ['classic', 'nordic'];
+// témy: klasická (8 levelov), severská (skyrimovský vzhľad + 9. level s drakom Ketvarrom)
+// a MMO (predvolená: hrá sa ako World of Warcraft — kúzla, nepriatelia, úlohy, obchodník, korisť; aj drak)
+const THEMES = ['classic', 'nordic', 'wow'];
 const Settings = {
   diff: 'layman', // nová hra začína laickou obťažnosťou
-  theme: 'classic',
+  theme: 'wow',
   get nordic() { return this.theme === 'nordic'; },
+  get wow() { return this.theme === 'wow'; },
+  get dragon() { return this.nordic || this.wow; }, // drak Ketvarr a 9. level
   // ťažká aj prastará (prastará = ťažká + starobylé zvitky s históriou)
   get hard() { return this.diff === 'hard' || this.diff === 'ancient'; },
   // ľahká aj laická (laická = ľahká + všetko bežnými slovami)
@@ -33,7 +36,7 @@ const Settings = {
   gpuName: '',
   // vysoké rozlíšenie textúr: ručne, alebo automaticky len na výkonnejších počítačoch
   get texHigh() {
-    if (!this.nordic) return false; // detailné textúry patria k severskej téme
+    if (!this.nordic && !this.wow) return false; // detailné textúry patria k severskej a MMO téme
     if (this.view.tex !== 'auto') return this.view.tex === 'high';
     const weakGpu = /swiftshader|llvmpipe|software|mali|adreno|powervr|intel\(r\) (hd|uhd) graphics [2-6]/i.test(this.gpuName);
     const mobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);

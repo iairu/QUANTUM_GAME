@@ -406,10 +406,16 @@ class L9Dragon extends Level {
     UI.label('wtitle', V3.add(wc, [0, 2.6, 0]), `🛡 ${tr('Štít Ketvarra', 'Ketvarr’s ward')}${V3.len(rv) < 0.97 ? ` · |r| = ${Fmt.num(V3.len(rv), 2)}` : ''}`, 'npc');
     UI.label('wn', V3.add(wc, V3.scale(qToWorld(nv), 2.1)), 'n', 'prompt', tr('Zraniteľné miesto n: úder meria pozdĺž tejto osi.', 'The weak spot n: a strike measures along this axis.'));
     // hráč
-    const pc = [0, 1 + Math.sin(t * 3) * 0.08, 6];
+    let pc = [0, 1 + Math.sin(t * 3) * 0.08, 6];
+    if (Settings.wow) { // MMO: kvantový mág s palicou (výstroj z ostrova)
+      const it = (sl) => Wow.item(Wow.S.equip[sl]) || {};
+      Wow.humanoid(r, [0, 0, 6], Math.PI, { robe: it('chest').robe || [0.18, 0.52, 0.86], trim: [0.95, 0.78, 0.32], hat: it('head').hat || 'wizard', hatCol: it('head').hat ? null : [0.2, 0.3, 0.75], staff: true, orb: it('weapon').orb || [0.4, 0.95, 1], swing: !!this.shout });
+      pc = [0, 1.5, 6];
+    } else {
     r.sphere(pc, 0.45, [0.3, 0.95, 1], { emissive: 0.8 });
     r.sphere(pc, 0.65, [0.4, 0.8, 1], { alpha: 0.18 });
     r.rod(V3.add(pc, [0.5, -0.2, 0]), V3.add(pc, [0.9, 1.4, -0.4]), [0.85, 0.85, 0.9], 0.05, { emissive: 0.3 }); // meč
+    }
     UI.label('player', V3.add(pc, [0, 1, 0]), 'ψ', 'player');
     if (this.shout) UI.label('shout', V3.add(pc, [0, 2 + this.shout.t, 0]), `${this.shout.word}!`, 'shoutlbl');
     // efekty: oheň a sek čepeľou

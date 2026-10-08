@@ -16,11 +16,23 @@ Texty sú v kóde ako `tr('slovensky', 'English')` (`js/i18n.js`); väčšie tab
 
 ## Témy
 - V nastaveniach (⚙ → 🎨 Téma) sa volí **téma** hry; zmena znovu načíta hru, postup ostáva.
-  - *Klasická* (predvolená) — pôvodný modrý Hilbertov ostrov, 8 levelov.
+  - *⚔ MMO (World of Warcraft)* (predvolená v novej hre) — hrá sa ako MMO, obsah ostáva rovnaký (nižšie); aj 9. level s drakom.
+  - *Klasická* — pôvodný modrý Hilbertov ostrov, 8 levelov.
   - *🐉 Severská (Skyrim)* — zasnežený ostrov, severské farby a písmo, detailné textúry a 9. level s drakom (nižšie).
 - Hudba a zvukové efekty sú v oboch témach rovnaké.
 
-## Finále v severskej téme: drak Ketvarr (level 9)
+## MMO téma (⚔ World of Warcraft)
+Dialógy, kvízy, levely, Kódex, Denník aj tlačidlá ostávajú rovnaké — mení sa spôsob hry (`js/wow.js`).
+- **Postava:** Psíčko je kvantový mág s úrovňou (1–20), zdravím a *koherenciou* (manou), palicou a rúchom; mimo boja sa obnovuje. Medzerník = skok.
+- **Lišta kúziel** (dole v strede, klávesy 1 … =): 1 Fázový šíp (zosielanie 1,6 s), 2 Pauliho preklopenie X, 3 Hadamard H, 4 Bornova čepeľ (meranie), 5 korekcia chýb (liečenie), 6 dekoherenčná vlna, 7 tunelovanie, 8/9 elixíry, 0 automatický útok, − jazdecká Blochova guľa, = návrat k Amplitúde. Globálny cooldown, cooldowny, cast bar, kúzla sa odomykajú s úrovňou.
+- **Kvantový súboj:** každý nepriateľ má štít = qubit. Bornova čepeľ zasiahne s **P(|1⟩) = (1 − z)/2** (inak štít skolabuje na |0⟩), X ho preklopí, H pošle na rovník, dekoherenčná vlna zmrští Blochov vektor, relaxácia T₁ ho ťahá späť na |0⟩. Rám cieľa ukazuje P(|1⟩).
+- **Nepriatelia = klasické omyly** (skryté premenné, biliardové elektróny, atómy-planetky, nadsvetelné signály, mačky mŕtve-aj-živé, kultisti vedomia); vysvetlivka každého vyvracia omyl. Slabé bližšie k stredu, silnejšie na okraji ostrova; stred a podstavce portálov sú bezpečné. Tab / klik = cieľ, pravý klik = útok, menovky so zdravím, plávajúce čísla, smrť → „Uvoľniť ducha“.
+- **Úlohy:** mentori majú nad hlavou „!“ (ďalší level), Amplitúda zadáva 6 úloh na omyly („!“ / „?“), sledovanie úloh pod minimapou.
+- **Obchodník Max Planck** pri fontáne: elixíry, výstroj (Intelekt, Výdrž), jazdecká Blochova guľa; predaj haraburdia. **Taška (B)** so 16 miestami a výstrojou; peniaze v zlatých/strieborných/medených.
+- **Levely sú dungeony:** portály sú víry v kamenných oblúkoch s odporúčanou úrovňou. Boss levelu (napr. *Sčítač pravdepodobností*) stráca zdravie s každým krokom a správnou odpoveďou, nesprávna odpoveď je jeho úder. Po porážke padá korisť podľa hviezdičiek (★ zelená, ★★ modrá, ★★★ fialová), peniaze a skúsenosti. Drak Ketvarr je nájazd.
+- Minimapa, nápis zóny, ukazovateľ skúseností, informačný kanál koristi, chybové hlásenia; slnečná lúka s cestami, listnaté stromy (pred kamerou sa spriehľadnia), fontána.
+
+## Finále v severskej a MMO téme: drak Ketvarr (level 9)
 - Nad Hilbertovým ostrovom krúži kvantový drak **Ketvarr**. Každý z 8 levelov naučí jedno *slovo moci*; s ôsmimi sa otvorí **Dračí štít** (portál 9 na severe, mentor Erwin Schrödinger).
 - **Ťahová bitka** v 3 kolách: drakov štít je qubit (Blochova guľa), úder čepeľou je **meranie** pozdĺž zraniteľného miesta *n* — zásah s P = (1 + r·n)/2 a kolaps štítu. Hráč vykríkne jedno slovo (hradlá X, H, Z, S; od 2. kola impulz RABI-RA s uhlom θ, v 3. kole aj s osou φ), drak urobí **vopred ohlásený ťah** (rotácia okolo z, úder krídlom X, rev oblohy Y, hmla dekoherencie, presun srdca) a chrlí oheň.
 - **Metrika:** draka zraní len úder s P(zásah) ≥ prah (ľahká/laická 80 %, normálna 90 %, ťažká 95 %). Tlačidlá ukazujú P(zásah) v ďalšom ťahu už aj s drakovým ťahom; po zranení drak štít prekuje. Na záver 3 otázky o tom, *prečo* si vyhral.
@@ -75,5 +87,6 @@ Každý level končí **jazykovými pascami** (kvíz o správnych formuláciách
 ## Štruktúra kódu
 - `js/math.js` vektory, matice, komplexné čísla · `js/quantum.js` simulátor 1 a 2 qubitov
 - `js/gl.js` renderer (shader, procedurálne siete, Blochova sféra) · `js/ui.js` dialógy, kvízy, denník, vysvetlivky
+- `js/wow.js` MMO téma: postava, kúzla, nepriatelia, úlohy, obchodník, taška, korisť, bossovia, rámy jednotiek, minimapa
 - `js/i18n.js` voľba jazyka a `tr()` · `js/settings.js` obťažnosť (`byDiff`) a nastavenia zobrazenia · `js/knowledge.js` teória a rovnice, extra otázky · `js/scrolls.js` starobylé zvitky · `js/views.js` pohľady 👁 · `js/tips.js` slovník vysvetliviek · `js/content.js` kódex a jazykové pasce · `js/main.js` hub, kamera, hra
 - `js/levels/*.js` jednotlivé levely, `registry.js` ich poradie

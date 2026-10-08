@@ -55,7 +55,7 @@ void main() {
     float line = smoothstep(0.46, 0.5, max(g.x, g.y));
     base = mix(base, base * 1.4 + 0.04, line * 0.55);
   } else if (uPattern > 1.5 && uPattern < 2.5) {   // studené more
-    if (uTheme < 0.5) {                            // klasická téma: pôvodná vlniaca sa voda
+    if (uTheme < 0.5 || uTheme > 1.5) {           // klasická a MMO téma: pôvodná vlniaca sa voda
       float w = sin(vWorld.x * 0.35 + uTime) * sin(vWorld.z * 0.31 - uTime * 0.8);
       base *= 0.9 + 0.12 * w;
     } else {
@@ -84,7 +84,7 @@ void main() {
     base *= (0.68 + 0.45 * f) * (0.82 + 0.36 * big);
     base *= mix(1.0, 0.72, smoothstep(0.95, 0.995, r));
     float cover = smoothstep(0.55, 0.85, n.y + 0.25 * (f - 0.5));
-    base = mix(base, SNOW, cover * 0.85);
+    if (uTheme < 1.5) base = mix(base, SNOW, cover * 0.85); else cover = 0.0; // v MMO téme bez snehu
     matte = 0.25;
     if (hi) {
       float m = fbm(q * 7.0), l = smoothstep(0.6, 0.72, fbm(q * 0.7 + 5.0)) * (1.0 - cover);
@@ -112,7 +112,7 @@ void main() {
       base += vec3(0.08, 0.04, 0.0) * sc * vnoise(q * 11.0);
       hgt = sc * 0.6 + fbm(q * 6.0) * 0.1; bk = 0.06;
     }
-  } else if (uPattern > 6.5) {                     // ihličie s poprašeným snehom (objekt)
+  } else if (uPattern > 6.5 && uPattern < 7.5) {   // ihličie s poprašeným snehom (objekt)
     float f = fbm(vObj.xz * 6.0 + vObj.y * 4.0);
     base *= 0.7 + 0.6 * f;
     float cover = smoothstep(0.55, 0.9, n.y) * smoothstep(0.45, 0.7, f);
@@ -124,14 +124,56 @@ void main() {
       hgt = nd * 0.4 + f * 0.3; bk = 0.03;
       sparkle = cover * step(0.99, h21(floor(vObj.xz * 60.0 + vObj.y * 30.0))) * lod(vObj.xz * 60.0);
     }
+  } else if (uPattern > 7.5 && uPattern < 8.5) {   // vír portálu inštancie (disk, svieti sám)
+    float r = length(vObj.xz), a = atan(vObj.z, vObj.x);
+    float sw = sin(a * 3.0 + r * 11.0 - uTime * 3.2) * 0.5 + 0.5, sw2 = sin(a * 5.0 - r * 7.0 + uTime * 2.1) * 0.5 + 0.5;
+    vec3 c = mix(base * 0.35, base * 1.5 + 0.15, sw * 0.7 + sw2 * 0.3);
+    c += vec3(1.0, 0.95, 1.0) * pow(max(1.0 - r, 0.0), 3.0) * 0.9;            // jasné jadro
+    c += base * smoothstep(0.82, 0.97, r) * 0.8;                                 // žiariaci okraj
+    o = vec4(c, uColor.a * smoothstep(1.0, 0.93, r));
+    return;
+  } else if (uPattern > 8.5 && uPattern < 9.5) {   // MMO: lúka s kvietkami, prašné cesty a dláždené námestie
+    vec2 p = vWorld.xz;
+    float f = fbm(p * 0.09), d = fbm(p * 0.8), R = length(p);
+    base = mix(base * 0.78, base * vec3(1.12, 1.15, 0.85), f) * (0.9 + 0.2 * d);
+    vec2 fc = floor(p * 3.0); float fl = step(0.985, h21(fc)) * smoothstep(0.35, 0.1, length(fract(p * 3.0) - 0.5));
+    base = mix(base, h21(fc + 7.0) > 0.5 ? vec3(1.0, 0.9, 0.35) : vec3(0.95, 0.95, 1.0), fl * 0.9 * lod(p * 3.0));
+    float an = atan(p.y, p.x), sf = (an + 1.5708) / 6.28318 * 8.0;
+    float spoke = abs(fract(sf) - 0.5) * 0.7854 * R;                              // cesty k 8 portálom
+    float road = min(abs(R - 20.0), R > 3.0 && R < 20.0 ? spoke : 99.0);
+    if (p.y < -19.0 && p.y > -29.5) road = min(road, abs(p.x));                   // cesta na sever k dračiemu štítu
+    float edge = 1.05 + 0.35 * (fbm(p * 0.7) - 0.5);
+    float rd = smoothstep(edge, edge - 0.25, road);
+    vec3 dirt = vec3(0.47, 0.36, 0.23) * (0.85 + 0.3 * fbm(p * 2.3));
+    base = mix(base, dirt, rd);
+    if (R < 4.2) {                                                                // námestie z dlažby
+      vec2 q = p * 1.4; q.x += 0.5 * mod(floor(q.y), 2.0);
+      vec2 g = abs(fract(q) - 0.5); float joint = smoothstep(0.42, 0.48, max(g.x, g.y));
+      vec3 cob = vec3(0.56, 0.54, 0.5) * (0.82 + 0.3 * h21(floor(q)));
+      base = mix(base, mix(cob, cob * 0.55, joint), smoothstep(4.2, 3.9, R));
+    }
+    matte = 0.25;
+  } else if (uPattern > 9.5 && uPattern < 10.5) {  // MMO: kreslené lístie (koruna stromu)
+    float f = fbm(vObj.xz * 3.0 + vObj.y * 2.0);
+    base *= 0.72 + 0.5 * f;
+    base = mix(base, base * vec3(1.2, 1.25, 0.8), smoothstep(0.2, 0.9, n.y) * 0.5);
+    matte = 0.15;
+  } else if (uPattern > 10.5 && uPattern < 11.5) { // MMO: murované kamenné kvádre (oblúky portálov, budovy)
+    vec2 q = plane(vWorld, n) * vec2(1.1, 2.2); q.x += 0.5 * mod(floor(q.y), 2.0);
+    vec2 g = abs(fract(q) - 0.5); float joint = smoothstep(0.43, 0.49, max(g.x, g.y));
+    base *= (0.8 + 0.3 * h21(floor(q))) * (0.85 + 0.25 * fbm(q * 3.0));
+    base = mix(base, base * 0.45, joint);
+    matte = 0.3;
   }
   if (uUnlit > 0.5) { o = vec4(base, uColor.a); return; }
   if (bk > 0.0) n = bump(n, hgt, bk);
   vec3 l = normalize(uLight), v = normalize(uCam - vWorld), h = normalize(l + v);
   float d = max(dot(n, l), 0.0);
   // severská téma: zem vs. studená obloha a teplé slnko; klasická: pôvodné neutrálne svetlo
-  vec3 amb = uTheme > 0.5 ? mix(vec3(0.3, 0.28, 0.26), vec3(0.42, 0.47, 0.56), n.y * 0.5 + 0.5) : vec3(0.38 + 0.14 * n.y);
-  vec3 sun = uTheme > 0.5 ? vec3(1.0, 0.95, 0.86) : vec3(1.0);
+  // MMO téma: teplé zlaté slnko a modrá obloha (sýte rozprávkové farby)
+  vec3 amb = uTheme > 1.5 ? mix(vec3(0.3, 0.27, 0.22), vec3(0.42, 0.48, 0.6), n.y * 0.5 + 0.5)
+    : uTheme > 0.5 ? mix(vec3(0.3, 0.28, 0.26), vec3(0.42, 0.47, 0.56), n.y * 0.5 + 0.5) : vec3(0.38 + 0.14 * n.y);
+  vec3 sun = uTheme > 1.5 ? vec3(1.08, 0.98, 0.82) : uTheme > 0.5 ? vec3(1.0, 0.95, 0.86) : vec3(1.0);
   float spec = pow(max(dot(n, h), 0.0), 48.0) * 0.45 * matte;
   float rim = pow(1.0 - max(dot(n, v), 0.0), 3.0) * 0.35;
   vec3 c = base * (amb + 0.72 * d * sun) + vec3(spec) + base * rim + base * uEmissive;
@@ -329,7 +371,7 @@ class Renderer {
     gl.uniform3fv(this.loc.uFogColor, this.fogColor);
     gl.uniform1f(this.loc.uTime, this.time);
     gl.uniform1f(this.loc.uDetail, Settings.texHigh ? 1 : 0);
-    gl.uniform1f(this.loc.uTheme, Settings.nordic ? 1 : 0);
+    gl.uniform1f(this.loc.uTheme, Settings.wow ? 2 : Settings.nordic ? 1 : 0);
   }
 
   // o: { emissive, unlit, pattern, alpha }

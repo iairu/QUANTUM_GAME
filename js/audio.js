@@ -184,6 +184,25 @@ const Sound = {
       case 'fire': N(1.0, { filter: 'lowpass', f: 1400, fTo: 400, gain: 0.2, attack: 0.08, rev: 1 }); N(0.8, { f: 3500, q: 2, gain: 0.04, rate: 0.5 }); break;
       case 'roar': T(95, 1.5, { to: 58, type: 'sawtooth', lp: 650, gain: 0.16, attack: 0.15, rev: 1 }); N(1.4, { filter: 'lowpass', f: 700, gain: 0.12, attack: 0.2, rev: 1 }); break;
       case 'rune': T(392, 1.2, { gain: 0.04, rev: 1 }); T(587.33, 1.2, { gain: 0.03, rev: 1, at: 0.1 }); break;
+      // MMO téma
+      case 'cast': N(1.4, { f: 600, fTo: 2400, q: 3, gain: 0.04, attack: 0.3, rev: 1 }); T(330, 1.4, { to: 660, gain: 0.025, attack: 0.4, rev: 1 }); break;
+      case 'bolt': N(0.35, { f: 3000, fTo: 700, q: 1.5, gain: 0.08 }); T(880, 0.25, { to: 330, type: 'triangle', gain: 0.05 }); break;
+      case 'shot': N(0.15, { f: 2600, fTo: 1200, q: 2, gain: 0.05 }); T(990, 0.12, { to: 660, gain: 0.03 }); break;
+      case 'hit': N(0.12, { filter: 'lowpass', f: 1200, gain: 0.14 }); T(140, 0.15, { to: 70, gain: 0.12 }); break;
+      case 'swing': N(0.2, { f: 1600, fTo: 400, q: 1, gain: 0.07 }); T(110, 0.12, { gain: 0.08, lp: 400, at: 0.08 }); break;
+      case 'aggro': T(180, 0.35, { to: 120, type: 'sawtooth', lp: 600, gain: 0.06 }); break;
+      case 'coin': for (const [f, i] of [[1975, 0], [2637, 1]]) T(f, 0.3, { type: 'triangle', gain: 0.04, at: i * 0.07 }); break;
+      case 'loot': T(659.25, 0.3, { type: 'triangle', gain: 0.05 }); T(880, 0.4, { type: 'triangle', gain: 0.05, at: 0.08 }); break;
+      case 'equip': N(0.15, { filter: 'lowpass', f: 1800, gain: 0.08 }); T(260, 0.1, { type: 'square', lp: 800, gain: 0.04, at: 0.05 }); break;
+      case 'bag': N(0.25, { filter: 'lowpass', f: 1100, gain: 0.08, attack: 0.03 }); break;
+      case 'target': T(1200, 0.06, { type: 'triangle', gain: 0.03 }); break;
+      case 'heal': for (const [f, i] of [[523.25, 0], [659.25, 1], [783.99, 2], [1046.5, 3]]) T(f, 0.8, { gain: 0.035, rev: 1, at: i * 0.07 }); break;
+      case 'nova': N(0.9, { f: 400, fTo: 3200, q: 1.2, gain: 0.09, rev: 1 }); T(110, 0.8, { to: 55, gain: 0.12 }); break;
+      case 'blink': T(1400, 0.3, { to: 300, gain: 0.05, rev: 1 }); N(0.2, { f: 4000, gain: 0.04 }); break;
+      case 'quest': for (const [m, i] of [[67, 0], [71, 1], [74, 2]]) T(this.midi(m), 0.7, { type: 'triangle', gain: 0.05, rev: 1, at: i * 0.11 }); break;
+      case 'levelup': for (const [m, i] of [[60, 0], [64, 1], [67, 2], [72, 3], [76, 4]]) T(this.midi(m), 1.6, { type: 'sawtooth', lp: 2200, gain: 0.045, attack: 0.02, rev: 1, at: i * 0.09 }); N(1.5, { f: 5000, q: 0.6, gain: 0.025, attack: 0.3, rev: 1 }); break;
+      case 'death': T(220, 2.2, { to: 82, type: 'sawtooth', lp: 500, gain: 0.08, rev: 1 }); N(1.8, { filter: 'lowpass', f: 600, gain: 0.08, rev: 1 }); break;
+      case 'bossdown': T(98, 2, { to: 49, type: 'sawtooth', lp: 500, gain: 0.12, rev: 1 }); for (const [m, i] of [[55, 1], [59, 2], [62, 3], [67, 4.5]]) T(this.midi(m), 1.8, { type: 'sawtooth', lp: 1300, gain: 0.05, attack: 0.05, rev: 1, at: 0.5 + i * 0.18 }); break;
     }
   },
 };

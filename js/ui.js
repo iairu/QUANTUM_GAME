@@ -254,6 +254,7 @@ const UI = {
       b.onclick = () => {
         const ok = i === q.correct;
         Sound.sfx(ok ? 'good' : 'bad');
+        Settings.wow && Wow.onAnswer(ok); // MMO: správna odpoveď = zásah bossa, nesprávna = jeho úder
         this.record({ kind: 'quiz', q: q.q, answer: q.options[q.correct], why: q.why, ok });
         [...box.children].forEach((c) => (c.disabled = true));
         b.classList.add(ok ? 'good' : 'bad');
@@ -429,6 +430,7 @@ const UI = {
     for (const [k, name, desc] of [
       ['classic', tr('Klasická', 'Classic'), tr('pôvodný modrý Hilbertov ostrov, 8 levelov', 'the original blue Hilbert Island, 8 levels')],
       ['nordic', tr('🐉 Severská (Skyrim)', '🐉 Nordic (Skyrim)'), tr('zasnežený ostrov s borovicami a menhirmi, severské písmo a farby, detailné textúry a záverečný 9. level: ťahový súboj s kvantovým drakom Ketvarrom', 'a snowy island with pines and standing stones, Nordic lettering and colours, detailed textures and a final 9th level: a turn-based battle with the quantum dragon Ketvarr')],
+      ['wow', tr('⚔ MMO (World of Warcraft)', '⚔ MMO (World of Warcraft)'), tr('hrá sa ako MMO: kvantový mág s úrovňami, lišta kúziel (hradlá X, H, meranie…), nepriatelia „klasické omyly“, úlohy, obchodník, taška a korisť; levely sú dungeony s bossom, ktorého porazíš vedomosťami; aj drak Ketvarr', 'plays like an MMO: a quantum mage with levels, a spell bar (X and H gates, measurement…), “classical misconception” enemies, quests, a merchant, bags and loot; levels are dungeons with a boss you defeat with knowledge; Ketvarr the dragon too')],
     ]) {
       const l = el('label'), r = el('input');
       r.type = 'radio'; r.name = 'theme'; r.checked = Settings.theme === k;
@@ -438,7 +440,7 @@ const UI = {
     }
     body.appendChild(th);
     body.appendChild(el('p', 'muted', tr('Zmena témy znovu načíta hru; postup, hudba a zvuky ostávajú.', 'Changing the theme reloads the game; progress, music and sounds stay.')));
-    if (Settings.nordic) {
+    if (Settings.nordic || Settings.wow) {
     body.appendChild(el('h3', null, tr('🖼 Textúry', '🖼 Textures')));
     const tx = el('div', 'diffs');
     for (const [k, name, desc] of [
