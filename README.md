@@ -16,6 +16,7 @@ Texty sú v kóde ako `tr('slovensky', 'English')` (`js/i18n.js`); väčšie tab
 
 ## Obťažnosť, nastavenia, ukladanie
 - **Obťažnosť** (rozbaľovací zoznam vpravo hore, dá sa meniť kedykoľvek):
+  - *🫶 Laická* — mechanika ako ľahká, ale všetko bežnými slovami: pred každou úlohou kartička „po ľudsky“, odborné slová s prekladom v zátvorke, jednoduché vysvetlivky, úvod sprievodkyne o kvantových počítačoch (`js/layman.js`).
   - *Ľahká* — väčšie tolerancie, menej meraní, nápovedy, v kvízoch o jednu nesprávnu možnosť menej, texty so zvýraznenými kľúčovými slovami.
   - *Normálna* — pôvodná hra; v paneli zbalený box „📐 Teória a rovnice“ s jadrom levelu.
   - *Ťažká* — viac poznatkov: rozbalená teória s rovnicami ku každej úlohe, 2 extra otázky s rovnicami na level, husté texty bez analógií; presnosť, náhodné ciele, bez nápovied, extra hádanky v leveli 3, prísnejšie hviezdičky.

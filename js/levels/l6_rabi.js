@@ -147,7 +147,7 @@ class L6Rabi extends Level {
     this.hist.push({ p1: (1 - this.r[2]) / 2, s: disp[0] });
     if (this.hist.length > 300) this.hist.shift();
     if (this.read) this.read.innerHTML = `P(|1⟩) = ${Fmt.pct((1 - this.r[2]) / 2)} · |r| = ${Fmt.num(V3.len(this.r), 2)}`
-      + (this.pulse ? tr(' · <b>RF impulz beží</b>', ' · <b>RF pulse running</b>') : '') + (this.stepIdx >= 4 && this.stepIdx < 5 ? ` · ${tr('posun od rezonancie', 'detuning')}: ${this.flags.tune || Settings.diff === 'easy' ? Fmt.num(this.delta, 2) : '?'}` : '');
+      + (this.pulse ? tr(' · <b>RF impulz beží</b>', ' · <b>RF pulse running</b>') : '') + (this.stepIdx >= 4 && this.stepIdx < 5 ? ` · ${tr('posun od rezonancie', 'detuning')}: ${this.flags.tune || Settings.easy ? Fmt.num(this.delta, 2) : '?'}` : '');
     if (this.rabiChart && this.rabiChart.isConnected) this.drawRabi();
     if (this.plot && this.plot.isConnected) this.drawPlot();
   }

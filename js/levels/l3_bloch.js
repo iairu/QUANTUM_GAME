@@ -118,7 +118,7 @@ class L3Bloch extends Level {
       + `<br>θ = ${Fmt.angle(th)}${Math.abs(Math.sin(th)) > 1e-3 ? ', φ = ' + Fmt.angle((ph + 2 * Math.PI) % (2 * Math.PI)) : ''}`
       + (this.moves !== undefined && !this.step ? `<br>${tr('Použité hradlá', 'Gates used')}: ${this.moves}` : '');
     const P = !this.step && this.plist && this.plist[this.pi];
-    if (P && Settings.diff === 'easy') {
+    if (P && Settings.easy) {
       const t = Q.bloch(Q.named(P.to)), tth = Math.acos(clamp(t[2], -1, 1)), tph = (Math.atan2(t[1], t[0]) + 2 * Math.PI) % (2 * Math.PI);
       this.readout.innerHTML += `<br><small>💡 ${tr('cieľ', 'target')}: θ = ${Fmt.angle(tth)}${Math.abs(Math.sin(tth)) > 1e-3 ? ', φ = ' + Fmt.angle(tph) : ''}</small>`;
     }

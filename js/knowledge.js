@@ -183,7 +183,7 @@ const TRAPS_HARD = {
 
 function theoryFor(num, step) {
   const T = THEORY[num];
-  if (!T || Settings.diff === 'easy') return null;
+  if (!T || Settings.easy) return null;
   const parts = [{ h: tr('Jadro levelu', 'Core of the level'), html: pick(T.core) }];
   if (Settings.hard && T[step]) parts.push({ h: tr('K tejto úlohe', 'For this task'), html: pick(T[step]), view: T.views?.[step] });
   return parts;

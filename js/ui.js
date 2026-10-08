@@ -130,8 +130,8 @@ const UI = {
   // ---------- HUD ----------
   setHud(title, quest) {
     $('#hud-title').innerHTML = title;
-    $('#hud-quest').innerHTML = quest ? '🎯 ' + annotate(Settings.diff === 'easy' ? emphasize(quest) : quest) : '';
-    $('#hud-quest').className = Settings.diff;
+    $('#hud-quest').innerHTML = quest ? '🎯 ' + annotate(Settings.easy ? emphasize(quest) : quest) : '';
+    $('#hud-quest').className = Settings.diff + (Settings.layman ? ' easy' : '');
   },
   toast(html, ms = 2600) {
     const t = el('div', 'toast', html);
@@ -196,7 +196,7 @@ const UI = {
       this.dialog.innerHTML = '';
       this.dialog.appendChild(el('div', 'who', (l.face || '💬') + ' ' + (l.who || '') + (opts.replay ? ` <small>(${tr('opakovanie', 'replay')})</small>` : '')));
       this.dialog.appendChild(el('div', 'txt', l.raw ? l.text : TextMode.render(l.text)));
-      this.dialog.className = 'show ' + Settings.diff + (Settings.hard ? ' hard' : '') + (l.cls ? ' ' + l.cls : '');
+      this.dialog.className = 'show ' + Settings.diff + (Settings.layman ? ' easy' : '') + (Settings.hard ? ' hard' : '') + (l.cls ? ' ' + l.cls : '');
       const nav = el('div', 'nav');
       const back = el('button', null, tr('◂ Späť', '◂ Back'));
       back.disabled = i === 0; back.onclick = prev; back.dataset.tip = tr('Predchádzajúca replika (← alebo Backspace). Celé rozhovory nájdeš v Denníku (L).', 'Previous line (← or Backspace). Full conversations are in the Journal (L).');
@@ -232,10 +232,10 @@ const UI = {
     this._next = null; this._prev = null;
     this.dialog.innerHTML = '';
     this.dialog.appendChild(el('div', 'who', (q.face || '❓') + ' ' + (q.who || tr('Otázka', 'Question'))));
-    this.dialog.appendChild(el('div', 'txt', annotate(q.q)));
+    this.dialog.appendChild(el('div', 'txt', annotate(q.q, true)));
     const box = el('div', 'choices');
     let order = q.options.map((_, i) => i);
-    if (Settings.diff === 'easy' && order.length > 2) { // ľahká: o jednu nesprávnu možnosť menej
+    if (Settings.easy && order.length > 2) { // ľahká a laická: o jednu nesprávnu možnosť menej
       const wrong = order.filter((i) => i !== q.correct);
       const drop = wrong[Math.floor(rand() * wrong.length)];
       order = order.filter((i) => i !== drop);
@@ -250,7 +250,7 @@ const UI = {
         [...box.children].forEach((c) => (c.disabled = true));
         b.classList.add(ok ? 'good' : 'bad');
         if (!ok) box.children[order.indexOf(q.correct)].classList.add('good');
-        const fb = el('div', 'why ' + (ok ? 'ok' : 'no'), (ok ? tr('✅ Správne. ', '✅ Correct. ') : tr('❌ Nie celkom. ', '❌ Not quite. ')) + annotate(q.why || ''));
+        const fb = el('div', 'why ' + (ok ? 'ok' : 'no'), (ok ? tr('✅ Správne. ', '✅ Correct. ') : tr('❌ Nie celkom. ', '❌ Not quite. ')) + annotate(q.why || '', true));
         this.dialog.appendChild(fb);
         const c = el('button', 'primary', tr('Pokračovať ▸', 'Continue ▸'));
         c.onclick = () => { this.dialog.classList.remove('show'); this.busy = false; this._next = null; cb && cb(ok); };
@@ -510,6 +510,7 @@ const TextMode = {
     return out.length ? out : [lines[lines.length - 1]];
   },
   render(html) {
+    if (Settings.layman) return annotate(html, true); // laická: bez kľúčových slov (bývajú to odborné termíny), žargón s prekladom
     if (Settings.diff !== 'easy') return annotate(html);
     const keys = this.keywords(html);
     if (!keys.length) return annotate(html);

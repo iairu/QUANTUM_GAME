@@ -2,11 +2,14 @@
 // Nastavenia hry: obťažnosť, vizualizácie a geometria zobrazenia. Ukladajú sa do localStorage
 // oddelene od postupu, takže reset hry ich nezmaže.
 
-const DIFFS = ['easy', 'normal', 'hard', 'ancient'];
+const DIFFS = ['layman', 'easy', 'normal', 'hard', 'ancient'];
 const Settings = {
   diff: 'normal',
   // ťažká aj prastará (prastará = ťažká + starobylé zvitky s históriou)
   get hard() { return this.diff === 'hard' || this.diff === 'ancient'; },
+  // ľahká aj laická (laická = ľahká + všetko bežnými slovami)
+  get easy() { return this.diff === 'easy' || this.diff === 'layman'; },
+  get layman() { return this.diff === 'layman'; },
   view: {
     grid: false,      // rovnobežky a poludníky Blochovej sféry, polárna mriežka komplexnej roviny
     proj: true,       // projekcie Blochovho vektora na osi (⟨X⟩, ⟨Y⟩, ⟨Z⟩)
@@ -36,11 +39,13 @@ const Settings = {
 Settings.load();
 
 // hodnota podľa aktuálnej obťažnosti (číta sa vždy znova, takže zmena platí okamžite)
-const byDiff = (easy, normal, hard) => (Settings.diff === 'easy' ? easy : Settings.hard ? hard : normal);
+const byDiff = (easy, normal, hard) => (Settings.easy ? easy : Settings.hard ? hard : normal);
 const DIFF_NAME = {
-  easy: tr('Ľahká', 'Easy'), normal: tr('Normálna', 'Normal'), hard: tr('Ťažká', 'Hard'), ancient: tr('📜 Prastará', '📜 Ancient'),
+  layman: tr('🫶 Laická', '🫶 Layman'), easy: tr('Ľahká', 'Easy'), normal: tr('Normálna', 'Normal'), hard: tr('Ťažká', 'Hard'), ancient: tr('📜 Prastará', '📜 Ancient'),
 };
 const DIFF_DESC = {
+  layman: tr('ľahká, ale všetko bežnými slovami: pred každou úlohou vysvetlenie „po ľudsky“, odborné slová s prekladom v zátvorke, jednoduché vysvetlivky — ideálny štart do kvantových počítačov',
+    'easy, but everything in everyday words: a plain-language explanation before every task, technical words translated in brackets, simple tooltips — the ideal start into quantum computing'),
   easy: tr('väčšie tolerancie, menej pokusov, nápovedy, v kvízoch o jednu nesprávnu možnosť menej',
     'wider tolerances, fewer trials, hints, one wrong option fewer in quizzes'),
   normal: tr('pôvodná hra', 'the original game'),

@@ -113,7 +113,7 @@ class L5Dirac extends Level {
     const toks = DIRAC_TOKENS.map((d) => UI.button(d.t, () => { this.tokens.push(d); this.refresh(); }, 'token'));
     this.view = UI.info('');
     UI.panelSet(tr('Skladanie výrazu', 'Building an expression'), [
-      UI.info(`<b>${tr('Postav', 'Build')}:</b> ${T.title}` + (Settings.diff === 'easy' ? `<br><small>💡 ${tr('počet tokenov', 'number of tokens')}: ${T.exact.length}${T.sq ? ' + |…|²' : ''} · ${tr('začni', 'start with')} ${T.exact[0]}</small>` : '')),
+      UI.info(`<b>${tr('Postav', 'Build')}:</b> ${T.title}` + (Settings.easy ? `<br><small>💡 ${tr('počet tokenov', 'number of tokens')}: ${T.exact.length}${T.sq ? ' + |…|²' : ''} · ${tr('začni', 'start with')} ${T.exact[0]}</small>` : '')),
       UI.row(...toks.slice(0, 3)), UI.row(...toks.slice(3, 6)), UI.row(...toks.slice(6)),
       UI.row(UI.button('|…|²', () => { this.squared = !this.squared; this.refresh(); }), UI.button('⌫', () => { this.tokens.pop(); this.refresh(); }), UI.button(tr('Vymaž', 'Clear'), () => { this.tokens = []; this.squared = false; this.refresh(); })),
       this.view,

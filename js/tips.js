@@ -273,6 +273,7 @@ const GLOSS_RE = GLOSS.map(([stem, tip]) => [new RegExp(`(?<![\\p{L}\u0002])(${s
 
 function tipFor(html) {
   const t = String(html).replace(/<br\s*\/?>/g, ' ').replace(/<[^>]+>/g, '').replace(/^[^\p{L}\p{N}|⟨(\[+−×⊗Â⌫ψαρ]+/u, '').trim();
+  if (Settings.layman && LAYMAN_TIPS[t]) return LAYMAN_TIPS[t];
   if (TIPS[t]) return TIPS[t];
   const raw = String(html).replace(/<[^>]+>/g, '').trim();
   if (TIPS[raw]) return TIPS[raw];
@@ -281,7 +282,9 @@ function tipFor(html) {
 }
 
 // do HTML textu dialógu pridá podčiarknuté pojmy s vysvetlivkou (prvý výskyt každého pojmu)
-function annotate(html) {
+// inline: v laickej obťažnosti aj krátky preklad žargónu v zátvorke (dialógy a kvízy, nie HUD)
+function annotate(html, inline = false) {
+  if (Settings.layman) return annotateLayman(html, inline);
   const used = new Set(), tips = [];
   return String(html).split(/(<[^>]+>)/).map((seg) => {
     if (seg.startsWith('<')) return seg;

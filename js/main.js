@@ -46,12 +46,19 @@ class Level {
     if (!this.keepSub) this.sub = {}; // sub = rozpracovaný stav kroku (napr. číslo hádanky), ukladá sa
     this.keepSub = false;
     Game.save();
-    const s = this.steps[this.stepIdx], run = () => (s ? s.call(this) : this.finale());
+    const s = this.steps[this.stepIdx], run = () => (s ? s.call(this) : this.finale()), name = s ? s.name : 'finale';
+    const pre = [];
+    // laická obťažnosť: pred krokom ho sprievodkyňa vysvetlí bežnými slovami
+    if (!this.seenScrolls.has('plain:' + name)) {
+      this.seenScrolls.add('plain:' + name);
+      pre.push(...laymanFor(this.num, name).map((t) => ({ who: tr('Amplitúda · po ľudsky', 'Amplitude · in plain words'), face: '🫶', text: t, raw: true, cls: 'plaincard' })));
+    }
     // prastará obťažnosť: pred krokom sa rozvinie starobylý zvitok s históriou
-    const sc = scrollFor(this.num, s ? s.name : 'finale').filter((x) => !this.seenScrolls.has(x.id));
-    if (!sc.length) return run();
+    const sc = scrollFor(this.num, name).filter((x) => !this.seenScrolls.has(x.id));
     sc.forEach((x) => { this.seenScrolls.add(x.id); Game.unlockScroll(x.id); });
-    UI.say(sc.map((x) => ({ who: `${tr('Starobylý zvitok', 'Ancient scroll')} · ${pick(x.title)}`, face: '📜', text: scrollHtml(x), raw: true, cls: 'scroll' })), run);
+    pre.push(...sc.map((x) => ({ who: `${tr('Starobylý zvitok', 'Ancient scroll')} · ${pick(x.title)}`, face: '📜', text: scrollHtml(x), raw: true, cls: 'scroll' })));
+    if (!pre.length) return run();
+    UI.say(pre, run);
   }
   viewState() { return null; }
   say(lines, done) { UI.say(lines.map((t) => (typeof t === 'string' ? { who: this.mentor, face: this.face, text: t } : t)), done); }
@@ -178,7 +185,7 @@ const Hub = {
       r.draw('cylinder', M4.trs(np, 0, [0.35, 1.1, 0.35]), V3.scale(L.color, 0.8));
       r.sphere(V3.add(np, [0, 1.45, 0]), 0.32, [0.95, 0.85, 0.75]);
       const dd = Game.progress.diff[L.num], st = (done ? ' ' + '★'.repeat(done) + '☆'.repeat(3 - done) : '') + (dd && dd !== 'normal' ? ` <small>(${DIFF_NAME[dd]})</small>` : '');
-      UI.hot(c, `<b>${tr('Portál', 'Portal')} ${L.num}: ${L.title}</b><br>${LEVEL_TIPS[L.num]}${open ? '' : tr('<br>🔒 Najprv dokonči predchádzajúci level.', '<br>🔒 Complete the previous level first.')}`, 60);
+      UI.hot(c, `<b>${tr('Portál', 'Portal')} ${L.num}: ${L.title}</b><br>${(Settings.layman ? LAYMAN_LEVEL_TIPS : LEVEL_TIPS)[L.num]}${open ? '' : tr('<br>🔒 Najprv dokonči predchádzajúci level.', '<br>🔒 Complete the previous level first.')}`, 60);
       UI.hot(V3.add(np, [0, 1.2, 0]), tr(`<b>${L.mentor}</b> — mentor levelu ${L.num}.`, `<b>${L.mentor}</b> — mentor of level ${L.num}.`), 30);
       UI.label('portal' + L.num, V3.add(c, [0, 2.9, 0]), `<b>${L.num} · ${L.title}</b>${st}<br><small>${open ? L.face + ' ' + L.mentor : tr('🔒 zamknuté', '🔒 locked')}</small>`, 'portal' + (open ? '' : ' locked'));
     }
@@ -248,7 +255,7 @@ Object.assign(CRYSTAL_TIPS, { '|0⟩': TIPS['|0⟩'], '|1⟩': TIPS['|1⟩'], '�
 // ------------------------------------------------------------------
 const Game = {
   keys: {},
-  progress: { stars: {}, diff: {}, codex: new Set(), scrolls: new Set(), introSeen: false, allUnlocked: false, session: null, moved: false },
+  progress: { stars: {}, diff: {}, codex: new Set(), scrolls: new Set(), introSeen: false, laymanSeen: false, allUnlocked: false, session: null, moved: false },
   init() {
     const canvas = $('#gl');
     try { this.r = new Renderer(canvas); }
@@ -345,6 +352,8 @@ const Game = {
     UI.refreshDialog && UI.refreshDialog();
     UI.toast(tr(`🎚 Obťažnosť: <b>${DIFF_NAME[d]}</b> — tolerancie platia hneď, nové ciele a nápovedy od ďalšej úlohy.`,
       `🎚 Difficulty: <b>${DIFF_NAME[d]}</b> — tolerances apply now, new targets and hints from the next task.`), 3600);
+    // prvé zapnutie laickej obťažnosti na ostrove: sprievodkyňa zopakuje úvod bežnými slovami
+    if (d === 'layman' && !this.progress.laymanSeen && this.scene === Hub && !UI.busy) this.guideTalk();
   },
   // zmaže postup (nastavenia a jazyk ponechá) a začne odznova
   resetAll() {
@@ -403,7 +412,12 @@ const Game = {
   guideTalk() {
     const A = (text) => ({ who: tr('Amplitúda (sprievodkyňa)', 'Amplitude (your guide)'), face: '✨', text });
     const first = !this.progress.introSeen;
-    this.progress.introSeen = true; this.save();
+    this.progress.introSeen = true;
+    if (Settings.layman && !this.progress.laymanSeen) {
+      this.progress.laymanSeen = true; this.save();
+      return UI.say(LAYMAN_INTRO.map(A));
+    }
+    this.save();
     UI.say(first ? tr([
       A('Ahoj! Vitaj na <b>Hilbertovom ostrove</b>. Ja som Amplitúda — komplexné číslo s veľkosťou aj fázou.'),
       A('A ty si <b>Psíčko</b> — kvantový stav <b>ψ</b>. Nie si guľôčka s polohou a rýchlosťou. Si <i>pravidlo pre predpovede</i>: hovoríš, aké výsledky dostane ten, kto sa ťa niečo opýta (zmeria).'),
@@ -411,6 +425,7 @@ const Game = {
       A('Okolo ostrova je 8 portálov. Za každým čaká mentor — Euler, Stern, Bloch, Feynman, Dirac, Rabi, Bell a Bohr. Naučia ťa <b>jazyk</b>, <b>symboly</b> a <b>správne obrazy</b> kvantového sveta.'),
       A('Cieľ nie je počítať integrály. Cieľ je <b>intuícia</b>: vedieť, čo je amplitúda, čo je pravdepodobnosť, čo robí meranie a kde klasické prirovnania prestávajú platiť.'),
       A('Ovládanie: <b>WASD</b> pohyb, <b>ťahanie myšou</b> kamera, <b>E</b> vstúpiť/hovoriť, <b>C</b> Kódex symbolov, <b>M</b> mapa, <b>H</b> pomoc. Začni portálom <b>1</b>!'),
+      A('Si v kvantovom svete nováčik? Vpravo hore prepni obťažnosť na <b>🫶 Laická</b> — všetko ti vysvetlím bežnými slovami.'),
     ], [
       A('Hi! Welcome to <b>Hilbert Island</b>. I am Amplitude — a complex number with both a magnitude and a phase.'),
       A('And you are <b>Little Psi</b> — the quantum state <b>ψ</b>. You are not a little ball with a position and a velocity. You are a <i>rule for predictions</i>: you tell what outcomes anyone who asks you something (measures you) will get.'),
@@ -418,6 +433,7 @@ const Game = {
       A('There are 8 portals around the island. Behind each one a mentor is waiting — Euler, Stern, Bloch, Feynman, Dirac, Rabi, Bell and Bohr. They will teach you the <b>language</b>, the <b>symbols</b> and the <b>right pictures</b> of the quantum world.'),
       A('The goal is not to compute integrals. The goal is <b>intuition</b>: knowing what an amplitude is, what a probability is, what a measurement does and where classical analogies stop working.'),
       A('Controls: <b>WASD</b> move, <b>mouse drag</b> camera, <b>E</b> enter/talk, <b>C</b> Codex of symbols, <b>M</b> map, <b>H</b> help. Start with portal <b>1</b>!'),
+      A('New to the quantum world? Switch the difficulty (top right) to <b>🫶 Layman</b> — I will explain everything in everyday words.'),
     ]) : [A(this.nextQuestText() + tr('. Nezabudni: <i>amplitúdy interferujú, pravdepodobnosti sa len merajú.</i>', '. Don’t forget: <i>amplitudes interfere, probabilities are only measured.</i>'))]);
   },
   toggleMap(force) {
@@ -478,7 +494,7 @@ const Game = {
   load() {
     try {
       const d = JSON.parse(localStorage.getItem('kvantp-game1') || 'null');
-      if (d) this.progress = { stars: d.stars || {}, diff: d.diff || {}, codex: new Set(d.codex || []), scrolls: new Set(d.scrolls || []), introSeen: !!d.introSeen, moved: !!d.moved, allUnlocked: !!d.allUnlocked, session: d.session || null };
+      if (d) this.progress = { stars: d.stars || {}, diff: d.diff || {}, codex: new Set(d.codex || []), scrolls: new Set(d.scrolls || []), introSeen: !!d.introSeen, laymanSeen: !!d.laymanSeen, moved: !!d.moved, allUnlocked: !!d.allUnlocked, session: d.session || null };
     } catch (e) { /* čistý začiatok */ }
   },
 };

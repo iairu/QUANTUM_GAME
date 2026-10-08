@@ -40,7 +40,7 @@ class L1Complex extends Level {
         + `Re α = ${Fmt.num(this.z[0], 2)}, Im α = ${Fmt.num(this.z[1], 2)}<br>`
         + tr(`<b>P = |α|² = ${Fmt.num(r * r, 2)}</b> &nbsp;<small>(fáza na P nemá vplyv!)</small>`, `<b>P = |α|² = ${Fmt.num(r * r, 2)}</b> &nbsp;<small>(the phase has no effect on P!)</small>`);
       const dist = C.abs(C.sub(this.z, this.target));
-      if (Settings.diff === 'easy') info.innerHTML += `<br><small>${tr('vzdialenosť od cieľa', 'distance from the target')}: ${Fmt.num(dist, 2)}</small>`;
+      if (Settings.easy) info.innerHTML += `<br><small>${tr('vzdialenosť od cieľa', 'distance from the target')}: ${Fmt.num(dist, 2)}</small>`;
       if (!this.done1 && dist < byDiff(0.12, 0.06, 0.03)) {
         this.done1 = true;
         this.grant(['euler', 'eiphi', 'amp']);

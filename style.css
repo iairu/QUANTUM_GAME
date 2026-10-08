@@ -152,6 +152,10 @@ html[lang="sk"] [data-lang="en"], html[lang="en"] [data-lang="sk"] { display: no
 #panel details summary { cursor: pointer; font-size: 13px; font-weight: 600; color: var(--gold); }
 /* čitateľnosť podľa obťažnosti */
 #dialog.easy .txt { font-size: 18px; line-height: 1.6; }
+#dialog .plain { color: #9fdcae; font-size: 0.85em; }
+#dialog.plaincard { border-color: #9fdcae; }
+#dialog.plaincard .txt { color: #e8f6ec; }
+#diff-select.layman { border-color: #9fdcae; }
 #dialog.easy .keys { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
 #dialog.easy .key { background: rgba(255, 210, 90, 0.16); border: 1px solid var(--gold); color: var(--gold); border-radius: 999px; padding: 2px 10px; font-weight: 700; }
 #dialog.easy .rest { color: #b9c2e6; font-size: 15px; }
