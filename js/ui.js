@@ -19,6 +19,7 @@ const UI = {
       ['#btn-map', tr('🗺 Mapa', '🗺 Map'), tr('Mapa (M)', 'Map (M)')],
       ['#btn-codex', tr('📖 Kódex', '📖 Codex'), tr('Kódex symbolov (C)', 'Codex of symbols (C)')],
       ['#btn-log', tr('📜 Denník', '📜 Journal'), tr('Denník rozhovorov (L)', 'Conversation journal (L)')],
+      ['#btn-views', '👁', tr('Pohľady: ten istý stav ako obrázky — ručičky, Blochove rezy, bázy, matica ρ (V)', 'Views: the same state as pictures — hands, Bloch cuts, bases, ρ matrix (V)')],
       ['#btn-settings', '⚙', tr('Nastavenia: vizualizácie a geometria (O)', 'Settings: visualizations and geometry (O)')],
       ['#btn-help', '❔', tr('Pomoc (H)', 'Help (H)')],
     ]) { $(id).textContent = text; $(id).title = title; }
@@ -48,6 +49,7 @@ const UI = {
     this.diffUi = diffUi;
     $('#settings .close').onclick = () => this.toggleSettings(false);
     $('#btn-settings').onclick = () => this.toggleSettings();
+    $('#btn-views').onclick = () => Views.toggle();
     $('#btn-codex').onclick = () => this.toggleCodex();
     $('#btn-map').onclick = () => Game.toggleMap();
     $('#btn-help').onclick = () => this.toggleHelp();
@@ -193,8 +195,8 @@ const UI = {
       const l = lines[i];
       this.dialog.innerHTML = '';
       this.dialog.appendChild(el('div', 'who', (l.face || '💬') + ' ' + (l.who || '') + (opts.replay ? ` <small>(${tr('opakovanie', 'replay')})</small>` : '')));
-      this.dialog.appendChild(el('div', 'txt', TextMode.render(l.text)));
-      this.dialog.className = 'show ' + Settings.diff;
+      this.dialog.appendChild(el('div', 'txt', l.raw ? l.text : TextMode.render(l.text)));
+      this.dialog.className = 'show ' + Settings.diff + (Settings.hard ? ' hard' : '') + (l.cls ? ' ' + l.cls : '');
       const nav = el('div', 'nav');
       const back = el('button', null, tr('◂ Späť', '◂ Back'));
       back.disabled = i === 0; back.onclick = prev; back.dataset.tip = tr('Predchádzajúca replika (← alebo Backspace). Celé rozhovory nájdeš v Denníku (L).', 'Previous line (← or Backspace). Full conversations are in the Journal (L).');
@@ -277,7 +279,24 @@ const UI = {
     this.panel.innerHTML = '';
     this.panel.appendChild(el('h3', null, title));
     for (const n of nodes) this.panel.appendChild(n);
+    this.appendTheory();
     this.panel.classList.add('show');
+  },
+  // „📐 Teória a rovnice“: normálna = len jadro (zbalené), ťažká/prastará = jadro + aktuálny krok (rozbalené)
+  appendTheory() {
+    const L = Game.scene;
+    if (!L || L === Hub || !L.steps) return;
+    const step = L.steps[L.stepIdx], parts = theoryFor(L.num, step ? step.name : '');
+    if (!parts) return;
+    const d = el('details', 'theory');
+    d.open = Settings.hard;
+    d.appendChild(el('summary', null, tr('📐 Teória a rovnice', '📐 Theory and equations')));
+    for (const p of parts) {
+      d.appendChild(el('h4', null, p.h));
+      d.appendChild(el('div', 'th', annotate(p.html)));
+      if (p.view) d.appendChild(this.button(tr('👁 Ukáž to obrázkom', '👁 Show it as a picture'), () => Views.open(p.view), '', tr('Otvorí pohľad, v ktorom túto rovnicu vidno.', 'Opens the view in which this equation can be seen.')));
+    }
+    this.panel.appendChild(d);
   },
   panelHide() { this.panel.classList.remove('show'); this.panel.innerHTML = ''; },
   button(html, onclick, cls = '', tip) {
@@ -406,9 +425,10 @@ const UI = {
     const list = $('#codex .list'), got = Game.progress.codex;
     list.innerHTML = '';
     const tabs = $('#codex .tabs'); tabs.innerHTML = '';
-    for (const [k, n] of [['all', tr('Všetko', 'All')], ['symbol', tr('🔣 Symboly', '🔣 Symbols')], ['osobnost', tr('👤 Osobnosti', '👤 People')], ['pojem', tr('💡 Pojmy', '💡 Concepts')]]) {
+    for (const [k, n] of [['all', tr('Všetko', 'All')], ['symbol', tr('🔣 Symboly', '🔣 Symbols')], ['osobnost', tr('👤 Osobnosti', '👤 People')], ['pojem', tr('💡 Pojmy', '💡 Concepts')], ['scroll', tr('📜 Zvitky', '📜 Scrolls')]]) {
       const b = el('button', filter === k ? 'on' : '', n); b.onclick = () => this.renderCodex(k); tabs.appendChild(b);
     }
+    if (filter === 'scroll') return this.renderScrolls(list);
     const entries = CODEX.filter((e) => filter === 'all' || e.type === filter);
     $('#codex .count').textContent = `${got.size} / ${CODEX.length} ${tr('odomknutých', 'unlocked')}`;
     for (const e of entries) {
@@ -419,6 +439,17 @@ const UI = {
           + `<div class="src">Level ${e.level}</div>`
         : `<div class="sym">?</div><div class="nm">${tr('zamknuté', 'locked')}</div><div class="ds">${tr(`Odomkneš v leveli ${e.level}.`, `Unlocked in level ${e.level}.`)}</div>`;
       if (!have) card.dataset.tip = tr(`Dokonči level ${e.level} (${LEVELS[e.level - 1].title}).`, `Complete level ${e.level} (${LEVELS[e.level - 1].title}).`);
+      list.appendChild(card);
+    }
+  },
+  renderScrolls(list) {
+    const got = Game.progress.scrolls;
+    $('#codex .count').textContent = `${got.size} / ${SCROLLS.length} ${tr('zvitkov', 'scrolls')} · ${tr('rozvinú sa v obťažnosti 📜 Prastará', 'they unroll in the 📜 Ancient difficulty')}`;
+    for (const s of SCROLLS) {
+      const have = got.has(s.id), card = el('div', 'card scrollcard ' + (have ? '' : 'locked'));
+      card.innerHTML = have
+        ? `<div class="sym">📜 ${s.year}</div>${scrollHtml(s)}<div class="src">Level ${s.level}</div>`
+        : `<div class="sym">📜 ?</div><div class="nm">${tr('zvinutý zvitok', 'a rolled-up scroll')}</div><div class="ds">${tr(`Level ${s.level} v obťažnosti Prastará.`, `Level ${s.level} on Ancient difficulty.`)}</div>`;
       list.appendChild(card);
     }
   },
@@ -449,22 +480,12 @@ const SLIDER_TIPS = tr([
 // ---------- čitateľnosť textu podľa obťažnosti ----------
 // ľahká: najdôležitejšie slová (zvýraznené kľúčové pojmy navrchu, zvyšok potlačený)
 // normálna: pôvodný text
-// ťažká: stručne a husto — len vety s kľúčovými pojmami, vzorcami a číslami; repliky jedného hovoriaceho sa zlúčia
+// ťažká/prastará: husto a s viac poznatkami — bez analógií, repliky jedného hovoriaceho sa zlúčia; rovnice sú v paneli „📐“
 const TextMode = {
-  INFO: /<b>|=|→|⟩|⟨|²|π|ħ|\d|≥|≠|∼|⊗/,
   ANALOGY: /^(<[^>]+>)*\s*(Prirovnanie|An analogy)/,
   sentences(html) { return String(html).split(/(?<=[.!?…])\s+(?=[„“(<|A-ZÁ-ŽÄÔ0-9])/u); },
-  // z repliky ponechá jedinú vetu s najväčšou hustotou informácie (kľúčové pojmy, vzorce, čísla); analógie vypustí
-  score(t) { return (t.match(/<b>/g) || []).length * 2 + (t.match(/[=→⟩⟨²πħ≥≠∼⊗]|\d/g) || []).length; },
-  condense(html) {
-    let best = '', bs = 0;
-    for (const t of this.sentences(html)) {
-      if (this.ANALOGY.test(t)) continue;
-      const sc = this.score(t);
-      if (sc > bs) { bs = sc; best = t; }
-    }
-    return best;
-  },
+  // ťažká: zachová všetky poznatky, vypustí len analógie („Prirovnanie: …“) — tie nahrádza teória s rovnicami v paneli
+  condense(html) { return this.sentences(html).filter((t) => !this.ANALOGY.test(t)).join(' '); },
   keywords(html) {
     const out = [];
     for (const m of String(html).matchAll(/<b>(.*?)<\/b>/g)) {
@@ -475,14 +496,15 @@ const TextMode = {
   },
   lines(lines) {
     lines = lines.map((l, i) => ({ ...l, src: [i] }));
-    if (Settings.diff !== 'hard') return lines;
+    if (!Settings.hard) return lines;
+    if (lines.some((l) => l.raw)) return lines;
     const out = [];
     for (const l of lines) {
       const text = this.condense(l.text);
       if (!text) continue;
       const last = out[out.length - 1];
       const len = (h) => h.replace(/<[^>]+>/g, '').length;
-      if (last && last.who === l.who && last.face === l.face && len(last.text) + len(text) < 240) { last.text += ' ' + text; last.src.push(...l.src); }
+      if (last && last.who === l.who && last.face === l.face && len(last.text) + len(text) < 480) { last.text += ' ' + text; last.src.push(...l.src); }
       else out.push({ ...l, text });
     }
     return out.length ? out : [lines[lines.length - 1]];

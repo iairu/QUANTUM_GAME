@@ -30,7 +30,7 @@ class L1Complex extends Level {
     this.tMag = byDiff(0.7, 0.7, 0.4 + Math.round(rand() * 10) * 0.05);
     this.tPh = byDiff(6, 6, 1 + Math.floor(rand() * 15)) * Math.PI / 8;
     this.target = C.scale(C.exp(this.tPh), this.tMag);
-    const hard = Settings.diff === 'hard';
+    const hard = Settings.hard;
     this.quest(tr('Nastav ručičku amplitúdy α na zlatý cieľ (veľkosť aj fázu).', 'Set the amplitude hand α onto the golden target (both magnitude and phase).'), { easy: tr('🎯 α → zlatý cieľ', '🎯 α → golden target'), hard: `α → ${hard ? '?' : Fmt.complex(this.target)} · ε < ${Fmt.num(byDiff(0.12, 0.06, 0.03), 2)}` });
     let r = 1, ph = 0;
     const info = UI.info('');
@@ -110,7 +110,7 @@ class L1Complex extends Level {
         x0: 0, x1: 2 * Math.PI, y0: 0, y1: 1, xlabel: tr('fáza cesty 2', 'phase of path 2'),
         xticks: [[0, '0'], [Math.PI / 2, 'π/2'], [Math.PI, 'π'], [3 * Math.PI / 2, '3π/2'], [2 * Math.PI, '2π']], yticks: [[0, '0'], [0.5, '½'], [1, '1']],
         hlines: [{ y: 0.5, color: '#9aa6d1', label: tr('klasicky', 'classical') }],
-        curves: Settings.diff === 'hard' ? [] : [{ f: (x) => Math.cos(x / 2) ** 2, color: '#ff7d8f' }],
+        curves: Settings.hard ? [] : [{ f: (x) => Math.cos(x / 2) ** 2, color: '#ff7d8f' }],
         points: [...this.visited.map(([x, y]) => ({ x, y, color: '#ff7d8f88', r: 1.5 })), { x: v, y: P, color: '#ffd25a', r: 5 }],
         legend: [['#ff7d8f', tr('kvantovo |A₁+A₂|²', 'quantum |A₁+A₂|²')], ['#9aa6d1', '|A₁|²+|A₂|²']],
       });
@@ -128,6 +128,14 @@ class L1Complex extends Level {
     };
     UI.panelSet(tr('Interferencia dvoch ciest', 'Interference of two paths'), [UI.slider(tr('fáza cesty 2', 'phase of path 2'), 0, 6.28, byDiff(0.02, 0.01, 0.004), 0, upd), info, chart,
       UI.info(tr('Najprv nájdi P = 0, potom P = 1.', 'First find P = 0, then P = 1.'), 'tip')]);
+  }
+
+  viewState() {
+    if (this.mode === 'set') return { amps: [{ z: this.z, label: 'α' }], note: tr('Jedna amplitúda α: dĺžka ručičky → P = |α|², uhol = fáza.', 'One amplitude α: hand length → P = |α|², angle = phase.') };
+    if (this.mode === 'mul') return { amps: [{ z: C.exp(this.angShown), label: 'α' }], note: tr('Násobenie i otočí ručičku o 90° a dĺžku nezmení.', 'Multiplying by i turns the hand by 90° and keeps its length.') };
+    if (this.mode === 'int') return { amps: [{ z: C.of(0.5), label: 'A₁' }, { z: C.scale(C.exp(this.ph2), 0.5), label: 'A₂' }], sum: true,
+      note: tr('Ručičky sa skladajú hlavou k päte; P je štvorec dĺžky zlatého súčtu.', 'Hands add head to tail; P is the square of the length of the golden sum.') };
+    return null;
   }
 
   update(dt) {
@@ -149,7 +157,7 @@ class L1Complex extends Level {
     }
     const O = [0, 0.03, 0];
     // polárna mriežka (vždy na ťažkej, inak podľa nastavení): kruhy |α| = 0,25 … 1, lúče po 22,5°
-    if ((Settings.view.grid || Settings.diff === 'hard') && this.mode !== 'int') {
+    if ((Settings.view.grid || Settings.hard) && this.mode !== 'int') {
       for (const k of [0.25, 0.5, 0.75]) r.draw('circle', M4.trs([0, 0.012, 0], 0, 2 * k), [0.55, 0.6, 0.85], { alpha: 0.5 });
       for (let k = 0; k < 16; k++) { const a = k * Math.PI / 8; r.dash([0, 0.012, 0], this.W([Math.cos(a), Math.sin(a)], 0.012), [0.55, 0.6, 0.85], { alpha: 0.5 }); }
       if (this.mode === 'set') for (const k of [0.25, 0.5, 0.75]) UI.label('pg' + k, [2 * k * 0.71 + 0.08, 0.02, 2 * k * 0.71], Fmt.num(k, 2), 'axis tiny');
@@ -170,7 +178,7 @@ class L1Complex extends Level {
       r.rod(this.W([0, this.z[1]]), this.W(this.z), [0.6, 0.8, 1], 0.01);
       UI.label('alpha', V3.add(this.W(this.z), [0, 0.35, 0]), 'α', 'player');
       UI.hot(this.W(this.z), tr(`<b>Amplitúda α</b> = ${Fmt.complex(this.z)}<br>dĺžka ${Fmt.num(C.abs(this.z), 2)}, fáza ${Fmt.angle(C.arg(this.z))}`, `<b>Amplitude α</b> = ${Fmt.complex(this.z)}<br>length ${Fmt.num(C.abs(this.z), 2)}, phase ${Fmt.angle(C.arg(this.z))}`), 30);
-      UI.hot(this.W(this.target), Settings.diff === 'hard' ? tr('<b>Zlatý cieľ</b> — odčítaj veľkosť a fázu z mriežky.', '<b>Golden target</b> — read its magnitude and phase off the grid.')
+      UI.hot(this.W(this.target), Settings.hard ? tr('<b>Zlatý cieľ</b> — odčítaj veľkosť a fázu z mriežky.', '<b>Golden target</b> — read its magnitude and phase off the grid.')
         : tr(`<b>Zlatý cieľ</b>: veľkosť ${Fmt.num(this.tMag, 2)}, fáza ${Fmt.angle(this.tPh)}.`, `<b>Golden target</b>: magnitude ${Fmt.num(this.tMag, 2)}, phase ${Fmt.angle(this.tPh)}.`), 26);
       UI.hot([3.4, 1.2, -1.6], tr(`<b>Stĺpec pravdepodobnosti</b> P = |α|² = ${Fmt.num(C.abs2(this.z), 2)}. Mení sa len s dĺžkou ručičky.`, `<b>Probability bar</b> P = |α|² = ${Fmt.num(C.abs2(this.z), 2)}. It changes only with the length of the hand.`), 40);
       // stĺpec pravdepodobnosti

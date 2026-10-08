@@ -155,3 +155,36 @@ html[lang="sk"] [data-lang="en"], html[lang="en"] [data-lang="sk"] { display: no
 #hud-quest.easy { font-size: 16px; }
 #hud-quest.easy b { color: var(--gold); }
 #hud-quest.hard { font-size: 13px; font-family: "Cambria Math", Georgia, serif; letter-spacing: 0.1px; }
+/* prastará = ťažká + zvitky */
+#hud-quest.ancient { font-size: 13px; font-family: "Cambria Math", Georgia, serif; }
+#diff-select.ancient { border-color: #c9a25a; }
+#dialog.scroll { background: linear-gradient(#f3e6c4, #e8d6a8); color: #3b2a12; border: 2px solid #9c7a3c; font-family: Georgia, "Times New Roman", serif; }
+#dialog.scroll .who { color: #7a4f12; }
+#dialog.scroll .txt { font-size: 15px; line-height: 1.55; }
+#dialog.scroll .hint { color: #7a6544; }
+#dialog.scroll button { color: #3b2a12; background: #e0c88f; border-color: #9c7a3c; }
+.scroll-head { font-size: 13px; color: #7a4f12; margin-bottom: 2px; }
+.scroll-title { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
+#dialog.scroll blockquote, .scrollcard blockquote { margin: 8px 0 0; padding: 6px 10px; border-left: 3px solid #9c7a3c; font-style: italic; background: rgba(156, 122, 60, 0.12); }
+.scrollcard .scroll-head { color: #d9b46a; }
+.scrollcard .scroll-title { font-size: 14px; }
+/* teória a rovnice v paneli */
+#panel details.theory { border-color: rgba(255, 210, 90, 0.4); }
+#panel details.theory h4 { margin: 8px 0 2px; font-size: 12px; color: var(--accent); }
+#panel details.theory .th { font-size: 13px; line-height: 1.5; }
+.eq { font-family: "Cambria Math", Georgia, serif; font-size: 15px; text-align: center; background: #0a0f24; border-radius: 6px; padding: 5px 6px; margin: 5px 0; overflow-x: auto; white-space: nowrap; }
+.ca { color: #6fa2ff; font-weight: 700; font-style: normal; }
+.cb { color: #ff7d8f; font-weight: 700; font-style: normal; }
+.cg { color: var(--gold); font-weight: 700; }
+/* 👁 pohľady */
+#views { position: fixed; left: 14px; top: 128px; width: 392px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 6px; display: none; z-index: 4; }
+#views.show { display: block; }
+#views .vh { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 4px; font-size: 13px; }
+#views .vtabs { display: flex; flex-wrap: wrap; gap: 3px; flex: 1; }
+#views .vtabs button { font-size: 11px; padding: 2px 6px; }
+#views .vtabs button.on { background: #1d5d7a; border-color: var(--accent); }
+#views .vclose { padding: 2px 7px; font-size: 11px; }
+#views canvas { width: 380px; height: 250px; display: block; border-radius: 8px; }
+#views .vcap { font-size: 12px; line-height: 1.5; padding: 4px 4px 0; font-family: "Cambria Math", Georgia, serif; max-height: 160px; overflow-y: auto; }
+#views .vnote { font-family: system-ui, sans-serif; color: var(--muted); margin-bottom: 3px; }
+@media (max-width: 720px) { #views { left: 6px; right: 6px; width: auto; top: 90px; } #views canvas { width: 100%; height: auto; } }

@@ -118,7 +118,7 @@ class L2Stern extends Level {
       else if (s.filter === '-') { pass *= 1 - pp; r = V3.scale(n, -1); up = 0; }
       else { r = V3.scale(n, 2 * pp - 1); up = pp; } // zabudnutý výsledok → zmes pozdĺž osi n
     }
-    return { up, pass };
+    return { up, pass, r };
   }
 
   sig() {
@@ -174,7 +174,7 @@ class L2Stern extends Level {
       : tr(`Na tienidle: <b>hore ${this.cnt.up}</b> (${pu}), <b>dole ${this.cnt.down}</b> (${pd})<br>Pohltené filtrom: ${this.cnt.abs}<br><small>Zostava: ${this.sig() || '—'}</small>`,
         `On the screen: <b>up ${this.cnt.up}</b> (${pu}), <b>down ${this.cnt.down}</b> (${pd})<br>Absorbed by filters: ${this.cnt.abs}<br><small>Setup: ${this.sig() || '—'}</small>`);
     // teória (presný výpočet) vs. meranie
-    const th = this.model === 'q' ? this.theory() : null, showTh = th && !this.hideTheory && Settings.diff !== 'hard';
+    const th = this.model === 'q' ? this.theory() : null, showTh = th && !this.hideTheory && !Settings.hard;
     if (showTh) this.stats.innerHTML += `<br><small>${tr('teória', 'theory')}: ${tr('hore', 'up')} ${Fmt.pct(th.up)}, ${tr('prejde filtrami', 'passes the filters')} ${Fmt.pct(th.pass)}</small>`;
     if (this.model !== 'q') { UI.drawChart(this.chart, { x0: 0, x1: 1, y0: 0, y1: 1, yticks: [[0, '0'], [1, '1']], legend: [['#9aa6d1', tr('klasický pás: bez dvoch stôp', 'classical band: no two spots')]] }); return; }
     const mu = tot ? this.cnt.up / tot : 0, md = tot ? this.cnt.down / tot : 0, fired = tot + this.cnt.abs;
@@ -224,6 +224,12 @@ class L2Stern extends Level {
     const hit = V3.add([this.SX - 0.06, Y, 0], V3.add(V3.scale(nW(last), sign * 1.3), [0, (rand() - 0.5) * 0.18, (rand() - 0.5) * 0.18]));
     pts.push(hit);
     this.parts.push({ pts, d: 0, kind: sign > 0 ? 'up' : 'down', hit });
+  }
+
+  viewState() {
+    const th = this.model === 'q' ? this.theory() : null;
+    if (!th) return { r: [0, 0, 0], note: tr('Nepolarizovaný zväzok z pece: maximálne zmiešaný stav I/2.', 'The unpolarised beam from the furnace: the maximally mixed state I/2.') };
+    return { r: th.r, note: tr('Stav atómov, ktoré prešli poslednou zapnutou stanicou (teória; nefiltrovaný výsledok = zmes).', 'The state of atoms after the last active station (theory; an unfiltered outcome = a mixture).') };
   }
 
   update(dt) {

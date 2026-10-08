@@ -25,7 +25,7 @@ const BLOCH_PUZZLES = [
 
 class L3Bloch extends Level {
   get steps() { return [this.intro, this.puzzles, this.measure, this.lab]; }
-  puzzleList() { return BLOCH_PUZZLES.filter((p) => !p.hard || Settings.diff === 'hard'); }
+  puzzleList() { return BLOCH_PUZZLES.filter((p) => !p.hard || Settings.hard); }
 
   setup() {
     this.cam = new OrbitCam([0, 0, 0], 7, 0.75, 0.32, 3.5, 14);
@@ -68,7 +68,7 @@ class L3Bloch extends Level {
       UI.row(UI.button(tr('↺ Znova', '↺ Again'), () => this.loadPuzzle(i))),
       this.readout,
       UI.info(`${tr('Povolené', 'Allowed')}: ${P.gates.join(', ')}`, 'tip'),
-      Settings.diff === 'hard' ? null : UI.info(tr('X, Y, Z: 180° okolo osí x, y, z · H: 180° okolo osi (x+z) · S: 90° okolo z · T: 45° okolo z', 'X, Y, Z: 180° about the x, y, z axes · H: 180° about the (x+z) axis · S: 90° about z · T: 45° about z'), 'tip'),
+      Settings.hard ? null : UI.info(tr('X, Y, Z: 180° okolo osí x, y, z · H: 180° okolo osi (x+z) · S: 90° okolo z · T: 45° okolo z', 'X, Y, Z: 180° about the x, y, z axes · H: 180° about the (x+z) axis · S: 90° about z · T: 45° about z'), 'tip'),
     ].filter(Boolean));
     this.updReadout();
   }
@@ -233,6 +233,11 @@ class L3Bloch extends Level {
     if (this.hist) bars.unshift({ x: 0.5, w: 0.5, y: this.hist[0] / 100, color: '#5fe08a', label: this.hist[0] + '×' }, { x: 1.5, w: 0.5, y: this.hist[1] / 100, color: '#ff6b7d', label: this.hist[1] + '×' });
     UI.drawChart(this.labChart, { x0: 0, x1: 2, y0: 0, y1: 1.15, yticks: [[0, '0'], [0.5, '½'], [1, '1']], xticks: [[0.5, '+m'], [1.5, '−m']], bars,
       legend: [['#ffd25a', tr('teória', 'theory')], ['#5fe08a', tr('100 meraní', '100 measurements')]] });
+  }
+
+  viewState() {
+    if (this.anim) return { r: V3.rotate(this.anim.v0, this.anim.axis, this.anim.ang * this.anim.t), note: tr('Hradlo práve otáča stav.', 'A gate is rotating the state.') };
+    return { psi: this.psi, note: tr('Všimni si: po hradle Y majú ručičky spoločnú fázu i (globálna fáza) — Blochove rezy ju nevidia.', 'Notice: after the Y gate both hands share the phase i (a global phase) — the Bloch cuts cannot see it.') };
   }
 
   update(dt) {

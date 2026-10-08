@@ -110,7 +110,7 @@ class L4Interference extends Level {
       UI.drawChart(chart, {
         x0: 0, x1: 1, y0: 0, y1: 1, xlabel: tr('p (0 = koherentné, 1 = meranie)', 'p (0 = coherent, 1 = measurement)'),
         xticks: [[0, '0'], [0.5, '½'], [1, '1']], yticks: [[0, '0'], [0.5, '½'], [1, '1']],
-        curves: Settings.diff === 'hard' && this.mode === 'deco' ? [] : [{ f: (x) => (1 + (1 - x) * c) / 2, color: '#b48cff' }],
+        curves: Settings.hard && this.mode === 'deco' ? [] : [{ f: (x) => (1 + (1 - x) * c) / 2, color: '#b48cff' }],
         hlines: this.mode === 'deco' ? [{ y: this.target, color: '#ffd25a', label: tr('cieľ', 'target') }] : [],
         points: [...(n ? [{ x: pe, y: this.hist[0] / n, color: '#5fe08a', r: 4 }] : []), { x: pe, y: this.P0(), color: '#ff7d8f', r: 5 }],
         legend: [['#ff7d8f', tr('teória', 'theory')], ['#5fe08a', tr('namerané', 'measured')]],
@@ -154,6 +154,10 @@ class L4Interference extends Level {
         'Mathematically, the second gate acts on the density matrix as <b>HρH†</b> (the dagger † = Hermitian conjugate). For the mixture I/2 you get I/2 again — nothing changes.',
         'The lesson for quantum computers: <b>coherence is the fuel</b> of interference. Lose it and you lose the advantage.']), () => this.next());
     }
+  }
+
+  viewState() {
+    return { r: this.shownR, note: tr('Stav qubitu na koľaji: meranie a dekoherencia mažú mimodiagonálu ρ a skracujú šípku.', 'The qubit state on the track: measurement and decoherence erase the off-diagonal of ρ and shorten the arrow.') };
   }
 
   update(dt) {

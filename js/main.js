@@ -19,7 +19,7 @@ class Level {
   // resume = { step, sub, mistakes } — pokračovanie rozohraného levelu po znovunačítaní stránky
   enter(resume) {
     this.cam = new OrbitCam([0, 0, 0], 6, 0.7, 0.35, 2.5, 20);
-    this.stepIdx = -1; this.mistakes = 0; this.t = 0; this.sub = {};
+    this.stepIdx = -1; this.mistakes = 0; this.t = 0; this.sub = {}; this.seenScrolls = new Set();
     Game.r.fog = 0;
     this.setup();
     if (resume) {
@@ -46,18 +46,25 @@ class Level {
     if (!this.keepSub) this.sub = {}; // sub = rozpracovaný stav kroku (napr. číslo hádanky), ukladá sa
     this.keepSub = false;
     Game.save();
-    const s = this.steps[this.stepIdx];
-    if (s) s.call(this); else this.finale();
+    const s = this.steps[this.stepIdx], run = () => (s ? s.call(this) : this.finale());
+    // prastará obťažnosť: pred krokom sa rozvinie starobylý zvitok s históriou
+    const sc = scrollFor(this.num, s ? s.name : 'finale').filter((x) => !this.seenScrolls.has(x.id));
+    if (!sc.length) return run();
+    sc.forEach((x) => { this.seenScrolls.add(x.id); Game.unlockScroll(x.id); });
+    UI.say(sc.map((x) => ({ who: `${tr('Starobylý zvitok', 'Ancient scroll')} · ${pick(x.title)}`, face: '📜', text: scrollHtml(x), raw: true, cls: 'scroll' })), run);
   }
+  viewState() { return null; }
   say(lines, done) { UI.say(lines.map((t) => (typeof t === 'string' ? { who: this.mentor, face: this.face, text: t } : t)), done); }
   ask(q, done) { UI.quiz({ who: this.mentor, face: this.face, ...q }, (ok) => { if (!ok) this.mistakes++; done && done(ok); }); }
   grant(ids) { Game.unlock(ids); }
   finale() {
     UI.panelHide();
-    this.quest(tr('Záverečná skúška jazyka', 'Final language exam'), { easy: tr('📝 Skúška', '📝 Exam'), hard: tr(`Jazykové pasce · ${TRAPS[this.num].length} otázok`, `Language traps · ${TRAPS[this.num].length} questions`) });
+    const nq = TRAPS[this.num].length + hardTraps(this.num).length + ancientTraps(this.num).length;
+    this.quest(tr('Záverečná skúška jazyka', 'Final language exam'), { easy: tr('📝 Skúška', '📝 Exam'), hard: tr(`Jazykové pasce + rovnice · ${nq} otázok`, `Language traps + equations · ${nq} questions`) });
     this.say([tr('Výborne! Ešte posledná skúška: <b>jazykové pasce</b>. Vyber správnu formuláciu — v kvantovom svete sa veľa chýb robí slovami, nie výpočtom.',
       'Excellent! One last exam: <b>language traps</b>. Pick the correct wording — in the quantum world many mistakes are made with words, not with calculations.')], () => {
-      UI.quizSeries(TRAPS[this.num].map((q) => ({ who: this.mentor, face: this.face, ...q })), (m) => {
+      const traps = [...TRAPS[this.num], ...hardTraps(this.num), ...ancientTraps(this.num)];
+      UI.quizSeries(traps.map((q) => ({ who: this.mentor, face: this.face, ...q })), (m) => {
         this.mistakes += m;
         const k = this.mistakes, stars = byDiff(k <= 1 ? 3 : k <= 3 ? 2 : 1, k === 0 ? 3 : k <= 2 ? 2 : 1, k === 0 ? 3 : k <= 1 ? 2 : 1);
         Game.completeLevel(this.num, stars);
@@ -100,6 +107,13 @@ const Hub = {
     }
   },
   exit() {},
+  // Psíčko: stav s rotujúcou globálnou fázou — ručičky sa točia spolu, Bloch, bázy ani ρ sa nemenia
+  viewState() {
+    const g = C.exp(this.player.phase);
+    return { psi: [C.scale(g, Math.cos(Math.PI / 6)), C.mul(g, C.scale(C.exp(Math.PI / 4), Math.sin(Math.PI / 6)))],
+      note: tr('Ty, Psíčko: <b>globálna fáza</b> točí obe ručičky spolu — Blochove rezy, bázy ani ρ sa nepohnú. Preto je nepozorovateľná.',
+        'You, Little Psi: the <b>global phase</b> turns both hands together — the Bloch cuts, bases and ρ do not move. That is why it is unobservable.') };
+  },
   update(dt) {
     const pl = this.player;
     pl.phase += dt * 2.2;
@@ -229,12 +243,13 @@ Object.assign(CRYSTAL_TIPS, { '|0⟩': TIPS['|0⟩'], '|1⟩': TIPS['|1⟩'], '�
 // ------------------------------------------------------------------
 const Game = {
   keys: {},
-  progress: { stars: {}, diff: {}, codex: new Set(), introSeen: false, allUnlocked: false, session: null },
+  progress: { stars: {}, diff: {}, codex: new Set(), scrolls: new Set(), introSeen: false, allUnlocked: false, session: null },
   init() {
     const canvas = $('#gl');
     try { this.r = new Renderer(canvas); }
     catch (e) { $('#fatal').style.display = 'flex'; $('#fatal').innerHTML = '<div>' + tr('Tvoj prehliadač nepodporuje WebGL2 (OpenGL ES 3.0).', 'Your browser does not support WebGL2 (OpenGL ES 3.0).') + '<br><small>' + e.message + '</small></div>'; return; }
     UI.init();
+    Views.init();
     this.load();
     this.levels = LEVELS.map((L) => new L.cls(L));
     Hub.init();
@@ -255,6 +270,7 @@ const Game = {
     if (this.saveAcc > 2) { this.saveAcc = 0; this.save(); } // stav hry (poloha, krok levelu) sa ukladá priebežne
     const pw = UI.panel.classList.contains('show') && window.innerWidth > 720 ? (UI.panel.offsetWidth + 14) / window.innerWidth : 0;
     this.r.shiftX += (pw - this.r.shiftX) * Math.min(1, dt * 6);
+    Views.update();
     UI.labelsBegin();
     this.scene.draw(this.r);
     UI.labelsEnd();
@@ -269,6 +285,7 @@ const Game = {
       if ((e.code === 'Enter' || e.code === 'Space') && UI.busy && UI._next) { e.preventDefault(); UI._next(); return; }
       if ((e.code === 'ArrowLeft' || e.code === 'Backspace') && UI.busy && UI._prev) { e.preventDefault(); UI._prev(); return; }
       if (e.code === 'KeyL') { UI.toggleLog(); return; }
+      if (e.code === 'KeyV') { Views.toggle(); return; } // pohľady aj počas dialógu
       if (UI.busy) return;
       if (e.code === 'KeyE' && this.scene === Hub) Hub.interact();
       if (e.code === 'KeyC') UI.toggleCodex();
@@ -356,6 +373,10 @@ const Game = {
     this.unlock(CODEX.filter((c) => c.level === n).map((c) => c.id));
     this.save();
   },
+  unlockScroll(id) {
+    if (this.progress.scrolls.has(id)) return;
+    this.progress.scrolls.add(id); this.save();
+  },
   unlock(ids) {
     const fresh = ids.filter((id) => !this.progress.codex.has(id));
     fresh.forEach((id) => this.progress.codex.add(id));
@@ -419,12 +440,12 @@ const Game = {
   save() {
     if (this.resetting || !this.levels) return;
     this.progress.session = this.snapshot();
-    try { localStorage.setItem('kvantp-game1', JSON.stringify({ ...this.progress, codex: [...this.progress.codex] })); } catch (e) { /* bez ukladania */ }
+    try { localStorage.setItem('kvantp-game1', JSON.stringify({ ...this.progress, codex: [...this.progress.codex], scrolls: [...this.progress.scrolls] })); } catch (e) { /* bez ukladania */ }
   },
   load() {
     try {
       const d = JSON.parse(localStorage.getItem('kvantp-game1') || 'null');
-      if (d) this.progress = { stars: d.stars || {}, diff: d.diff || {}, codex: new Set(d.codex || []), introSeen: !!d.introSeen, allUnlocked: !!d.allUnlocked, session: d.session || null };
+      if (d) this.progress = { stars: d.stars || {}, diff: d.diff || {}, codex: new Set(d.codex || []), scrolls: new Set(d.scrolls || []), introSeen: !!d.introSeen, allUnlocked: !!d.allUnlocked, session: d.session || null };
     } catch (e) { /* čistý začiatok */ }
   },
 };

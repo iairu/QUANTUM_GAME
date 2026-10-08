@@ -118,6 +118,11 @@ class L6Rabi extends Level {
     this.watch = true;
   }
 
+  viewState() {
+    return { r: this.disp(), note: this.frame === 'lab' ? tr('Laboratórny rámec: fáza β sa točí (precesia), dĺžky ručičiek stoja.', 'Laboratory frame: the phase of β turns (precession), the hand lengths stay.')
+      : tr('Rotujúci rámec: impulz mení dĺžky ručičiek, T₂ zmenšuje koherenciu.', 'Rotating frame: a pulse changes the hand lengths, T₂ shrinks the coherence.') };
+  }
+
   update(dt) {
     this.t += dt;
     this.labPh += this.w0 * dt;
@@ -150,7 +155,7 @@ class L6Rabi extends Level {
   // Rabiho krivka: P(|1⟩) po impulze z |0⟩ v závislosti od plochy Ω_R·t pri aktuálnom rozladení Δ
   drawRabi() {
     const W = this.OR, D = this.delta, Wf = Math.hypot(W, D), P1 = (A) => (W * W) / (Wf * Wf) * Math.sin(Wf * (A / W) / 2) ** 2;
-    const hide = Settings.diff === 'hard' && this.stepIdx === 4 && !this.flags.tune;
+    const hide = Settings.hard && this.stepIdx === 4 && !this.flags.tune;
     UI.drawChart(this.rabiChart, {
       x0: 0, x1: 2 * Math.PI, y0: 0, y1: 1.05, xlabel: tr('plocha impulzu Ω_R·t', 'pulse area Ω_R·t'),
       xticks: [[0, '0'], [Math.PI / 2, 'π/2'], [Math.PI, 'π'], [3 * Math.PI / 2, '3π/2'], [2 * Math.PI, '2π']], yticks: [[0, '0'], [0.5, '½'], [1, '1']],

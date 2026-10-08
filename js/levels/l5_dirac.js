@@ -140,9 +140,9 @@ class L5Dirac extends Level {
           this.ask(tr({ q: 'Ktorý výraz je OPERÁTOR?', options: ['|ψ⟩⟨φ|', '⟨φ|ψ⟩', '⟨ψ|Â|ψ⟩'], correct: 0, why: 'Ket-bra = operátor; bra-ket = číslo; ⟨ψ|Â|ψ⟩ = číslo (stredná hodnota).' }, { q: 'Which expression is an OPERATOR?', options: ['|ψ⟩⟨φ|', '⟨φ|ψ⟩', '⟨ψ|Â|ψ⟩'], correct: 0, why: 'Ket-bra = operator; bra-ket = number; ⟨ψ|Â|ψ⟩ = number (expectation value).' }), () => this.after());
         } else this.after();
       });
-    } else if (Settings.diff === 'hard') this.mistakes++; // ťažká: každé zlé overenie je chyba
+    } else if (Settings.hard) this.mistakes++; // ťažká: každé zlé overenie je chyba
     if (ok) return;
-    const pen = Settings.diff === 'hard' ? tr(' <small>(+1 chyba)</small>', ' <small>(+1 mistake)</small>') : '';
+    const pen = Settings.hard ? tr(' <small>(+1 chyba)</small>', ' <small>(+1 mistake)</small>') : '';
     if (this.res.type === 'bad') UI.toast(tr('Taký výraz gramatika nepovoľuje: ', 'The grammar does not allow such an expression: ') + this.res.why + pen, 3500);
     else if (this.res.type !== T.want) UI.toast(tr(`Postavil si <b>${TYPE_NAME[this.res.type] || '—'}</b>, ale úloha chce <b>${TYPE_NAME[T.want]}</b>.`, `You built: <b>${TYPE_NAME[this.res.type] || '—'}</b>, but the task wants: <b>${TYPE_NAME[T.want]}</b>.`) + pen, 3500);
     else UI.toast(tr('Typ sedí, ale skontroluj, ktoré stavy a v akom poradí úloha žiada.', 'The type is right, but check which states and in what order the task asks for.') + pen, 3000);

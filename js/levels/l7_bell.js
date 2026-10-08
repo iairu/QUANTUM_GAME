@@ -110,7 +110,7 @@ class L7Bell extends Level {
       const sl = (k, label) => UI.slider(label, -90, 180, byDiff(15, 7.5, 7.5), this.ang[k], (v) => { this.ang[k] = v; this.drawChsh(); return v + '°'; });
       UI.panelSet(tr('CHSH hra', 'CHSH game'), [sl('a0', tr('Alica, x=0: a₀', 'Alice, x=0: a₀')), sl('a1', tr('Alica, x=1: a₁', 'Alice, x=1: a₁')), sl('b0', 'Bob, y=0: b₀'), sl('b1', 'Bob, y=1: b₁'),
         UI.row(UI.button(tr(`Hraj ${byDiff(400, 400, 1000)} kôl`, `Play ${byDiff(400, 400, 1000)} rounds`), () => this.play(), 'big'), UI.button(tr('Klasicky (vždy 0)', 'Classically (always 0)'), () => this.playClassic())),
-        Settings.diff === 'hard' ? null : UI.button(tr('💡 Nápoveda', '💡 Hint'), () => UI.toast(tr('Skús a₀ = 0°, a₁ = 90°, b₀ = 45°, b₁ = −45°. Rozdiely uhlov 45° (a 135° pre x=y=1).', 'Try a₀ = 0°, a₁ = 90°, b₀ = 45°, b₁ = −45°. Angle differences of 45° (and 135° for x=y=1).'), 6000)),
+        Settings.hard ? null : UI.button(tr('💡 Nápoveda', '💡 Hint'), () => UI.toast(tr('Skús a₀ = 0°, a₁ = 90°, b₀ = 45°, b₁ = −45°. Rozdiely uhlov 45° (a 135° pre x=y=1).', 'Try a₀ = 0°, a₁ = 90°, b₀ = 45°, b₁ = −45°. Angle differences of 45° (and 135° for x=y=1).'), 6000)),
         this.read, this.chart].filter(Boolean));
       this.drawChsh();
     });
@@ -145,7 +145,7 @@ class L7Bell extends Level {
     if (!this.chart) return;
     const A = this.ang, pr = (a, b) => Math.cos((a - b) * Math.PI / 360) ** 2;
     const th = [pr(A.a0, A.b0), pr(A.a0, A.b1), pr(A.a1, A.b0), 1 - pr(A.a1, A.b1)], avg = th.reduce((s, v) => s + v, 0) / 4;
-    const showTh = Settings.diff !== 'hard', bars = [];
+    const showTh = !Settings.hard, bars = [];
     th.forEach((v, k) => {
       if (this.pairWin) bars.push({ x: k + 0.5, w: 0.5, y: this.pairWin[k], color: k === 3 ? '#ff7da8' : '#4f8cff', label: Fmt.pct(this.pairWin[k]) });
       if (showTh) bars.push({ x: k + 0.5, w: 0.66, y: v, color: '#ffd25a', outline: true });
@@ -161,6 +161,10 @@ class L7Bell extends Level {
     let win = 0;
     for (let i = 0; i < 400; i++) { const x = rand() < 0.5 ? 1 : 0, y = rand() < 0.5 ? 1 : 0; if ((0 ^ 0) === (x & y)) win++; }
     this.read.innerHTML = tr(`Klasická stratégia „vždy 0“: <b>${Fmt.pct(win / 400)}</b> — prehrá len pri x = y = 1.<br>Lepšie to klasicky nejde.`, `Classical strategy “always 0”: <b>${Fmt.pct(win / 400)}</b> — it loses only when x = y = 1.<br>Classically you cannot do better.`);
+  }
+
+  viewState() {
+    return { two: this.psi, note: tr('Dva qubity: 4 amplitúdy. Pri previazaní sa šípky A aj B v Blochových rezoch stiahnu do stredu.', 'Two qubits: 4 amplitudes. When entangled, arrows A and B in the Bloch cuts shrink to the centre.') };
   }
 
   update(dt) {
