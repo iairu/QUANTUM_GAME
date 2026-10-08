@@ -1,0 +1,178 @@
+'use strict';
+// LEVEL 4 — Chrám interferencie (mentor: Richard Feynman)
+// H → H vs. H → meranie → H: koherentná superpozícia vs. zmes, matica hustoty, dekoherencia.
+
+class L4Interference extends Level {
+  get steps() { return [this.intro, this.pure, this.withMeasure, this.deco]; }
+
+  setup() {
+    this.cam = new OrbitCam([0, 0.8, -0.8], 11, 0.0, 0.42, 5, 20);
+    this.mode = 'none'; this.p = 0; this.hist = [0, 0]; this.shot = null; this.f = {};
+    this.shownR = [0, 0, 1]; this.flash = [0, 0];
+    this.X = { prep: -5.5, h1: -3, mid: 0, h2: 3, det: 5.5 };
+  }
+
+  // Blochov vektor po prejdení do pozície x (H: (x,y,z) → (z,−y,x))
+  stateAt(x) {
+    let r = [0, 0, 1];
+    const H = (v) => [v[2], -v[1], v[0]];
+    if (x >= this.X.h1) r = H(r);
+    if (x >= this.X.mid) {
+      if (this.mode === 'meas') r = [0, 0, r[2]];
+      if (this.mode === 'deco') r = [r[0] * (1 - this.p), r[1] * (1 - this.p), r[2]];
+    }
+    if (x >= this.X.h2) r = H(r);
+    return r;
+  }
+  P0() { return (1 + this.stateAt(99)[2]) / 2; }
+
+  intro() {
+    this.quest('Vypočuj si Feynmana');
+    this.say([
+      'Hej! Som Dick Feynman. Raz som povedal, že dvojštrbinový pokus obsahuje <b>jediné tajomstvo</b> kvantovej mechaniky. Tu je jeho qubitová verzia.',
+      'Koľaj: qubit začne v |0⟩, prejde bránou <b>H</b>, stredom chrámu a druhou bránou <b>H</b>. Na konci ho detektor zmeria: 0 alebo 1.',
+      'Prirovnanie: k pokladu vedú <b>dve cesty</b>. Kým nikto nevie, ktorou si šiel, ich amplitúdy sa môžu sčítať aj vyrušiť. Keď to niekto <b>zistí</b> (zmeria), interferencia zmizne — ostanú len obyčajné pravdepodobnosti.',
+      'Vzadu vidíš <b>maticu hustoty ρ</b> (ró) ako stĺpce: dva na diagonále = pravdepodobnosti (populácie), dva mimo diagonály = <b>koherencie</b>, „pamäť fázy“.',
+    ], () => this.next());
+  }
+
+  pure() {
+    this.mode = 'none'; this.resetHist();
+    this.ask({ q: 'Qubit |0⟩ → H → H → meranie. Čo nameriaš?', options: ['vždy 0', '50 % : 50 %', 'vždy 1'], correct: 0,
+      why: 'H·H = I. Príspevky k |1⟩ sa deštruktívne vyrušia, k |0⟩ konštruktívne sčítajú.' }, () => {
+      this.quest('Pošli aspoň 50 qubitov cez H → H (stred chrámu prázdny). Sleduj stĺpce ρ!');
+      this.buildPanel(false);
+    });
+  }
+
+  withMeasure() {
+    this.mode = 'meas'; this.resetHist();
+    this.ask({ q: 'Teraz do stredu vložíme meranie v Z-báze a jeho výsledok ZABUDNEME. Čo nameriaš na konci?', options: ['50 % : 50 %', 'vždy 0', 'vždy 1'], correct: 0,
+      why: 'Meranie zničí koherenciu (mimodiagonálne prvky ρ). Zostane zmes ½|0⟩⟨0| + ½|1⟩⟨1| = I/2 — a tú druhé H nezmení.' }, () => {
+      this.quest('Pošli aspoň 50 qubitov s meraním v strede. Pozri, čo sa stane s mimodiagonálnymi stĺpcami ρ.');
+      this.buildPanel(false);
+    });
+  }
+
+  deco() {
+    this.mode = 'deco'; this.p = 0; this.resetHist();
+    this.say([
+      'Meranie je extrémny prípad. V skutočnom čipe qubit pomaly „uniká“ do prostredia: <b>dekoherencia</b>. Prostredie akoby čiastočne odmeralo fázu.',
+      'Posuvníkom nastav silu dekoherencie <b>p</b> (0 = nič, 1 = úplné meranie). Úloha: nájdi p, pri ktorom bude P(0) = <b>75 %</b>, a pošli aspoň 50 qubitov.',
+    ], () => {
+      this.quest('Nastav dekoherenciu p tak, aby P(0) = 75 %, a pošli aspoň 50 qubitov.');
+      this.buildPanel(true);
+    });
+  }
+
+  resetHist() { this.hist = [0, 0]; this.updInfo && this.updInfo(); }
+
+  buildPanel(withSlider) {
+    const nodes = [];
+    const names = { none: 'stred prázdny', meas: 'meranie Z (zabudnuté)', deco: 'dekoherencia p' };
+    nodes.push(UI.info(`Stred chrámu: <b>${names[this.mode]}</b>`));
+    if (withSlider) nodes.push(UI.slider('sila p', 0, 1, 0.05, this.p, (v) => { if (v !== this.p) { this.p = v; this.resetHist(); } return Fmt.num(v, 2); }));
+    nodes.push(UI.row(UI.button('Pošli 1 (pomaly)', () => this.sendOne()), UI.button('Pošli 100', () => this.sendMany(100), 'big'), UI.button('Vymaž', () => this.resetHist())));
+    const info = UI.info('');
+    this.updInfo = () => {
+      const n = this.hist[0] + this.hist[1];
+      info.innerHTML = `Detektor: <b>0 → ${this.hist[0]}×</b>, <b>1 → ${this.hist[1]}×</b>` + (n ? ` (P(0) ≈ ${Fmt.pct(this.hist[0] / n)})` : '')
+        + `<br><small>teória: P(0) = ${Fmt.pct(this.P0())}</small>`;
+    };
+    nodes.push(info);
+    nodes.push(UI.info('Stĺpce vzadu: ρ₀₀, ρ₁₁ = populácie; |ρ₀₁| = koherencia.', 'tip'));
+    UI.panelSet('Interferometer', nodes);
+    this.updInfo();
+  }
+
+  sendOne() { if (!this.shot) this.shot = { x: this.X.prep }; }
+  sendMany(n) {
+    const p0 = this.P0();
+    for (let i = 0; i < n; i++) this.hist[rand() < p0 ? 0 : 1]++;
+    this.flash = [1, 1];
+    this.updInfo(); this.check();
+  }
+  check() {
+    const n = this.hist[0] + this.hist[1];
+    if (n < 50) return;
+    if (this.stepIdx === 1 && !this.f.a) {
+      this.f.a = true;
+      this.grant(['feynman', 'coh']);
+      this.say(['Vidíš? Stále 0. Pozri na ρ cestou: po prvom H sú <b>všetky štyri stĺpce rovnako vysoké</b> — mimodiagonálne koherencie nesú informáciu o fáze a druhé H ich premení na istotu.'], () => this.next());
+    } else if (this.stepIdx === 2 && !this.f.b) {
+      this.f.b = true;
+      this.grant(['rho', 'mix', 'supmix']);
+      this.say(['Po meraní mimodiagonálne stĺpce <b>zmizli</b>. Diagonála je rovnaká ako pri superpozícii (½, ½), preto ich <b>meranie v Z-báze nerozlíši</b>. Rozdiel sa ukáže až pri ďalšej operácii.',
+        'Na Blochovej sfére: šípka sa stiahla do <b>stredu</b> (maximálne zmiešaný stav I/2). Druhé H otáča guľu, ale bod v strede sa otáčaním nepohne.'], () => this.next());
+    } else if (this.stepIdx === 3 && !this.f.c && this.mode === 'deco' && Math.abs(this.P0() - 0.75) < 0.03) {
+      this.f.c = true;
+      this.grant(['deco', 'dagger']);
+      this.say(['Presne: p = ½ polovične zmršťuje koherencie a P(0) = 1 − p/2 = ¾. Šípka je kratšia než 1 → <b>zmiešaný stav</b> vnútri gule.',
+        'Matematicky druhé hradlo pôsobí na maticu hustoty ako <b>HρH†</b> (dýka † = hermitovské združenie). Pre zmes I/2 dostaneš opäť I/2 — nič nezmení.',
+        'Poučenie pre kvantové počítače: <b>koherencia je palivo</b> interferencie. Kto ju stratí, stratí výhodu.'], () => this.next());
+    }
+  }
+
+  update(dt) {
+    this.t += dt;
+    this.flash = this.flash.map((f) => Math.max(0, f - dt * 2));
+    let target;
+    if (this.shot) {
+      this.shot.x += dt * 2.4;
+      target = this.stateAt(this.shot.x);
+      if (this.shot.x >= this.X.det) {
+        const out = rand() < this.P0() ? 0 : 1;
+        this.hist[out]++; this.flash[out] = 1; this.shot = null;
+        this.updInfo && this.updInfo(); this.check();
+        UI.toast(`Detektor: ${out}`, 1200);
+      }
+    } else target = this.stateAt(99);
+    this.shownR = V3.lerp(this.shownR, target, Math.min(1, dt * 5));
+  }
+
+  draw(r) {
+    r.begin(this.cam.eye(), this.cam.target);
+    r.draw('box', M4.trs([0, -0.06, -1.5], 0, [15, 0.1, 8]), [0.2, 0.16, 0.3], { pattern: 1 });
+    r.rod([this.X.prep, 0.15, 0], [this.X.det, 0.15, 0], [0.7, 0.6, 0.9], 0.05);
+    const gate = (x, label, col) => {
+      r.draw('torus', M4.orient([x, 0.9, 0], [1, 0, 0], 0.9), col, { emissive: 0.4 });
+      UI.label('g' + x, [x, 2.1, 0], label, 'prompt');
+      UI.hot([x, 0.9, 0], TIPS.H, 45);
+    };
+    gate(this.X.h1, 'H', [0.75, 0.45, 1]);
+    gate(this.X.h2, 'H', [0.75, 0.45, 1]);
+    UI.label('prep', [this.X.prep, 1.3, 0], 'príprava<br>|0⟩', 'ket');
+    if (this.mode === 'meas') {
+      r.draw('box', M4.trs([0, 0.9, 0], 0, [0.5, 1.2, 1.4]), [0.9, 0.3, 0.3], { alpha: 0.5 });
+      UI.label('mid', [0, 2.1, 0], '👁 meranie Z<br><small>výsledok zabudnutý</small>', 'prompt');
+    } else if (this.mode === 'deco') {
+      for (let i = 0; i < 6; i++) r.sphere([Math.sin(this.t + i) * 0.4, 0.6 + i * 0.15, Math.cos(this.t * 0.7 + i * 2) * 0.5], 0.25 + 0.1 * this.p, [0.7, 0.7, 0.8], { alpha: 0.1 + 0.35 * this.p });
+      UI.label('mid', [0, 2.1, 0], `🌫 prostredie<br><small>p = ${Fmt.num(this.p, 2)}</small>`, 'prompt');
+    } else UI.label('mid', [0, 2.1, 0], '(prázdne)', 'axis');
+    // detektor
+    for (let k = 0; k < 2; k++) {
+      const p = [this.X.det + 0.3, 0.5, k ? 0.6 : -0.6];
+      r.draw('box', M4.trs(p, 0, 0.5), k ? [1, 0.45, 0.45] : [0.45, 0.65, 1], { emissive: 0.2 + this.flash[k] });
+      UI.hot(p, `<b>Detektor výsledku ${k}</b> — meranie v Z-báze na konci koľaje.`, 30);
+      const n = this.hist[0] + this.hist[1], h = n ? this.hist[k] / n * 2.5 : 0;
+      r.draw('cylinder', M4.trs([this.X.det + 1.3, 0, k ? 0.6 : -0.6], 0, [0.22, Math.max(h, 0.01), 0.22]), k ? [1, 0.45, 0.45] : [0.45, 0.65, 1]);
+      UI.label('d' + k, [this.X.det + 1.3, h + 0.4, k ? 0.6 : -0.6], `${k}: ${this.hist[k]}`, 'axis');
+    }
+    // putujúci qubit s malou Blochovou sférou
+    const qx = this.shot ? this.shot.x : this.X.det - 0.6;
+    r.sphere([qx, 0.45, 0], 0.22, [0.3, 0.95, 1], { emissive: 0.8 });
+    Bloch.draw(r, [qx, 2.0, 0.0], 0.7, this.shownR, {});
+    UI.hot([qx, 0.45, 0], '<b>Qubit</b> putujúci koľajou. Nad ním je jeho Blochova sféra.', 25);
+    UI.label('qb', [qx, 3.0, 0], this.shot ? 'ψ' : 'stav na konci', 'player');
+    // matica hustoty ako stĺpce
+    const R = this.shownR, rho = [[(1 + R[2]) / 2, Math.hypot(R[0], R[1]) / 2], [Math.hypot(R[0], R[1]) / 2, (1 - R[2]) / 2]];
+    for (let i = 0; i < 2; i++) for (let j = 0; j < 2; j++) {
+      const p = [-1 + j * 2, 0, -3.6 + i * 1.6], h = rho[i][j] * 3, diag = i === j;
+      r.draw('box', M4.trs(V3.add(p, [0, 0.02, 0]), 0, [1.4, 0.04, 1.2]), [0.3, 0.3, 0.4]);
+      r.draw('box', M4.trs(V3.add(p, [0, h / 2, 0]), 0, [0.6, Math.max(h, 0.01), 0.6]), diag ? [0.45, 0.65, 1] : [0.9, 0.5, 1], { emissive: diag ? 0.1 : 0.4 });
+      UI.hot(V3.add(p, [0, h / 2 + 0.1, 0]), diag ? `<b>ρ<sub>${i}${i}</sub></b> — populácia: pravdepodobnosť výsledku ${i}.` : '<b>|ρ₀₁|</b> — koherencia: „pamäť“ relatívnej fázy. Bez nej niet interferencie.', 34);
+      UI.label(`rho${i}${j}`, V3.add(p, [0, h + 0.35, 0]), `${diag ? 'ρ' : '|ρ'}<sub>${i}${j}</sub>${diag ? '' : '|'} = ${Fmt.num(rho[i][j], 2)}`, 'axis');
+    }
+    UI.label('rhoT', [3, 0.8, -3], 'matica hustoty ρ', 'axis');
+  }
+}

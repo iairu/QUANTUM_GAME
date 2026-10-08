@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="sk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Psíčko v kvantovom svete</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="gl"></canvas>
+<div id="labels"></div>
+
+<div id="hud">
+  <div id="hud-title"></div>
+  <div id="hud-quest"></div>
+</div>
+<div id="topbar">
+  <button id="btn-hub" title="Späť na ostrov">🏝 Ostrov</button>
+  <button id="btn-map" title="Mapa (M)">🗺 Mapa</button>
+  <button id="btn-codex" title="Kódex symbolov (C)">📖 Kódex</button>
+  <button id="btn-log" title="Denník rozhovorov (L)">📜 Denník</button>
+  <button id="btn-help" title="Pomoc (H)">❔</button>
+</div>
+
+<div id="panel"></div>
+<div id="dialog"></div>
+<div id="toasts"></div>
+
+<div id="codex" class="overlay">
+  <div class="box">
+    <button class="close">✕</button>
+    <h2>📖 Kódex kvantového jazyka</h2>
+    <div class="count"></div>
+    <div class="tabs"></div>
+    <div class="list"></div>
+  </div>
+</div>
+
+<div id="map" class="overlay">
+  <div class="box">
+    <button class="close" onclick="Game.toggleMap(false)">✕</button>
+    <h2>🗺 Hilbertov ostrov</h2>
+    <canvas></canvas>
+  </div>
+</div>
+
+<div id="help" class="overlay">
+  <div class="box">
+    <button class="close">✕</button>
+    <h2>❔ Ako hrať</h2>
+    <p>Si <b>Psíčko</b> — kvantový stav <b>ψ</b>. Prejdi 8 portálov a nauč sa jazyk, symboly a správne obrazy kvantového sveta.</p>
+    <table>
+      <tr><td><b>W A S D</b> / šípky</td><td>pohyb po ostrove (Shift = rýchlejšie)</td></tr>
+      <tr><td><b>ťahanie myšou</b></td><td>otáčanie kamery · <b>koliesko</b> = priblíženie</td></tr>
+      <tr><td><b>E</b></td><td>vstúpiť do portálu / hovoriť</td></tr>
+      <tr><td><b>Enter</b> / medzerník</td><td>pokračovať v dialógu</td></tr>
+      <tr><td><b>←</b> / Backspace</td><td>vrátiť sa o repliku späť v dialógu</td></tr>
+      <tr><td><b>L</b></td><td>Denník — všetky rozhovory a vysvetlenia, dajú sa prečítať aj prehrať znova</td></tr>
+      <tr><td><b>myš nad čímkoľvek</b></td><td>krátka vysvetlivka (tlačidlá, symboly, 3D objekty, <span class="term">podčiarknuté pojmy</span>)</td></tr>
+      <tr><td><b>C</b></td><td>Kódex odomknutých symbolov, osobností a pojmov</td></tr>
+      <tr><td><b>M</b></td><td>mapa ostrova</td></tr>
+      <tr><td><b>Esc</b></td><td>zavrieť okná</td></tr>
+      <tr><td><b>F9</b></td><td>odomknúť všetky levely (režim učiteľa)</td></tr>
+    </table>
+    <h3>Levely</h3>
+    <ol>
+      <li><b>Komplexný prístav</b> (Euler) — amplitúda, fáza, i, interferencia</li>
+      <li><b>Sternova–Gerlachova pec</b> — meranie spinu, dve stopy, báza je súčasťou otázky</li>
+      <li><b>Blochovo observatórium</b> (Bloch) — hradlá ako rotácie, relatívna vs. globálna fáza</li>
+      <li><b>Chrám interferencie</b> (Feynman) — superpozícia vs. zmes, matica hustoty, dekoherencia</li>
+      <li><b>Diracova knižnica</b> (Dirac) — gramatika bra-ket</li>
+      <li><b>Rabiho rezonátor</b> (Rabi, Zeeman) — NMR, precesia, π-impulz, rezonancia, T₂</li>
+      <li><b>Bellov most</b> (Bell, Einstein) — previazanosť, nemožnosť signalizácie, CHSH hra</li>
+      <li><b>Sieň výkladov</b> (Bohr a filozofi) — kolaps, komplementarita, interpretácie</li>
+    </ol>
+    <p>Každý level končí <b>jazykovými pascami</b> — kvízom o správnych formuláciách. Hviezdičky ★ závisia od počtu chýb.</p>
+  </div>
+</div>
+
+<div id="journal" class="overlay">
+  <div class="box">
+    <button class="close">✕</button>
+    <h2>📜 Denník rozhovorov</h2>
+    <p class="muted">Všetky dialógy a vysvetlenia z kvízov (najnovšie hore). Rozbaľ, prečítaj alebo prehraj znova.</p>
+    <div class="list"></div>
+  </div>
+</div>
+
+<div id="tip"></div>
+<div id="fatal"></div>
+
+<script src="js/math.js"></script>
+<script src="js/quantum.js"></script>
+<script src="js/gl.js"></script>
+<script src="js/tips.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/content.js"></script>
+<script src="js/main.js"></script>
+<script src="js/levels/l1_complex.js"></script>
+<script src="js/levels/l2_stern.js"></script>
+<script src="js/levels/l3_bloch.js"></script>
+<script src="js/levels/l4_interference.js"></script>
+<script src="js/levels/l5_dirac.js"></script>
+<script src="js/levels/l6_rabi.js"></script>
+<script src="js/levels/l7_bell.js"></script>
+<script src="js/levels/l8_philo.js"></script>
+<script src="js/levels/registry.js"></script>
+</body>
+</html>
