@@ -483,3 +483,7 @@ button, select, summary, label, input[type=range], input[type=checkbox], input[t
 #gl.c-talk { cursor: var(--cur-talk, var(--cur-ptr)); }
 /* počas otáčania kamery kurzor zmizne */
 body.cam-rot, body.cam-rot * { cursor: none !important; }
+/* „🔎 Opýtaj sa Google“ v dialógoch */
+#dialog button.ask { font-size: 12px; padding: 4px 9px; opacity: 0.85; }
+#dialog button.ask:hover { opacity: 1; }
+#dialog > button.ask { float: left; margin-top: 10px; }

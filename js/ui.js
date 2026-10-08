@@ -208,6 +208,7 @@ const UI = {
       const back = el('button', null, tr('◂ Späť', '◂ Back'));
       back.disabled = i === 0; back.onclick = prev; back.dataset.tip = tr('Predchádzajúca replika (← alebo Backspace). Celé rozhovory nájdeš v Denníku (L).', 'Previous line (← or Backspace). Full conversations are in the Journal (L).');
       nav.appendChild(back);
+      nav.appendChild(this.askButton(l.text));
       nav.appendChild(el('span', 'hint', `${i + 1} / ${lines.length} · ${tr('Enter = ďalej, ← = späť', 'Enter = next, ← = back')}`));
       const b = el('button', 'primary', i < lines.length - 1 ? tr('Ďalej ▸', 'Next ▸') : tr('Rozumiem ✓', 'Got it ✓'));
       b.onclick = next;
@@ -265,6 +266,8 @@ const UI = {
         const c = el('button', 'primary', tr('Pokračovať ▸', 'Continue ▸'));
         c.onclick = () => { this.dialog.classList.remove('show'); this.busy = false; this._next = null; cb && cb(ok); };
         this.dialog.appendChild(c);
+        // až po odpovedi (inak by sa dala odpoveď len vyhľadať): otázka, správna odpoveď a vysvetlenie
+        this.dialog.appendChild(this.askButton(`${q.q}\n${tr('Správna odpoveď', 'Correct answer')}: ${q.options[q.correct]}\n${q.why || ''}`));
         this._next = c.onclick;
         c.focus();
       };
@@ -272,6 +275,21 @@ const UI = {
     }
     this.dialog.appendChild(box);
     this.dialog.classList.add('show');
+  },
+
+  // „Opýtaj sa Google“: otvorí text repliky v novej karte v režime AI vyhľadávania Google (udm=50, ako udm=2 pre obrázky)
+  askButton(html) {
+    const b = el('button', 'ask', tr('🔎 Opýtaj sa Google', '🔎 Ask Google more'));
+    b.dataset.tip = tr('Otvorí v novej karte AI vyhľadávanie Google s textom tejto repliky — ak chceš vedieť viac.', 'Opens Google AI search in a new tab with the text of this line — if you want to know more.');
+    b.onclick = (e) => { e.stopPropagation(); this.askGoogle(html); };
+    return b;
+  },
+  askGoogle(html) {
+    const d = document.createElement('div');
+    d.innerHTML = String(html).replace(/<sup>(.*?)<\/sup>/g, '^($1)').replace(/<sub>(.*?)<\/sub>/g, '_$1').replace(/<br\s*\/?>/g, '\n');
+    const text = d.textContent.replace(/[ \t]+/g, ' ').replace(/\s*\n\s*/g, '\n').trim().slice(0, 1500);
+    const q = tr('Vysvetli mi to podrobnejšie (kvantová mechanika): ', 'Explain this to me in more detail (quantum mechanics): ') + text;
+    window.open(`https://www.google.com/search?udm=50&hl=${LANG}&q=${encodeURIComponent(q)}`, '_blank', 'noopener');
   },
 
   // zruší rozbehnutý dialóg/kvíz bez pokračovania (odchod z levelu uprostred rozhovoru)
