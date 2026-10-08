@@ -16,11 +16,18 @@ class OrbitCam {
 // ------------------------------------------------------------------
 class Level {
   constructor(def) { Object.assign(this, def); }
-  enter() {
+  // resume = { step, sub, mistakes } — pokračovanie rozohraného levelu po znovunačítaní stránky
+  enter(resume) {
     this.cam = new OrbitCam([0, 0, 0], 6, 0.7, 0.35, 2.5, 20);
-    this.stepIdx = -1; this.mistakes = 0; this.t = 0;
+    this.stepIdx = -1; this.mistakes = 0; this.t = 0; this.sub = {};
     Game.r.fog = 0;
     this.setup();
+    if (resume) {
+      this.stepIdx = Math.max(-1, (resume.step | 0) - 1);
+      this.mistakes = resume.mistakes | 0;
+      this.sub = resume.sub || {};
+      this.keepSub = true;
+    }
     UI.setHud(`${this.num} · ${this.title}`, '');
     this.next();
   }
@@ -28,9 +35,17 @@ class Level {
   setup() {}
   update() {}
   draw() {}
-  quest(text) { UI.setHud(`${this.num} · ${this.title}`, text); }
+  // text = normálna úloha; alt.easy = len kľúčové slová, alt.hard = stručne a husto (vzorce, čísla)
+  quest(text, alt = {}) {
+    this.questArgs = [text, alt];
+    UI.setHud(`${this.num} · ${this.title}`, byDiff(alt.easy ?? text, text, alt.hard ?? text));
+  }
+  request() { if (this.questArgs) this.quest(...this.questArgs); }
   next() {
     this.stepIdx++;
+    if (!this.keepSub) this.sub = {}; // sub = rozpracovaný stav kroku (napr. číslo hádanky), ukladá sa
+    this.keepSub = false;
+    Game.save();
     const s = this.steps[this.stepIdx];
     if (s) s.call(this); else this.finale();
   }
@@ -39,16 +54,16 @@ class Level {
   grant(ids) { Game.unlock(ids); }
   finale() {
     UI.panelHide();
-    this.quest(tr('Záverečná skúška jazyka', 'Final language exam'));
+    this.quest(tr('Záverečná skúška jazyka', 'Final language exam'), { easy: tr('📝 Skúška', '📝 Exam'), hard: tr(`Jazykové pasce · ${TRAPS[this.num].length} otázok`, `Language traps · ${TRAPS[this.num].length} questions`) });
     this.say([tr('Výborne! Ešte posledná skúška: <b>jazykové pasce</b>. Vyber správnu formuláciu — v kvantovom svete sa veľa chýb robí slovami, nie výpočtom.',
       'Excellent! One last exam: <b>language traps</b>. Pick the correct wording — in the quantum world many mistakes are made with words, not with calculations.')], () => {
       UI.quizSeries(TRAPS[this.num].map((q) => ({ who: this.mentor, face: this.face, ...q })), (m) => {
         this.mistakes += m;
-        const stars = this.mistakes === 0 ? 3 : this.mistakes <= 2 ? 2 : 1;
+        const k = this.mistakes, stars = byDiff(k <= 1 ? 3 : k <= 3 ? 2 : 1, k === 0 ? 3 : k <= 2 ? 2 : 1, k === 0 ? 3 : k <= 1 ? 2 : 1);
         Game.completeLevel(this.num, stars);
         const rating = '★'.repeat(stars) + '☆'.repeat(3 - stars);
-        this.say([tr(`Level dokončený! Hodnotenie: <b>${rating}</b> (chyby: ${this.mistakes}).<br>Nové karty nájdeš v <b>Kódexe</b> (klávesa C).`,
-          `Level complete! Rating: <b>${rating}</b> (mistakes: ${this.mistakes}).<br>You will find new cards in the <b>Codex</b> (key C).`)], () => Game.backToHub());
+        this.say([tr(`Level dokončený! Hodnotenie: <b>${rating}</b> (chyby: ${this.mistakes}, obťažnosť: ${DIFF_NAME[Settings.diff]}).<br>Nové karty nájdeš v <b>Kódexe</b> (klávesa C).`,
+          `Level complete! Rating: <b>${rating}</b> (mistakes: ${this.mistakes}, difficulty: ${DIFF_NAME[Settings.diff]}).<br>You will find new cards in the <b>Codex</b> (key C).`)], () => Game.backToHub());
       });
     });
   }
@@ -147,7 +162,7 @@ const Hub = {
       const np = pt.npc;
       r.draw('cylinder', M4.trs(np, 0, [0.35, 1.1, 0.35]), V3.scale(L.color, 0.8));
       r.sphere(V3.add(np, [0, 1.45, 0]), 0.32, [0.95, 0.85, 0.75]);
-      const st = done ? ' ' + '★'.repeat(done) + '☆'.repeat(3 - done) : '';
+      const dd = Game.progress.diff[L.num], st = (done ? ' ' + '★'.repeat(done) + '☆'.repeat(3 - done) : '') + (dd && dd !== 'normal' ? ` <small>(${DIFF_NAME[dd]})</small>` : '');
       UI.hot(c, `<b>${tr('Portál', 'Portal')} ${L.num}: ${L.title}</b><br>${LEVEL_TIPS[L.num]}${open ? '' : tr('<br>🔒 Najprv dokonči predchádzajúci level.', '<br>🔒 Complete the previous level first.')}`, 60);
       UI.hot(V3.add(np, [0, 1.2, 0]), tr(`<b>${L.mentor}</b> — mentor levelu ${L.num}.`, `<b>${L.mentor}</b> — mentor of level ${L.num}.`), 30);
       UI.label('portal' + L.num, V3.add(c, [0, 2.9, 0]), `<b>${L.num} · ${L.title}</b>${st}<br><small>${open ? L.face + ' ' + L.mentor : tr('🔒 zamknuté', '🔒 locked')}</small>`, 'portal' + (open ? '' : ' locked'));
@@ -214,7 +229,7 @@ Object.assign(CRYSTAL_TIPS, { '|0⟩': TIPS['|0⟩'], '|1⟩': TIPS['|1⟩'], '�
 // ------------------------------------------------------------------
 const Game = {
   keys: {},
-  progress: { stars: {}, codex: new Set(), introSeen: false, allUnlocked: false },
+  progress: { stars: {}, diff: {}, codex: new Set(), introSeen: false, allUnlocked: false, session: null },
   init() {
     const canvas = $('#gl');
     try { this.r = new Renderer(canvas); }
@@ -224,6 +239,7 @@ const Game = {
     this.levels = LEVELS.map((L) => new L.cls(L));
     Hub.init();
     this.scene = Hub; Hub.enter();
+    this.restoreSession();
     this.bindInput(canvas);
     this.last = performance.now();
     requestAnimationFrame((t) => this.loop(t));
@@ -233,7 +249,10 @@ const Game = {
     const dt = Math.min((now - this.last) / 1000, 0.05);
     this.last = now;
     this.r.time += dt;
+    if (Settings.view.autoRotate && this.scene !== Hub && this.scene.cam && !this.dragging) this.scene.cam.yaw += Settings.view.autoRotate * dt;
     this.scene.update(dt);
+    this.saveAcc = (this.saveAcc || 0) + dt;
+    if (this.saveAcc > 2) { this.saveAcc = 0; this.save(); } // stav hry (poloha, krok levelu) sa ukladá priebežne
     const pw = UI.panel.classList.contains('show') && window.innerWidth > 720 ? (UI.panel.offsetWidth + 14) / window.innerWidth : 0;
     this.r.shiftX += (pw - this.r.shiftX) * Math.min(1, dt * 6);
     UI.labelsBegin();
@@ -245,6 +264,7 @@ const Game = {
   bindInput(canvas) {
     window.addEventListener('keydown', (e) => {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+      if (e.code === 'Escape') UI.toggleSettings(false);
       this.keys[e.code] = true;
       if ((e.code === 'Enter' || e.code === 'Space') && UI.busy && UI._next) { e.preventDefault(); UI._next(); return; }
       if ((e.code === 'ArrowLeft' || e.code === 'Backspace') && UI.busy && UI._prev) { e.preventDefault(); UI._prev(); return; }
@@ -253,6 +273,7 @@ const Game = {
       if (e.code === 'KeyE' && this.scene === Hub) Hub.interact();
       if (e.code === 'KeyC') UI.toggleCodex();
       if (e.code === 'KeyM') this.toggleMap();
+      if (e.code === 'KeyO') UI.toggleSettings();
       if (e.code === 'KeyH' || e.code === 'F1') { e.preventDefault(); UI.toggleHelp(); }
       if (e.code === 'Escape') { UI.toggleCodex(false); UI.toggleHelp(false); UI.toggleLog(false); this.toggleMap(false); }
       if (e.code === 'F9') { e.preventDefault(); this.unlockAll(); }
@@ -261,21 +282,24 @@ const Game = {
     window.addEventListener('contextmenu', (e) => e.preventDefault()); // pravé tlačidlo slúži na otáčanie, nie na menu
     window.addEventListener('blur', () => { this.keys = {}; });
     let drag = null;
-    canvas.addEventListener('pointerdown', (e) => { drag = [e.clientX, e.clientY]; canvas.setPointerCapture(e.pointerId); });
+    canvas.addEventListener('pointerdown', (e) => { drag = [e.clientX, e.clientY]; this.dragging = true; canvas.setPointerCapture(e.pointerId); });
     canvas.addEventListener('pointermove', (e) => {
       if (!drag) return;
       const cam = this.scene.cam;
       cam && cam.drag(e.clientX - drag[0], e.clientY - drag[1]);
       drag = [e.clientX, e.clientY];
     });
-    canvas.addEventListener('pointerup', () => { drag = null; });
+    canvas.addEventListener('pointerup', () => { drag = null; this.dragging = false; });
+    window.addEventListener('pagehide', () => this.save());
+    document.addEventListener('visibilitychange', () => { if (document.hidden) this.save(); });
     canvas.addEventListener('wheel', (e) => { e.preventDefault(); this.scene.cam && this.scene.cam.zoom(e.deltaY); }, { passive: false });
   },
-  enterLevel(num) {
+  enterLevel(num, resume) {
     this.scene.exit();
     UI.labelsClear();
     this.scene = this.levels[num - 1];
-    this.scene.enter();
+    this.scene.enter(resume);
+    this.save();
   },
   backToHub() {
     if (this.scene === Hub || UI.busy) return;
@@ -284,8 +308,40 @@ const Game = {
     UI.labelsClear();
     this.scene = Hub;
     Hub.enter(from);
+    this.save();
   },
   isUnlocked(n) { return n === 1 || this.progress.allUnlocked || this.progress.stars[n - 1] !== undefined || this.progress.stars[n] !== undefined; },
+  setDifficulty(d) {
+    if (!DIFFS.includes(d) || d === Settings.diff) return;
+    Settings.diff = d; Settings.save();
+    UI.diffUi && UI.diffUi();
+    if (this.scene && this.scene !== Hub) this.scene.request(); else UI.setHud(tr('Hilbertov ostrov', 'Hilbert Island'), this.nextQuestText());
+    UI.refreshDialog && UI.refreshDialog();
+    UI.toast(tr(`🎚 Obťažnosť: <b>${DIFF_NAME[d]}</b> — tolerancie platia hneď, nové ciele a nápovedy od ďalšej úlohy.`,
+      `🎚 Difficulty: <b>${DIFF_NAME[d]}</b> — tolerances apply now, new targets and hints from the next task.`), 3600);
+  },
+  // zmaže postup (nastavenia a jazyk ponechá) a začne odznova
+  resetAll() {
+    this.resetting = true;
+    try { localStorage.removeItem('kvantp-game1'); localStorage.removeItem('kvantp-game1-log'); } catch (e) { /* bez ukladania */ }
+    location.reload();
+  },
+  // aktuálne miesto v hre: ostrov (poloha hráča) alebo level (krok, rozpracovaný stav, chyby)
+  snapshot() {
+    const s = this.scene;
+    if (!s || s === Hub) return { scene: 0, p: Hub.player.p, h: Hub.player.heading, yaw: Hub.cam.yaw };
+    return { scene: s.num, step: s.stepIdx, sub: s.sub, mistakes: s.mistakes };
+  },
+  restoreSession() {
+    const ss = this.progress.session;
+    if (!ss) return;
+    if (ss.scene > 0 && this.isUnlocked(ss.scene)) {
+      this.enterLevel(ss.scene, ss);
+      UI.toast(tr('↩ Pokračuješ tam, kde si skončil(a).', '↩ Continuing where you left off.'));
+    } else if (Array.isArray(ss.p)) {
+      Hub.player.p = ss.p; Hub.player.heading = ss.h || 0; Hub.cam.yaw = ss.yaw || 0;
+    }
+  },
   // odomkne všetky levely bez toho, aby ich označilo za dokončené (režim učiteľa / skákanie medzi levelmi)
   unlockAll() {
     this.progress.allUnlocked = true;
@@ -295,6 +351,8 @@ const Game = {
   },
   completeLevel(n, stars) {
     this.progress.stars[n] = Math.max(stars, this.progress.stars[n] || 0);
+    const rank = (d) => DIFFS.indexOf(d);
+    if (!this.progress.diff[n] || rank(Settings.diff) > rank(this.progress.diff[n])) this.progress.diff[n] = Settings.diff;
     this.unlock(CODEX.filter((c) => c.level === n).map((c) => c.id));
     this.save();
   },
@@ -359,12 +417,14 @@ const Game = {
     }
   },
   save() {
+    if (this.resetting || !this.levels) return;
+    this.progress.session = this.snapshot();
     try { localStorage.setItem('kvantp-game1', JSON.stringify({ ...this.progress, codex: [...this.progress.codex] })); } catch (e) { /* bez ukladania */ }
   },
   load() {
     try {
       const d = JSON.parse(localStorage.getItem('kvantp-game1') || 'null');
-      if (d) this.progress = { stars: d.stars || {}, codex: new Set(d.codex || []), introSeen: !!d.introSeen, allUnlocked: !!d.allUnlocked };
+      if (d) this.progress = { stars: d.stars || {}, diff: d.diff || {}, codex: new Set(d.codex || []), introSeen: !!d.introSeen, allUnlocked: !!d.allUnlocked, session: d.session || null };
     } catch (e) { /* čistý začiatok */ }
   },
 };

@@ -87,7 +87,7 @@ class L5Dirac extends Level {
   }
 
   intro() {
-    this.quest(tr('Vypočuj si Diraca', 'Listen to Dirac'));
+    this.quest(tr('Vypočuj si Diraca', 'Listen to Dirac'), { easy: '💬 Dirac', hard: tr('bra-ket: typy výrazov', 'bra-ket: expression types') });
     this.say(tr([
       'Dirac.',
       { who: 'Knihovníčka Ket', face: '📚', text: '(šepky) Pán profesor Dirac je povestne málovravný. Kolegovia vraj zaviedli jednotku <b>1 dirac = jedno slovo za hodinu</b>. Dovoľ, aby som tlmočila.' },
@@ -105,15 +105,15 @@ class L5Dirac extends Level {
     ]), () => this.next());
   }
 
-  tasks() { this.loadTask(0); }
+  tasks() { this.loadTask(this.sub.ti || 0); }
   loadTask(i) {
-    this.ti = i; this.tokens = []; this.squared = false;
+    this.ti = i; this.sub.ti = i; this.tokens = []; this.squared = false;
     const T = DIRAC_TASKS[i];
-    this.quest(tr(`Úloha ${i + 1}/${DIRAC_TASKS.length}: Postav ${T.title}.`, `Task ${i + 1}/${DIRAC_TASKS.length}: Build ${T.title}.`));
+    this.quest(tr(`Úloha ${i + 1}/${DIRAC_TASKS.length}: Postav ${T.title}.`, `Task ${i + 1}/${DIRAC_TASKS.length}: Build ${T.title}.`), { easy: tr(`🧱 ${i + 1}/${DIRAC_TASKS.length}: ${T.title}`, `🧱 ${i + 1}/${DIRAC_TASKS.length}: ${T.title}`), hard: `${i + 1}/${DIRAC_TASKS.length} · ${T.title} · ${tr('typ', 'type')}: ${TYPE_NAME[T.want]}` });
     const toks = DIRAC_TOKENS.map((d) => UI.button(d.t, () => { this.tokens.push(d); this.refresh(); }, 'token'));
     this.view = UI.info('');
     UI.panelSet(tr('Skladanie výrazu', 'Building an expression'), [
-      UI.info(`<b>${tr('Postav', 'Build')}:</b> ${T.title}`),
+      UI.info(`<b>${tr('Postav', 'Build')}:</b> ${T.title}` + (Settings.diff === 'easy' ? `<br><small>💡 ${tr('počet tokenov', 'number of tokens')}: ${T.exact.length}${T.sq ? ' + |…|²' : ''} · ${tr('začni', 'start with')} ${T.exact[0]}</small>` : '')),
       UI.row(...toks.slice(0, 3)), UI.row(...toks.slice(3, 6)), UI.row(...toks.slice(6)),
       UI.row(UI.button('|…|²', () => { this.squared = !this.squared; this.refresh(); }), UI.button('⌫', () => { this.tokens.pop(); this.refresh(); }), UI.button(tr('Vymaž', 'Clear'), () => { this.tokens = []; this.squared = false; this.refresh(); })),
       this.view,
@@ -140,9 +140,12 @@ class L5Dirac extends Level {
           this.ask(tr({ q: 'Ktorý výraz je OPERÁTOR?', options: ['|ψ⟩⟨φ|', '⟨φ|ψ⟩', '⟨ψ|Â|ψ⟩'], correct: 0, why: 'Ket-bra = operátor; bra-ket = číslo; ⟨ψ|Â|ψ⟩ = číslo (stredná hodnota).' }, { q: 'Which expression is an OPERATOR?', options: ['|ψ⟩⟨φ|', '⟨φ|ψ⟩', '⟨ψ|Â|ψ⟩'], correct: 0, why: 'Ket-bra = operator; bra-ket = number; ⟨ψ|Â|ψ⟩ = number (expectation value).' }), () => this.after());
         } else this.after();
       });
-    } else if (this.res.type === 'bad') UI.toast(tr('Taký výraz gramatika nepovoľuje: ', 'The grammar does not allow such an expression: ') + this.res.why, 3500);
-    else if (this.res.type !== T.want) UI.toast(tr(`Postavil si <b>${TYPE_NAME[this.res.type] || '—'}</b>, ale úloha chce <b>${TYPE_NAME[T.want]}</b>.`, `You built: <b>${TYPE_NAME[this.res.type] || '—'}</b>, but the task wants: <b>${TYPE_NAME[T.want]}</b>.`), 3500);
-    else UI.toast(tr('Typ sedí, ale skontroluj, ktoré stavy a v akom poradí úloha žiada.', 'The type is right, but check which states and in what order the task asks for.'), 3000);
+    } else if (Settings.diff === 'hard') this.mistakes++; // ťažká: každé zlé overenie je chyba
+    if (ok) return;
+    const pen = Settings.diff === 'hard' ? tr(' <small>(+1 chyba)</small>', ' <small>(+1 mistake)</small>') : '';
+    if (this.res.type === 'bad') UI.toast(tr('Taký výraz gramatika nepovoľuje: ', 'The grammar does not allow such an expression: ') + this.res.why + pen, 3500);
+    else if (this.res.type !== T.want) UI.toast(tr(`Postavil si <b>${TYPE_NAME[this.res.type] || '—'}</b>, ale úloha chce <b>${TYPE_NAME[T.want]}</b>.`, `You built: <b>${TYPE_NAME[this.res.type] || '—'}</b>, but the task wants: <b>${TYPE_NAME[T.want]}</b>.`) + pen, 3500);
+    else UI.toast(tr('Typ sedí, ale skontroluj, ktoré stavy a v akom poradí úloha žiada.', 'The type is right, but check which states and in what order the task asks for.') + pen, 3000);
   }
   after() {
     if (this.ti + 1 < DIRAC_TASKS.length) this.loadTask(this.ti + 1);

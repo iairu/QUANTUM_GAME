@@ -14,7 +14,7 @@ class L6Rabi extends Level {
   get delta() { return this.f - this.d0; }
 
   intro() {
-    this.quest(tr('Vypočuj si Rabiho', 'Listen to Rabi'));
+    this.quest(tr('Vypočuj si Rabiho', 'Listen to Rabi'), { easy: '💬 Rabi & Zeeman', hard: tr('NMR: B₀ → 2 hladiny, RF → rotácie', 'NMR: B₀ → 2 levels, RF → rotations') });
     this.say(tr([
       'Shalom! Som I. I. Rabi. V roku 1938 som naučil atómy „počúvať rádio“ — to je <b>magnetická rezonancia</b>. Z nej je dnes NMR, MRI aj atómové hodiny.',
       { who: 'Pieter Zeeman', face: '🧪', text: 'Dovoľ, aby som doplnil: v statickom poli <b>B₀</b> sa energia spinu ½ rozštiepi na <b>dve hladiny</b> (Zeemanov jav). Tie dve hladiny sú náš qubit.' },
@@ -33,13 +33,17 @@ class L6Rabi extends Level {
     if (o.frame) nodes.push(UI.row(
       UI.button((this.frame === 'lab' ? '● ' : '○ ') + tr('Laboratórny rámec', 'Laboratory frame'), () => { this.frame = 'lab'; this.buildPanel(o); }),
       UI.button((this.frame === 'rot' ? '● ' : '○ ') + tr('Rotujúci rámec', 'Rotating frame'), () => { this.frame = 'rot'; this.buildPanel(o); this.onFrame && this.onFrame(); })));
-    if (o.area) nodes.push(UI.slider(tr('plocha impulzu Ω<sub>R</sub>t', 'pulse area Ω<sub>R</sub>t'), 0, 2 * Math.PI, Math.PI / 8, this.area, (v) => { this.area = v; return Fmt.angle(v); }));
-    if (o.tune) nodes.push(UI.slider(tr('frekvencia RF (posun)', 'RF frequency (offset)'), -2, 2, 0.1, this.f, (v) => { this.f = v; return Fmt.num(v, 1); }));
+    if (o.frame) nodes.push(UI.slider(tr('sila poľa B₀ (Larmorova frekvencia ω₀)', 'field strength B₀ (Larmor frequency ω₀)'), 1, 8, 0.5, this.w0, (v) => { this.w0 = v; return Fmt.num(v, 1) + ' rad/s'; },
+      tr('ω₀ = γB₀: silnejšie pole → rýchlejšia precesia. P(|1⟩) sa ani tak nemení.', 'ω₀ = γB₀: a stronger field → faster precession. P(|1⟩) still does not change.')));
+    if (o.area) nodes.push(UI.slider(tr('plocha impulzu Ω<sub>R</sub>t', 'pulse area Ω<sub>R</sub>t'), 0, 2 * Math.PI, byDiff(Math.PI / 8, Math.PI / 8, Math.PI / 16), this.area, (v) => { this.area = v; return Fmt.angle(v); }));
+    if (o.tune) nodes.push(UI.slider(tr('frekvencia RF (posun)', 'RF frequency (offset)'), -2, 2, byDiff(0.1, 0.1, 0.05), this.f, (v) => { this.f = v; return Fmt.num(v, 1); }));
     if (o.area) nodes.push(UI.row(UI.button(tr('▶ Impulz z |0⟩', '▶ Pulse from |0⟩'), () => this.startPulse(), 'big'), UI.button('Reset |0⟩', () => { this.r = [0, 0, 1]; this.pulse = null; })));
     if (o.t2) nodes.push(UI.info(tr('Dekoherencia T₂ je <b>zapnutá</b> (T₂ ≈ 2,5 s).', 'Decoherence T₂ is <b>on</b> (T₂ ≈ 2.5 s).'), 'tip'));
     this.read = UI.info('');
     this.plot = el('canvas', 'plot'); this.plot.width = 300; this.plot.height = 120;
+    this.rabiChart = o.area ? UI.chart(300, 110) : null;
     nodes.push(this.read, this.plot, UI.info(`<span style="color:#7f7">— P(|1⟩)</span> &nbsp; <span style="color:#fb6">— ${tr('NMR signál (priečna magnetizácia v laboratóriu)', 'NMR signal (transverse magnetisation in the lab)')}</span>`, 'tip'));
+    if (this.rabiChart) nodes.push(this.rabiChart);
     UI.panelSet(tr('NMR / Rabiho rezonátor', 'NMR / Rabi’s resonator'), nodes);
   }
 
@@ -52,7 +56,7 @@ class L6Rabi extends Level {
 
   precession() {
     this.r = Q.bloch(Q.fromBloch(Math.PI / 3, 0)); this.frame = 'lab'; this.labTime = 0;
-    this.quest(tr('Pozoruj spin aspoň 4 sekundy v LABORATÓRNOM rámci. Potom prepni na ROTUJÚCI rámec.', 'Watch the spin for at least 4 seconds in the LABORATORY frame. Then switch to the ROTATING frame.'));
+    this.quest(tr('Pozoruj spin aspoň 4 sekundy v LABORATÓRNOM rámci. Potom prepni na ROTUJÚCI rámec.', 'Watch the spin for at least 4 seconds in the LABORATORY frame. Then switch to the ROTATING frame.'), { easy: tr('👀 4 s laboratórium → 🎠 rotujúci rámec', '👀 4 s lab → 🎠 rotating frame'), hard: tr('lab ≥ 4 s → rot · ω₀ = γB₀ · dP₁/dt = ?', 'lab ≥ 4 s → rot · ω₀ = γB₀ · dP₁/dt = ?') });
     this.buildPanel({ frame: true });
     this.onFrame = () => {
       if (this.labTime < 4 || this.flags.p) return;
@@ -68,10 +72,10 @@ class L6Rabi extends Level {
 
   piPulse() {
     this.frame = 'rot'; this.r = [0, 0, 1]; this.onFrame = null;
-    this.quest(tr('Nastav plochu impulzu tak, aby jediný impulz preklopil |0⟩ na |1⟩ (P(|1⟩) > 98 %).', 'Set the pulse area so that a single pulse flips |0⟩ to |1⟩ (P(|1⟩) > 98 %).'));
+    this.quest(tr('Nastav plochu impulzu tak, aby jediný impulz preklopil |0⟩ na |1⟩ (P(|1⟩) > 98 %).', 'Set the pulse area so that a single pulse flips |0⟩ to |1⟩ (P(|1⟩) > 98 %).'), { easy: tr('⚡ |0⟩ → |1⟩ jedným impulzom', '⚡ |0⟩ → |1⟩ with one pulse'), hard: `Ω<sub>R</sub>t = ? · P(|1⟩) > ${Fmt.pct(byDiff(0.95, 0.98, 0.995))}` });
     this.buildPanel({ area: true });
     this.check = () => {
-      if (this.r[2] < -0.96 && !this.flags.pi) {
+      if (this.r[2] < -byDiff(0.9, 0.96, 0.99) && !this.flags.pi) {
         this.flags.pi = true;
         this.grant(['rabi', 'OmegaR', 'rabiosc']);
         this.say(tr(['To je <b>π-impulz</b>: rotácia o 180° — ako hradlo X. Plocha impulzu Ω<sub>R</sub>·t je <b>uhol rotácie</b>, nie čas v sekundách.',
@@ -83,10 +87,10 @@ class L6Rabi extends Level {
   }
 
   halfPulse() {
-    this.quest(tr('Jediným impulzom z |0⟩ dostaň stav na rovník (P(|1⟩) = 50 %).', 'With a single pulse from |0⟩, bring the state to the equator (P(|1⟩) = 50 %).'));
+    this.quest(tr('Jediným impulzom z |0⟩ dostaň stav na rovník (P(|1⟩) = 50 %).', 'With a single pulse from |0⟩, bring the state to the equator (P(|1⟩) = 50 %).'), { easy: tr('⚡ |0⟩ → rovník (50 %)', '⚡ |0⟩ → equator (50 %)'), hard: `Ω<sub>R</sub>t = ? · |P(|1⟩) − ½| < ${Fmt.pct(byDiff(0.06, 0.03, 0.015))}` });
     this.buildPanel({ area: true });
     this.check = () => {
-      if (Math.abs(this.r[2]) < 0.06 && !this.flags.half) {
+      if (Math.abs(this.r[2]) < byDiff(0.12, 0.06, 0.03) && !this.flags.half) {
         this.flags.half = true;
         this.say([tr('<b>π/2-impulz</b> — rovnomerná superpozícia. V NMR je to základný krok takmer každého experimentu.', 'A <b>π/2 pulse</b> — an equal superposition. In NMR it is the basic step of almost every experiment.')], () => this.next());
       }
@@ -94,12 +98,12 @@ class L6Rabi extends Level {
   }
 
   tuning() {
-    this.d0 = (rand() < 0.5 ? -1 : 1) * (0.8 + Math.round(rand() * 6) / 10);
+    this.d0 = (rand() < 0.5 ? -1 : 1) * byDiff(0.8 + Math.round(rand() * 6) / 10, 0.8 + Math.round(rand() * 6) / 10, 0.6 + Math.round(rand() * 20) * 0.05);
     this.f = 0; this.area = Math.PI;
-    this.quest(tr('Rádio je rozladené! Nájdi rezonančnú frekvenciu tak, aby π-impulz opäť preklopil spin (P(|1⟩) > 97 %).', 'The radio is detuned! Find the resonance frequency so that a π pulse flips the spin again (P(|1⟩) > 97 %).'));
+    this.quest(tr('Rádio je rozladené! Nájdi rezonančnú frekvenciu tak, aby π-impulz opäť preklopil spin (P(|1⟩) > 97 %).', 'The radio is detuned! Find the resonance frequency so that a π pulse flips the spin again (P(|1⟩) > 97 %).'), { easy: tr('📻 nájdi rezonanciu · π-impulz', '📻 find the resonance · π pulse'), hard: `Δ → 0 · π · P(|1⟩) > ${Fmt.pct(byDiff(0.94, 0.97, 0.99))} · Ω<sub>eff</sub> = √(Ω²+Δ²)` });
     this.say([tr('Niekto pohol frekvenciou RF generátora. Mimo rezonancie sa spin otáča okolo <b>naklonenej osi</b> a nikdy sa úplne nepreklopí. Hľadaj rytmus hojdačky!', 'Someone has moved the frequency of the RF generator. Off resonance the spin rotates about a <b>tilted axis</b> and never fully flips. Find the rhythm of the swing!')], () => this.buildPanel({ area: true, tune: true }));
     this.check = () => {
-      if (this.r[2] < -0.94 && !this.flags.tune) {
+      if (this.r[2] < -byDiff(0.88, 0.94, 0.98) && !this.flags.tune) {
         this.flags.tune = true;
         this.say([tr('Rezonancia nájdená! Presne takto sa v NMR hľadá frekvencia jadra. Rozdiel frekvencií (detuning) nakláňa os rotácie.', 'Resonance found! This is exactly how the frequency of a nucleus is found in NMR. The frequency difference (detuning) tilts the rotation axis.')], () => this.next());
       }
@@ -108,7 +112,7 @@ class L6Rabi extends Level {
 
   t2() {
     this.useT2 = true; this.f = this.d0; this.area = Math.PI / 2;
-    this.quest(tr('Dekoherencia T₂: urob π/2-impulz a čakaj, kým sa Blochov vektor nezmrští pod 30 % dĺžky.', 'Decoherence T₂: apply a π/2 pulse and wait until the Bloch vector shrinks below 30 % of its length.'));
+    this.quest(tr('Dekoherencia T₂: urob π/2-impulz a čakaj, kým sa Blochov vektor nezmrští pod 30 % dĺžky.', 'Decoherence T₂: apply a π/2 pulse and wait until the Bloch vector shrinks below 30 % of its length.'), { easy: tr('⏳ π/2 · čakaj (T₂)', '⏳ π/2 · wait (T₂)'), hard: `π/2 → |r<sub>⊥</sub>| ∝ e<sup>−t/T₂</sup> < ${Fmt.num(0.3, 1)} · T₂ ≈ ${Fmt.num(2.5, 1)} s` });
     this.say([tr('Skutočné spiny cítia susedov a nehomogenity poľa. Každá molekula precesuje trochu inak a fázy sa rozbiehajú: <b>T₂ (dephasing)</b>. Pomalší návrat populácií k tepelnému stavu je <b>T₁</b>.', 'Real spins feel their neighbours and field inhomogeneities. Each molecule precesses a little differently and the phases drift apart: <b>T₂ (dephasing)</b>. The slower return of populations to the thermal state is <b>T₁</b>.')], () => this.buildPanel({ area: true, t2: true }));
     this.check = () => {};
     this.watch = true;
@@ -138,8 +142,23 @@ class L6Rabi extends Level {
     this.hist.push({ p1: (1 - this.r[2]) / 2, s: disp[0] });
     if (this.hist.length > 300) this.hist.shift();
     if (this.read) this.read.innerHTML = `P(|1⟩) = ${Fmt.pct((1 - this.r[2]) / 2)} · |r| = ${Fmt.num(V3.len(this.r), 2)}`
-      + (this.pulse ? tr(' · <b>RF impulz beží</b>', ' · <b>RF pulse running</b>') : '') + (this.stepIdx >= 4 && this.stepIdx < 5 ? ` · ${tr('posun od rezonancie', 'detuning')}: ${this.flags.tune ? Fmt.num(this.delta, 1) : '?'}` : '');
+      + (this.pulse ? tr(' · <b>RF impulz beží</b>', ' · <b>RF pulse running</b>') : '') + (this.stepIdx >= 4 && this.stepIdx < 5 ? ` · ${tr('posun od rezonancie', 'detuning')}: ${this.flags.tune || Settings.diff === 'easy' ? Fmt.num(this.delta, 2) : '?'}` : '');
+    if (this.rabiChart && this.rabiChart.isConnected) this.drawRabi();
     if (this.plot && this.plot.isConnected) this.drawPlot();
+  }
+
+  // Rabiho krivka: P(|1⟩) po impulze z |0⟩ v závislosti od plochy Ω_R·t pri aktuálnom rozladení Δ
+  drawRabi() {
+    const W = this.OR, D = this.delta, Wf = Math.hypot(W, D), P1 = (A) => (W * W) / (Wf * Wf) * Math.sin(Wf * (A / W) / 2) ** 2;
+    const hide = Settings.diff === 'hard' && this.stepIdx === 4 && !this.flags.tune;
+    UI.drawChart(this.rabiChart, {
+      x0: 0, x1: 2 * Math.PI, y0: 0, y1: 1.05, xlabel: tr('plocha impulzu Ω_R·t', 'pulse area Ω_R·t'),
+      xticks: [[0, '0'], [Math.PI / 2, 'π/2'], [Math.PI, 'π'], [3 * Math.PI / 2, '3π/2'], [2 * Math.PI, '2π']], yticks: [[0, '0'], [0.5, '½'], [1, '1']],
+      curves: [...(Math.abs(D) > 0.01 && !hide ? [{ f: (A) => Math.sin(A / 2) ** 2, color: '#5a6690', dash: [4, 4], width: 1 }] : []), ...(hide ? [] : [{ f: P1, color: '#7f7' }])],
+      vlines: [{ x: this.area, color: '#ffd25a' }],
+      points: [{ x: this.area, y: P1(this.area), color: '#ffd25a', r: hide ? 0 : 5 }],
+      legend: [['#7f7', tr('Rabiho oscilácia P(|1⟩)', 'Rabi oscillation P(|1⟩)')], ...(Math.abs(D) > 0.01 && !hide ? [['#5a6690', tr('v rezonancii', 'at resonance')]] : [])],
+    });
   }
 
   disp() { return this.frame === 'lab' ? V3.rotate(this.r, [0, 0, 1], this.labPh) : this.r; }
@@ -178,7 +197,7 @@ class L6Rabi extends Level {
     UI.hot([mx - 1.9, 1.7, 0], TIPS['B₀'], 30);
     // Blochova sféra
     const c = [1.6, 1.7, 0];
-    Bloch.draw(r, c, 1.6, d, { labelFn: UI.label.bind(UI), key: 'r', axisNames: true });
+    Bloch.draw(r, c, 1.6, d, { labelFn: UI.label.bind(UI), key: 'r', axisNames: true, bars: true });
     if (this.pulse && this.frame === 'rot') {
       const D = this.delta, ax = V3.norm([this.OR, 0, D]);
       r.rod(V3.sub(c, V3.scale(qToWorld(ax), 2)), V3.add(c, V3.scale(qToWorld(ax), 2)), [1, 1, 0.4], 0.02, { emissive: 0.8 });

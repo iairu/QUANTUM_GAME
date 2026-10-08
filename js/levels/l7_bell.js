@@ -14,7 +14,7 @@ class L7Bell extends Level {
   get E() { return { who: 'Albert Einstein', face: '👴' }; }
 
   intro() {
-    this.quest(tr('Vypočuj si Bella a Einsteina', 'Listen to Bell and Einstein'));
+    this.quest(tr('Vypočuj si Bella a Einsteina', 'Listen to Bell and Einstein'), { easy: '💬 Bell & Einstein', hard: tr('EPR 1935 vs. Bell 1964', 'EPR 1935 vs. Bell 1964') });
     this.say(tr([
       'Dobrý deň, som John Bell z CERN. Vitaj na <b>moste previazanosti</b>. Vľavo stojí <b>Alica</b> so svojím qubitom, vpravo <b>Bob</b>.',
       { ...this.E, text: 'A ja som Einstein. Roku 1935 sme s Podolským a Rosenom tvrdili, že kvantová mechanika je <b>neúplná</b>. Ak niečo na diaľku predpoviem s istotou, musí to byť „prvok reality“ vopred! Žiadne <i>spukhafte Fernwirkung</i> — strašidelné pôsobenie na diaľku.' },
@@ -28,7 +28,7 @@ class L7Bell extends Level {
 
   build() {
     this.psi = Q2.zero();
-    this.quest(tr('Vyrob Bellov stav |Φ⁺⟩ = (|00⟩ + |11⟩)/√2 z |00⟩.', 'Make the Bell state |Φ⁺⟩ = (|00⟩ + |11⟩)/√2 from |00⟩.'));
+    this.quest(tr('Vyrob Bellov stav |Φ⁺⟩ = (|00⟩ + |11⟩)/√2 z |00⟩.', 'Make the Bell state |Φ⁺⟩ = (|00⟩ + |11⟩)/√2 from |00⟩.'), { easy: tr('🔗 |00⟩ → Bellov stav', '🔗 |00⟩ → Bell state'), hard: '|00⟩ → (|00⟩+|11⟩)/√2 · {H, X, CNOT}' });
     const A = (U, q, n) => UI.button(n, () => { this.psi = Q2.apply1(U, q, this.psi); this.after(); });
     this.read = UI.info('');
     UI.panelSet(tr('Dva qubity', 'Two qubits'), [
@@ -56,7 +56,7 @@ class L7Bell extends Level {
 
   noSignal() {
     this.psi = this.bell(); this.basis = { A: 0, B: 0 }; this.tab = null;
-    this.quest(tr('Meraj páry v zostavách (Alica Z, Bob Z) a (Alica X, Bob Z). Sleduj, čo vidí Bob SÁM.', 'Measure pairs in the setups (Alice Z, Bob Z) and (Alice X, Bob Z). Watch what Bob sees ON HIS OWN.'));
+    this.quest(tr('Meraj páry v zostavách (Alica Z, Bob Z) a (Alica X, Bob Z). Sleduj, čo vidí Bob SÁM.', 'Measure pairs in the setups (Alice Z, Bob Z) and (Alice X, Bob Z). Watch what Bob sees ON HIS OWN.'), { easy: tr('📏 Z·Z, potom X·Z · sleduj Boba', '📏 Z·Z, then X·Z · watch Bob'), hard: tr('(Z,Z), (X,Z) · P<sub>B</sub>(0) = ?', '(Z,Z), (X,Z) · P<sub>B</sub>(0) = ?') });
     this.read = UI.info('');
     const pick = (who) => {
       const s = el('select');
@@ -93,7 +93,7 @@ class L7Bell extends Level {
 
   chsh() {
     this.showAxes = true;
-    this.quest(tr('CHSH hra: nastav uhly meraní tak, aby tím vyhral viac ako 80 % kôl (klasicky najviac 75 %).', 'CHSH game: set the measurement angles so that the team wins more than 80 % of rounds (classically at most 75 %).'));
+    this.quest(tr('CHSH hra: nastav uhly meraní tak, aby tím vyhral viac ako 80 % kôl (klasicky najviac 75 %).', 'CHSH game: set the measurement angles so that the team wins more than 80 % of rounds (classically at most 75 %).'), { easy: tr(`🎲 vyhraj > ${Fmt.pct(byDiff(0.78, 0.8, 0.83))}`, `🎲 win > ${Fmt.pct(byDiff(0.78, 0.8, 0.83))}`), hard: `a⊕b = x·y · P<sub>win</sub> > ${Fmt.pct(byDiff(0.78, 0.8, 0.83))} · ${tr('klasicky', 'classical')} ≤ 75 % · cos²(π/8) ≈ 85 %` });
     this.say(tr([
       'Pravidlá <b>CHSH hry</b>: rozhodca pošle Alici náhodný bit x a Bobovi náhodný bit y. Bez komunikácie odpovedia bitmi a, b.',
       'Vyhrávajú, ak <b>a ⊕ b = x · y</b>: teda majú odpovedať <b>rovnako</b>, okrem prípadu x = y = 1, keď majú odpovedať <b>rôzne</b>.',
@@ -106,24 +106,30 @@ class L7Bell extends Level {
       'With an entangled pair, Alice picks the measurement angle a₀ or a₁ depending on x, and Bob picks b₀ or b₁ depending on y. Try to find angles that beat 75 %!',
     ]), () => {
       this.read = UI.info('');
-      const sl = (k, label) => UI.slider(label, -90, 180, 7.5, this.ang[k], (v) => { this.ang[k] = v; return v + '°'; });
+      this.chart = UI.chart(300, 130); this.pairWin = null;
+      const sl = (k, label) => UI.slider(label, -90, 180, byDiff(15, 7.5, 7.5), this.ang[k], (v) => { this.ang[k] = v; this.drawChsh(); return v + '°'; });
       UI.panelSet(tr('CHSH hra', 'CHSH game'), [sl('a0', tr('Alica, x=0: a₀', 'Alice, x=0: a₀')), sl('a1', tr('Alica, x=1: a₁', 'Alice, x=1: a₁')), sl('b0', 'Bob, y=0: b₀'), sl('b1', 'Bob, y=1: b₁'),
-        UI.row(UI.button(tr('Hraj 400 kôl', 'Play 400 rounds'), () => this.play(), 'big'), UI.button(tr('Klasicky (vždy 0)', 'Classically (always 0)'), () => this.playClassic())),
-        UI.button(tr('💡 Nápoveda', '💡 Hint'), () => UI.toast(tr('Skús a₀ = 0°, a₁ = 90°, b₀ = 45°, b₁ = −45°. Rozdiely uhlov 45° (a 135° pre x=y=1).', 'Try a₀ = 0°, a₁ = 90°, b₀ = 45°, b₁ = −45°. Angle differences of 45° (and 135° for x=y=1).'), 6000)),
-        this.read]);
+        UI.row(UI.button(tr(`Hraj ${byDiff(400, 400, 1000)} kôl`, `Play ${byDiff(400, 400, 1000)} rounds`), () => this.play(), 'big'), UI.button(tr('Klasicky (vždy 0)', 'Classically (always 0)'), () => this.playClassic())),
+        Settings.diff === 'hard' ? null : UI.button(tr('💡 Nápoveda', '💡 Hint'), () => UI.toast(tr('Skús a₀ = 0°, a₁ = 90°, b₀ = 45°, b₁ = −45°. Rozdiely uhlov 45° (a 135° pre x=y=1).', 'Try a₀ = 0°, a₁ = 90°, b₀ = 45°, b₁ = −45°. Angle differences of 45° (and 135° for x=y=1).'), 6000)),
+        this.read, this.chart].filter(Boolean));
+      this.drawChsh();
     });
   }
   play() {
     const d = (x) => x * Math.PI / 180, phi = this.bell();
+    const N = byDiff(400, 400, 1000), cnt = [0, 0, 0, 0], won = [0, 0, 0, 0];
     let win = 0;
-    for (let i = 0; i < 400; i++) {
+    for (let i = 0; i < N; i++) {
       const x = rand() < 0.5 ? 1 : 0, y = rand() < 0.5 ? 1 : 0;
       const [a, b] = Q2.sample(phi, d(x ? this.ang.a1 : this.ang.a0), d(y ? this.ang.b1 : this.ang.b0));
-      if ((a ^ b) === (x & y)) win++;
+      cnt[x * 2 + y]++;
+      if ((a ^ b) === (x & y)) { win++; won[x * 2 + y]++; }
     }
-    const p = win / 400;
-    this.read.innerHTML = tr(`Kvantová stratégia: <b>${Fmt.pct(p)}</b> výhier (${win}/400)<br>Bellova (klasická) hranica: 75 %`, `Quantum strategy: <b>${Fmt.pct(p)}</b> wins (${win}/400)<br>Bell (classical) bound: 75 %`);
-    if (p > 0.8 && !this.flags.chsh) {
+    const p = win / N;
+    this.pairWin = won.map((w, k) => (cnt[k] ? w / cnt[k] : 0)); this.lastP = p;
+    this.drawChsh();
+    this.read.innerHTML = tr(`Kvantová stratégia: <b>${Fmt.pct(p)}</b> výhier (${win}/${N})<br>Bellova (klasická) hranica: 75 %`, `Quantum strategy: <b>${Fmt.pct(p)}</b> wins (${win}/${N})<br>Bell (classical) bound: 75 %`);
+    if (p > byDiff(0.78, 0.8, 0.83) && !this.flags.chsh) {
       this.flags.chsh = true;
       this.grant(['bell', 'chsh']);
       this.say(tr([`${Fmt.pct(p)}! Teoretické maximum je cos²(π/8) ≈ <b>85 %</b>. Toto <b>žiadne rukavice nedokážu</b>.`,
@@ -133,6 +139,23 @@ class L7Bell extends Level {
         { ...this.E, text: 'Hmm... So either I give up locality, or the idea that values exist before the measurement.' },
         'Exactly. <b>Bohm</b> chooses non-locality (the pilot wave), the operational approach (Bohr) gives up pre-existing values. And note: you still haven’t sent each other a <b>message</b>. Aspect, Clauser and Zeilinger received the 2022 Nobel Prize for the experimental confirmation.']), () => this.next());
     }
+  }
+  // výhra pre každú dvojicu (x, y): teória (|Φ⁺⟩, osi v rovine xz) P(rovnaké) = cos²((a − b)/2) a namerané
+  drawChsh() {
+    if (!this.chart) return;
+    const A = this.ang, pr = (a, b) => Math.cos((a - b) * Math.PI / 360) ** 2;
+    const th = [pr(A.a0, A.b0), pr(A.a0, A.b1), pr(A.a1, A.b0), 1 - pr(A.a1, A.b1)], avg = th.reduce((s, v) => s + v, 0) / 4;
+    const showTh = Settings.diff !== 'hard', bars = [];
+    th.forEach((v, k) => {
+      if (this.pairWin) bars.push({ x: k + 0.5, w: 0.5, y: this.pairWin[k], color: k === 3 ? '#ff7da8' : '#4f8cff', label: Fmt.pct(this.pairWin[k]) });
+      if (showTh) bars.push({ x: k + 0.5, w: 0.66, y: v, color: '#ffd25a', outline: true });
+    });
+    UI.drawChart(this.chart, {
+      x0: 0, x1: 4, y0: 0, y1: 1.15, yticks: [[0, '0'], [0.5, '½'], [1, '1']],
+      xticks: [[0.5, 'x0 y0'], [1.5, 'x0 y1'], [2.5, 'x1 y0'], [3.5, 'x1 y1 ≠']], bars,
+      hlines: [{ y: 0.75, color: '#9aa6d1', label: tr('klasicky 75 %', 'classical 75 %') }, ...(showTh ? [{ y: avg, color: '#ffd25a', label: `${tr('teória', 'theory')} ${Fmt.pct(avg)}` }] : [])],
+      legend: [['#4f8cff', tr('namerané', 'measured')], ...(showTh ? [['#ffd25a', tr('teória', 'theory')]] : [])],
+    });
   }
   playClassic() {
     let win = 0;

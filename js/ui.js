@@ -19,6 +19,7 @@ const UI = {
       ['#btn-map', tr('🗺 Mapa', '🗺 Map'), tr('Mapa (M)', 'Map (M)')],
       ['#btn-codex', tr('📖 Kódex', '📖 Codex'), tr('Kódex symbolov (C)', 'Codex of symbols (C)')],
       ['#btn-log', tr('📜 Denník', '📜 Journal'), tr('Denník rozhovorov (L)', 'Conversation journal (L)')],
+      ['#btn-settings', '⚙', tr('Nastavenia: vizualizácie a geometria (O)', 'Settings: visualizations and geometry (O)')],
       ['#btn-help', '❔', tr('Pomoc (H)', 'Help (H)')],
     ]) { $(id).textContent = text; $(id).title = title; }
     const ls = $('#lang-select');
@@ -32,6 +33,21 @@ const UI = {
       Game.unlockAll();
       this.toggleHelp(false);
     };
+    const rb = $('#btn-reset');
+    rb.textContent = tr('🗑 Reset hry', '🗑 Reset game');
+    rb.onclick = () => {
+      if (!confirm(tr('Naozaj zmazať celý postup (hviezdičky, Kódex, Denník, rozohranú hru)? Nedá sa to vrátiť.',
+        'Really erase all progress (stars, Codex, Journal, game in progress)? This cannot be undone.'))) return;
+      Game.resetAll();
+    };
+    const ds = $('#diff-select');
+    for (const d of DIFFS) { const o = el('option', null, DIFF_NAME[d]); o.value = d; ds.appendChild(o); }
+    const diffUi = () => { ds.value = Settings.diff; ds.className = Settings.diff; ds.dataset.tip = `<b>${tr('Obťažnosť', 'Difficulty')}: ${DIFF_NAME[Settings.diff]}</b> — ${DIFF_DESC[Settings.diff]}.<br>${tr('Dá sa zmeniť kedykoľvek.', 'Can be changed at any time.')}`; };
+    diffUi();
+    ds.onchange = () => { Game.setDifficulty(ds.value); diffUi(); ds.blur(); };
+    this.diffUi = diffUi;
+    $('#settings .close').onclick = () => this.toggleSettings(false);
+    $('#btn-settings').onclick = () => this.toggleSettings();
     $('#btn-codex').onclick = () => this.toggleCodex();
     $('#btn-map').onclick = () => Game.toggleMap();
     $('#btn-help').onclick = () => this.toggleHelp();
@@ -96,7 +112,7 @@ const UI = {
     const p = Game.r.project(world);
     if (!p) { e.style.display = 'none'; return; }
     e.style.display = '';
-    e.style.transform = `translate(${p[0]}px, ${p[1]}px) translate(-50%, -50%)`;
+    e.style.transform = `translate(${p[0]}px, ${p[1]}px) translate(-50%, -50%)` + (Settings.view.labelScale !== 1 ? ` scale(${Settings.view.labelScale})` : '');
     this.labelUsed.add(key);
   },
   labelsEnd() {
@@ -112,7 +128,8 @@ const UI = {
   // ---------- HUD ----------
   setHud(title, quest) {
     $('#hud-title').innerHTML = title;
-    $('#hud-quest').innerHTML = quest ? '🎯 ' + annotate(quest) : '';
+    $('#hud-quest').innerHTML = quest ? '🎯 ' + annotate(Settings.diff === 'easy' ? emphasize(quest) : quest) : '';
+    $('#hud-quest').className = Settings.diff;
   },
   toast(html, ms = 2600) {
     const t = el('div', 'toast', html);
@@ -168,13 +185,16 @@ const UI = {
   say(lines, done, opts = {}) {
     lines = lines.map((l) => (typeof l === 'string' ? { text: l } : l));
     if (!opts.replay) this.record({ kind: 'say', lines });
+    const orig = lines;
+    lines = TextMode.lines(orig);
     let i = 0;
     this.busy = true;
     const show = () => {
       const l = lines[i];
       this.dialog.innerHTML = '';
       this.dialog.appendChild(el('div', 'who', (l.face || '💬') + ' ' + (l.who || '') + (opts.replay ? ` <small>(${tr('opakovanie', 'replay')})</small>` : '')));
-      this.dialog.appendChild(el('div', 'txt', annotate(l.text)));
+      this.dialog.appendChild(el('div', 'txt', TextMode.render(l.text)));
+      this.dialog.className = 'show ' + Settings.diff;
       const nav = el('div', 'nav');
       const back = el('button', null, tr('◂ Späť', '◂ Back'));
       back.disabled = i === 0; back.onclick = prev; back.dataset.tip = tr('Predchádzajúca replika (← alebo Backspace). Celé rozhovory nájdeš v Denníku (L).', 'Previous line (← or Backspace). Full conversations are in the Journal (L).');
@@ -194,6 +214,13 @@ const UI = {
     };
     const prev = () => { if (i > 0) { i--; show(); } };
     this._next = next; this._prev = prev;
+    // zmena obťažnosti počas dialógu: prepočítaj stránky a ukáž zodpovedajúcu
+    this.refreshDialog = () => {
+      if (this._next !== next) return;
+      const cur = lines[i], nl = TextMode.lines(orig);
+      i = Math.min(nl.length - 1, Math.max(0, nl.findIndex((x) => x.src && cur.src && x.src.some((k) => cur.src.includes(k)))));
+      lines = nl; show();
+    };
     show();
   },
 
@@ -205,7 +232,12 @@ const UI = {
     this.dialog.appendChild(el('div', 'who', (q.face || '❓') + ' ' + (q.who || tr('Otázka', 'Question'))));
     this.dialog.appendChild(el('div', 'txt', annotate(q.q)));
     const box = el('div', 'choices');
-    const order = q.options.map((_, i) => i);
+    let order = q.options.map((_, i) => i);
+    if (Settings.diff === 'easy' && order.length > 2) { // ľahká: o jednu nesprávnu možnosť menej
+      const wrong = order.filter((i) => i !== q.correct);
+      const drop = wrong[Math.floor(rand() * wrong.length)];
+      order = order.filter((i) => i !== drop);
+    }
     if (q.shuffle !== false) order.sort(() => rand() - 0.5);
     for (const i of order) {
       const b = el('button', 'choice', q.options[i]);
@@ -270,6 +302,100 @@ const UI = {
   },
   info(html, cls = '') { return el('div', 'info ' + cls, annotate(html)); },
 
+  // ---------- grafy v paneli ----------
+  chart(w = 300, h = 130) {
+    const c = el('canvas', 'plot'); c.width = w; c.height = h;
+    if (!Settings.view.charts) c.style.display = 'none';
+    return c;
+  },
+  // o: { x0, x1, y0, y1, xticks:[[x,label]], yticks, curves:[{f,color,dash,width}], hlines:[{y,color,label}], vlines,
+  //      bars:[{x,w,y,color,outline,label}], points:[{x,y,color,r}], legend:[[color,text]], xlabel }
+  drawChart(c, o) {
+    if (!c || !Settings.view.charts) return;
+    const g = c.getContext('2d'), W = c.width, H = c.height, pl = 30, pr = 8, pt = 8, pb = o.xlabel ? 26 : 16;
+    const X = (x) => pl + (x - o.x0) / (o.x1 - o.x0) * (W - pl - pr), Y = (y) => H - pb - (y - o.y0) / (o.y1 - o.y0) * (H - pt - pb);
+    g.fillStyle = '#0b1020'; g.fillRect(0, 0, W, H);
+    g.font = '10px system-ui, sans-serif'; g.lineWidth = 1;
+    g.strokeStyle = '#2a3356'; g.fillStyle = '#8f9bc8';
+    g.textAlign = 'right'; g.textBaseline = 'middle';
+    for (const [y, t] of o.yticks || []) { g.beginPath(); g.moveTo(pl, Y(y)); g.lineTo(W - pr, Y(y)); g.stroke(); g.fillText(t, pl - 3, Y(y)); }
+    g.textAlign = 'center'; g.textBaseline = 'top';
+    for (const [x, t] of o.xticks || []) { g.beginPath(); g.moveTo(X(x), pt); g.lineTo(X(x), H - pb); g.stroke(); g.fillText(t, X(x), H - pb + 2); }
+    if (o.xlabel) g.fillText(o.xlabel, (pl + W - pr) / 2, H - 11);
+    for (const b of o.bars || []) {
+      const x = X(b.x - b.w / 2), w = X(b.x + b.w / 2) - x, y = Y(b.y), y0 = Y(Math.max(o.y0, 0));
+      if (b.outline) { g.strokeStyle = b.color; g.lineWidth = 2; g.setLineDash([4, 3]); g.strokeRect(x, y, w, y0 - y); g.setLineDash([]); g.lineWidth = 1; }
+      else { g.fillStyle = b.color; g.fillRect(x, y, w, y0 - y); }
+      if (b.label) { g.fillStyle = '#dfe6ff'; g.textBaseline = 'bottom'; g.fillText(b.label, x + w / 2, y - 1); g.textBaseline = 'top'; }
+    }
+    for (const h of o.hlines || []) {
+      g.strokeStyle = h.color; g.setLineDash([5, 4]); g.beginPath(); g.moveTo(pl, Y(h.y)); g.lineTo(W - pr, Y(h.y)); g.stroke(); g.setLineDash([]);
+      if (h.label) { g.fillStyle = h.color; g.textAlign = 'right'; g.textBaseline = 'bottom'; g.fillText(h.label, W - pr - 2, Y(h.y) - 1); g.textAlign = 'center'; g.textBaseline = 'top'; }
+    }
+    for (const v of o.vlines || []) { g.strokeStyle = v.color; g.setLineDash([3, 3]); g.beginPath(); g.moveTo(X(v.x), pt); g.lineTo(X(v.x), H - pb); g.stroke(); g.setLineDash([]); }
+    for (const cv of o.curves || []) {
+      g.strokeStyle = cv.color; g.lineWidth = cv.width || 2; if (cv.dash) g.setLineDash(cv.dash);
+      g.beginPath();
+      for (let i = 0; i <= 160; i++) { const x = o.x0 + (o.x1 - o.x0) * i / 160, y = clamp(cv.f(x), o.y0, o.y1); i ? g.lineTo(X(x), Y(y)) : g.moveTo(X(x), Y(y)); }
+      g.stroke(); g.setLineDash([]); g.lineWidth = 1;
+    }
+    for (const p of o.points || []) { g.fillStyle = p.color; g.beginPath(); g.arc(X(p.x), Y(clamp(p.y, o.y0, o.y1)), p.r || 4, 0, 7); g.fill(); }
+    g.textAlign = 'left'; g.textBaseline = 'top';
+    let lx = pl + 4;
+    for (const [col, t] of o.legend || []) { g.fillStyle = col; g.fillRect(lx, pt + 3, 8, 8); g.fillStyle = '#cfd6f5'; g.fillText(t, lx + 11, pt + 2); lx += 18 + g.measureText(t).width; }
+  },
+  checkbox(label, checked, onchange, tip) {
+    const w = el('label', 'chk'), cb = el('input');
+    cb.type = 'checkbox'; cb.checked = checked; cb.onchange = () => onchange(cb.checked);
+    w.append(cb, el('span', null, label));
+    if (tip) w.dataset.tip = tip;
+    return w;
+  },
+
+  // ---------- nastavenia ----------
+  toggleSettings(force) {
+    const o = $('#settings'), show = force ?? !o.classList.contains('show');
+    o.classList.toggle('show', show);
+    if (show) this.renderSettings();
+  },
+  renderSettings() {
+    const body = $('#settings .body'), V = Settings.view, ch = () => Settings.save();
+    body.innerHTML = '';
+    body.appendChild(el('h3', null, tr('🎚 Obťažnosť', '🎚 Difficulty')));
+    const diffs = el('div', 'diffs');
+    for (const d of DIFFS) {
+      const l = el('label'), r = el('input');
+      r.type = 'radio'; r.name = 'diff'; r.checked = Settings.diff === d;
+      r.onchange = () => { Game.setDifficulty(d); this.diffUi(); };
+      l.append(r, el('b', null, DIFF_NAME[d]), el('small', null, DIFF_DESC[d]));
+      diffs.appendChild(l);
+    }
+    body.appendChild(diffs);
+    body.appendChild(el('h3', null, tr('📊 Vizualizácie', '📊 Visualizations')));
+    const g1 = el('div', 'grid2');
+    for (const [k, label, tip] of [
+      ['grid', tr('mriežka: rovnobežky a poludníky sféry, polárna mriežka komplexnej roviny', 'grid: sphere latitudes and meridians, polar grid of the complex plane'), tr('Pomáha odčítať uhly θ, φ a veľkosť amplitúdy.', 'Helps to read off the angles θ, φ and the magnitude of an amplitude.')],
+      ['proj', tr('projekcie Blochovho vektora na osi (⟨X⟩, ⟨Y⟩, ⟨Z⟩)', 'projections of the Bloch vector onto the axes (⟨X⟩, ⟨Y⟩, ⟨Z⟩)'), tr('Prerušované čiary od šípky k osi z a do rovníkovej roviny.', 'Dashed lines from the arrow to the z axis and to the equatorial plane.')],
+      ['angles', tr('oblúky uhlov θ, φ a fázy amplitúdy', 'arcs of the angles θ, φ and of the amplitude phase'), null],
+      ['bars', tr('stĺpce P(0), P(1) pri Blochovej sfére', 'P(0), P(1) bars next to the Bloch sphere'), null],
+      ['trail', tr('stopa šípky počas rotácie', 'trail of the arrow during rotations'), null],
+      ['charts', tr('grafy v paneli levelu (teória vs. meranie)', 'charts in the level panel (theory vs. measurement)'), tr('Zmena sa prejaví pri ďalšom otvorení panelu.', 'Takes effect the next time a panel opens.')],
+    ]) g1.appendChild(this.checkbox(label, V[k], (v) => { V[k] = v; ch(); }, tip));
+    body.appendChild(g1);
+    body.appendChild(el('h3', null, tr('📐 Geometria zobrazenia', '📐 View geometry')));
+    const g2 = el('div', 'grid2');
+    const deg = (v) => Math.round(v * 180 / Math.PI) + '°';
+    g2.append(
+      this.slider(tr('zorný uhol kamery', 'camera field of view'), 0.5, 1.6, 0.05, V.fov, (v) => { V.fov = v; ch(); return deg(v); }, tr('Menší uhol = teleobjektív (menej skreslenia), väčší = širokouhlý pohľad.', 'Smaller = telephoto (less distortion), larger = wide-angle view.')),
+      this.slider(tr('veľkosť popiskov', 'label size'), 0.6, 1.8, 0.05, V.labelScale, (v) => { V.labelScale = v; ch(); return Math.round(v * 100) + ' %'; }),
+      this.slider(tr('nepriehľadnosť Blochovej sféry', 'Bloch sphere opacity'), 0, 0.45, 0.01, V.glass, (v) => { V.glass = v; ch(); return Math.round(v * 100) + ' %'; }),
+      this.slider(tr('automatické otáčanie kamery (v leveloch)', 'automatic camera rotation (in levels)'), 0, 0.6, 0.05, V.autoRotate, (v) => { V.autoRotate = v; ch(); return v ? Fmt.num(v, 2) + ' rad/s' : tr('vypnuté', 'off'); }),
+    );
+    body.appendChild(g2);
+    body.appendChild(el('p', 'muted', tr('Nastavenia sa ukladajú automaticky. Ďalšie geometrické ovládanie (uhly magnetov, os rotácie, fázový posun, sila poľa B₀…) nájdeš priamo v paneloch levelov.',
+      'Settings are saved automatically. More geometric controls (magnet angles, rotation axis, phase shifter, field strength B₀…) are in the level panels.')));
+  },
+
   // ---------- kódex ----------
   toggleCodex(force) {
     const c = $('#codex'), show = force ?? !c.classList.contains('show');
@@ -319,3 +445,57 @@ const SLIDER_TIPS = tr([
   [/RF frequency/, 'Generator frequency. At resonance the spin rotates about an axis in the xy plane and can be fully flipped.'],
   [/Alice|Bob/, 'Angle of the measurement axis in the xz plane of the Bloch sphere (0° = z, 90° = x).'],
 ]);
+
+// ---------- čitateľnosť textu podľa obťažnosti ----------
+// ľahká: najdôležitejšie slová (zvýraznené kľúčové pojmy navrchu, zvyšok potlačený)
+// normálna: pôvodný text
+// ťažká: stručne a husto — len vety s kľúčovými pojmami, vzorcami a číslami; repliky jedného hovoriaceho sa zlúčia
+const TextMode = {
+  INFO: /<b>|=|→|⟩|⟨|²|π|ħ|\d|≥|≠|∼|⊗/,
+  ANALOGY: /^(<[^>]+>)*\s*(Prirovnanie|An analogy)/,
+  sentences(html) { return String(html).split(/(?<=[.!?…])\s+(?=[„“(<|A-ZÁ-ŽÄÔ0-9])/u); },
+  // z repliky ponechá jedinú vetu s najväčšou hustotou informácie (kľúčové pojmy, vzorce, čísla); analógie vypustí
+  score(t) { return (t.match(/<b>/g) || []).length * 2 + (t.match(/[=→⟩⟨²πħ≥≠∼⊗]|\d/g) || []).length; },
+  condense(html) {
+    let best = '', bs = 0;
+    for (const t of this.sentences(html)) {
+      if (this.ANALOGY.test(t)) continue;
+      const sc = this.score(t);
+      if (sc > bs) { bs = sc; best = t; }
+    }
+    return best;
+  },
+  keywords(html) {
+    const out = [];
+    for (const m of String(html).matchAll(/<b>(.*?)<\/b>/g)) {
+      const k = m[1].replace(/<(?!\/?(sub|sup)\b)[^>]+>/g, '').trim();
+      if (k && !out.includes(k)) out.push(k);
+    }
+    return out.slice(0, 6);
+  },
+  lines(lines) {
+    lines = lines.map((l, i) => ({ ...l, src: [i] }));
+    if (Settings.diff !== 'hard') return lines;
+    const out = [];
+    for (const l of lines) {
+      const text = this.condense(l.text);
+      if (!text) continue;
+      const last = out[out.length - 1];
+      const len = (h) => h.replace(/<[^>]+>/g, '').length;
+      if (last && last.who === l.who && last.face === l.face && len(last.text) + len(text) < 240) { last.text += ' ' + text; last.src.push(...l.src); }
+      else out.push({ ...l, text });
+    }
+    return out.length ? out : [lines[lines.length - 1]];
+  },
+  render(html) {
+    if (Settings.diff !== 'easy') return annotate(html);
+    const keys = this.keywords(html);
+    if (!keys.length) return annotate(html);
+    return `<div class="keys">${keys.map((k) => `<span class="key">${k}</span>`).join('')}</div><div class="rest">${annotate(html)}</div>`;
+  },
+};
+// zvýrazní čísla, stavy a slová písané veľkými písmenami (pre ľahkú obťažnosť v úlohách)
+function emphasize(text) {
+  return String(text).split(/(<[^>]+>)/).map((seg) => (seg.startsWith('<') ? seg
+    : seg.replace(/(\|[^|⟩]{1,4}⟩|\d+(?:[.,]\d+)?\s?%?|[A-ZÁ-Ž]{3,}[A-ZÁ-Ž]*)/gu, '<b>$1</b>'))).join('');
+}

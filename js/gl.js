@@ -54,7 +54,7 @@ class Renderer {
     this.meshes = {
       sphere: this.sphereMesh(32, 18), lowSphere: this.sphereMesh(12, 8), cylinder: this.cylinderMesh(20),
       cone: this.coneMesh(20), box: this.boxMesh(), disk: this.diskMesh(48), torus: this.torusMesh(48, 12, 0.08),
-      circle: this.circleMesh(96), axes: this.linesMesh([[-1, 0, 0], [1, 0, 0], [0, -1, 0], [0, 1, 0], [0, 0, -1], [0, 0, 1]]),
+      circle: this.circleMesh(96), arc: this.arcMesh(96), dash: this.dashMesh(14), axes: this.linesMesh([[-1, 0, 0], [1, 0, 0], [0, -1, 0], [0, 1, 0], [0, 0, -1], [0, 0, 1]]),
     };
     this.view = M4.ident(); this.proj = M4.ident(); this.vp = M4.ident(); this.cam = [0, 0, 5];
     this.shiftX = 0; this.fog = 0; this.fogColor = [0.06, 0.08, 0.16]; this.time = 0;
@@ -183,6 +183,20 @@ class Renderer {
     return this.mesh(p, n, null, this.gl.LINE_LOOP);
   }
 
+  // celý kruh ako lomená čiara (97 bodov) — kreslí sa len časť cez o.count (oblúk uhla)
+  arcMesh(seg) {
+    const p = [], n = [];
+    for (let s = 0; s <= seg; s++) { const f = 2 * Math.PI * s / seg; p.push(Math.cos(f), 0, Math.sin(f)); n.push(0, 1, 0); }
+    return this.mesh(p, n, null, this.gl.LINE_STRIP);
+  }
+
+  // prerušovaná úsečka pozdĺž osi y od 0 po 1
+  dashMesh(k) {
+    const p = [];
+    for (let i = 0; i < k; i++) p.push([0, i / k, 0], [0, (i + 0.55) / k, 0]);
+    return this.linesMesh(p);
+  }
+
   linesMesh(pts) { return this.mesh(pts.flat(), pts.flatMap(() => [0, 1, 0]), null, this.gl.LINES); }
 
   // dynamická lomená čiara (napr. graf); vráti mesh, ktorý sa dá znovu naplniť cez updateLine
@@ -196,7 +210,7 @@ class Renderer {
     return w / Math.max(h, 1);
   }
 
-  begin(eye, target, fov = 0.9) {
+  begin(eye, target, fov = Settings.view.fov) {
     const gl = this.gl, aspect = this.resize();
     gl.clearColor(0, 0, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -227,7 +241,7 @@ class Renderer {
     gl.depthMask(a >= 1);
     gl.bindVertexArray(m.vao);
     if (m.indexed) gl.drawElements(m.mode, m.count, gl.UNSIGNED_SHORT, 0);
-    else gl.drawArrays(m.mode, 0, m.count);
+    else gl.drawArrays(m.mode, 0, Math.min(m.count, o.count ?? m.count));
     gl.depthMask(true);
   }
 
@@ -248,6 +262,23 @@ class Renderer {
 
   sphere(p, r, color, o = {}) { this.draw('sphere', M4.trs(p, 0, r), color, o); }
 
+  // prerušovaná čiara z a do b
+  dash(a, b, color, o = {}) {
+    const d = V3.sub(b, a), L = V3.len(d);
+    if (L > 1e-4) this.draw('dash', M4.alignY(a, d, L, 1), color, o);
+  }
+
+  // oblúk polomeru R so stredom c: začína v smere u, otáča sa k smeru w (u ⟂ w), uhol ang
+  arc(c, u, w, R, ang, color, o = {}) {
+    if (ang < 1e-3) return;
+    const n = V3.cross(u, w), m = new Float32Array(16);
+    m[0] = u[0] * R; m[1] = u[1] * R; m[2] = u[2] * R;
+    m[4] = n[0]; m[5] = n[1]; m[6] = n[2];
+    m[8] = w[0] * R; m[9] = w[1] * R; m[10] = w[2] * R;
+    m[12] = c[0]; m[13] = c[1]; m[14] = c[2]; m[15] = 1;
+    this.draw('arc', m, color, { ...o, count: Math.ceil(ang / (2 * Math.PI) * 96) + 1 });
+  }
+
   // projekcia svetového bodu na obrazovku v CSS pixeloch; null, ak je za kamerou
   project(p) {
     const v = M4.transform(this.vp, p);
@@ -260,24 +291,74 @@ class Renderer {
 const qToWorld = (v) => [v[0], v[2], -v[1]];
 
 // Blochova sféra: sklenená guľa, osi, rovník, popisky stavov a šípka stavu.
+// Voliteľné vizualizácie (Settings.view): mriežka, projekcie na osi, uhly θ a φ, stĺpce P(0), P(1).
+// o: { target, trail, labelFn, key, labels, axisNames, color, glass, bars, detail }
 const Bloch = {
   draw(r, center, radius, vec, o = {}) {
-    const P = (q) => V3.add(center, V3.scale(qToWorld(q), radius));
+    const V = Settings.view, P = (q) => V3.add(center, V3.scale(qToWorld(q), radius));
+    const lab = o.labelFn && o.labels !== false ? o.labelFn : null, key = o.key || 'b';
     r.draw('circle', M4.trs(center, 0, radius), [0.55, 0.75, 1]);                                   // rovník
     r.draw('circle', M4.orient(center, [1, 0, 0], radius), [0.35, 0.45, 0.7]);                     // poludník
     r.draw('circle', M4.orient(center, [0, 0, 1], radius), [0.35, 0.45, 0.7]);
     r.draw('axes', M4.trs(center, 0, radius * 1.18), [0.6, 0.65, 0.8]);
+    if (V.grid && o.detail !== false) {
+      for (const t of [30, 60, 120, 150]) {
+        const a = t * Math.PI / 180;
+        r.draw('circle', M4.trs(V3.add(center, [0, radius * Math.cos(a), 0]), 0, radius * Math.sin(a)), [0.4, 0.5, 0.75], { alpha: 0.4 }); // rovnobežky
+        r.draw('circle', M4.orient(center, [Math.cos(a), 0, Math.sin(a)], radius), [0.4, 0.5, 0.75], { alpha: 0.4 });                     // poludníky
+      }
+    }
     if (o.target) r.arrow(center, P(o.target), [1, 0.85, 0.2], radius * 0.025, { alpha: 0.55, emissive: 0.4 });
-    if (o.trail) for (const t of o.trail) r.sphere(P(t), radius * 0.012, [0.5, 0.9, 1], { unlit: 1 });
+    if (o.trail && V.trail) for (const t of o.trail) r.sphere(P(t), radius * 0.012, [0.5, 0.9, 1], { unlit: 1 });
+    const L = vec ? V3.len(vec) : 0;
     if (vec) {
-      const L = V3.len(vec);
       if (L > 0.02) r.arrow(center, P(vec), o.color || [1, 0.35, 0.45], radius * 0.035, { emissive: 0.35 });
       else r.sphere(center, radius * 0.06, o.color || [1, 0.35, 0.45], { emissive: 0.5 });
       if (L > 0.02) r.sphere(P(vec), radius * 0.05, o.color || [1, 0.35, 0.45], { emissive: 0.6 });
     }
-    r.sphere(center, radius, o.glass || [0.45, 0.6, 1], { alpha: 0.13 });
+    if (vec && L > 0.02 && o.detail !== false) {
+      const w = qToWorld(vec), tip = P(vec), zFoot = V3.add(center, [0, w[1] * radius, 0]), eq = V3.add(center, [w[0] * radius, 0, w[2] * radius]);
+      const hor = Math.hypot(vec[0], vec[1]);
+      if (V.proj) {
+        r.dash(tip, zFoot, [1, 0.8, 0.4]);
+        if (hor > 0.03) { r.dash(tip, eq, [0.6, 0.9, 1]); r.dash(center, eq, [0.6, 0.9, 1]); }
+        r.rod(center, zFoot, [1, 0.8, 0.4], radius * 0.012, { emissive: 0.6 });                     // ⟨Z⟩ na osi z
+        r.sphere(zFoot, radius * 0.03, [1, 0.8, 0.4], { emissive: 0.8 });
+        if (lab) {
+          lab(key + 'pz', V3.add(zFoot, [-radius * 0.32, 0, 0]), `⟨Z⟩ = ${Fmt.num(vec[2], 2)}`, 'axis tiny',
+            tr('Projekcia Blochovho vektora na os z = stredná hodnota ⟨Z⟩ = P(0) − P(1).', 'Projection of the Bloch vector onto the z axis = expectation value ⟨Z⟩ = P(0) − P(1).'));
+          if (hor > 0.03) lab(key + 'pxy', V3.add(eq, [0, -radius * 0.12, 0]), `⟨X⟩ = ${Fmt.num(vec[0], 2)}, ⟨Y⟩ = ${Fmt.num(vec[1], 2)}`, 'axis tiny',
+            tr('Projekcia do roviny xy: stredné hodnoty ⟨X⟩, ⟨Y⟩. Jej dĺžka je veľkosť koherencie (2|ρ₀₁|), jej smer je relatívna fáza φ.',
+              'Projection onto the xy plane: expectation values ⟨X⟩, ⟨Y⟩. Its length is the size of the coherence (2|ρ₀₁|), its direction is the relative phase φ.'));
+        }
+      }
+      if (V.angles) {
+        const u = V3.norm(w), up = [0, 1, 0], th = Math.acos(clamp(u[1], -1, 1));
+        const h = hor > 1e-3 ? V3.norm([w[0], 0, w[2]]) : [1, 0, 0];
+        r.arc(center, up, h, radius * 0.32, th, [1, 0.6, 0.9]);
+        if (lab && th > 0.08) lab(key + 'th', V3.add(center, V3.scale(V3.add(V3.scale(up, Math.cos(th / 2)), V3.scale(h, Math.sin(th / 2))), radius * 0.44)), 'θ', 'axis',
+          tr('θ — uhol od severného pólu |0⟩. Určuje P(0) = cos²(θ/2).', 'θ — angle from the north pole |0⟩. Sets P(0) = cos²(θ/2).'));
+        if (hor > 0.03) {
+          let ph = Math.atan2(vec[1], vec[0]); if (ph < 0) ph += 2 * Math.PI;
+          r.arc(center, [1, 0, 0], [0, 0, -1], radius * 0.45, ph, [0.6, 1, 0.7]);
+          if (lab) lab(key + 'ph', V3.add(center, [Math.cos(ph / 2) * radius * 0.57, 0.02, -Math.sin(ph / 2) * radius * 0.57]), 'φ', 'axis',
+            tr('φ — relatívna fáza: uhol v rovníkovej rovine od osi x.', 'φ — relative phase: angle in the equatorial plane from the x axis.'));
+        }
+      }
+    }
+    if (vec && o.bars && V.bars) {
+      // stĺpce stoja vzadu vľavo (mimo predvoleného pohľadu kamery), výška 1,6 R = pravdepodobnosť 1
+      const p0 = clamp((1 + vec[2]) / 2, 0, 1), base = V3.add(center, [-radius * 1.9, -radius, -radius * 1.2]), H = radius * 1.6;
+      [[p0, [0.45, 0.65, 1], 0], [1 - p0, [1, 0.45, 0.45], 1]].forEach(([p, col, k]) => {
+        const b = V3.add(base, [k * radius * 0.3, 0, 0]);
+        r.draw('cylinder', M4.trs(b, 0, [radius * 0.08, H, radius * 0.08]), [1, 1, 1], { alpha: 0.1 });
+        r.draw('cylinder', M4.trs(b, 0, [radius * 0.07, Math.max(p * H, 0.005), radius * 0.07]), col, { emissive: 0.3 });
+        if (lab) lab(key + 'bar' + k, V3.add(b, [0, p * H + radius * (0.15 + k * 0.17), 0]), `P(${k}) = ${Fmt.pct(p)}`, 'axis tiny',
+          tr(`Pravdepodobnosť výsledku ${k} pri meraní v Z-báze.`, `Probability of outcome ${k} for a measurement in the Z basis.`));
+      });
+    }
+    r.sphere(center, radius, o.glass || [0.45, 0.6, 1], { alpha: V.glass });
     if (typeof UI !== 'undefined' && UI.hot) {
-      const L = vec ? V3.len(vec) : 0;
       if (vec) UI.hot(L > 0.02 ? P(vec) : center, tr(
         `<b>Blochov vektor</b> (šípka stavu). Dĺžka ${Fmt.num(L, 2)} → ${L > 0.99 ? '<b>čistý stav</b> (na povrchu)' : L < 0.02 ? '<b>maximálne zmiešaný stav</b> I/2 (stred)' : '<b>zmiešaný stav</b> (vnútri gule)'}.<br>Smer hore = |0⟩, dole = |1⟩, rovník = superpozície.`,
         `<b>Bloch vector</b> (the state arrow). Length ${Fmt.num(L, 2)} → ${L > 0.99 ? '<b>pure state</b> (on the surface)' : L < 0.02 ? '<b>maximally mixed state</b> I/2 (centre)' : '<b>mixed state</b> (inside the ball)'}.<br>Up = |0⟩, down = |1⟩, equator = superpositions.`), 26);
@@ -285,11 +366,11 @@ const Bloch = {
       UI.hot(center, tr('<b>Blochova sféra</b>: obraz stavu qubitu (nie priestor laboratória!). Povrch = čisté stavy, vnútro = zmiešané. Hradlá sú rotácie gule.',
         '<b>Bloch sphere</b>: a picture of the qubit state (not laboratory space!). Surface = pure states, interior = mixed. Gates are rotations of the ball.'), 70);
     }
-    if (o.labels !== false && o.labelFn) {
-      const L = [[[0, 0, 1], '|0⟩'], [[0, 0, -1], '|1⟩'], [[1, 0, 0], '|+⟩'], [[-1, 0, 0], '|−⟩'], [[0, 1, 0], '|+i⟩'], [[0, -1, 0], '|−i⟩']];
-      for (const [q, t] of L) o.labelFn(o.key + t, V3.add(center, V3.scale(qToWorld(q), radius * 1.28)), t, 'ket');
+    if (lab) {
+      const Ls = [[[0, 0, 1], '|0⟩'], [[0, 0, -1], '|1⟩'], [[1, 0, 0], '|+⟩'], [[-1, 0, 0], '|−⟩'], [[0, 1, 0], '|+i⟩'], [[0, -1, 0], '|−i⟩']];
+      for (const [q, t] of Ls) lab(key + t, V3.add(center, V3.scale(qToWorld(q), radius * 1.28)), t, 'ket');
       if (o.axisNames) for (const [q, t] of [[[1.45, 0, 0], 'x'], [[0, 1.45, 0], 'y'], [[0, 0, 1.45], 'z']])
-        o.labelFn(o.key + 'ax' + t, V3.add(center, V3.scale(qToWorld(q), radius)), t, 'axis');
+        lab(key + 'ax' + t, V3.add(center, V3.scale(qToWorld(q), radius)), t, 'axis');
     }
   },
 };

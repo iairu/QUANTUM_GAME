@@ -15,7 +15,7 @@ class L2Stern extends Level {
   }
 
   intro() {
-    this.quest(tr('Vypočuj si Sterna a Gerlacha', 'Listen to Stern and Gerlach'));
+    this.quest(tr('Vypočuj si Sterna a Gerlacha', 'Listen to Stern and Gerlach'), { easy: '💬 Stern & Gerlach', hard: tr('SG: Ag, nehomogénne B, ±ħ/2', 'SG: Ag, inhomogeneous B, ±ħ/2') });
     this.say(tr([
       { who: 'Otto Stern', face: '🧲', text: 'Vitaj vo Frankfurte, rok 1922! Z tejto <b>pece</b> letia atómy striebra. Každý má jeden nepárový elektrón a ten sa správa ako maličký magnet.' },
       { who: 'Walther Gerlach', face: '🧲', text: 'Zväzok pustíme cez <b>nehomogénne</b> magnetické pole (horný pól je ostrý, dolný plochý). Magnetický moment sa podľa svojej orientácie vychýli hore alebo dole.' },
@@ -29,9 +29,11 @@ class L2Stern extends Level {
 
   // ---------- úloha 1: klasika vs. skutočnosť ----------
   twoSpots() {
-    this.quest(tr('Vystreľ aspoň 50 atómov v KLASICKOM modeli a aspoň 50 v SKUTOČNOM (kvantovom).', 'Fire at least 50 atoms in the CLASSICAL model and at least 50 in REALITY (quantum).'));
+    const n = byDiff(30, 50, 80);
+    this.quest(tr(`Vystreľ aspoň ${n} atómov v KLASICKOM modeli a aspoň ${n} v SKUTOČNOM (kvantovom).`, `Fire at least ${n} atoms in the CLASSICAL model and at least ${n} in REALITY (quantum).`), { easy: tr(`🔫 ${n} klasicky · ${n} skutočne`, `🔫 ${n} classical · ${n} real`), hard: tr(`N ≥ ${n}: klasicky vs. kvantovo · počet stôp?`, `N ≥ ${n}: classical vs. quantum · number of spots?`) });
     this.check = () => {
-      if (this.f.s1 || this.seen.q < 50 || this.seen.c < 50) return;
+      const need = byDiff(30, 50, 80);
+      if (this.f.s1 || this.seen.q < need || this.seen.c < need) return;
       this.f.s1 = true;
       this.ask(tr({ q: 'Koľko stôp vytvorí skutočný (kvantový) zväzok na tienidle?', options: ['dve oddelené stopy', 'spojitý pás', 'jednu stopu v strede'], correct: 0,
         why: 'Pri meraní projekcie spinu ½ v zvolenej osi sú len dva výsledky: <b>+ħ/2</b> a <b>−ħ/2</b>.' }, { q: 'How many spots does the real (quantum) beam make on the screen?', options: ['two separate spots', 'a continuous band', 'one spot in the middle'], correct: 0,
@@ -52,7 +54,8 @@ class L2Stern extends Level {
   // ---------- úloha 2: postupné merania ----------
   sequences() {
     this.edit = true; this.model = 'q';
-    this.quest(tr('Vyskúšaj zostavu A (Z+ → Z) a zostavu B (Z+ → X+ → Z). Pri každej musí na tienidlo dopadnúť aspoň 40 atómov (filtre časť pohltia).', 'Try setup A (Z+ → Z) and setup B (Z+ → X+ → Z). For each, at least 40 atoms must reach the screen (filters absorb some).'));
+    const n = byDiff(25, 40, 60);
+    this.quest(tr(`Vyskúšaj zostavu A (Z+ → Z) a zostavu B (Z+ → X+ → Z). Pri každej musí na tienidlo dopadnúť aspoň ${n} atómov (filtre časť pohltia).`, `Try setup A (Z+ → Z) and setup B (Z+ → X+ → Z). For each, at least ${n} atoms must reach the screen (filters absorb some).`), { easy: tr(`🧲 Zostava A · Zostava B · ${n} atómov`, `🧲 Setup A · Setup B · ${n} atoms`), hard: `A: Z+ → Z · B: Z+ → X+ → Z · N ≥ ${n}` });
     this.say(tr([
       { who: 'Otto Stern', face: '🧲', text: 'Teraz môžeš zapojiť až <b>tri magnety</b> za sebou, otáčať ich (os z = 0°, os x = 90°) a nastaviť <b>filter</b>, ktorý prepustí len jeden zväzok.' },
       { who: 'Walther Gerlach', face: '🧲', text: 'Zostava A: prvý magnet Z prepustí len „+“, druhý magnet znova Z. Zostava B: medzi ne vlož magnet X (prepúšťa „+“). Tipni si výsledok skôr, než vystrelíš!' },
@@ -61,9 +64,9 @@ class L2Stern extends Level {
       { who: 'Walther Gerlach', face: '🧲', text: 'Setup A: the first Z magnet lets only “+” through, the second magnet measures Z again. Setup B: put an X magnet (passing “+”) between them. Guess the result before you fire!' },
     ]));
     this.check = () => {
-      const sig = this.sig(), tot = this.cnt.up + this.cnt.down;
-      if (sig === 'z+|z' && tot >= 40 && !this.f.A) { this.f.A = true; UI.toast(tr(`✅ Zostava A: hore ${Fmt.pct(this.cnt.up / tot)} — atóm si „pamätá“ výsledok Z.`, `✅ Setup A: up ${Fmt.pct(this.cnt.up / tot)} — the atom “remembers” the Z result.`)); }
-      if (sig === 'z+|x+|z' && tot >= 40 && !this.f.B) { this.f.B = true; UI.toast(tr(`✅ Zostava B: hore ${Fmt.pct(this.cnt.up / tot)} — znova 50/50!`, `✅ Setup B: up ${Fmt.pct(this.cnt.up / tot)} — 50/50 again!`)); }
+      const sig = this.sig(), tot = this.cnt.up + this.cnt.down, need = byDiff(25, 40, 60);
+      if (sig === 'z+|z' && tot >= need && !this.f.A) { this.f.A = true; UI.toast(tr(`✅ Zostava A: hore ${Fmt.pct(this.cnt.up / tot)} — atóm si „pamätá“ výsledok Z.`, `✅ Setup A: up ${Fmt.pct(this.cnt.up / tot)} — the atom “remembers” the Z result.`)); }
+      if (sig === 'z+|x+|z' && tot >= need && !this.f.B) { this.f.B = true; UI.toast(tr(`✅ Zostava B: hore ${Fmt.pct(this.cnt.up / tot)} — znova 50/50!`, `✅ Setup B: up ${Fmt.pct(this.cnt.up / tot)} — 50/50 again!`)); }
       if (this.f.A && this.f.B && !this.f.s2) {
         this.f.s2 = true;
         setTimeout(() => this.ask(tr({ q: 'Prečo zostava B (Z+ → X+ → Z) dáva na konci opäť 50 : 50?', options: ['Meranie v osi x pripravilo nový stav |+x⟩; v ňom je výsledok v osi z neistý.', 'Magnet X pokazil atómy.', 'Atómy mali skryté hodnoty pre všetky osi a magnet X ich premiešal.'], correct: 0,
@@ -79,20 +82,43 @@ class L2Stern extends Level {
 
   // ---------- úloha 3: predpoveď ----------
   predict() {
-    this.preset([['z', '+'], [60, 'none'], null]);
-    this.quest(tr('Predpovedz výsledok a over ho: druhý magnet je otočený o 60°.', 'Predict the result and test it: the second magnet is rotated by 60°.'));
-    this.ask(tr({ q: 'Atómy prešli filtrom „+z“. Druhý magnet je otočený o 60° od osi z. Aký podiel pôjde do jeho hornej stopy?', options: ['približne 75 %', 'približne 50 %', 'približne 25 %', '100 %'], correct: 0,
-      why: 'Pravdepodobnosť je cos²(60°/2) = cos²(30°) = ¾. Na Blochovej sfére: (1 + cos 60°)/2. Čím menší uhol medzi osami, tým istejší výsledok.' }, { q: 'The atoms passed a “+z” filter. The second magnet is rotated 60° from the z axis. What fraction goes to its upper spot?', options: ['about 75 %', 'about 50 %', 'about 25 %', '100 %'], correct: 0,
-      why: 'The probability is cos²(60°/2) = cos²(30°) = ¾. On the Bloch sphere: (1 + cos 60°)/2. The smaller the angle between the axes, the more certain the outcome.' }), () => {
-      this.quest(tr('Over predpoveď: na tienidlo musí dopadnúť aspoň 100 atómov (cos²30° = 75 %).', 'Test the prediction: at least 100 atoms must reach the screen (cos²30° = 75 %).'));
+    const a = byDiff(60, 60, [30, 45, 120, 135][Math.floor(rand() * 4)]), p = Math.cos(a * Math.PI / 360) ** 2;
+    this.hideTheory = true; // teória v paneli by prezradila odpoveď
+    this.preset([['z', '+'], [a, 'none'], null]);
+    this.quest(tr(`Predpovedz výsledok a over ho: druhý magnet je otočený o ${a}°.`, `Predict the result and test it: the second magnet is rotated by ${a}°.`), { easy: tr(`🤔 Tipni: magnet ${a}°`, `🤔 Guess: magnet ${a}°`), hard: `P(+ | +z, ${a}°) = ?` });
+    const pc = (x) => Fmt.pct(x), opts = [p, 1 - p, 0.5, 1].map((x) => tr(`približne ${pc(x)}`, `about ${pc(x)}`));
+    this.ask({
+      q: tr(`Atómy prešli filtrom „+z“. Druhý magnet je otočený o ${a}° od osi z. Aký podiel pôjde do jeho hornej stopy?`, `The atoms passed a “+z” filter. The second magnet is rotated ${a}° from the z axis. What fraction goes to its upper spot?`),
+      options: opts, correct: 0,
+      why: tr(`Pravdepodobnosť je cos²(${a}°/2) = ${pc(p)}. Na Blochovej sfére: (1 + cos ${a}°)/2. Čím menší uhol medzi osami, tým istejší výsledok.`,
+        `The probability is cos²(${a}°/2) = ${pc(p)}. On the Bloch sphere: (1 + cos ${a}°)/2. The smaller the angle between the axes, the more certain the outcome.`),
+    }, () => {
+      this.hideTheory = false; this.updStats();
+      const need = byDiff(60, 100, 200);
+      this.quest(tr(`Over predpoveď: na tienidlo musí dopadnúť aspoň ${need} atómov (cos²(${a}°/2) = ${pc(p)}).`, `Test the prediction: at least ${need} atoms must reach the screen (cos²(${a}°/2) = ${pc(p)}).`), { easy: tr(`🔫 ${need} atómov`, `🔫 ${need} atoms`), hard: `N ≥ ${need} · cos²(${a}°/2)` });
       this.check = () => {
         const tot = this.cnt.up + this.cnt.down;
-        if (this.sig() === 'z+|60°' && tot >= 100 && !this.f.s3) {
+        if (this.sig() === `z+|${a}°` && tot >= byDiff(60, 100, 200) && !this.f.s3) {
           this.f.s3 = true;
-          this.say([{ who: 'Otto Stern', face: '🧲', text: tr(`Namerali sme ${Fmt.pct(this.cnt.up / tot)} hore. Jedno meranie dá vždy len +ħ/2 alebo −ħ/2, ale <b>štatistika mnohých opakovaní</b> prezradí pravdepodobnosť. Presne tak sa v laboratóriu overuje Bornovo pravidlo.`, `We measured ${Fmt.pct(this.cnt.up / tot)} up. A single measurement always gives just +ħ/2 or −ħ/2, but the <b>statistics of many repetitions</b> reveal the probability. That is exactly how the Born rule is tested in the lab.`) }], () => this.next());
+          this.say([{ who: 'Otto Stern', face: '🧲', text: tr(`Namerali sme ${Fmt.pct(this.cnt.up / tot)} hore (teória ${pc(p)}). Jedno meranie dá vždy len +ħ/2 alebo −ħ/2, ale <b>štatistika mnohých opakovaní</b> prezradí pravdepodobnosť. Presne tak sa v laboratóriu overuje Bornovo pravidlo.`, `We measured ${Fmt.pct(this.cnt.up / tot)} up (theory ${pc(p)}). A single measurement always gives just +ħ/2 or −ħ/2, but the <b>statistics of many repetitions</b> reveal the probability. That is exactly how the Born rule is tested in the lab.`) }], () => this.next());
         }
       };
     });
+  }
+
+  // presná teória pre aktuálnu zostavu: nepolarizovaný zväzok → magnety s filtrami.
+  // Vráti { up: P(hore | dopadol), pass: podiel atómov, ktoré prejdú filtrami }.
+  theory() {
+    const act = this.st.filter((s) => s.on);
+    if (!act.length) return null;
+    let r = [0, 0, 0], pass = 1, up = 0.5;
+    for (const s of act) {
+      const a = s.ang * Math.PI / 180, n = [Math.sin(a), 0, Math.cos(a)], pp = Q.probAlong(r, n);
+      if (s.filter === '+') { pass *= pp; r = n; up = 1; }
+      else if (s.filter === '-') { pass *= 1 - pp; r = V3.scale(n, -1); up = 0; }
+      else { r = V3.scale(n, 2 * pp - 1); up = pp; } // zabudnutý výsledok → zmes pozdĺž osi n
+    }
+    return { up, pass };
   }
 
   sig() {
@@ -122,7 +148,7 @@ class L2Stern extends Level {
         on.append(cb, document.createTextNode(` Magnet ${i + 1}`));
         box.appendChild(on);
         if (s.on) {
-          box.appendChild(UI.slider(tr('os', 'axis'), 0, 180, 15, s.ang, (v) => { if (v !== s.ang) { s.ang = v; this.resetCounts(); } return v === 0 ? 'z' : v === 90 ? 'x' : v + '°'; }));
+          box.appendChild(UI.slider(tr('os', 'axis'), 0, 180, 5, s.ang, (v) => { if (v !== s.ang) { s.ang = v; this.resetCounts(); } return v === 0 ? 'z' : v === 90 ? 'x' : v + '°'; }));
           const sel = el('select');
           for (const [v, t] of [['none', tr('bez filtra', 'no filter')], ['+', tr('prepusti len +', 'pass only +')], ['-', tr('prepusti len −', 'pass only −')]]) { const o = el('option', null, t); o.value = v; sel.appendChild(o); }
           sel.value = s.filter; sel.onchange = () => { s.filter = sel.value; this.resetCounts(); };
@@ -134,7 +160,8 @@ class L2Stern extends Level {
     }
     nodes.push(UI.row(UI.button(tr('Vystreľ 1', 'Fire 1'), () => this.fire(1)), UI.button(tr('Vystreľ 100', 'Fire 100'), () => this.fire(100), 'big'), UI.button(tr('Vymaž', 'Clear'), () => this.resetCounts())));
     this.stats = UI.info('');
-    nodes.push(this.stats);
+    this.chart = UI.chart(300, 120);
+    nodes.push(this.stats, this.chart);
     UI.panelSet(tr('Sternov–Gerlachov aparát', 'Stern–Gerlach apparatus'), nodes);
     this.updStats();
   }
@@ -146,6 +173,22 @@ class L2Stern extends Level {
       ? tr(`Klasický model: ${this.cnt.c} atómov — každý dopadne inam (spojitý pás).`, `Classical model: ${this.cnt.c} atoms — each lands somewhere else (a continuous band).`)
       : tr(`Na tienidle: <b>hore ${this.cnt.up}</b> (${pu}), <b>dole ${this.cnt.down}</b> (${pd})<br>Pohltené filtrom: ${this.cnt.abs}<br><small>Zostava: ${this.sig() || '—'}</small>`,
         `On the screen: <b>up ${this.cnt.up}</b> (${pu}), <b>down ${this.cnt.down}</b> (${pd})<br>Absorbed by filters: ${this.cnt.abs}<br><small>Setup: ${this.sig() || '—'}</small>`);
+    // teória (presný výpočet) vs. meranie
+    const th = this.model === 'q' ? this.theory() : null, showTh = th && !this.hideTheory && Settings.diff !== 'hard';
+    if (showTh) this.stats.innerHTML += `<br><small>${tr('teória', 'theory')}: ${tr('hore', 'up')} ${Fmt.pct(th.up)}, ${tr('prejde filtrami', 'passes the filters')} ${Fmt.pct(th.pass)}</small>`;
+    if (this.model !== 'q') { UI.drawChart(this.chart, { x0: 0, x1: 1, y0: 0, y1: 1, yticks: [[0, '0'], [1, '1']], legend: [['#9aa6d1', tr('klasický pás: bez dvoch stôp', 'classical band: no two spots')]] }); return; }
+    const mu = tot ? this.cnt.up / tot : 0, md = tot ? this.cnt.down / tot : 0, fired = tot + this.cnt.abs;
+    const bars = [
+      { x: 0.5, w: 0.5, y: mu, color: '#4f8cff', label: tot ? Fmt.pct(mu) : '' },
+      { x: 1.5, w: 0.5, y: md, color: '#ff6b7d', label: tot ? Fmt.pct(md) : '' },
+      { x: 2.5, w: 0.5, y: fired ? tot / fired : 0, color: '#5fe08a', label: fired ? Fmt.pct(tot / fired) : '' },
+    ];
+    if (showTh) bars.push({ x: 0.5, w: 0.62, y: th.up, color: '#ffd25a', outline: true }, { x: 1.5, w: 0.62, y: 1 - th.up, color: '#ffd25a', outline: true }, { x: 2.5, w: 0.62, y: th.pass, color: '#ffd25a', outline: true });
+    UI.drawChart(this.chart, {
+      x0: 0, x1: 3, y0: 0, y1: 1.15, yticks: [[0, '0'], [0.5, '½'], [1, '1']],
+      xticks: [[0.5, '+ħ/2'], [1.5, '−ħ/2'], [2.5, tr('prešlo', 'passed')]], bars,
+      legend: [['#4f8cff', tr('namerané', 'measured')], ...(showTh ? [['#ffd25a', tr('teória', 'theory')]] : [])],
+    });
   }
 
   fire(n) { this.queue += n; }

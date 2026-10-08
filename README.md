@@ -14,6 +14,13 @@ Texty sú v kóde ako `tr('slovensky', 'English')` (`js/i18n.js`); väčšie tab
 
 *The game is in Slovak and English. Without a saved choice, Czech and Slovak browsers get SK, everyone else EN. Switch with the SK / EN selector in the top-right corner.*
 
+## Obťažnosť, nastavenia, ukladanie
+- **Obťažnosť** (rozbaľovací zoznam vpravo hore, dá sa meniť kedykoľvek): *Ľahká* — väčšie tolerancie, menej meraní, nápovedy, v kvízoch o jednu nesprávnu možnosť menej, texty so zvýraznenými kľúčovými slovami; *Normálna* — pôvodná hra; *Ťažká* — presnosť, viac meraní, náhodné ciele, bez nápovied, extra hádanky v leveli 3, prísnejšie hviezdičky, stručné texty plné informácií (vzorce, čísla).
+- **⚙ Nastavenia** (O): vizualizácie (mriežka sféry, projekcie ⟨X⟩⟨Y⟩⟨Z⟩, uhly θ/φ, stĺpce P(0)/P(1), stopa, grafy) a geometria zobrazenia (zorný uhol, veľkosť popiskov, priehľadnosť sféry, automatické otáčanie).
+- Geometrické ovládanie v leveloch: voľné uhly magnetov (L2), geometrické laboratórium — ľubovoľný stav, rotácia R<sub>n</sub>(α), meranie pozdĺž osi m (L3), fázový posun φ (L4), sila poľa B₀ (L6).
+- **Stav hry sa ukladá priebežne** do localStorage: postup, Kódex, Denník, rozohraný level aj s krokom, poloha na ostrove, jazyk, obťažnosť, nastavenia. Po znovunačítaní hra pokračuje tam, kde skončila.
+- **Pomoc (H)** → *Odomknúť všetky levely* / *Reset hry* (zmaže postup, ponechá jazyk a nastavenia).
+
 ## Ovládanie
 | kláves | akcia |
 |---|---|
@@ -24,7 +31,7 @@ Texty sú v kóde ako `tr('slovensky', 'English')` (`js/i18n.js`); väčšie tab
 | ← / Backspace | späť v dialógu |
 | L | Denník — všetky rozhovory a vysvetlenia (prečítať / prehrať znova) |
 | C | Kódex symbolov, osobností a pojmov |
-| M | mapa · H pomoc · Esc zavrieť okná |
+| M | mapa · H pomoc · O nastavenia · Esc zavrieť okná |
 | F9 | odomknúť všetky levely (režim učiteľa) — aj tlačidlom na konci okna Pomoc (H) |
 
 Prejdením myšou nad čímkoľvek (tlačidlo, symbol, 3D objekt, podčiarknutý pojem v texte) sa zobrazí krátka vysvetlivka.
@@ -44,5 +51,5 @@ Každý level končí **jazykovými pascami** (kvíz o správnych formuláciách
 ## Štruktúra kódu
 - `js/math.js` vektory, matice, komplexné čísla · `js/quantum.js` simulátor 1 a 2 qubitov
 - `js/gl.js` renderer (shader, procedurálne siete, Blochova sféra) · `js/ui.js` dialógy, kvízy, denník, vysvetlivky
-- `js/i18n.js` voľba jazyka a `tr()` · `js/tips.js` slovník vysvetliviek · `js/content.js` kódex a jazykové pasce · `js/main.js` hub, kamera, hra
+- `js/i18n.js` voľba jazyka a `tr()` · `js/settings.js` obťažnosť (`byDiff`) a nastavenia zobrazenia · `js/tips.js` slovník vysvetliviek · `js/content.js` kódex a jazykové pasce · `js/main.js` hub, kamera, hra
 - `js/levels/*.js` jednotlivé levely, `registry.js` ich poradie

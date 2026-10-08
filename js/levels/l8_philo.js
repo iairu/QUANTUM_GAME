@@ -64,7 +64,7 @@ class L8Philo extends Level {
   }
 
   intro() {
-    this.quest(tr('Vypočuj si Bohra', 'Listen to Bohr'));
+    this.quest(tr('Vypočuj si Bohra', 'Listen to Bohr'), { easy: '💬 Bohr', hard: tr('Bohr: komplementarita', 'Bohr: complementarity') });
     this.say(tr([
       'Velkommen! Som Niels Bohr. Na mojom erbe je jin-jang a nápis <i>Contraria sunt complementa</i> — protiklady sa dopĺňajú.',
       'Fyzik musí vedieť počítať. Ale musí vedieť aj <b>hovoriť</b> — a nehovoriť nezmysly. V tejto sieni stoja myslitelia, ktorých spomínajú vaše prednášky.',
@@ -79,7 +79,8 @@ class L8Philo extends Level {
   }
 
   statues() {
-    this.quest(tr('Porozprávaj sa so všetkými 6 mysliteľmi (tlačidlá vpravo).', 'Talk to all 6 thinkers (buttons on the right).'));
+    this.talked = new Set(this.sub.talked || []);
+    this.quest(tr('Porozprávaj sa so všetkými 6 mysliteľmi (tlačidlá vpravo).', 'Talk to all 6 thinkers (buttons on the right).'), { easy: tr('🗣 6 mysliteľov', '🗣 6 thinkers'), hard: 'Kant · Wittgenstein · Stodola · Bohm · Heisenberg · Noether' });
     this.buildPanel();
   }
   buildPanel() {
@@ -94,7 +95,7 @@ class L8Philo extends Level {
     UI.say(p.lines.map((t) => ({ who: p.name, face: p.face, text: t })), () => {
       UI.quiz({ who: p.name, face: p.face, ...p.q }, (ok) => {
         if (!ok) this.mistakes++;
-        this.talked.add(p.id); this.grant([p.id]); this.buildPanel();
+        this.talked.add(p.id); this.sub.talked = [...this.talked]; this.grant([p.id]); this.buildPanel();
         if (this.talked.size === PHILOSOPHERS.length && this.stepIdx === 1) this.next();
       });
     });
@@ -103,7 +104,7 @@ class L8Philo extends Level {
   sorting() {
     this.active = null;
     UI.panelHide();
-    this.quest(tr('Záverečná úloha Bohra: tri roviny otázok a štyri otázky ku každému pojmu', 'Bohr’s final task: three levels of questions and four questions for every concept'));
+    this.quest(tr('Záverečná úloha Bohra: tri roviny otázok a štyri otázky ku každému pojmu', 'Bohr’s final task: three levels of questions and four questions for every concept'), { easy: tr('🗂 zatrieď otázky', '🗂 sort the questions'), hard: tr('ontológia / epistemológia / fenomenológia · 4 otázky', 'ontology / epistemology / phenomenology · 4 questions') });
     this.say(tr([
       'Výborne. Prednáška ťa varuje: nezamieňaj <b>tri otázky</b> — <b>ontológia</b> (Čo existuje?), <b>epistemológia</b> (Čo o tom môžeme vedieť?), <b>fenomenológia</b> (Ako sa nám jav ukazuje?).',
       'Zatrieď nasledujúce vety.',

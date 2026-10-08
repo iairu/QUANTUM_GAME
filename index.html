@@ -6,6 +6,7 @@
 <title>Psíčko v kvantovom svete</title>
 <link rel="stylesheet" href="style.css">
 <script src="js/i18n.js"></script>
+<script src="js/settings.js"></script>
 </head>
 <body>
 <canvas id="gl"></canvas>
@@ -20,7 +21,9 @@
   <button id="btn-map"></button>
   <button id="btn-codex"></button>
   <button id="btn-log"></button>
+  <button id="btn-settings"></button>
   <button id="btn-help"></button>
+  <select id="diff-select"></select>
   <select id="lang-select">
     <option value="sk">SK</option>
     <option value="en">EN</option>
@@ -67,6 +70,7 @@
         <tr><td><b>myš nad čímkoľvek</b></td><td>krátka vysvetlivka (tlačidlá, symboly, 3D objekty, <span class="term">podčiarknuté pojmy</span>)</td></tr>
         <tr><td><b>C</b></td><td>Kódex odomknutých symbolov, osobností a pojmov</td></tr>
         <tr><td><b>M</b></td><td>mapa ostrova</td></tr>
+        <tr><td><b>O</b> / ⚙</td><td>nastavenia: vizualizácie a geometria zobrazenia · obťažnosť je vpravo hore</td></tr>
         <tr><td><b>Esc</b></td><td>zavrieť okná</td></tr>
         <tr><td><b>F9</b></td><td>odomknúť všetky levely (režim učiteľa)</td></tr>
       </table>
@@ -96,6 +100,7 @@
         <tr><td><b>mouse over anything</b></td><td>a short tooltip (buttons, symbols, 3D objects, <span class="term">underlined terms</span>)</td></tr>
         <tr><td><b>C</b></td><td>Codex of unlocked symbols, people and concepts</td></tr>
         <tr><td><b>M</b></td><td>island map</td></tr>
+        <tr><td><b>O</b> / ⚙</td><td>settings: visualizations and view geometry · difficulty is in the top-right corner</td></tr>
         <tr><td><b>Esc</b></td><td>close windows</td></tr>
         <tr><td><b>F9</b></td><td>unlock all levels (teacher mode)</td></tr>
       </table>
@@ -113,10 +118,22 @@
       <p>Every level ends with <b>language traps</b> — a quiz about correct wording. Stars ★ depend on the number of mistakes.</p>
     </div>
     <div class="unlock-all">
-      <p class="warn" data-lang="sk">⚠️ <b>Pozor:</b> toto okamžite odomkne všetky levely. Môžeš preskakovať kamkoľvek, ale prídeš o postupný výklad — neskoršie levely predpokladajú pojmy z predchádzajúcich.</p>
-      <p class="warn" data-lang="en">⚠️ <b>Warning:</b> this immediately unlocks every level. You can jump anywhere, but you skip the step-by-step explanations — later levels assume concepts from earlier ones.</p>
-      <button id="btn-unlock-all"></button>
+      <p class="warn" data-lang="sk">⚠️ <b>Pozor:</b> „Odomknúť“ okamžite sprístupní všetky levely — môžeš preskakovať kamkoľvek, ale prídeš o postupný výklad (neskoršie levely predpokladajú pojmy z predchádzajúcich). „Reset“ nenávratne zmaže hviezdičky, Kódex, Denník aj rozohranú hru (jazyk, obťažnosť a nastavenia zostanú).</p>
+      <p class="warn" data-lang="en">⚠️ <b>Warning:</b> “Unlock” immediately opens every level — you can jump anywhere, but you skip the step-by-step explanations (later levels assume concepts from earlier ones). “Reset” permanently erases your stars, Codex, Journal and the game in progress (language, difficulty and settings are kept).</p>
+      <div class="row">
+        <button id="btn-unlock-all"></button>
+        <button id="btn-reset"></button>
+      </div>
     </div>
+  </div>
+</div>
+
+<div id="settings" class="overlay">
+  <div class="box">
+    <button class="close">✕</button>
+    <h2 data-lang="sk">⚙ Nastavenia</h2>
+    <h2 data-lang="en">⚙ Settings</h2>
+    <div class="body"></div>
   </div>
 </div>
 
