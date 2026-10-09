@@ -76,6 +76,7 @@
   <select id="lang-select">
     <option value="sk">SK</option>
     <option value="en">EN</option>
+    <option value="uk">UA</option>
   </select>
 </div>
 
@@ -88,6 +89,7 @@
     <button class="close">✕</button>
     <h2 data-lang="sk">📖 Kódex kvantového jazyka</h2>
     <h2 data-lang="en">📖 Codex of the Quantum Language</h2>
+    <h2 data-lang="uk">📖 Кодекс квантової мови</h2>
     <div class="count"></div>
     <div class="tabs"></div>
     <div class="list"></div>
@@ -99,8 +101,10 @@
     <button class="close" onclick="Game.toggleMap(false)">✕</button>
     <h2 data-lang="sk">🗺 Hilbertov ostrov</h2>
     <h2 data-lang="en">🗺 Hilbert Island</h2>
+    <h2 data-lang="uk">🗺 Острів Гільберта</h2>
     <p class="hint" data-lang="sk">Klikni na odomknutý portál a okamžite sa presunieš do jeho levelu.</p>
     <p class="hint" data-lang="en">Click an unlocked portal to teleport straight into its level.</p>
+    <p class="hint" data-lang="uk">Клікни на відкритий портал — і миттєво перенесешся до його рівня.</p>
     <canvas></canvas>
   </div>
 </div>
@@ -184,9 +188,48 @@
       </ol>
       <p>Every level ends with <b>language traps</b> — a quiz about correct wording. Stars ★ depend on the number of mistakes.</p>
     </div>
+    <div data-lang="uk">
+      <h2>❔ Як грати</h2>
+      <p>Ти — <b>Псічко</b>, квантовий стан <b>ψ</b>. Пройди 8 порталів і вивчи мову, символи та правильні образи квантового світу<span class="theme-nordic"> — а з вісьмома словами сили перемож квантового дракона <b>Кетварра</b> на Драконовому піку (портал 9)</span>.</p>
+      <table>
+        <tr><td><b>W A S D</b> / стрілки</td><td>рух островом (Shift = швидше)</td></tr>
+        <tr><td><b>тягни мишею</b></td><td>обертання камери · <b>коліщатко</b> = наближення</td></tr>
+        <tr><td><b>E</b></td><td>увійти в портал / говорити</td></tr>
+        <tr><td><b>Enter</b> / пробіл</td><td>продовжити діалог</td></tr>
+        <tr><td><b>←</b> / Backspace</td><td>повернутися на репліку назад у діалозі</td></tr>
+        <tr><td><b>L</b></td><td>Щоденник — усі розмови й пояснення, можна прочитати або відтворити знову</td></tr>
+        <tr><td><b>миша над будь-чим</b></td><td>коротка підказка (кнопки, символи, 3D-об’єкти, <span class="term">підкреслені поняття</span>)</td></tr>
+        <tr><td><b>C</b></td><td>Кодекс відкритих символів, особистостей і понять</td></tr>
+        <tr><td><b>M</b></td><td>мапа острова</td></tr>
+        <tr><td><b>N</b> / 🔊</td><td>вимкнути / увімкнути музику та звуки (гучність — у налаштуваннях)</td></tr>
+        <tr><td><b>O</b> / ⚙</td><td>налаштування: візуалізації та геометрія вигляду · складність — праворуч угорі</td></tr>
+        <tr><td><b>V</b> / 👁</td><td>погляди: той самий стан як стрілки годинника, перерізи Блоха, базиси, матриця ρ, запис — будь-коли</td></tr>
+        <tr><td><b>Esc</b></td><td>закрити вікна</td></tr>
+        <tr><td><b>F9</b></td><td>відкрити всі рівні (режим учителя)</td></tr>
+        <tr class="theme-wow"><td colspan="2"><b>⚔ Тема MMO</b></td></tr>
+        <tr class="theme-wow"><td><b>1 – 7</b></td><td>закляття: 1 Фазова стріла · 2 X (переворот) · 3 H (Адамар) · 4 Борнів клинок (вимірювання, влучає з P(|1⟩)) · 5 корекція помилок (лікування) · 6 декогеренційна хвиля · 7 тунелювання</td></tr>
+        <tr class="theme-wow"><td><b>8 / 9 · 0 · − · =</b></td><td>зілля здоров’я / когерентності · автоатака · сфера Блоха (верхове) · повернення до Амплітуди</td></tr>
+        <tr class="theme-wow"><td><b>Tab</b> · <b>клік</b> · <b>правий клік</b></td><td>наступна ціль · вибрати ціль · вибрати й атакувати / говорити з персонажем</td></tr>
+        <tr class="theme-wow"><td><b>пробіл</b> · <b>B</b></td><td>стрибок · сумки та спорядження (купівля й продаж — у Планка біля фонтана)</td></tr>
+        <tr class="theme-wow"><td colspan="2" class="muted">Рівні — це підземелля: бос (хибне уявлення) втрачає здоров’я з кожним кроком і кожною правильною відповіддю; неправильна відповідь — його удар. За перемогу випадає здобич залежно від зірок (★ зелена, ★★ синя, ★★★ фіолетова).</td></tr>
+      </table>
+      <h3>Рівні</h3>
+      <ol>
+        <li><b>Комплексна гавань</b> (Ейлер) — амплітуда, фаза, i, інтерференція</li>
+        <li><b>Піч Штерна–Ґерлаха</b> — вимірювання спіну, дві плями, базис — частина питання</li>
+        <li><b>Обсерваторія Блоха</b> (Блох) — гейти як повороти, відносна проти глобальної фази</li>
+        <li><b>Храм інтерференції</b> (Фейнман) — суперпозиція проти суміші, матриця густини, декогеренція</li>
+        <li><b>Бібліотека Дірака</b> (Дірак) — граматика бра-кет</li>
+        <li><b>Резонатор Рабі</b> (Рабі, Зееман) — ЯМР, прецесія, π-імпульс, резонанс, T₂</li>
+        <li><b>Міст Белла</b> (Белл, Ейнштейн) — сплутаність, неможливість сигналізації, гра CHSH</li>
+        <li><b>Зала тлумачень</b> (Бор і філософи) — колапс, доповнювальність, тлумачення</li>
+      </ol>
+      <p>Кожен рівень закінчується <b>мовними пастками</b> — вікториною про правильні формулювання. Зірки ★ залежать від кількості помилок.</p>
+    </div>
     <div class="unlock-all">
       <p class="warn" data-lang="sk">⚠️ <b>Pozor:</b> „Odomknúť“ okamžite sprístupní všetky levely — môžeš preskakovať kamkoľvek, ale prídeš o postupný výklad (neskoršie levely predpokladajú pojmy z predchádzajúcich). „Reset“ nenávratne zmaže hviezdičky, Kódex, Denník aj rozohranú hru (jazyk, obťažnosť a nastavenia zostanú) a hra začne znovu výberom témy a obťažnosti.</p>
       <p class="warn" data-lang="en">⚠️ <b>Warning:</b> “Unlock” immediately opens every level — you can jump anywhere, but you skip the step-by-step explanations (later levels assume concepts from earlier ones). “Reset” permanently erases your stars, Codex, Journal and the game in progress (language, difficulty and settings are kept), and the game starts again with the choice of theme and difficulty.</p>
+      <p class="warn" data-lang="uk">⚠️ <b>Увага:</b> «Відкрити» одразу робить доступними всі рівні — можна переходити куди завгодно, але ти пропустиш поступове пояснення (пізніші рівні спираються на поняття з попередніх). «Скинути» безповоротно стирає зірки, Кодекс, Щоденник і розпочату гру (мова, складність і налаштування залишаються), а гра почнеться знову з вибору теми та складності.</p>
       <div class="row">
         <button id="btn-unlock-all"></button>
         <button id="btn-reset"></button>
@@ -200,6 +243,7 @@
     <button class="close">✕</button>
     <h2 data-lang="sk">⚙ Nastavenia</h2>
     <h2 data-lang="en">⚙ Settings</h2>
+    <h2 data-lang="uk">⚙ Налаштування</h2>
     <div class="body"></div>
   </div>
 </div>
@@ -209,8 +253,10 @@
     <button class="close">✕</button>
     <h2 data-lang="sk">📜 Denník rozhovorov</h2>
     <h2 data-lang="en">📜 Conversation Journal</h2>
+    <h2 data-lang="uk">📜 Щоденник розмов</h2>
     <p class="muted" data-lang="sk">Všetky dialógy a vysvetlenia z kvízov (najnovšie hore). Rozbaľ, prečítaj alebo prehraj znova.</p>
     <p class="muted" data-lang="en">All dialogues and quiz explanations (newest on top). Expand, read or replay.</p>
+    <p class="muted" data-lang="uk">Усі діалоги та пояснення з вікторин (найновіші вгорі). Розгорни, прочитай або відтвори знову.</p>
     <div class="list"></div>
   </div>
 </div>

@@ -63,16 +63,16 @@ document.documentElement.dataset.theme = Settings.theme;
 // hodnota podľa aktuálnej obťažnosti (číta sa vždy znova, takže zmena platí okamžite)
 const byDiff = (easy, normal, hard) => (Settings.easy ? easy : Settings.hard ? hard : normal);
 const DIFF_NAME = {
-  layman: tr('🫶 Laická', '🫶 Layman'), easy: tr('Ľahká', 'Easy'), normal: tr('Normálna', 'Normal'), hard: tr('Ťažká', 'Hard'), ancient: tr('📜 Prastará', '📜 Ancient'),
+  layman: tr('🫶 Laická', '🫶 Layman', '🫶 Для новачків'), easy: tr('Ľahká', 'Easy', 'Легка'), normal: tr('Normálna', 'Normal', 'Звичайна'), hard: tr('Ťažká', 'Hard', 'Складна'), ancient: tr('📜 Prastará', '📜 Ancient', '📜 Прадавня'),
 };
 const DIFF_DESC = {
   layman: tr('ľahká, ale všetko bežnými slovami: pred každou úlohou vysvetlenie „po ľudsky“, odborné slová s prekladom v zátvorke, jednoduché vysvetlivky — ideálny štart do kvantových počítačov',
-    'easy, but everything in everyday words: a plain-language explanation before every task, technical words translated in brackets, simple tooltips — the ideal start into quantum computing'),
+    'easy, but everything in everyday words: a plain-language explanation before every task, technical words translated in brackets, simple tooltips — the ideal start into quantum computing', 'легка, але все звичайними словами: перед кожним завданням пояснення «по-людськи», фахові слова з перекладом у дужках, прості підказки — ідеальний старт у квантові комп’ютери'),
   easy: tr('väčšie tolerancie, menej pokusov, nápovedy, v kvízoch o jednu nesprávnu možnosť menej',
-    'wider tolerances, fewer trials, hints, one wrong option fewer in quizzes'),
-  normal: tr('pôvodná hra', 'the original game'),
+    'wider tolerances, fewer trials, hints, one wrong option fewer in quizzes', 'ширші допуски, менше спроб, підказки, у вікторинах на одну неправильну відповідь менше'),
+  normal: tr('pôvodná hra', 'the original game', 'оригінальна гра'),
   hard: tr('viac poznatkov: teória a rovnice pri každom kroku, extra otázky s rovnicami; presnosť, náhodné ciele, bez nápovied, prísnejšie hviezdičky',
-    'more knowledge: theory and equations at every step, extra equation questions; precision, random targets, no hints, stricter stars'),
+    'more knowledge: theory and equations at every step, extra equation questions; precision, random targets, no hints, stricter stars', 'більше знань: теорія та рівняння на кожному кроці, додаткові питання з рівняннями; точність, випадкові цілі, без підказок, суворіші зірки'),
   ancient: tr('ťažká + starobylé zvitky: história objavov, roky, autori, ich rozhovory a slávne výroky; otázka z histórie v každom leveli',
-    'hard + ancient scrolls: the history of the discoveries, years, authors, their conversations and famous words; a history question in every level'),
+    'hard + ancient scrolls: the history of the discoveries, years, authors, their conversations and famous words; a history question in every level', 'складна + прадавні сувої: історія відкриттів, роки, автори, їхні розмови та славетні вислови; питання з історії в кожному рівні'),
 };

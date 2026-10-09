@@ -15,38 +15,38 @@ const DIFF_ICON = {
   ancient: '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M14 8h24a4 4 0 0 1 0 8h-4v20a4 4 0 0 1-4 4H10a4 4 0 0 1 0-8h4z" fill="currentColor" fill-opacity=".2"/><path d="M14 32V8a4 4 0 0 0-4 4v4h4M30 40a4 4 0 0 0 4-4v-4H10"/><path d="M20 16h8M20 22h8M20 28h6" stroke-width="2.4"/></svg>',
 };
 const DIFF_TAG = {
-  layman: tr('Prvý krok do kvantového sveta', 'Brand new to the quantum world'),
-  easy: tr('Pohodové tempo s nápovedami', 'A relaxed pace with hints'),
-  normal: tr('Hra tak, ako bola navrhnutá', 'The game as it was designed'),
-  hard: tr('Rovnice, presnosť, žiadne nápovedy', 'Equations, precision, no hints'),
-  ancient: tr('Ťažká + história fyziky', 'Hard + the history of physics'),
+  layman: tr('Prvý krok do kvantového sveta', 'Brand new to the quantum world', 'Перший крок у квантовий світ'),
+  easy: tr('Pohodové tempo s nápovedami', 'A relaxed pace with hints', 'Спокійний темп із підказками'),
+  normal: tr('Hra tak, ako bola navrhnutá', 'The game as it was designed', 'Гра такою, якою її задумано'),
+  hard: tr('Rovnice, presnosť, žiadne nápovedy', 'Equations, precision, no hints', 'Рівняння, точність, жодних підказок'),
+  ancient: tr('Ťažká + história fyziky', 'Hard + the history of physics', 'Складна + історія фізики'),
 };
 // „normálna“ má v nastaveniach len krátky popis; tu ju treba porovnať s ostatnými
 const WELCOME_DESC = {
   normal: tr('pôvodná hra: štandardné tolerancie, počet pokusov aj hviezdičky — presne medzi ľahkou a ťažkou',
-    'the original game: standard tolerances, number of trials and stars — right between easy and hard'),
+    'the original game: standard tolerances, number of trials and stars — right between easy and hard', 'оригінальна гра: стандартні допуски, кількість спроб і зірки — рівно посередині між легкою та складною'),
 };
 const DIFF_TITLE = {
-  layman: tr('Laická', 'Layman'), easy: tr('Ľahká', 'Easy'), normal: tr('Normálna', 'Normal'), hard: tr('Ťažká', 'Hard'), ancient: tr('Prastará', 'Ancient'),
+  layman: tr('Laická', 'Layman', 'Для новачків'), easy: tr('Ľahká', 'Easy', 'Легка'), normal: tr('Normálna', 'Normal', 'Звичайна'), hard: tr('Ťažká', 'Hard', 'Складна'), ancient: tr('Prastará', 'Ancient', 'Прадавня'),
 };
 const THEME_INFO = {
   classic: {
-    name: tr('Klasická', 'Classic'), icon: '🔬',
-    tag: tr('Čistý vedecký svet', 'A clean scientific world'),
+    name: tr('Klasická', 'Classic', 'Класична'), icon: '🔬',
+    tag: tr('Čistý vedecký svet', 'A clean scientific world', 'Чистий науковий світ'),
     desc: tr('Minimalistický ostrov s mriežkou a 8 portálmi. Nič neodvádza pozornosť od fyziky — a beží aj na slabších počítačoch.',
-      'A minimalist grid island with 8 portals. Nothing distracts from the physics — and it runs on weaker computers too.'),
+      'A minimalist grid island with 8 portals. Nothing distracts from the physics — and it runs on weaker computers too.', 'Мінімалістичний острів із сіткою та 8 порталами. Ніщо не відволікає від фізики — і гра йде навіть на слабших комп’ютерах.'),
   },
   nordic: {
-    name: tr('Severská', 'Nordic'), icon: '🏔',
-    tag: tr('Zasnežené hory a runy', 'Snowy mountains and runes'),
+    name: tr('Severská', 'Nordic', 'Північна'), icon: '🏔',
+    tag: tr('Zasnežené hory a runy', 'Snowy mountains and runes', 'Засніжені гори та руни'),
     desc: tr('Borovicový les pod horami v štýle severských ság. Každý mentor ťa naučí slovo moci a v 9. leveli porazíš kvantového draka Ketvarra.',
-      'A pine forest under the mountains in the style of the northern sagas. Each mentor teaches you a Word of Power, and in level 9 you defeat the quantum dragon Ketvarr.'),
+      'A pine forest under the mountains in the style of the northern sagas. Each mentor teaches you a Word of Power, and in level 9 you defeat the quantum dragon Ketvarr.', 'Сосновий ліс під горами в дусі північних саг. Кожен наставник навчить тебе слова сили, а в 9-му рівні ти переможеш квантового дракона Кетварра.'),
   },
   wow: {
     name: 'MMO', icon: '⚔️',
-    tag: tr('Hraj ako v online RPG', 'Play it like an online RPG'),
+    tag: tr('Hraj ako v online RPG', 'Play it like an online RPG', 'Грай як в онлайн-RPG'),
     desc: tr('Kúzla 1–7, boj s klasickými omylmi, úlohy, skúsenosti, obchodník Planck, korisť a jazda na Blochovej guli. Levely sú dungeony s bossmi — a na konci čaká drak.',
-      'Spells 1–7, fights with classical misconceptions, quests, experience, Planck the vendor, loot and a Bloch-sphere mount. Levels are dungeons with bosses — and a dragon awaits at the end.'),
+      'Spells 1–7, fights with classical misconceptions, quests, experience, Planck the vendor, loot and a Bloch-sphere mount. Levels are dungeons with bosses — and a dragon awaits at the end.', 'Закляття 1–7, бої з класичними хибними уявленнями, завдання, досвід, торговець Планк, здобич і верхова Блохова куля. Рівні — це підземелля з босами, а наприкінці чекає дракон.'),
   },
 };
 
@@ -60,14 +60,14 @@ const Welcome = {
     const el = this.el = document.createElement('div');
     el.id = 'welcome';
     el.innerHTML = `<div class="wbox">
-      <select class="wlang"><option value="sk">SK</option><option value="en">EN</option></select>
+      <select class="wlang"><option value="sk">SK</option><option value="en">EN</option><option value="uk">UA</option></select>
       <div class="whead">
         <div class="wpsi">ψ</div>
-        <h1>${tr('Psíčko v kvantovom svete', 'Little Psi in the Quantum World')}</h1>
+        <h1>${tr('Psíčko v kvantovom svete', 'Little Psi in the Quantum World', 'Псічко у квантовому світі')}</h1>
         <p>${tr('Vyber si, ako bude svet vyzerať a ako veľmi ťa má potrápiť. Obe voľby sa dajú neskôr zmeniť v nastaveniach.',
-          'Choose how the world should look and how hard it should push you. Both can be changed later in the settings.')}</p>
+          'Choose how the world should look and how hard it should push you. Both can be changed later in the settings.', 'Обери, як виглядатиме світ і наскільки сильно він має тебе випробувати. Обидва вибори можна згодом змінити в налаштуваннях.')}</p>
       </div>
-      <h2>${tr('1 · Téma', '1 · Theme')}</h2>
+      <h2>${tr('1 · Téma', '1 · Theme', '1 · Тема')}</h2>
       <div class="wthemes">${THEMES.map((t) => `
         <button class="wtheme" data-v="${t}">
           <span class="shot"><img src="assets/theme-${t}.webp" alt="" loading="eager"><span class="ticon">${THEME_INFO[t].icon}</span></span>
@@ -75,7 +75,7 @@ const Welcome = {
           <span class="d">${THEME_INFO[t].desc}</span>
         </button>`).join('')}
       </div>
-      <h2>${tr('2 · Obťažnosť', '2 · Difficulty')}</h2>
+      <h2>${tr('2 · Obťažnosť', '2 · Difficulty', '2 · Складність')}</h2>
       <div class="wdiffs">${DIFFS.map((d) => `
         <button class="wdiff ${d}" data-v="${d}">
           <span class="dicon">${DIFF_ICON[d]}</span>
@@ -83,7 +83,7 @@ const Welcome = {
           <span class="d">${(WELCOME_DESC[d] || DIFF_DESC[d]).replace(/^./, (c) => c.toUpperCase())}.</span>
         </button>`).join('')}
       </div>
-      <div class="wgo"><button class="primary big">${tr('▶ Začať hru', '▶ Start the game')}</button></div>
+      <div class="wgo"><button class="primary big">${tr('▶ Začať hru', '▶ Start the game', '▶ Почати гру')}</button></div>
     </div>`;
     document.body.appendChild(el);
     const sync = () => {

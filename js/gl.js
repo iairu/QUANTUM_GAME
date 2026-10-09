@@ -185,7 +185,7 @@ void main() {
 class Renderer {
   constructor(canvas) {
     const gl = canvas.getContext('webgl2', { antialias: true, alpha: true, premultipliedAlpha: false });
-    if (!gl) throw new Error(tr('WebGL2 nie je dostupné', 'WebGL2 is not available'));
+    if (!gl) throw new Error(tr('WebGL2 nie je dostupné', 'WebGL2 is not available', 'WebGL2 недоступний'));
     this.gl = gl; this.canvas = canvas;
     this.prog = this.program(VS, FS);
     try { const ext = gl.getExtension('WEBGL_debug_renderer_info'); Settings.gpuName = ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER); } catch (e) { /* neznáme GPU */ }
@@ -471,10 +471,10 @@ const Bloch = {
         r.sphere(zFoot, radius * 0.03, [1, 0.8, 0.4], { emissive: 0.8 });
         if (lab) {
           lab(key + 'pz', V3.add(zFoot, [-radius * 0.32, 0, 0]), `⟨Z⟩ = ${Fmt.num(vec[2], 2)}`, 'axis tiny',
-            tr('Projekcia Blochovho vektora na os z = stredná hodnota ⟨Z⟩ = P(0) − P(1).', 'Projection of the Bloch vector onto the z axis = expectation value ⟨Z⟩ = P(0) − P(1).'));
+            tr('Projekcia Blochovho vektora na os z = stredná hodnota ⟨Z⟩ = P(0) − P(1).', 'Projection of the Bloch vector onto the z axis = expectation value ⟨Z⟩ = P(0) − P(1).', 'Проєкція вектора Блоха на вісь z = середнє значення ⟨Z⟩ = P(0) − P(1).'));
           if (hor > 0.03) lab(key + 'pxy', V3.add(eq, [0, -radius * 0.12, 0]), `⟨X⟩ = ${Fmt.num(vec[0], 2)}, ⟨Y⟩ = ${Fmt.num(vec[1], 2)}`, 'axis tiny',
             tr('Projekcia do roviny xy: stredné hodnoty ⟨X⟩, ⟨Y⟩. Jej dĺžka je veľkosť koherencie (2|ρ₀₁|), jej smer je relatívna fáza φ.',
-              'Projection onto the xy plane: expectation values ⟨X⟩, ⟨Y⟩. Its length is the size of the coherence (2|ρ₀₁|), its direction is the relative phase φ.'));
+              'Projection onto the xy plane: expectation values ⟨X⟩, ⟨Y⟩. Its length is the size of the coherence (2|ρ₀₁|), its direction is the relative phase φ.', 'Проєкція на площину xy: середні значення ⟨X⟩, ⟨Y⟩. Її довжина — величина когерентності (2|ρ₀₁|), її напрямок — відносна фаза φ.'));
         }
       }
       if (V.angles) {
@@ -482,12 +482,12 @@ const Bloch = {
         const h = hor > 1e-3 ? V3.norm([w[0], 0, w[2]]) : [1, 0, 0];
         r.arc(center, up, h, radius * 0.32, th, [1, 0.6, 0.9]);
         if (lab && th > 0.08) lab(key + 'th', V3.add(center, V3.scale(V3.add(V3.scale(up, Math.cos(th / 2)), V3.scale(h, Math.sin(th / 2))), radius * 0.44)), 'θ', 'axis',
-          tr('θ — uhol od severného pólu |0⟩. Určuje P(0) = cos²(θ/2).', 'θ — angle from the north pole |0⟩. Sets P(0) = cos²(θ/2).'));
+          tr('θ — uhol od severného pólu |0⟩. Určuje P(0) = cos²(θ/2).', 'θ — angle from the north pole |0⟩. Sets P(0) = cos²(θ/2).', 'θ — кут від північного полюса |0⟩. Визначає P(0) = cos²(θ/2).'));
         if (hor > 0.03) {
           let ph = Math.atan2(vec[1], vec[0]); if (ph < 0) ph += 2 * Math.PI;
           r.arc(center, [1, 0, 0], [0, 0, -1], radius * 0.45, ph, [0.6, 1, 0.7]);
           if (lab) lab(key + 'ph', V3.add(center, [Math.cos(ph / 2) * radius * 0.57, 0.02, -Math.sin(ph / 2) * radius * 0.57]), 'φ', 'axis',
-            tr('φ — relatívna fáza: uhol v rovníkovej rovine od osi x.', 'φ — relative phase: angle in the equatorial plane from the x axis.'));
+            tr('φ — relatívna fáza: uhol v rovníkovej rovine od osi x.', 'φ — relative phase: angle in the equatorial plane from the x axis.', 'φ — відносна фаза: кут в екваторіальній площині від осі x.'));
         }
       }
     }
@@ -499,17 +499,17 @@ const Bloch = {
         r.draw('cylinder', M4.trs(b, 0, [radius * 0.08, H, radius * 0.08]), [1, 1, 1], { alpha: 0.1 });
         r.draw('cylinder', M4.trs(b, 0, [radius * 0.07, Math.max(p * H, 0.005), radius * 0.07]), col, { emissive: 0.3 });
         if (lab) lab(key + 'bar' + k, V3.add(b, [0, p * H + radius * (0.15 + k * 0.17), 0]), `P(${k}) = ${Fmt.pct(p)}`, 'axis tiny',
-          tr(`Pravdepodobnosť výsledku ${k} pri meraní v Z-báze.`, `Probability of outcome ${k} for a measurement in the Z basis.`));
+          tr(`Pravdepodobnosť výsledku ${k} pri meraní v Z-báze.`, `Probability of outcome ${k} for a measurement in the Z basis.`, `Імовірність результату ${k} при вимірюванні в базисі Z.`));
       });
     }
     r.sphere(center, radius, o.glass || [0.45, 0.6, 1], { alpha: V.glass });
     if (typeof UI !== 'undefined' && UI.hot) {
       if (vec) UI.hot(L > 0.02 ? P(vec) : center, tr(
         `<b>Blochov vektor</b> (šípka stavu). Dĺžka ${Fmt.num(L, 2)} → ${L > 0.99 ? '<b>čistý stav</b> (na povrchu)' : L < 0.02 ? '<b>maximálne zmiešaný stav</b> I/2 (stred)' : '<b>zmiešaný stav</b> (vnútri gule)'}.<br>Smer hore = |0⟩, dole = |1⟩, rovník = superpozície.`,
-        `<b>Bloch vector</b> (the state arrow). Length ${Fmt.num(L, 2)} → ${L > 0.99 ? '<b>pure state</b> (on the surface)' : L < 0.02 ? '<b>maximally mixed state</b> I/2 (centre)' : '<b>mixed state</b> (inside the ball)'}.<br>Up = |0⟩, down = |1⟩, equator = superpositions.`), 26);
-      if (o.target) UI.hot(P(o.target), tr('<b>Cieľ</b> — sem dostaň šípku stavu.', '<b>Target</b> — get the state arrow here.'), 22);
+        `<b>Bloch vector</b> (the state arrow). Length ${Fmt.num(L, 2)} → ${L > 0.99 ? '<b>pure state</b> (on the surface)' : L < 0.02 ? '<b>maximally mixed state</b> I/2 (centre)' : '<b>mixed state</b> (inside the ball)'}.<br>Up = |0⟩, down = |1⟩, equator = superpositions.`, `<b>Вектор Блоха</b> (стрілка стану). Довжина ${Fmt.num(L, 2)} → ${L > 0.99 ? '<b>чистий стан</b> (на поверхні)' : L < 0.02 ? '<b>максимально змішаний стан</b> I/2 (центр)' : '<b>змішаний стан</b> (усередині кулі)'}.<br>Угору = |0⟩, униз = |1⟩, екватор = суперпозиції.`), 26);
+      if (o.target) UI.hot(P(o.target), tr('<b>Cieľ</b> — sem dostaň šípku stavu.', '<b>Target</b> — get the state arrow here.', '<b>Ціль</b> — доведи сюди стрілку стану.'), 22);
       UI.hot(center, tr('<b>Blochova sféra</b>: obraz stavu qubitu (nie priestor laboratória!). Povrch = čisté stavy, vnútro = zmiešané. Hradlá sú rotácie gule.',
-        '<b>Bloch sphere</b>: a picture of the qubit state (not laboratory space!). Surface = pure states, interior = mixed. Gates are rotations of the ball.'), 70);
+        '<b>Bloch sphere</b>: a picture of the qubit state (not laboratory space!). Surface = pure states, interior = mixed. Gates are rotations of the ball.', '<b>Сфера Блоха</b>: зображення стану кубіта (а не простір лабораторії!). Поверхня = чисті стани, нутро = змішані. Гейти — це повороти кулі.'), 70);
     }
     if (lab) {
       const Ls = [[[0, 0, 1], '|0⟩'], [[0, 0, -1], '|1⟩'], [[1, 0, 0], '|+⟩'], [[-1, 0, 0], '|−⟩'], [[0, 1, 0], '|+i⟩'], [[0, -1, 0], '|−i⟩']];

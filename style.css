@@ -125,7 +125,7 @@ button[data-tip] { cursor: pointer; }
 #journal .line.good { color: var(--good); }
 #journal .entry button { margin: 4px 0 4px 6px; }
 /* jazyk: statický obsah s data-lang sa zobrazí len v aktuálnom jazyku */
-html[lang="sk"] [data-lang="en"], html[lang="en"] [data-lang="sk"] { display: none; }
+html:not([lang="sk"]) [data-lang="sk"], html:not([lang="en"]) [data-lang="en"], html:not([lang="uk"]) [data-lang="uk"] { display: none; }
 #lang-select { font: inherit; color: var(--text); background: #1b2550; border: 1px solid var(--line); border-radius: 8px; padding: 5px 6px; cursor: pointer; }
 #lang-select:hover { border-color: var(--accent); }
 /* odomknutie všetkých levelov (pomoc) */

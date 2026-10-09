@@ -53,12 +53,12 @@ class Level {
     // laická obťažnosť: pred krokom ho sprievodkyňa vysvetlí bežnými slovami
     if (!this.seenScrolls.has('plain:' + name)) {
       this.seenScrolls.add('plain:' + name);
-      pre.push(...laymanFor(this.num, name).map((t) => ({ who: tr('Amplitúda · po ľudsky', 'Amplitude · in plain words'), face: '🫶', text: t, raw: true, cls: 'plaincard' })));
+      pre.push(...laymanFor(this.num, name).map((t) => ({ who: tr('Amplitúda · po ľudsky', 'Amplitude · in plain words', 'Амплітуда · простими словами'), face: '🫶', text: t, raw: true, cls: 'plaincard' })));
     }
     // prastará obťažnosť: pred krokom sa rozvinie starobylý zvitok s históriou
     const sc = scrollFor(this.num, name).filter((x) => !this.seenScrolls.has(x.id));
     sc.forEach((x) => { this.seenScrolls.add(x.id); Game.unlockScroll(x.id); });
-    pre.push(...sc.map((x) => ({ who: `${tr('Starobylý zvitok', 'Ancient scroll')} · ${pick(x.title)}`, face: '📜', text: scrollHtml(x), raw: true, cls: 'scroll' })));
+    pre.push(...sc.map((x) => ({ who: `${tr('Starobylý zvitok', 'Ancient scroll', 'Прадавній сувій')} · ${pick(x.title)}`, face: '📜', text: scrollHtml(x), raw: true, cls: 'scroll' })));
     if (!pre.length) return run();
     UI.say(pre, run);
   }
@@ -69,9 +69,9 @@ class Level {
   finale() {
     UI.panelHide();
     const nq = TRAPS[this.num].length + hardTraps(this.num).length + ancientTraps(this.num).length;
-    this.quest(tr('Záverečná skúška jazyka', 'Final language exam'), { easy: tr('📝 Skúška', '📝 Exam'), hard: tr(`Jazykové pasce + rovnice · ${nq} otázok`, `Language traps + equations · ${nq} questions`) });
+    this.quest(tr('Záverečná skúška jazyka', 'Final language exam', 'Підсумковий іспит із мови'), { easy: tr('📝 Skúška', '📝 Exam', '📝 Іспит'), hard: tr(`Jazykové pasce + rovnice · ${nq} otázok`, `Language traps + equations · ${nq} questions`, `Мовні пастки + рівняння · ${nq} питань`) });
     this.say([tr('Výborne! Ešte posledná skúška: <b>jazykové pasce</b>. Vyber správnu formuláciu — v kvantovom svete sa veľa chýb robí slovami, nie výpočtom.',
-      'Excellent! One last exam: <b>language traps</b>. Pick the correct wording — in the quantum world many mistakes are made with words, not with calculations.')], () => {
+      'Excellent! One last exam: <b>language traps</b>. Pick the correct wording — in the quantum world many mistakes are made with words, not with calculations.', 'Чудово! Останній іспит: <b>мовні пастки</b>. Обери правильне формулювання — у квантовому світі багато помилок роблять словами, а не обчисленнями.')], () => {
       const traps = [...TRAPS[this.num], ...hardTraps(this.num), ...ancientTraps(this.num)];
       UI.quizSeries(traps.map((q) => ({ who: this.mentor, face: this.face, ...q })), (m) => {
         this.mistakes += m;
@@ -79,7 +79,7 @@ class Level {
         Game.completeLevel(this.num, stars);
         const rating = '★'.repeat(stars) + '☆'.repeat(3 - stars);
         this.say([tr(`Level dokončený! Hodnotenie: <b>${rating}</b> (chyby: ${this.mistakes}, obťažnosť: ${DIFF_NAME[Settings.diff]}).<br>Nové karty nájdeš v <b>Kódexe</b> (klávesa C).`,
-          `Level complete! Rating: <b>${rating}</b> (mistakes: ${this.mistakes}, difficulty: ${DIFF_NAME[Settings.diff]}).<br>You will find new cards in the <b>Codex</b> (key C).`)], () => Game.backToHub());
+          `Level complete! Rating: <b>${rating}</b> (mistakes: ${this.mistakes}, difficulty: ${DIFF_NAME[Settings.diff]}).<br>You will find new cards in the <b>Codex</b> (key C).`, `Рівень пройдено! Оцінка: <b>${rating}</b> (помилок: ${this.mistakes}, складність: ${DIFF_NAME[Settings.diff]}).<br>Нові картки знайдеш у <b>Кодексі</b> (клавіша C).`)], () => Game.backToHub());
       });
     });
   }
@@ -124,7 +124,7 @@ const Hub = {
   },
   enter(fromLevel) {
     Game.r.fog = Settings.wow ? 0.009 : 0.012; Game.r.fogColor = Settings.wow ? [0.62, 0.75, 0.88] : Settings.nordic ? [0.29, 0.34, 0.4] : [0.06, 0.08, 0.16];
-    UI.setHud(tr('Hilbertov ostrov', 'Hilbert Island'), Game.nextQuestText());
+    UI.setHud(tr('Hilbertov ostrov', 'Hilbert Island', 'Острів Гільберта'), Game.nextQuestText());
     if (fromLevel) {
       const pt = this.portals[fromLevel - 1];
       this.player.p = V3.add(pt.p, V3.scale(pt.dir, 4.5));
@@ -138,7 +138,7 @@ const Hub = {
     const g = C.exp(this.player.phase);
     return { psi: [C.scale(g, Math.cos(Math.PI / 6)), C.mul(g, C.scale(C.exp(Math.PI / 4), Math.sin(Math.PI / 6)))],
       note: tr('Ty, Psíčko: <b>globálna fáza</b> točí obe ručičky spolu — Blochove rezy, bázy ani ρ sa nepohnú. Preto je nepozorovateľná.',
-        'You, Little Psi: the <b>global phase</b> turns both hands together — the Bloch cuts, bases and ρ do not move. That is why it is unobservable.') };
+        'You, Little Psi: the <b>global phase</b> turns both hands together — the Bloch cuts, bases and ρ do not move. That is why it is unobservable.', 'Ти, Псічко: <b>глобальна фаза</b> обертає обидві стрілки разом — перерізи Блоха, базиси й ρ не рухаються. Саме тому її неможливо спостерегти.') };
   },
   update(dt) {
     const pl = this.player;
@@ -188,7 +188,7 @@ const Hub = {
     if (!this.near) return;
     const L = this.near.L;
     if (!Game.isUnlocked(L.num)) {
-      UI.toast(tr(`🔒 Najprv dokonči level ${L.num - 1}.`, `🔒 Complete level ${L.num - 1} first.`));
+      UI.toast(tr(`🔒 Najprv dokonči level ${L.num - 1}.`, `🔒 Complete level ${L.num - 1} first.`, `🔒 Спершу пройди рівень ${L.num - 1}.`));
       return;
     }
     Game.enterLevel(L.num);
@@ -222,7 +222,7 @@ const Hub = {
     const gy = 1.6 + Math.sin(t * 1.3) * 0.15;
     r.sphere([0, gy, 0], 0.55, [1, 0.75, 0.3], { emissive: 0.6 });
     r.draw('torus', M4.orient([0, gy, 0], [Math.sin(t), 1, Math.cos(t)], 0.9), [1, 0.85, 0.5], { emissive: 0.4 });
-    UI.label('guide', [0, gy + 1.1, 0], tr('✨ Amplitúda<br><small>sprievodkyňa</small>', '✨ Amplitude<br><small>your guide</small>'), 'npc');
+    UI.label('guide', [0, gy + 1.1, 0], tr('✨ Amplitúda<br><small>sprievodkyňa</small>', '✨ Amplitude<br><small>your guide</small>', '✨ Амплітуда<br><small>твоя провідниця</small>'), 'npc');
     // portály
     for (const pt of this.portals) {
       const L = pt.L, open = Game.isUnlocked(L.num), done = Game.progress.stars[L.num];
@@ -242,9 +242,9 @@ const Hub = {
       r.draw('cylinder', M4.trs(np, 0, [0.35, 1.1, 0.35]), V3.scale(L.color, 0.8));
       r.sphere(V3.add(np, [0, 1.45, 0]), 0.32, [0.95, 0.85, 0.75]);
       const dd = Game.progress.diff[L.num], st = (done ? ' ' + '★'.repeat(done) + '☆'.repeat(3 - done) : '') + (dd && dd !== 'normal' ? ` <small>(${DIFF_NAME[dd]})</small>` : '');
-      UI.hot(c, `<b>${tr('Portál', 'Portal')} ${L.num}: ${L.title}</b><br>${(Settings.layman ? LAYMAN_LEVEL_TIPS : LEVEL_TIPS)[L.num]}${open ? '' : tr('<br>🔒 Najprv dokonči predchádzajúci level.', '<br>🔒 Complete the previous level first.')}`, 60);
-      UI.hot(V3.add(np, [0, 1.2, 0]), tr(`<b>${L.mentor}</b> — mentor levelu ${L.num}.`, `<b>${L.mentor}</b> — mentor of level ${L.num}.`), 30);
-      UI.label('portal' + L.num, V3.add(c, [0, 2.9, 0]), `<b>${L.num} · ${L.title}</b>${st}<br><small>${open ? L.face + ' ' + L.mentor : tr('🔒 zamknuté', '🔒 locked')}</small>`, 'portal' + (open ? '' : ' locked'));
+      UI.hot(c, `<b>${tr('Portál', 'Portal', 'Портал')} ${L.num}: ${L.title}</b><br>${(Settings.layman ? LAYMAN_LEVEL_TIPS : LEVEL_TIPS)[L.num]}${open ? '' : tr('<br>🔒 Najprv dokonči predchádzajúci level.', '<br>🔒 Complete the previous level first.', '<br>🔒 Спершу пройди попередній рівень.')}`, 60);
+      UI.hot(V3.add(np, [0, 1.2, 0]), tr(`<b>${L.mentor}</b> — mentor levelu ${L.num}.`, `<b>${L.mentor}</b> — mentor of level ${L.num}.`, `<b>${L.mentor}</b> — наставник рівня ${L.num}.`), 30);
+      UI.label('portal' + L.num, V3.add(c, [0, 2.9, 0]), `<b>${L.num} · ${L.title}</b>${st}<br><small>${open ? L.face + ' ' + L.mentor : tr('🔒 zamknuté', '🔒 locked', '🔒 закрито')}</small>`, 'portal' + (open ? '' : ' locked'));
     }
     // plávajúce kryštály so symbolmi
     for (const c of this.crystals) {
@@ -257,11 +257,11 @@ const Hub = {
     if (!Settings.dragon) { /* klasická téma: bez draka a snehu */ } else if (Game.progress.stars[9] === undefined) {
       const w = t * 0.11, dp = [Math.cos(w) * 46, 27 + Math.sin(t * 0.5) * 3, Math.sin(w) * 46];
       Dragon.draw(r, dp, Math.atan2(-Math.sin(w), Math.cos(w)), { scale: 2.4, bank: 0.35, t });
-      UI.hot(dp, tr('<b>Ketvarr</b> — kvantový drak. Porazíš ho na Dračom štíte (portál 9), keď sa naučíš všetkých 8 slov moci.', '<b>Ketvarr</b> — the quantum dragon. You will defeat him on Dragon’s Peak (portal 9) once you learn all 8 Words of Power.'), 60);
+      UI.hot(dp, tr('<b>Ketvarr</b> — kvantový drak. Porazíš ho na Dračom štíte (portál 9), keď sa naučíš všetkých 8 slov moci.', '<b>Ketvarr</b> — the quantum dragon. You will defeat him on Dragon’s Peak (portal 9) once you learn all 8 Words of Power.', '<b>Кетварр</b> — квантовий дракон. Ти переможеш його на Драконовому піку (портал 9), коли вивчиш усі 8 слів сили.'), 60);
     } else {
       const dp = [0, 35.6, -52];
       Dragon.draw(r, dp, 0, { scale: 2.2, landed: true, t });
-      UI.hot(dp, tr('<b>Ketvarr</b> — porazený drak teraz stráži ostrov pred zlými prirovnaniami.', '<b>Ketvarr</b> — the defeated dragon now guards the island against bad analogies.'), 60);
+      UI.hot(dp, tr('<b>Ketvarr</b> — porazený drak teraz stráži ostrov pred zlými prirovnaniami.', '<b>Ketvarr</b> — the defeated dragon now guards the island against bad analogies.', '<b>Кетварр</b> — переможений дракон тепер охороняє острів від поганих аналогій.'), 60);
     }
     if (N) Snow.draw(r, pl.p, 26);
     // hráč: „Psíčko“ — kvantový stav ψ s rotujúcou (nepozorovateľnou) globálnou fázou
@@ -271,7 +271,7 @@ const Hub = {
       Wow.drawWorld(r);
       const head = Wow.drawPlayer(r);
       pc = V3.add(pl.p, [0, 1.2 + (pl.y || 0), 0]);
-      UI.label('player', head, `ψ <small class="pname">${tr('Psíčko', 'Little Psi')}</small>`, 'player', null);
+      UI.label('player', head, `ψ <small class="pname">${tr('Psíčko', 'Little Psi', 'Псічко')}</small>`, 'player', null);
     } else {
     r.sphere(pc, 0.42, [0.3, 0.95, 1], { emissive: 0.8 });
     r.draw('circle', M4.trs(pc, 0, 0.75), [0.6, 1, 1]);
@@ -281,22 +281,22 @@ const Hub = {
     UI.label('player', V3.add(pc, [0, 0.95, 0]), 'ψ', 'player');
     }
     UI.hot(pc, tr('<b>Ty — Psíčko (stav ψ)</b>. Zlatá ručička je tvoja <b>globálna fáza</b>: točí sa, ale nedá sa zmerať.',
-      '<b>You — Little Psi (the state ψ)</b>. The golden hand is your <b>global phase</b>: it turns, but it cannot be measured.'), 40);
-    UI.hot([0, gy, 0], tr('<b>Amplitúda</b> — sprievodkyňa. Podíď k nej a stlač E.', '<b>Amplitude</b> — your guide. Walk up to her and press E.'), 40);
+      '<b>You — Little Psi (the state ψ)</b>. The golden hand is your <b>global phase</b>: it turns, but it cannot be measured.', '<b>Ти — Псічко (стан ψ)</b>. Золота стрілка — твоя <b>глобальна фаза</b>: вона обертається, але виміряти її неможливо.'), 40);
+    UI.hot([0, gy, 0], tr('<b>Amplitúda</b> — sprievodkyňa. Podíď k nej a stlač E.', '<b>Amplitude</b> — your guide. Walk up to her and press E.', '<b>Амплітуда</b> — твоя провідниця. Підійди до неї й натисни E.'), 40);
     // nápoveda ovládania na začiatku hry — zmizne po prvom kroku
     if (!Game.progress.moved && !UI.busy) {
-      UI.label('wasd', V3.add(pl.p, [0, -0.2, 0]), `<div class="wasd"><span>W</span><br><span>A</span><span>S</span><span>D</span></div><small>${tr('pohyb · ťahaj myšou = kamera', 'move · drag mouse = camera')}</small>`, 'hint', null);
+      UI.label('wasd', V3.add(pl.p, [0, -0.2, 0]), `<div class="wasd"><span>W</span><br><span>A</span><span>S</span><span>D</span></div><small>${tr('pohyb · ťahaj myšou = kamera', 'move · drag mouse = camera', 'рух · тягни мишею = камера')}</small>`, 'hint', null);
     }
     const py = WW ? 3.3 + (pl.y || 0) : 2.4;
-    if (this.nearVendor && !UI.busy) UI.label('prompt', V3.add(pl.p, [0, py, 0]), tr('[E] Obchodovať s Planckom', '[E] Trade with Planck'), 'prompt');
+    if (this.nearVendor && !UI.busy) UI.label('prompt', V3.add(pl.p, [0, py, 0]), tr('[E] Obchodovať s Planckom', '[E] Trade with Planck', '[E] Торгувати з Планком'), 'prompt');
     else if (this.near) {
       const L = this.near.L;
-      UI.label('prompt', V3.add(pl.p, [0, py, 0]), Game.isUnlocked(L.num) ? tr(`[E] Vstúpiť: ${L.title}`, `[E] Enter: ${L.title}`) : tr('🔒 zamknuté', '🔒 locked'), 'prompt');
-    } else if (this.nearGuide) UI.label('prompt', V3.add(pl.p, [0, py, 0]), tr('[E] Hovoriť s Amplitúdou', '[E] Talk to Amplitude'), 'prompt');
+      UI.label('prompt', V3.add(pl.p, [0, py, 0]), Game.isUnlocked(L.num) ? tr(`[E] Vstúpiť: ${L.title}`, `[E] Enter: ${L.title}`, `[E] Увійти: ${L.title}`) : tr('🔒 zamknuté', '🔒 locked', '🔒 закрито'), 'prompt');
+    } else if (this.nearGuide) UI.label('prompt', V3.add(pl.p, [0, py, 0]), tr('[E] Hovoriť s Amplitúdou', '[E] Talk to Amplitude', '[E] Поговорити з Амплітудою'), 'prompt');
     if (WW) { // značky úloh nad Amplitúdou
       const qm = Wow.questMark();
       if (qm) UI.label('guideq', [0, gy + 2.3, 0], qm === '…' ? '?' : qm, 'qmark' + (qm === '…' ? ' gray' : ''),
-        qm === '!' ? tr('Amplitúda má pre teba úlohu.', 'Amplitude has a quest for you.') : qm === '?' ? tr('Úloha splnená — odovzdaj ju Amplitúde.', 'Quest complete — turn it in to Amplitude.') : tr('Úloha prebieha.', 'Quest in progress.'));
+        qm === '!' ? tr('Amplitúda má pre teba úlohu.', 'Amplitude has a quest for you.', 'Амплітуда має для тебе завдання.') : qm === '?' ? tr('Úloha splnená — odovzdaj ju Amplitúde.', 'Quest complete — turn it in to Amplitude.', 'Завдання виконано — здай його Амплітуді.') : tr('Úloha prebieha.', 'Quest in progress.', 'Завдання виконується.'));
     }
   },
 
@@ -336,12 +336,12 @@ const Hub = {
     const done = Game.progress.stars[L.num], np = pt.npc, face = Math.atan2(-np[0], -np[2]);
     Wow.humanoid(r, np, face, { robe: V3.scale(L.color, 0.75), trim: [0.92, 0.8, 0.45], hat: ['hood', 'top', 'wizard', null][L.num % 4], hatCol: V3.scale(L.color, 0.55), hair: [0.75, 0.72, 0.7], staff: L.num % 2 === 1, orb: L.color });
     const next = open && done === undefined;
-    if (next) UI.label('qm' + L.num, V3.add(np, [0, 2.75, 0]), '!', 'qmark', tr(`${L.mentor} má pre teba úlohu: dokonči level ${L.num}.`, `${L.mentor} has a quest for you: complete level ${L.num}.`));
+    if (next) UI.label('qm' + L.num, V3.add(np, [0, 2.75, 0]), '!', 'qmark', tr(`${L.mentor} má pre teba úlohu: dokonči level ${L.num}.`, `${L.mentor} has a quest for you: complete level ${L.num}.`, `${L.mentor} має для тебе завдання: пройди рівень ${L.num}.`));
     const dd = Game.progress.diff[L.num], st = (done ? ' ' + '★'.repeat(done) + '☆'.repeat(3 - done) : '') + (dd && dd !== 'normal' ? ` <small>(${DIFF_NAME[dd]})</small>` : '');
-    const rec = L.boss ? tr('Nájazd · úr. 16+', 'Raid · lvl 16+') : tr(`Dungeon · úr. ${L.num * 2 - 1}–${L.num * 2 + 1}`, `Dungeon · lvl ${L.num * 2 - 1}–${L.num * 2 + 1}`);
-    UI.hot(c, `<b>${tr('Inštancia', 'Instance')} ${L.num}: ${L.title}</b> <small>(${rec})</small><br>${(Settings.layman ? LAYMAN_LEVEL_TIPS : LEVEL_TIPS)[L.num]}<br>${tr('Boss', 'Boss')}: <b>${BOSSES[L.num].icon} ${BOSSES[L.num].name}</b>${open ? '' : tr('<br>🔒 Najprv dokonči predchádzajúci level.', '<br>🔒 Complete the previous level first.')}`, 60);
-    UI.hot(V3.add(np, [0, 1.2, 0]), tr(`<b>${L.mentor}</b> — mentor levelu ${L.num}.`, `<b>${L.mentor}</b> — mentor of level ${L.num}.`), 30);
-    UI.label('portal' + L.num, V3.add(pt.p, [0, hh + 2, 0]), `<b>${L.num} · ${L.title}</b>${st}<br><small>${open ? `${L.face} ${L.mentor} · ${rec}` : tr('🔒 zamknuté', '🔒 locked')}</small>`, 'portal' + (open ? '' : ' locked'));
+    const rec = L.boss ? tr('Nájazd · úr. 16+', 'Raid · lvl 16+', 'Рейд · рів. 16+') : tr(`Dungeon · úr. ${L.num * 2 - 1}–${L.num * 2 + 1}`, `Dungeon · lvl ${L.num * 2 - 1}–${L.num * 2 + 1}`, `Підземелля · рів. ${L.num * 2 - 1}–${L.num * 2 + 1}`);
+    UI.hot(c, `<b>${tr('Inštancia', 'Instance', 'Інстанс')} ${L.num}: ${L.title}</b> <small>(${rec})</small><br>${(Settings.layman ? LAYMAN_LEVEL_TIPS : LEVEL_TIPS)[L.num]}<br>${tr('Boss', 'Boss', 'Бос')}: <b>${BOSSES[L.num].icon} ${BOSSES[L.num].name}</b>${open ? '' : tr('<br>🔒 Najprv dokonči predchádzajúci level.', '<br>🔒 Complete the previous level first.', '<br>🔒 Спершу пройди попередній рівень.')}`, 60);
+    UI.hot(V3.add(np, [0, 1.2, 0]), tr(`<b>${L.mentor}</b> — mentor levelu ${L.num}.`, `<b>${L.mentor}</b> — mentor of level ${L.num}.`, `<b>${L.mentor}</b> — наставник рівня ${L.num}.`), 30);
+    UI.label('portal' + L.num, V3.add(pt.p, [0, hh + 2, 0]), `<b>${L.num} · ${L.title}</b>${st}<br><small>${open ? `${L.face} ${L.mentor} · ${rec}` : tr('🔒 zamknuté', '🔒 locked', '🔒 закрито')}</small>`, 'portal' + (open ? '' : ' locked'));
     UI.label('mentor' + L.num, V3.add(np, [0, 2.2, 0]), `${L.mentor}`, 'npc friendly small', null);
   },
 };
@@ -366,6 +366,16 @@ const LEVEL_TIPS = tr({
   7: 'Entanglement, Bell state, no-signalling, the CHSH game.',
   8: 'Language and reality: Bohr, Kant, Wittgenstein, Stodola, Bohm, collapse.',
   9: '🐉 The final battle with the dragon Ketvarr: turn-based, ward = qubit, strike = measurement, aim for P(hit) ≥ the threshold.',
+}, {
+  1: 'Комплексні числа: амплітуда як стрілка годинника, фаза, i² = −1, інтерференція.',
+  2: 'Вимірювання спіну: дві плями, ±ħ/2, базис вимірювання — частина питання.',
+  3: 'Сфера Блоха: гейти як повороти, відносна проти глобальної фази, вимірювання.',
+  4: 'Суперпозиція проти суміші, матриця густини ρ, когерентності, декогеренція.',
+  5: 'Граматика бра-кет: стан, питання, число, оператор, імовірність.',
+  6: 'ЯМР: B₀, зееманівські рівні, прецесія, осциляції Рабі, π-імпульс, T₂.',
+  7: 'Сплутаність, стан Белла, неможливість сигналізації, гра CHSH.',
+  8: 'Мова й реальність: Бор, Кант, Вітгенштейн, Стодола, Бом, колапс.',
+  9: '🐉 Фінальна битва з драконом Кетварром: покрокова, захист = кубіт, удар = вимірювання, цілься на P(влучання) ≥ порогу.',
 });
 const CRYSTAL_TIPS = tr({
   'ψ': 'ψ — kvantový stav (vlnová funkcia).', 'ħ': 'ħ = h/2π — redukovaná Planckova konštanta.',
@@ -377,6 +387,11 @@ const CRYSTAL_TIPS = tr({
   '⟨φ|ψ⟩': '⟨φ|ψ⟩ — bra-ket: a complex number (overlap amplitude).', '⊗': '⊗ — tensor product: combines systems.',
   'ρ': 'ρ — the density matrix.', 'Σ': 'Σ — a sum (e.g. expanding a state in a basis).', 'e<sup>iφ</sup>': 'e^{iφ} — phase factor, a point on the unit circle.',
   '†': '† — dagger, Hermitian conjugate.', '|Φ⁺⟩': '|Φ⁺⟩ — a Bell (maximally entangled) state.',
+}, {
+  'ψ': 'ψ — квантовий стан (хвильова функція).', 'ħ': 'ħ = h/2π — зведена стала Планка.',
+  '⟨φ|ψ⟩': '⟨φ|ψ⟩ — бра-кет: комплексне число (амплітуда перекриття).', '⊗': '⊗ — тензорний добуток: поєднує системи.',
+  'ρ': 'ρ — матриця густини.', 'Σ': 'Σ — сума (напр. розклад стану в базисі).', 'e<sup>iφ</sup>': 'e^{iφ} — фазовий множник, точка на одиничному колі.',
+  '†': '† — «кинджал», ермітове спряження.', '|Φ⁺⟩': '|Φ⁺⟩ — стан Белла (максимально сплутаний).',
 });
 Object.assign(CRYSTAL_TIPS, { '|0⟩': TIPS['|0⟩'], '|1⟩': TIPS['|1⟩'], 'Ĥ': TIPS['Ĥ'] });
 
@@ -389,7 +404,7 @@ const Game = {
   init() {
     const canvas = $('#gl');
     try { this.r = new Renderer(canvas); }
-    catch (e) { $('#fatal').style.display = 'flex'; $('#fatal').innerHTML = '<div>' + tr('Tvoj prehliadač nepodporuje WebGL2 (OpenGL ES 3.0).', 'Your browser does not support WebGL2 (OpenGL ES 3.0).') + '<br><small>' + e.message + '</small></div>'; return; }
+    catch (e) { $('#fatal').style.display = 'flex'; $('#fatal').innerHTML = '<div>' + tr('Tvoj prehliadač nepodporuje WebGL2 (OpenGL ES 3.0).', 'Your browser does not support WebGL2 (OpenGL ES 3.0).', 'Твій браузер не підтримує WebGL2 (OpenGL ES 3.0).') + '<br><small>' + e.message + '</small></div>'; return; }
     UI.init();
     Views.init();
     this.load();
@@ -501,10 +516,10 @@ const Game = {
     Settings.diff = d; Settings.save();
     UI.labelsClear(); // 3D popisky si načítajú vysvetlivky pre novú obťažnosť (laická má vlastné)
     UI.diffUi && UI.diffUi();
-    if (this.scene && this.scene !== Hub) this.scene.request(); else UI.setHud(tr('Hilbertov ostrov', 'Hilbert Island'), this.nextQuestText());
+    if (this.scene && this.scene !== Hub) this.scene.request(); else UI.setHud(tr('Hilbertov ostrov', 'Hilbert Island', 'Острів Гільберта'), this.nextQuestText());
     UI.refreshDialog && UI.refreshDialog();
     UI.toast(tr(`🎚 Obťažnosť: <b>${DIFF_NAME[d]}</b> — tolerancie platia hneď, nové ciele a nápovedy od ďalšej úlohy.`,
-      `🎚 Difficulty: <b>${DIFF_NAME[d]}</b> — tolerances apply now, new targets and hints from the next task.`), 3600);
+      `🎚 Difficulty: <b>${DIFF_NAME[d]}</b> — tolerances apply now, new targets and hints from the next task.`, `🎚 Складність: <b>${DIFF_NAME[d]}</b> — допуски діють одразу, нові цілі й підказки — з наступного завдання.`), 3600);
     // prvé zapnutie laickej obťažnosti na ostrove: sprievodkyňa zopakuje úvod bežnými slovami
     if (d === 'layman' && !this.progress.laymanSeen && this.scene === Hub && !UI.busy) this.guideTalk();
   },
@@ -533,7 +548,7 @@ const Game = {
     if (!ss) return;
     if (ss.scene > 0 && ss.scene <= this.levels.length && this.isUnlocked(ss.scene)) {
       this.enterLevel(ss.scene, ss);
-      UI.toast(tr('↩ Pokračuješ tam, kde si skončil(a).', '↩ Continuing where you left off.'));
+      UI.toast(tr('↩ Pokračuješ tam, kde si skončil(a).', '↩ Continuing where you left off.', '↩ Продовжуєш там, де зупинився(-лася).'));
     } else if (Array.isArray(ss.p)) {
       Hub.player.p = ss.p; Hub.player.heading = ss.h || 0; Hub.cam.yaw = ss.yaw || 0;
     }
@@ -542,8 +557,8 @@ const Game = {
   unlockAll() {
     this.progress.allUnlocked = true;
     this.save();
-    UI.toast(tr('🔓 Všetky levely odomknuté — môžeš vstúpiť do ľubovoľného portálu.', '🔓 All levels unlocked — you can enter any portal.'));
-    if (this.scene === Hub) UI.setHud(tr('Hilbertov ostrov', 'Hilbert Island'), this.nextQuestText());
+    UI.toast(tr('🔓 Všetky levely odomknuté — môžeš vstúpiť do ľubovoľného portálu.', '🔓 All levels unlocked — you can enter any portal.', '🔓 Усі рівні відкрито — можеш увійти в будь-який портал.'));
+    if (this.scene === Hub) UI.setHud(tr('Hilbertov ostrov', 'Hilbert Island', 'Острів Гільберта'), this.nextQuestText());
   },
   completeLevel(n, stars) {
     const fresh = this.progress.stars[n] === undefined;
@@ -553,8 +568,8 @@ const Game = {
     if (fresh && Settings.dragon && !LEVELS[n - 1].boss) { // každý mentor naučí jedno slovo moci proti drakovi
       const ring = LEVELS.filter((L) => !L.boss), k = ring.filter((L) => this.progress.stars[L.num] !== undefined).length;
       setTimeout(() => UI.toast(k < ring.length
-        ? tr(`🐉 Slovo moci ${k}/${ring.length} — Ketvarr nad ostrovom nepokojne krúži.`, `🐉 Word of Power ${k}/${ring.length} — Ketvarr circles the island restlessly.`)
-        : tr('🐉 Všetkých 8 slov moci! Dračí štít (portál 9) je otvorený.', '🐉 All 8 Words of Power! Dragon’s Peak (portal 9) is open.'), 4200), 1200);
+        ? tr(`🐉 Slovo moci ${k}/${ring.length} — Ketvarr nad ostrovom nepokojne krúži.`, `🐉 Word of Power ${k}/${ring.length} — Ketvarr circles the island restlessly.`, `🐉 Слово сили ${k}/${ring.length} — Кетварр неспокійно кружляє над островом.`)
+        : tr('🐉 Všetkých 8 slov moci! Dračí štít (portál 9) je otvorený.', '🐉 All 8 Words of Power! Dragon’s Peak (portal 9) is open.', '🐉 Усі 8 слів сили! Драконів пік (портал 9) відкрито.'), 4200), 1200);
     }
     const rank = (d) => DIFFS.indexOf(d);
     if (!this.progress.diff[n] || rank(Settings.diff) > rank(this.progress.diff[n])) this.progress.diff[n] = Settings.diff;
@@ -570,19 +585,19 @@ const Game = {
     fresh.forEach((id) => this.progress.codex.add(id));
     if (fresh.length) {
       const names = fresh.map((id) => CODEX.find((c) => c.id === id)).filter(Boolean).map((c) => c.sym + ' ' + c.name);
-      UI.toast(tr('📖 Nové v Kódexe: ', '📖 New in the Codex: ') + names.join(', '), 3800);
+      UI.toast(tr('📖 Nové v Kódexe: ', '📖 New in the Codex: ', '📖 Нове в Кодексі: ') + names.join(', '), 3800);
       this.save();
     }
   },
   nextQuestText() {
     const n = LEVELS.find((L) => this.progress.stars[L.num] === undefined);
-    if (n && n.boss) return tr(`Vystúp na Dračí štít (portál ${n.num}) a poraz draka Ketvarra!`, `Climb Dragon’s Peak (portal ${n.num}) and defeat the dragon Ketvarr!`);
-    return n ? tr(`Choď k portálu ${n.num}: ${n.title} (${n.mentor})`, `Go to portal ${n.num}: ${n.title} (${n.mentor})`)
-      : Settings.dragon ? tr('Ketvarr je porazený a ostrov zachránený! Skús zlepšiť hviezdičky.', 'Ketvarr is defeated and the island is saved! Try to improve your stars.')
-        : tr('Všetky levely hotové! Skús zlepšiť hviezdičky.', 'All levels done! Try to improve your stars.');
+    if (n && n.boss) return tr(`Vystúp na Dračí štít (portál ${n.num}) a poraz draka Ketvarra!`, `Climb Dragon’s Peak (portal ${n.num}) and defeat the dragon Ketvarr!`, `Піднімися на Драконів пік (портал ${n.num}) і перемож дракона Кетварра!`);
+    return n ? tr(`Choď k portálu ${n.num}: ${n.title} (${n.mentor})`, `Go to portal ${n.num}: ${n.title} (${n.mentor})`, `Іди до порталу ${n.num}: ${n.title} (${n.mentor})`)
+      : Settings.dragon ? tr('Ketvarr je porazený a ostrov zachránený! Skús zlepšiť hviezdičky.', 'Ketvarr is defeated and the island is saved! Try to improve your stars.', 'Кетварра переможено, острів урятовано! Спробуй покращити свої зірки.')
+        : tr('Všetky levely hotové! Skús zlepšiť hviezdičky.', 'All levels done! Try to improve your stars.', 'Усі рівні пройдено! Спробуй покращити свої зірки.');
   },
   guideTalk() {
-    const A = (text) => ({ who: tr('Amplitúda (sprievodkyňa)', 'Amplitude (your guide)'), face: '✨', text });
+    const A = (text) => ({ who: tr('Amplitúda (sprievodkyňa)', 'Amplitude (your guide)', 'Амплітуда (твоя провідниця)'), face: '✨', text });
     const first = !this.progress.introSeen;
     this.progress.introSeen = true;
     if (Settings.layman && !this.progress.laymanSeen) {
@@ -611,7 +626,17 @@ const Game = {
       A('Controls: <b>WASD</b> move, <b>mouse drag</b> camera, <b>E</b> enter/talk, <b>C</b> Codex of symbols, <b>M</b> map, <b>H</b> help. Start with portal <b>1</b>!'),
       A('New to the quantum world? Switch the difficulty (top right) to <b>🫶 Layman</b> — I will explain everything in everyday words.'),
       Settings.wow && A('One more thing: the island is full of <b>classical misconceptions</b>. Fight them with spells <b>1–7</b> (Tab = target, right-click = attack), gather experience and money, shop at <b>Planck’s</b> by the fountain (B = bags). Talk to me again and I will give you your first quest.'),
-    ]) : [A(this.nextQuestText() + tr('. Nezabudni: <i>amplitúdy interferujú, pravdepodobnosti sa len merajú.</i>', '. Don’t forget: <i>amplitudes interfere, probabilities are only measured.</i>'))]).filter(Boolean));
+    ], [
+      A('Привіт! Ласкаво просимо на <b>Острів Гільберта</b>. Я — Амплітуда, комплексне число, що має і модуль, і фазу.'),
+      A('А ти — <b>Псічко</b>, квантовий стан <b>ψ</b>. Ти не кулька з положенням і швидкістю. Ти — <i>правило для передбачень</i>: ти кажеш, які результати отримає кожен, хто тебе про щось запитає (виміряє).'),
+      A('Бачиш ту золоту стрілку, що обертається довкола тебе? Це твоя <b>глобальна фаза</b>. Вона обертається, але ніхто у світі не може її виміряти. Запам’ятай: <b>глобальну фазу неможливо спостерегти, а відносну — можна</b>.'),
+      A('Довкола острова — 8 порталів. За кожним чекає наставник — Ейлер, Штерн, Блох, Фейнман, Дірак, Рабі, Белл і Бор. Вони навчать тебе <b>мови</b>, <b>символів</b> і <b>правильних образів</b> квантового світу.'),
+      Settings.dragon && A('Над островом кружляє <b>Кетварр</b>, квантовий дракон. Кожен наставник навчить тебе одного <b>слова сили</b>. Коли матимеш усі вісім, піднімися на <b>Драконів пік</b> на півночі й перемож його.'),
+      A('Мета — не обчислювати інтеграли. Мета — <b>інтуїція</b>: знати, що таке амплітуда, що таке ймовірність, що робить вимірювання і де класичні порівняння перестають працювати.'),
+      A('Керування: <b>WASD</b> рух, <b>тягни мишею</b> — камера, <b>E</b> увійти/говорити, <b>C</b> Кодекс символів, <b>M</b> мапа, <b>H</b> довідка. Почни з порталу <b>1</b>!'),
+      A('Ти новачок у квантовому світі? Перемкни складність (праворуч угорі) на <b>🫶 Для новачків</b> — я все поясню звичайними словами.'),
+      Settings.wow && A('І ще одне: острів повний <b>класичних хибних уявлень</b>. Борися з ними закляттями <b>1–7</b> (Tab = ціль, правий клік = атака), збирай досвід і гроші, купуй у <b>Планка</b> біля фонтана (B = сумки). Поговори зі мною ще раз — і я дам тобі перше завдання.'),
+    ]) : [A(this.nextQuestText() + tr('. Nezabudni: <i>amplitúdy interferujú, pravdepodobnosti sa len merajú.</i>', '. Don’t forget: <i>amplitudes interfere, probabilities are only measured.</i>', '. Не забувай: <i>амплітуди інтерферують, імовірності лише вимірюються.</i>'))]).filter(Boolean));
   },
   toggleMap(force) {
     const m = $('#map'), show = force ?? !m.classList.contains('show');
@@ -629,10 +654,10 @@ const Game = {
     const pt = this.mapPortalAt(x, y);
     if (!pt) return;
     const L = pt.L;
-    if (!this.isUnlocked(L.num)) { UI.toast(tr(`🔒 Najprv dokonči level ${L.num - 1}.`, `🔒 Complete level ${L.num - 1} first.`)); return; }
+    if (!this.isUnlocked(L.num)) { UI.toast(tr(`🔒 Najprv dokonči level ${L.num - 1}.`, `🔒 Complete level ${L.num - 1} first.`, `🔒 Спершу пройди рівень ${L.num - 1}.`)); return; }
     if (this.scene === this.levels[L.num - 1]) { this.toggleMap(false); return; }
     if (this.scene !== Hub && !confirm(tr(`Presunúť sa do levelu ${L.num}: ${L.title}? Postup v aktuálnom leveli (${this.scene.num} · ${this.scene.title}) sa neuloží.`,
-      `Teleport to level ${L.num}: ${L.title}? Progress in the current level (${this.scene.num} · ${this.scene.title}) will not be saved.`))) return;
+      `Teleport to level ${L.num}: ${L.title}? Progress in the current level (${this.scene.num} · ${this.scene.title}) will not be saved.`, `Перенестися до рівня ${L.num}: ${L.title}? Поступ у поточному рівні (${this.scene.num} · ${this.scene.title}) не буде збережено.`))) return;
     this.toggleMap(false);
     UI.cancelDialog();
     this.enterLevel(L.num);
@@ -664,12 +689,12 @@ const Game = {
     g.fillStyle = '#ffcf5a'; g.beginPath(); g.arc(cx, cy, s * 1.2, 0, 7); g.fill();
     if (Settings.wow) { // MMO: neutrálne omyly a obchodník
       g.fillStyle = '#ffd100'; for (const m of Wow.mobs) if (m.state !== 'dead') { const [x, y] = P(m.p); g.beginPath(); g.arc(x, y, s * 0.55, 0, 7); g.fill(); }
-      const [vx, vy] = P(VENDOR_POS); g.fillStyle = '#ffd100'; g.fillText('💰 Planck', vx, vy);
+      const [vx, vy] = P(VENDOR_POS); g.fillStyle = '#ffd100'; g.fillText(tr('💰 Planck', '💰 Planck', '💰 Планк'), vx, vy);
     }
     if (this.scene === Hub) {
       const [x, y] = P(Hub.player.p);
       g.fillStyle = '#5ff'; g.beginPath(); g.arc(x, y, s * 1.1, 0, 7); g.fill();
-      g.fillText(tr('ψ (ty)', 'ψ (you)'), x, y - s * 1.8);
+      g.fillText(tr('ψ (ty)', 'ψ (you)', 'ψ (ти)'), x, y - s * 1.8);
     }
   },
   save() {

@@ -94,7 +94,7 @@ const Fmt = {
     const a = Math.abs(x), sg = x < 0 ? '−' : '';
     for (const [v, s] of known) if (Math.abs(a - v) < 5e-4) return v === 0 ? '0' : sg + s;
     if (+a.toFixed(d) === 0) return '0'; // zaokrúhlené na nulu: bez „−0“
-    return sg + a.toFixed(d).replace(/0+$/, '').replace(/\.$/, '').replace('.', tr(',', '.'));
+    return sg + a.toFixed(d).replace(/0+$/, '').replace(/\.$/, '').replace('.', tr(',', '.', ','));
   },
   complex(c, d = 3) {
     const re = Math.abs(c[0]) < 5e-4 ? 0 : c[0], im = Math.abs(c[1]) < 5e-4 ? 0 : c[1];

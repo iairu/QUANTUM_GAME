@@ -11,140 +11,140 @@
 // Dáta: nepriatelia, predmety, kúzla, úlohy, bossovia
 // ------------------------------------------------------------------
 const MOB_TYPES = {
-  hidden: { lvl: [1, 3], col: [0.42, 0.3, 0.55], junk: 'junk_hidden', name: tr('Skrytá premenná', 'Hidden Variable'),
+  hidden: { lvl: [1, 3], col: [0.42, 0.3, 0.55], junk: 'junk_hidden', name: tr('Skrytá premenná', 'Hidden Variable', 'Прихована змінна'),
     tip: tr('Omyl: „Výsledok merania bol určený vopred, len ho nepoznáme.“ Bell (1964) ukázal, že žiadne <b>lokálne skryté premenné</b> nevysvetlia kvantové korelácie — experimenty to potvrdili.',
-      'Misconception: “The outcome was fixed in advance, we just don’t know it.” Bell (1964) showed that no <b>local hidden variables</b> can reproduce quantum correlations — experiments confirm it.') },
-  billiard: { lvl: [3, 5], col: [0.1, 0.1, 0.12], junk: 'junk_billiard', name: tr('Biliardový elektrón', 'Billiard-Ball Electron'),
+      'Misconception: “The outcome was fixed in advance, we just don’t know it.” Bell (1964) showed that no <b>local hidden variables</b> can reproduce quantum correlations — experiments confirm it.', 'Хибне уявлення: «Результат був визначений наперед, ми його просто не знаємо». Белл (1964) показав, що жодні <b>локальні приховані змінні</b> не можуть відтворити квантові кореляції — експерименти це підтверджують.') },
+  billiard: { lvl: [3, 5], col: [0.1, 0.1, 0.12], junk: 'junk_billiard', name: tr('Biliardový elektrón', 'Billiard-Ball Electron', 'Більярдний електрон'),
     tip: tr('Omyl: „Elektrón je malá gulička s presnou dráhou.“ Medzi meraniami nemá kvantový objekt trajektóriu — má <b>stav</b>, ktorý dáva pravdepodobnosti.',
-      'Misconception: “An electron is a tiny ball with a definite path.” Between measurements a quantum object has no trajectory — it has a <b>state</b> that gives probabilities.') },
-  planet: { lvl: [5, 8], col: [0.85, 0.35, 0.25], junk: 'junk_planet', name: tr('Atóm-planetka', 'Little-Planet Atom'),
+      'Misconception: “An electron is a tiny ball with a definite path.” Between measurements a quantum object has no trajectory — it has a <b>state</b> that gives probabilities.', 'Хибне уявлення: «Електрон — це крихітна кулька з певною траєкторією». Між вимірюваннями квантовий об’єкт не має траєкторії — він має <b>стан</b>, що дає ймовірності.') },
+  planet: { lvl: [5, 8], col: [0.85, 0.35, 0.25], junk: 'junk_planet', name: tr('Atóm-planetka', 'Little-Planet Atom', 'Атом-планетка'),
     tip: tr('Omyl: „Elektróny obiehajú jadro ako planéty.“ Taký elektrón by vyžiaril energiu a za ~10⁻¹¹ s spadol do jadra. Orbitál je <b>rozdelenie amplitúd</b>, nie dráha.',
-      'Misconception: “Electrons orbit the nucleus like planets.” Such an electron would radiate and fall in within ~10⁻¹¹ s. An orbital is an <b>amplitude distribution</b>, not a track.') },
-  ftl: { lvl: [8, 11], col: [1, 0.25, 0.2], junk: 'junk_ftl', name: tr('Nadsvetelný signál', 'Faster-than-Light Signal'),
+      'Misconception: “Electrons orbit the nucleus like planets.” Such an electron would radiate and fall in within ~10⁻¹¹ s. An orbital is an <b>amplitude distribution</b>, not a track.', 'Хибне уявлення: «Електрони обертаються навколо ядра, як планети». Такий електрон випромінював би й упав на ядро за ~10⁻¹¹ с. Орбіталь — це <b>розподіл амплітуд</b>, а не доріжка.') },
+  ftl: { lvl: [8, 11], col: [1, 0.25, 0.2], junk: 'junk_ftl', name: tr('Nadsvetelný signál', 'Faster-than-Light Signal', 'Надсвітловий сигнал'),
     tip: tr('Omyl: „Previazanosťou sa dá poslať správa rýchlejšie ako svetlo.“ <b>Nemožnosť signalizácie</b>: Bobova lokálna štatistika nezávisí od Alicinej voľby.',
-      'Misconception: “Entanglement can send a message faster than light.” <b>No-signalling</b>: Bob’s local statistics never depend on Alice’s choice.') },
-  cat: { lvl: [11, 14], col: [0.55, 0.52, 0.5], junk: 'junk_cat', name: tr('Mačka mŕtva-aj-živá', 'Dead-and-Alive Cat'),
+      'Misconception: “Entanglement can send a message faster than light.” <b>No-signalling</b>: Bob’s local statistics never depend on Alice’s choice.', 'Хибне уявлення: «Сплутаність може передати повідомлення швидше за світло». <b>Неможливість сигналізації</b>: локальна статистика Боба ніколи не залежить від вибору Аліси.') },
+  cat: { lvl: [11, 14], col: [0.55, 0.52, 0.5], junk: 'junk_cat', name: tr('Mačka mŕtva-aj-živá', 'Dead-and-Alive Cat', 'Мертво-живий кіт'),
     tip: tr('Omyl: „Mačka je naraz mŕtva aj živá.“ Stav dáva <b>pravdepodobnosti</b> výsledkov; meranie dá jeden výsledok. Superpozícia nie je „oboje naraz“.',
-      'Misconception: “The cat is dead and alive at once.” The state gives <b>probabilities</b> of outcomes; a measurement gives one. A superposition is not “both at once”.') },
-  cultist: { lvl: [14, 17], col: [0.28, 0.1, 0.32], junk: 'junk_cultist', name: tr('Kultista vedomia', 'Consciousness Cultist'),
+      'Misconception: “The cat is dead and alive at once.” The state gives <b>probabilities</b> of outcomes; a measurement gives one. A superposition is not “both at once”.', 'Хибне уявлення: «Кіт одночасно мертвий і живий». Стан дає <b>імовірності</b> результатів; вимірювання дає один. Суперпозиція — це не «обидва водночас».') },
+  cultist: { lvl: [14, 17], col: [0.28, 0.1, 0.32], junk: 'junk_cultist', name: tr('Kultista vedomia', 'Consciousness Cultist', 'Сектант свідомості'),
     tip: tr('Omyl: „Kolaps spôsobuje vedomie pozorovateľa.“ Meranie je <b>fyzikálna interakcia</b> s prístrojom; dekoherencia prebieha aj bez ľudí.',
-      'Misconception: “The observer’s consciousness causes the collapse.” A measurement is a <b>physical interaction</b> with an apparatus; decoherence happens with or without people.') },
+      'Misconception: “The observer’s consciousness causes the collapse.” A measurement is a <b>physical interaction</b> with an apparatus; decoherence happens with or without people.', 'Хибне уявлення: «Колапс спричиняє свідомість спостерігача». Вимірювання — це <b>фізична взаємодія</b> з приладом; декогеренція відбувається з людьми чи без них.') },
 };
 // tábory nepriateľov v sektoroch medzi portálmi (sever ostáva voľný pre cestu k dračiemu štítu)
 const MOB_CAMPS = ['hidden', 'billiard', 'planet', 'ftl', 'cat', 'cultist', 'cultist'];
 
 const QCOL = ['#9d9d9d', '#ffffff', '#1eff00', '#0070dd', '#a335ee', '#ff8000']; // šedá, biela, zelená, modrá, fialová, oranžová
-const QNAME = tr(['Bezcenné', 'Bežné', 'Nezvyčajné', 'Vzácne', 'Epické', 'Legendárne'], ['Poor', 'Common', 'Uncommon', 'Rare', 'Epic', 'Legendary']);
-const SLOT_NAME = { head: tr('Hlava', 'Head'), chest: tr('Hruď', 'Chest'), weapon: tr('Zbraň', 'Weapon'), trinket: tr('Talizman', 'Trinket') };
+const QNAME = tr(['Bezcenné', 'Bežné', 'Nezvyčajné', 'Vzácne', 'Epické', 'Legendárne'], ['Poor', 'Common', 'Uncommon', 'Rare', 'Epic', 'Legendary'], ['Убогий', 'Звичайний', 'Незвичайний', 'Рідкісний', 'Епічний', 'Легендарний']);
+const SLOT_NAME = { head: tr('Hlava', 'Head', 'Голова'), chest: tr('Hruď', 'Chest', 'Груди'), weapon: tr('Zbraň', 'Weapon', 'Зброя'), trinket: tr('Talizman', 'Trinket', 'Дрібничка') };
 
 const ITEMS = {
-  pot_hp: { icon: '🧪', q: 1, use: 'hp', buy: 40, sell: 10, name: tr('Liečivá amplitúda', 'Healing Amplitude'),
-    text: tr('Použitie: obnoví 45 % zdravia.', 'Use: restores 45% health.'), flavor: tr('Normovaná na jednotku — nikdy neprekypí.', 'Normalised to one — it never overflows.') },
-  pot_mana: { icon: '💧', q: 1, use: 'mana', buy: 40, sell: 10, name: tr('Elixír koherencie', 'Coherence Draught'),
-    text: tr('Použitie: obnoví 45 % koherencie (many).', 'Use: restores 45% coherence (mana).'), flavor: tr('Vypi skôr, než si ťa všimne okolie.', 'Drink it before the environment notices.') },
-  junk_hidden: { icon: '📒', q: 0, sell: 14, name: tr('Zošit skrytých premenných', 'Ledger of Hidden Variables'),
-    flavor: tr('Všetky stránky sú prázdne. Bell to vedel.', 'Every page is blank. Bell knew.') },
-  junk_billiard: { icon: '🎱', q: 0, sell: 22, name: tr('Otlčená biliardová guľa', 'Chipped Billiard Ball'),
-    flavor: tr('Kde bola medzi dvoma meraniami? Otázka bez odpovede.', 'Where was it between two measurements? A question without an answer.') },
-  junk_planet: { icon: '🪐', q: 0, sell: 30, name: tr('Ohnutá elektrónová dráha', 'Bent Electron Orbit'),
-    flavor: tr('Vraj sa točila 10⁻¹¹ sekundy, potom spadla.', 'Rumour says it spun for 10⁻¹¹ seconds, then fell in.') },
-  junk_ftl: { icon: '✉', q: 0, sell: 40, name: tr('Nedoručený nadsvetelný telegram', 'Undelivered FTL Telegram'),
-    flavor: tr('Obsah: náhodné bity. Korelácie áno, správa nie.', 'Contents: random bits. Correlations yes, message no.') },
-  junk_cat: { icon: '📿', q: 0, sell: 52, name: tr('Polovičný mačací obojok', 'Half a Cat Collar'),
-    flavor: tr('Pri otvorení škatule bol obojok celý. Len jeden výsledok.', 'When the box was opened the collar was whole. Just one outcome.') },
-  junk_cultist: { icon: '📜', q: 0, sell: 65, name: tr('Leták „Myseľ to skolabuje“', 'Pamphlet: “The Mind Collapses It”'),
-    flavor: tr('Detektor kliká aj v prázdnom laboratóriu.', 'The detector clicks in an empty lab too.') },
-  robe_sup: { icon: '🥻', q: 2, slot: 'chest', sta: 4, int: 2, buy: 250, sell: 60, robe: [0.45, 0.28, 0.75], name: tr('Rúcho superpozície', 'Robe of Superposition'),
-    flavor: tr('Utkané z nití |0⟩ a |1⟩ — s určitou relatívnou fázou.', 'Woven from |0⟩ and |1⟩ threads — with a definite relative phase.') },
-  hat_dirac: { icon: '🎩', q: 2, slot: 'head', sta: 2, int: 4, buy: 400, sell: 100, hat: 'top', name: tr('Diracov cylinder', 'Dirac’s Top Hat'),
-    flavor: tr('⟨klobúk|hlava⟩ = 1. Sedí dokonale.', '⟨hat|head⟩ = 1. A perfect fit.') },
-  wand_euler: { icon: '🪄', q: 2, slot: 'weapon', int: 6, buy: 600, sell: 150, orb: [0.4, 1, 0.5], name: tr('Eulerova palička', 'Euler’s Wand'),
-    flavor: tr('Na rukoväti je vyryté e<sup>iπ</sup> + 1 = 0.', 'Engraved along the shaft: e<sup>iπ</sup> + 1 = 0.') },
-  ring_planck: { icon: '💍', q: 2, slot: 'trinket', sta: 3, int: 3, buy: 500, sell: 120, name: tr('Planckova pečatná prsteň', 'Planck’s Signet'),
-    flavor: tr('Energia prichádza po kvantách. Zľavy tiež.', 'Energy comes in quanta. So do discounts.') },
-  mount_bloch: { icon: '🔮', q: 4, mount: true, buy: 10000, sell: 0, name: tr('Opraty Blochovej gule', 'Reins of the Bloch Sphere'),
-    text: tr('Použitie: naučí ťa privolať jazdeckú Blochovu guľu (kláves −). +60 % rýchlosť pohybu.', 'Use: teaches you to summon a rideable Bloch sphere (key −). +60% movement speed.'),
-    flavor: tr('Povrch = čisté stavy. Ruky prosím držte vnútri gule.', 'Surface = pure states. Please keep your hands inside the sphere.') },
+  pot_hp: { icon: '🧪', q: 1, use: 'hp', buy: 40, sell: 10, name: tr('Liečivá amplitúda', 'Healing Amplitude', 'Цілюща амплітуда'),
+    text: tr('Použitie: obnoví 45 % zdravia.', 'Use: restores 45% health.', 'Використання: відновлює 45% здоров’я.'), flavor: tr('Normovaná na jednotku — nikdy neprekypí.', 'Normalised to one — it never overflows.', 'Нормована до одиниці — ніколи не переливається.') },
+  pot_mana: { icon: '💧', q: 1, use: 'mana', buy: 40, sell: 10, name: tr('Elixír koherencie', 'Coherence Draught', 'Настій когерентності'),
+    text: tr('Použitie: obnoví 45 % koherencie (many).', 'Use: restores 45% coherence (mana).', 'Використання: відновлює 45% когерентності (мани).'), flavor: tr('Vypi skôr, než si ťa všimne okolie.', 'Drink it before the environment notices.', 'Випий, поки довкілля не помітило.') },
+  junk_hidden: { icon: '📒', q: 0, sell: 14, name: tr('Zošit skrytých premenných', 'Ledger of Hidden Variables', 'Книга прихованих змінних'),
+    flavor: tr('Všetky stránky sú prázdne. Bell to vedel.', 'Every page is blank. Bell knew.', 'Кожна сторінка порожня. Белл знав.') },
+  junk_billiard: { icon: '🎱', q: 0, sell: 22, name: tr('Otlčená biliardová guľa', 'Chipped Billiard Ball', 'Надщерблена більярдна куля'),
+    flavor: tr('Kde bola medzi dvoma meraniami? Otázka bez odpovede.', 'Where was it between two measurements? A question without an answer.', 'Де вона була між двома вимірюваннями? Питання без відповіді.') },
+  junk_planet: { icon: '🪐', q: 0, sell: 30, name: tr('Ohnutá elektrónová dráha', 'Bent Electron Orbit', 'Погнута орбіта електрона'),
+    flavor: tr('Vraj sa točila 10⁻¹¹ sekundy, potom spadla.', 'Rumour says it spun for 10⁻¹¹ seconds, then fell in.', 'Кажуть, вона крутилася 10⁻¹¹ секунди, а потім упала.') },
+  junk_ftl: { icon: '✉', q: 0, sell: 40, name: tr('Nedoručený nadsvetelný telegram', 'Undelivered FTL Telegram', 'Недоставлена надсвітлова телеграма'),
+    flavor: tr('Obsah: náhodné bity. Korelácie áno, správa nie.', 'Contents: random bits. Correlations yes, message no.', 'Вміст: випадкові біти. Кореляції — так, повідомлення — ні.') },
+  junk_cat: { icon: '📿', q: 0, sell: 52, name: tr('Polovičný mačací obojok', 'Half a Cat Collar', 'Половина котячого нашийника'),
+    flavor: tr('Pri otvorení škatule bol obojok celý. Len jeden výsledok.', 'When the box was opened the collar was whole. Just one outcome.', 'Коли скриньку відкрили, нашийник був цілий. Лише один результат.') },
+  junk_cultist: { icon: '📜', q: 0, sell: 65, name: tr('Leták „Myseľ to skolabuje“', 'Pamphlet: “The Mind Collapses It”', 'Брошура «Колапс робить розум»'),
+    flavor: tr('Detektor kliká aj v prázdnom laboratóriu.', 'The detector clicks in an empty lab too.', 'Детектор клацає і в порожній лабораторії.') },
+  robe_sup: { icon: '🥻', q: 2, slot: 'chest', sta: 4, int: 2, buy: 250, sell: 60, robe: [0.45, 0.28, 0.75], name: tr('Rúcho superpozície', 'Robe of Superposition', 'Мантія суперпозиції'),
+    flavor: tr('Utkané z nití |0⟩ a |1⟩ — s určitou relatívnou fázou.', 'Woven from |0⟩ and |1⟩ threads — with a definite relative phase.', 'Виткана з ниток |0⟩ і |1⟩ — з певною відносною фазою.') },
+  hat_dirac: { icon: '🎩', q: 2, slot: 'head', sta: 2, int: 4, buy: 400, sell: 100, hat: 'top', name: tr('Diracov cylinder', 'Dirac’s Top Hat', 'Циліндр Дірака'),
+    flavor: tr('⟨klobúk|hlava⟩ = 1. Sedí dokonale.', '⟨hat|head⟩ = 1. A perfect fit.', '⟨капелюх|голова⟩ = 1. Сидить ідеально.') },
+  wand_euler: { icon: '🪄', q: 2, slot: 'weapon', int: 6, buy: 600, sell: 150, orb: [0.4, 1, 0.5], name: tr('Eulerova palička', 'Euler’s Wand', 'Жезл Ейлера'),
+    flavor: tr('Na rukoväti je vyryté e<sup>iπ</sup> + 1 = 0.', 'Engraved along the shaft: e<sup>iπ</sup> + 1 = 0.', 'Вигравіювано вздовж руків’я: e<sup>iπ</sup> + 1 = 0.') },
+  ring_planck: { icon: '💍', q: 2, slot: 'trinket', sta: 3, int: 3, buy: 500, sell: 120, name: tr('Planckova pečatná prsteň', 'Planck’s Signet', 'Перстень Планка'),
+    flavor: tr('Energia prichádza po kvantách. Zľavy tiež.', 'Energy comes in quanta. So do discounts.', 'Енергія приходить квантами. Знижки теж.') },
+  mount_bloch: { icon: '🔮', q: 4, mount: true, buy: 10000, sell: 0, name: tr('Opraty Blochovej gule', 'Reins of the Bloch Sphere', 'Поводи сфери Блоха'),
+    text: tr('Použitie: naučí ťa privolať jazdeckú Blochovu guľu (kláves −). +60 % rýchlosť pohybu.', 'Use: teaches you to summon a rideable Bloch sphere (key −). +60% movement speed.', 'Використання: навчить тебе викликати сферу Блоха для верхової їзди (клавіша −). +60% швидкості руху.'),
+    flavor: tr('Povrch = čisté stavy. Ruky prosím držte vnútri gule.', 'Surface = pure states. Please keep your hands inside the sphere.', 'Поверхня = чисті стани. Будь ласка, тримайте руки всередині сфери.') },
 };
 const VENDOR_STOCK = ['pot_hp', 'pot_mana', 'robe_sup', 'hat_dirac', 'ring_planck', 'wand_euler', 'mount_bloch'];
 
 // korisť z bossov levelov: kvalita podľa hviezdičiek (★ zelená, ★★ modrá, ★★★ fialová)
 const BOSS_LOOT = {
-  1: { slot: 'trinket', icon: '🧭', name: tr('Eulerov kompas fázy', 'Euler’s Compass of Phase') },
-  2: { slot: 'weapon', icon: '🧲', name: tr('Palica dvoch stôp', 'Staff of the Two Spots') },
-  3: { slot: 'head', icon: '🌐', name: tr('Diadém Blochovej gule', 'Circlet of the Bloch Sphere'), hat: 'circlet' },
-  4: { slot: 'chest', icon: '🥁', name: tr('Feynmanovo rúcho dráh', 'Feynman’s Robe of Paths'), robe: [0.62, 0.3, 0.9] },
-  5: { slot: 'trinket', icon: '📐', name: tr('Diracova dýka †', 'Dirac’s Dagger †') },
-  6: { slot: 'weapon', icon: '📻', name: tr('Rezonančná palica π-impulzu', 'Resonant Rod of the π Pulse') },
-  7: { slot: 'chest', icon: '🔔', name: tr('Previazané rúcho Bellovo', 'Bell’s Entangled Vestments'), robe: [0.9, 0.35, 0.55] },
-  8: { slot: 'head', icon: '☯', name: tr('Bohrova kapucňa komplementarity', 'Bohr’s Hood of Complementarity'), hat: 'hood' },
-  9: { slot: 'weapon', icon: '🐉', name: tr('Ketvarrov zub', 'Fang of Ketvarr') },
+  1: { slot: 'trinket', icon: '🧭', name: tr('Eulerov kompas fázy', 'Euler’s Compass of Phase', 'Ейлерів компас фази') },
+  2: { slot: 'weapon', icon: '🧲', name: tr('Palica dvoch stôp', 'Staff of the Two Spots', 'Посох двох плям') },
+  3: { slot: 'head', icon: '🌐', name: tr('Diadém Blochovej gule', 'Circlet of the Bloch Sphere', 'Діадема сфери Блоха'), hat: 'circlet' },
+  4: { slot: 'chest', icon: '🥁', name: tr('Feynmanovo rúcho dráh', 'Feynman’s Robe of Paths', 'Фейнманова мантія шляхів'), robe: [0.62, 0.3, 0.9] },
+  5: { slot: 'trinket', icon: '📐', name: tr('Diracova dýka †', 'Dirac’s Dagger †', 'Кинджал Дірака †') },
+  6: { slot: 'weapon', icon: '📻', name: tr('Rezonančná palica π-impulzu', 'Resonant Rod of the π Pulse', 'Резонансний жезл π-імпульсу') },
+  7: { slot: 'chest', icon: '🔔', name: tr('Previazané rúcho Bellovo', 'Bell’s Entangled Vestments', 'Сплутані шати Белла'), robe: [0.9, 0.35, 0.55] },
+  8: { slot: 'head', icon: '☯', name: tr('Bohrova kapucňa komplementarity', 'Bohr’s Hood of Complementarity', 'Борів каптур доповнювальності'), hat: 'hood' },
+  9: { slot: 'weapon', icon: '🐉', name: tr('Ketvarrov zub', 'Fang of Ketvarr', 'Ікло Кетварра') },
 };
 const BOSSES = {
-  1: { icon: '➕', name: tr('Sčítač pravdepodobností', 'The Probability Adder'), tip: tr('Sčítava pravdepodobnosti namiesto amplitúd — a interferencia mu uniká.', 'Adds probabilities instead of amplitudes — and so misses interference.') },
-  2: { icon: '🌀', name: tr('Golem roztočeného vĺčika', 'Spinning-Top Golem'), tip: tr('Verí, že spin je doslova točiaca sa gulička s ľubovoľnou hodnotou.', 'Believes spin is literally a spinning ball with any value at all.') },
-  3: { icon: '👻', name: tr('Fantóm globálnej fázy', 'Phantom of the Global Phase'), tip: tr('Tvrdí, že globálnu fázu sa dá zmerať.', 'Claims the global phase can be measured.') },
-  4: { icon: '🎭', name: tr('Podvodník zmesi', 'The Mixture Impostor'), tip: tr('Vydáva zmes za superpozíciu — chýbajú mu koherencie.', 'Passes a mixture off as a superposition — it lacks the coherences.') },
-  5: { icon: '👺', name: tr('Škriatok ket-bra', 'The Ket-Bra Gremlin'), tip: tr('Prehadzuje bra a ket a z čísel robí operátory.', 'Swaps bras and kets and turns numbers into operators.') },
-  6: { icon: '📡', name: tr('Rozladený prízrak', 'The Detuned Wraith'), tip: tr('Vysiela mimo rezonancie a čuduje sa, že spin sa nepreklopí.', 'Transmits off resonance and wonders why the spin won’t flip.') },
-  7: { icon: '📨', name: tr('Strašidelný posol', 'The Spooky Courier'), tip: tr('Chce previazanosťou posielať správy rýchlejšie ako svetlo.', 'Wants to send messages faster than light through entanglement.') },
-  8: { icon: '🕯', name: tr('Veľkňaz kolapsu mysľou', 'High Priest of Mind-Collapse'), tip: tr('Káže, že svet skolabuje, až keď sa naň niekto pozrie.', 'Preaches that the world collapses only when someone looks.') },
-  9: { icon: '🐉', name: 'Ketvarr', tip: tr('Kvantový drak. Jeho štít je qubit.', 'The quantum dragon. His ward is a qubit.') },
+  1: { icon: '➕', name: tr('Sčítač pravdepodobností', 'The Probability Adder', 'Додавач імовірностей'), tip: tr('Sčítava pravdepodobnosti namiesto amplitúd — a interferencia mu uniká.', 'Adds probabilities instead of amplitudes — and so misses interference.', 'Додає ймовірності замість амплітуд — і тому пропускає інтерференцію.') },
+  2: { icon: '🌀', name: tr('Golem roztočeného vĺčika', 'Spinning-Top Golem', 'Голем-дзиґа'), tip: tr('Verí, že spin je doslova točiaca sa gulička s ľubovoľnou hodnotou.', 'Believes spin is literally a spinning ball with any value at all.', 'Вірить, що спін — це буквально кулька, яка крутиться з будь-яким значенням.') },
+  3: { icon: '👻', name: tr('Fantóm globálnej fázy', 'Phantom of the Global Phase', 'Привид глобальної фази'), tip: tr('Tvrdí, že globálnu fázu sa dá zmerať.', 'Claims the global phase can be measured.', 'Стверджує, що глобальну фазу можна виміряти.') },
+  4: { icon: '🎭', name: tr('Podvodník zmesi', 'The Mixture Impostor', 'Самозванець-суміш'), tip: tr('Vydáva zmes za superpozíciu — chýbajú mu koherencie.', 'Passes a mixture off as a superposition — it lacks the coherences.', 'Видає суміш за суперпозицію — їй бракує когерентностей.') },
+  5: { icon: '👺', name: tr('Škriatok ket-bra', 'The Ket-Bra Gremlin', 'Кет-бра гремлін'), tip: tr('Prehadzuje bra a ket a z čísel robí operátory.', 'Swaps bras and kets and turns numbers into operators.', 'Плутає бра й кети та перетворює числа на оператори.') },
+  6: { icon: '📡', name: tr('Rozladený prízrak', 'The Detuned Wraith', 'Розстроєний привид'), tip: tr('Vysiela mimo rezonancie a čuduje sa, že spin sa nepreklopí.', 'Transmits off resonance and wonders why the spin won’t flip.', 'Передає поза резонансом і дивується, чому спін не перевертається.') },
+  7: { icon: '📨', name: tr('Strašidelný posol', 'The Spooky Courier', 'Моторошний кур’єр'), tip: tr('Chce previazanosťou posielať správy rýchlejšie ako svetlo.', 'Wants to send messages faster than light through entanglement.', 'Хоче надсилати повідомлення швидше за світло через сплутаність.') },
+  8: { icon: '🕯', name: tr('Veľkňaz kolapsu mysľou', 'High Priest of Mind-Collapse', 'Верховний жрець колапсу розумом'), tip: tr('Káže, že svet skolabuje, až keď sa naň niekto pozrie.', 'Preaches that the world collapses only when someone looks.', 'Проповідує, що світ колапсує, лише коли хтось дивиться.') },
+  9: { icon: '🐉', name: tr('Ketvarr', 'Ketvarr', 'Кетварр'), tip: tr('Kvantový drak. Jeho štít je qubit.', 'The quantum dragon. His ward is a qubit.', 'Квантовий дракон. Його захист — кубіт.') },
 };
 
 // kúzla: id, kláves, ikona, úroveň, čas zosielania, mana, dosah, cooldown, poškodenie
 const SPELLS = [
   { id: 'bolt', key: 'Digit1', label: '1', icon: 'φ', lvl: 1, cast: 1.6, mana: 10, range: 30, dmg: [16, 22], sp: 0.9, col: [0.4, 0.9, 1],
-    name: tr('Fázový šíp', 'Phase Bolt'), text: tr('Vystrelí zväzok komplexnej amplitúdy. Spoľahlivé poškodenie — nemení štít (qubit) cieľa.', 'Fires a bundle of complex amplitude. Reliable damage — it does not change the target’s ward (qubit).') },
+    name: tr('Fázový šíp', 'Phase Bolt', 'Фазова стріла'), text: tr('Vystrelí zväzok komplexnej amplitúdy. Spoľahlivé poškodenie — nemení štít (qubit) cieľa.', 'Fires a bundle of complex amplitude. Reliable damage — it does not change the target’s ward (qubit).', 'Випускає згусток комплексної амплітуди. Надійна шкода — не змінює захист (кубіт) цілі.') },
   { id: 'flip', key: 'Digit2', label: '2', icon: 'X', lvl: 1, mana: 8, range: 30, cd: 4, dmg: [6, 9], sp: 0.3, col: [1, 0.35, 0.35],
-    name: tr('Pauliho preklopenie', 'Pauli Flip'), text: tr('Hradlo X: otočí štít cieľa o 180° okolo osi x — |0⟩ ↔ |1⟩. Pripraví ho na Bornovu čepeľ.', 'The X gate: turns the target’s ward 180° about the x axis — |0⟩ ↔ |1⟩. Sets it up for Born’s Blade.') },
+    name: tr('Pauliho preklopenie', 'Pauli Flip', 'Переворот Паулі'), text: tr('Hradlo X: otočí štít cieľa o 180° okolo osi x — |0⟩ ↔ |1⟩. Pripraví ho na Bornovu čepeľ.', 'The X gate: turns the target’s ward 180° about the x axis — |0⟩ ↔ |1⟩. Sets it up for Born’s Blade.', 'Гейт X: повертає захист цілі на 180° навколо осі x — |0⟩ ↔ |1⟩. Готує її до Борнового клинка.') },
   { id: 'had', key: 'Digit3', label: '3', icon: 'H', lvl: 2, mana: 8, range: 30, dmg: [4, 6], sp: 0.3, col: [0.4, 1, 0.5],
-    name: tr('Hadamardov úder', 'Hadamard Strike'), text: tr('Hradlo H: |0⟩ → |+⟩ (rovník). Potom P(|1⟩) = 50 % — superpozícia nie je „polovičný zásah“, ale lotéria.', 'The H gate: |0⟩ → |+⟩ (the equator). Then P(|1⟩) = 50% — a superposition is not a “half hit”, it is a lottery.') },
+    name: tr('Hadamardov úder', 'Hadamard Strike', 'Удар Адамара'), text: tr('Hradlo H: |0⟩ → |+⟩ (rovník). Potom P(|1⟩) = 50 % — superpozícia nie je „polovičný zásah“, ale lotéria.', 'The H gate: |0⟩ → |+⟩ (the equator). Then P(|1⟩) = 50% — a superposition is not a “half hit”, it is a lottery.', 'Гейт H: |0⟩ → |+⟩ (екватор). Тоді P(|1⟩) = 50% — суперпозиція не є «половиною влучання», це лотерея.') },
   { id: 'measure', key: 'Digit4', label: '4', icon: '⚔', lvl: 3, mana: 14, range: 30, cd: 5, dmg: [50, 64], sp: 1.6, col: [1, 0.85, 0.3],
-    name: tr('Bornova čepeľ', 'Born’s Blade'), text: tr('Meranie v Z-báze. Zasiahne s pravdepodobnosťou <b>P(|1⟩) = (1 − z)/2</b> a veľmi bolí; inak štít skolabuje na |0⟩ a čepeľ minie. Po meraní je štít v jednom z výsledkov.', 'A measurement in the Z basis. Hits with probability <b>P(|1⟩) = (1 − z)/2</b> and hurts a lot; otherwise the ward collapses onto |0⟩ and the blade misses. After the measurement the ward is in one of the outcomes.') },
+    name: tr('Bornova čepeľ', 'Born’s Blade', 'Борнів клинок'), text: tr('Meranie v Z-báze. Zasiahne s pravdepodobnosťou <b>P(|1⟩) = (1 − z)/2</b> a veľmi bolí; inak štít skolabuje na |0⟩ a čepeľ minie. Po meraní je štít v jednom z výsledkov.', 'A measurement in the Z basis. Hits with probability <b>P(|1⟩) = (1 − z)/2</b> and hurts a lot; otherwise the ward collapses onto |0⟩ and the blade misses. After the measurement the ward is in one of the outcomes.', 'Вимірювання в базисі Z. Влучає з імовірністю <b>P(|1⟩) = (1 − z)/2</b> і завдає великої шкоди; інакше захист колапсує в |0⟩ і клинок промахується. Після вимірювання захист перебуває в одному з результатів.') },
   { id: 'heal', key: 'Digit5', label: '5', icon: '✚', lvl: 4, cast: 2, mana: 22, self: true, col: [0.4, 1, 0.6],
-    name: tr('Kvantová korekcia chýb', 'Quantum Error Correction'), text: tr('Obnoví 40 % zdravia. Chyby sa opravia bez toho, aby sa zmeral samotný stav.', 'Restores 40% health. Errors are fixed without measuring the state itself.') },
+    name: tr('Kvantová korekcia chýb', 'Quantum Error Correction', 'Квантова корекція помилок'), text: tr('Obnoví 40 % zdravia. Chyby sa opravia bez toho, aby sa zmeral samotný stav.', 'Restores 40% health. Errors are fixed without measuring the state itself.', 'Відновлює 40% здоров’я. Помилки виправляються без вимірювання самого стану.') },
   { id: 'nova', key: 'Digit6', label: '6', icon: 'ρ', lvl: 6, mana: 25, cd: 12, aoe: 7, dmg: [14, 20], sp: 0.5, col: [0.75, 0.5, 1],
-    name: tr('Dekoherenčná vlna', 'Decoherence Nova'), text: tr('Zasiahne všetkých nepriateľov do 7 m a zmrští ich Blochove vektory: zmiešaný stav má P(|1⟩) ≈ 50 %.', 'Hits every enemy within 7 m and shrinks their Bloch vectors: a mixed state has P(|1⟩) ≈ 50%.') },
+    name: tr('Dekoherenčná vlna', 'Decoherence Nova', 'Декогеренційна хвиля'), text: tr('Zasiahne všetkých nepriateľov do 7 m a zmrští ich Blochove vektory: zmiešaný stav má P(|1⟩) ≈ 50 %.', 'Hits every enemy within 7 m and shrinks their Bloch vectors: a mixed state has P(|1⟩) ≈ 50%.', 'Вражає всіх ворогів у радіусі 7 м і зменшує їхні вектори Блоха: змішаний стан має P(|1⟩) ≈ 50%.') },
   { id: 'blink', key: 'Digit7', label: '7', icon: '⇝', lvl: 8, mana: 12, cd: 15, self: true, col: [0.7, 0.5, 1],
-    name: tr('Tunelovanie', 'Quantum Tunnelling'), text: tr('Presunie ťa 9 m dopredu. Amplitúda za bariérou nie je nulová.', 'Moves you 9 m forward. The amplitude beyond a barrier is not zero.') },
+    name: tr('Tunelovanie', 'Quantum Tunnelling', 'Квантове тунелювання'), text: tr('Presunie ťa 9 m dopredu. Amplitúda za bariérou nie je nulová.', 'Moves you 9 m forward. The amplitude beyond a barrier is not zero.', 'Переносить тебе на 9 м уперед. Амплітуда за бар’єром не дорівнює нулю.') },
   { id: 'pot_hp', key: 'Digit8', label: '8', item: 'pot_hp' },
   { id: 'pot_mana', key: 'Digit9', label: '9', item: 'pot_mana' },
   { id: 'shoot', key: 'Digit0', label: '0', icon: 'ψ', lvl: 1, range: 25, col: [1, 0.85, 0.4],
-    name: tr('Strela ψ (automatický útok)', 'ψ Shot (auto attack)'), text: tr('Zapne/vypne automatické strieľanie palicou na cieľ každé 2 s. Pravý klik na nepriateľa ho zapne tiež.', 'Toggles automatic shots from your staff at the target every 2 s. Right-clicking an enemy turns it on too.') },
+    name: tr('Strela ψ (automatický útok)', 'ψ Shot (auto attack)', 'Постріл ψ (автоатака)'), text: tr('Zapne/vypne automatické strieľanie palicou na cieľ každé 2 s. Pravý klik na nepriateľa ho zapne tiež.', 'Toggles automatic shots from your staff at the target every 2 s. Right-clicking an enemy turns it on too.', 'Вмикає автоматичні постріли з посоха по цілі кожні 2 с. Правий клік по ворогу теж їх вмикає.') },
   { id: 'mount', key: 'Minus', label: '−', icon: '🔮', lvl: 1, cast: 1.5, needMount: true,
-    name: tr('Blochova guľa (jazda)', 'Bloch Sphere (mount)'), text: tr('Nasadni / zosadni. +60 % rýchlosť. Kúpiš u Plancka.', 'Mount / dismount. +60% speed. Sold by Planck.') },
+    name: tr('Blochova guľa (jazda)', 'Bloch Sphere (mount)', 'Сфера Блоха (верхове)'), text: tr('Nasadni / zosadni. +60 % rýchlosť. Kúpiš u Plancka.', 'Mount / dismount. +60% speed. Sold by Planck.', 'Осідлати / зіскочити. +60% швидкості. Продає Планк.') },
   { id: 'hearth', key: 'Equal', label: '=', icon: '🏠', lvl: 1, cast: 3, cd: 30,
-    name: tr('Návrat k Amplitúde', 'Return to Amplitude'), text: tr('Po 3 s ťa prenesie k Amplitúde do stredu ostrova (z levelu späť na ostrov).', 'After 3 s takes you to Amplitude in the middle of the island (from a level back to the island).') },
+    name: tr('Návrat k Amplitúde', 'Return to Amplitude', 'Повернення до Амплітуди'), text: tr('Po 3 s ťa prenesie k Amplitúde do stredu ostrova (z levelu späť na ostrov).', 'After 3 s takes you to Amplitude in the middle of the island (from a level back to the island).', 'Через 3 с переносить тебе до Амплітуди в центрі острова (з рівня — назад на острів).') },
 ];
 const GCD = 1.2;
 
 // úlohy od Amplitúdy: zneškodni omyly (vždy jedna aktívna)
 const QUESTS = [
-  { mob: 'hidden', n: 5, c: 90, items: [['pot_hp', 3]], title: tr('Nič nie je skryté', 'Nothing Is Hidden'),
+  { mob: 'hidden', n: 5, c: 90, items: [['pot_hp', 3]], title: tr('Nič nie je skryté', 'Nothing Is Hidden', 'Нічого не приховано'),
     offer: tr(['Na lúkach za portálmi sa premávajú <b>Skryté premenné</b>. Šepkajú, že výsledok merania bol daný vopred.', 'Bell dokázal, že žiadne lokálne skryté premenné nevysvetlia kvantové korelácie. Zneškodni ich <b>5</b> — a vráť sa ku mne.'],
-      ['The meadows beyond the portals are crawling with <b>Hidden Variables</b>. They whisper that the outcome was fixed in advance.', 'Bell proved that no local hidden variables can explain quantum correlations. Debunk <b>5</b> of them — and come back to me.']),
-    done: tr('Výborne. Pamätaj: kvantové pravdepodobnosti nie sú len naša nevedomosť.', 'Well done. Remember: quantum probabilities are not just our ignorance.') },
-  { mob: 'billiard', n: 6, c: 160, items: [['pot_mana', 3]], title: tr('Guľky bez dráhy', 'Balls Without a Path'),
+      ['The meadows beyond the portals are crawling with <b>Hidden Variables</b>. They whisper that the outcome was fixed in advance.', 'Bell proved that no local hidden variables can explain quantum correlations. Debunk <b>5</b> of them — and come back to me.'], ['Луки за порталами кишать <b>Прихованими змінними</b>. Вони шепочуть, що результат був визначений наперед.', 'Белл довів, що жодні локальні приховані змінні не пояснять квантових кореляцій. Розвінчай <b>5</b> із них — і повертайся до мене.']),
+    done: tr('Výborne. Pamätaj: kvantové pravdepodobnosti nie sú len naša nevedomosť.', 'Well done. Remember: quantum probabilities are not just our ignorance.', 'Молодець. Пам’ятай: квантові ймовірності — це не просто наше незнання.') },
+  { mob: 'billiard', n: 6, c: 160, items: [['pot_mana', 3]], title: tr('Guľky bez dráhy', 'Balls Without a Path', 'Кулі без траєкторії'),
     offer: tr(['Biliardové elektróny sa kotúľajú po ostrove, akoby mali presnú dráhu.', 'Medzi meraniami kvantový objekt žiadnu trajektóriu nemá. Rozbi ich <b>6</b>.'],
-      ['Billiard-Ball Electrons roll around the island as if they had a definite path.', 'Between measurements a quantum object has no trajectory. Break <b>6</b> of them.']),
-    done: tr('Dráha je obraz z klasickej fyziky. Ty máš lepší: stav a amplitúdy.', 'A path is a picture from classical physics. You have a better one: the state and its amplitudes.') },
-  { mob: 'planet', n: 4, c: 260, items: [['pot_hp', 3], ['pot_mana', 2]], title: tr('Pád planetiek', 'The Fall of the Little Planets'),
+      ['Billiard-Ball Electrons roll around the island as if they had a definite path.', 'Between measurements a quantum object has no trajectory. Break <b>6</b> of them.'], ['Більярдні електрони котяться островом так, ніби мають певну траєкторію.', 'Між вимірюваннями квантовий об’єкт не має траєкторії. Розбий <b>6</b> із них.']),
+    done: tr('Dráha je obraz z klasickej fyziky. Ty máš lepší: stav a amplitúdy.', 'A path is a picture from classical physics. You have a better one: the state and its amplitudes.', 'Траєкторія — це образ із класичної фізики. У тебе є кращий: стан та його амплітуди.') },
+  { mob: 'planet', n: 4, c: 260, items: [['pot_hp', 3], ['pot_mana', 2]], title: tr('Pád planetiek', 'The Fall of the Little Planets', 'Падіння планеток'),
     offer: tr(['Atómy-planetky tvrdia, že elektróny obiehajú jadro ako planéty Slnko.', 'Taký elektrón by žiaril a do jadra by spadol za stotinu miliardtiny sekundy. Zhoď ich <b>4</b>.'],
-      ['The Little-Planet Atoms claim electrons orbit the nucleus like planets around the Sun.', 'Such an electron would radiate and fall into the nucleus within a hundredth of a billionth of a second. Bring down <b>4</b>.']),
-    done: tr('Orbitál nie je dráha, ale rozloženie amplitúd. Presne tak.', 'An orbital is not a path but a distribution of amplitudes. Exactly.') },
-  { mob: 'ftl', n: 4, c: 400, items: [['pot_hp', 4]], title: tr('Žiadne správy cez previazanosť', 'No Messages Through Entanglement'),
+      ['The Little-Planet Atoms claim electrons orbit the nucleus like planets around the Sun.', 'Such an electron would radiate and fall into the nucleus within a hundredth of a billionth of a second. Bring down <b>4</b>.'], ['Атоми-планетки стверджують, що електрони обертаються навколо ядра, як планети навколо Сонця.', 'Такий електрон випромінював би й упав на ядро за соту частку мільярдної секунди. Збий <b>4</b>.']),
+    done: tr('Orbitál nie je dráha, ale rozloženie amplitúd. Presne tak.', 'An orbital is not a path but a distribution of amplitudes. Exactly.', 'Орбіталь — не траєкторія, а розподіл амплітуд. Саме так.') },
+  { mob: 'ftl', n: 4, c: 400, items: [['pot_hp', 4]], title: tr('Žiadne správy cez previazanosť', 'No Messages Through Entanglement', 'Жодних повідомлень через сплутаність'),
     offer: tr(['Nadsvetelné signály lietajú nad mostom a sľubujú správy rýchlejšie ako svetlo.', 'Previazanosť dáva korelácie, nie správy — Bobova štatistika nezávisí od Alicinej voľby. Zachyť <b>4</b>.'],
-      ['Faster-than-Light Signals fly over the bridge, promising messages faster than light.', 'Entanglement gives correlations, not messages — Bob’s statistics don’t depend on Alice’s choice. Intercept <b>4</b>.']),
-    done: tr('Nemožnosť signalizácie drží. Relativita si vydýchla.', 'No-signalling holds. Relativity breathes a sigh of relief.') },
-  { mob: 'cat', n: 4, c: 600, items: [['pot_hp', 4], ['pot_mana', 4]], title: tr('Otvor škatuľu', 'Open the Box'),
+      ['Faster-than-Light Signals fly over the bridge, promising messages faster than light.', 'Entanglement gives correlations, not messages — Bob’s statistics don’t depend on Alice’s choice. Intercept <b>4</b>.'], ['Надсвітлові сигнали літають над мостом і обіцяють повідомлення швидше за світло.', 'Сплутаність дає кореляції, а не повідомлення — статистика Боба не залежить від вибору Аліси. Перехопи <b>4</b>.']),
+    done: tr('Nemožnosť signalizácie drží. Relativita si vydýchla.', 'No-signalling holds. Relativity breathes a sigh of relief.', 'Неможливість сигналізації діє. Теорія відносності з полегшенням зітхає.') },
+  { mob: 'cat', n: 4, c: 600, items: [['pot_hp', 4], ['pot_mana', 4]], title: tr('Otvor škatuľu', 'Open the Box', 'Відкрий скриньку'),
     offer: tr(['Mačky „mŕtve aj živé“ strašia po okraji ostrova.', 'Superpozícia nie je „oboje naraz“ — stav dáva pravdepodobnosti a meranie jeden výsledok. Upokoj <b>4</b>.'],
-      ['“Dead-and-alive” cats haunt the edge of the island.', 'A superposition is not “both at once” — the state gives probabilities, a measurement one outcome. Calm <b>4</b>.']),
-    done: tr('Schrödinger by bol spokojný. Jeho mačka bola kritika, nie návod.', 'Schrödinger would be pleased. His cat was a critique, not a recipe.') },
-  { mob: 'cultist', n: 5, c: 900, items: [['pot_hp', 5], ['pot_mana', 5]], title: tr('Detektor nepotrebuje dušu', 'A Detector Needs No Soul'),
+      ['“Dead-and-alive” cats haunt the edge of the island.', 'A superposition is not “both at once” — the state gives probabilities, a measurement one outcome. Calm <b>4</b>.'], ['Краєм острова блукають «мертво-живі» коти.', 'Суперпозиція — це не «обидва водночас»: стан дає ймовірності, вимірювання — один результат. Заспокой <b>4</b>.']),
+    done: tr('Schrödinger by bol spokojný. Jeho mačka bola kritika, nie návod.', 'Schrödinger would be pleased. His cat was a critique, not a recipe.', 'Шредінгер був би задоволений. Його кіт був критикою, а не рецептом.') },
+  { mob: 'cultist', n: 5, c: 900, items: [['pot_hp', 5], ['pot_mana', 5]], title: tr('Detektor nepotrebuje dušu', 'A Detector Needs No Soul', 'Детекторові не потрібна душа'),
     offer: tr(['Kultisti vedomia kážu, že svet skolabuje, až keď sa naň niekto pozrie.', 'Meranie je fyzikálna interakcia; dekoherencia beží aj v prázdnom laboratóriu. Rozožeň <b>5</b>.'],
-      ['The Consciousness Cultists preach that the world collapses only when someone looks.', 'A measurement is a physical interaction; decoherence runs even in an empty lab. Disperse <b>5</b>.']),
-    done: tr('Ostrov je čistý od omylov. Si skutočný kvantový mág.', 'The island is clean of misconceptions. You are a true quantum mage.') },
+      ['The Consciousness Cultists preach that the world collapses only when someone looks.', 'A measurement is a physical interaction; decoherence runs even in an empty lab. Disperse <b>5</b>.'], ['Сектанти свідомості проповідують, що світ колапсує, лише коли хтось дивиться.', 'Вимірювання — фізична взаємодія; декогеренція йде навіть у порожній лабораторії. Розжени <b>5</b>.']),
+    done: tr('Ostrov je čistý od omylov. Si skutočný kvantový mág.', 'The island is clean of misconceptions. You are a true quantum mage.', 'Острів очищено від хибних уявлень. Ти справжній квантовий маг.') },
 ];
 
 const DIFF_DMG = () => byDiff(0.7, 1, 1.25); // nepriatelia v ľahkej/laickej obťažnosti udierajú slabšie
@@ -188,7 +188,7 @@ const Wow = {
     const k = +st, base = 2 + +n * 1.6;
     return { icon: B.icon, q: 1 + k, slot: B.slot, name: B.name, robe: B.robe, hat: B.hat, orb: B.slot === 'weapon' ? [[0.4, 1, 0.4], [0.3, 0.6, 1], [0.8, 0.45, 1]][k - 1] : null,
       int: Math.round(base * (0.8 + 0.4 * k)), sta: Math.round(base * (0.5 + 0.35 * k)), sell: 50 * +n * k,
-      flavor: tr(`Korisť: ${BOSSES[n].name} (level ${n}).`, `Dropped by ${BOSSES[n].name} (level ${n}).`) };
+      flavor: tr(`Korisť: ${BOSSES[n].name} (level ${n}).`, `Dropped by ${BOSSES[n].name} (level ${n}).`, `Здобич із ${BOSSES[n].name} (рівень ${n}).`) };
   },
 
   init() {
@@ -258,18 +258,18 @@ const Wow = {
       s.xp -= xpNeed(s.lvl); s.lvl++;
       s.hp = this.maxHp; s.mana = this.maxMana;
       Sound.sfx('levelup');
-      this.banner(tr(`Úroveň ${s.lvl}!`, `Level ${s.lvl}!`), 'ding');
+      this.banner(tr(`Úroveň ${s.lvl}!`, `Level ${s.lvl}!`, `Рівень ${s.lvl}!`), 'ding');
       this.fx.push({ kind: 'ding', t: 0 });
       const learn = SPELLS.filter((sp) => sp.lvl === s.lvl && !sp.item);
-      UI.toast(tr(`⬆ Dosiahol(a) si <b>úroveň ${s.lvl}</b>! Zdravie a koherencia rastú.`, `⬆ You reached <b>level ${s.lvl}</b>! Health and coherence increase.`)
-        + learn.map((sp) => `<br>✨ ${tr('Nové kúzlo', 'New spell')}: <b>${sp.name}</b> (${sp.label})`).join(''), 4200);
+      UI.toast(tr(`⬆ Dosiahol(a) si <b>úroveň ${s.lvl}</b>! Zdravie a koherencia rastú.`, `⬆ You reached <b>level ${s.lvl}</b>! Health and coherence increase.`, `⬆ Ти досяг(-ла) <b>рівня ${s.lvl}</b>! Здоров’я та когерентність зростають.`)
+        + learn.map((sp) => `<br>✨ ${tr('Nové kúzlo', 'New spell', 'Нове закляття')}: <b>${sp.name}</b> (${sp.label})`).join(''), 4200);
     }
     if (s.lvl >= MAX_LVL) s.xp = 0;
     Game.save();
   },
   money(c, why) {
     this.S.money += c;
-    if (c > 0) { Sound.sfx('coin'); this.feed(`${tr('Získavaš', 'You receive')} ${fmtMoney(c)}${why ? ' · ' + why : ''}`); }
+    if (c > 0) { Sound.sfx('coin'); this.feed(`${tr('Získavaš', 'You receive', 'Ти отримуєш')} ${fmtMoney(c)}${why ? ' · ' + why : ''}`); }
   },
   addItem(id, n = 1, quiet) {
     const b = this.S.bags, it = this.item(id);
@@ -278,10 +278,10 @@ const Wow = {
     let left = n;
     for (const slot of b) if (slot[0] === id && slot[1] < stack && left) { const k = Math.min(left, stack - slot[1]); slot[1] += k; left -= k; }
     while (left > 0) {
-      if (b.length >= 16) { this.err(tr('Taška je plná.', 'Your bags are full.')); return false; }
+      if (b.length >= 16) { this.err(tr('Taška je plná.', 'Your bags are full.', 'Твої сумки повні.')); return false; }
       const k = Math.min(left, stack); b.push([id, k]); left -= k;
     }
-    if (!quiet) { Sound.sfx('loot'); this.feed(`${tr('Korisť', 'You receive loot')}: ${this.itemLink(id, n)}`); }
+    if (!quiet) { Sound.sfx('loot'); this.feed(`${tr('Korisť', 'You receive loot', 'Ти отримуєш здобич')}: ${this.itemLink(id, n)}`); }
     this.renderBags();
     return true;
   },
@@ -295,8 +295,8 @@ const Wow = {
     const it = this.item(id), s = this.S;
     if (!it) return;
     if (it.use) {
-      if (!this.count(id)) return this.err(tr('Nemáš ' + it.name + '.', 'You have no ' + it.name + '.'));
-      if ((this.cd.potion || 0) > 0) return this.err(tr('Elixír ešte nie je pripravený.', 'Potion is not ready yet.'));
+      if (!this.count(id)) return this.err(tr('Nemáš ' + it.name + '.', 'You have no ' + it.name + '.', 'У тебе немає: ' + it.name + '.'));
+      if ((this.cd.potion || 0) > 0) return this.err(tr('Elixír ešte nie je pripravený.', 'Potion is not ready yet.', 'Зілля ще не готове.'));
       this.takeItem(id); this.cd.potion = 30;
       if (it.use === 'hp') { const h = Math.round(this.maxHp * 0.45); s.hp = Math.min(this.maxHp, s.hp + h); this.playerFct(`+${h}`, 'heal'); }
       else { const m = Math.round(this.maxMana * 0.45); s.mana = Math.min(this.maxMana, s.mana + m); this.playerFct(`+${m}`, 'mana'); }
@@ -305,7 +305,7 @@ const Wow = {
     }
     if (it.mount) {
       this.takeItem(id); s.mount = true;
-      UI.toast(tr('🔮 Naučil(a) si sa privolať <b>Blochovu guľu</b> — kláves <b>−</b>.', '🔮 You learned to summon the <b>Bloch Sphere</b> — key <b>−</b>.'), 3800);
+      UI.toast(tr('🔮 Naučil(a) si sa privolať <b>Blochovu guľu</b> — kláves <b>−</b>.', '🔮 You learned to summon the <b>Bloch Sphere</b> — key <b>−</b>.', '🔮 Ти навчився(-лася) викликати <b>сферу Блоха</b> — клавіша <b>−</b>.'), 3800);
       Sound.sfx('levelup'); this.renderBar(true); return;
     }
     if (it.slot) this.equip(id);
@@ -323,7 +323,7 @@ const Wow = {
   unequip(slot) {
     const s = this.S, id = s.equip[slot];
     if (!id) return;
-    if (s.bags.length >= 16) return this.err(tr('Taška je plná.', 'Your bags are full.'));
+    if (s.bags.length >= 16) return this.err(tr('Taška je plná.', 'Your bags are full.', 'Твої сумки повні.'));
     delete s.equip[slot];
     this.addItem(id, 1, true);
     s.hp = Math.min(s.hp, this.maxHp); s.mana = Math.min(s.mana, this.maxMana);
@@ -332,35 +332,35 @@ const Wow = {
   },
   sell(i) {
     const [id, n] = this.S.bags[i], it = this.item(id);
-    if (!it.sell) return this.err(tr('Tento predmet obchodník nekúpi.', 'The merchant won’t buy that.'));
+    if (!it.sell) return this.err(tr('Tento predmet obchodník nekúpi.', 'The merchant won’t buy that.', 'Торговець це не купить.'));
     this.S.bags.splice(i, 1);
-    this.money(it.sell * n, tr('predaj', 'sold') + ' ' + this.itemLink(id, n));
+    this.money(it.sell * n, tr('predaj', 'sold', 'продано') + ' ' + this.itemLink(id, n));
     this.renderBags(); this.renderVendor(); Game.save();
   },
   sellJunk() {
     let sum = 0;
     this.S.bags = this.S.bags.filter(([id, n]) => { const it = this.item(id); if (it.q === 0) { sum += it.sell * n; return false; } return true; });
-    if (sum) this.money(sum, tr('predaj haraburdia', 'sold junk')); else this.err(tr('Nemáš žiadne haraburdie.', 'You have no junk.'));
+    if (sum) this.money(sum, tr('predaj haraburdia', 'sold junk', 'продано мотлох')); else this.err(tr('Nemáš žiadne haraburdie.', 'You have no junk.', 'У тебе немає мотлоху.'));
     this.renderBags(); this.renderVendor(); Game.save();
   },
   buy(id) {
     const it = this.item(id);
-    if (it.mount && (this.S.mount || this.count(id))) return this.err(tr('Toto už máš.', 'You already know that.'));
-    if (this.S.money < it.buy) return this.err(tr('Nemáš dosť peňazí.', 'You don’t have enough money.'));
-    if (this.addItem(id, 1, true)) { this.S.money -= it.buy; Sound.sfx('coin'); this.feed(`${tr('Kúpené', 'Bought')}: ${this.itemLink(id)}`); }
+    if (it.mount && (this.S.mount || this.count(id))) return this.err(tr('Toto už máš.', 'You already know that.', 'Ти це вже знаєш.'));
+    if (this.S.money < it.buy) return this.err(tr('Nemáš dosť peňazí.', 'You don’t have enough money.', 'У тебе недостатньо грошей.'));
+    if (this.addItem(id, 1, true)) { this.S.money -= it.buy; Sound.sfx('coin'); this.feed(`${tr('Kúpené', 'Bought', 'Куплено')}: ${this.itemLink(id)}`); }
     this.renderVendor(); Game.save();
   },
   tipItem(id, extra = '') {
     const it = this.item(id);
     if (!it) return '';
-    const st = [it.int && `+${it.int} ${tr('Intelekt', 'Intellect')}`, it.sta && `+${it.sta} ${tr('Výdrž', 'Stamina')}`].filter(Boolean);
+    const st = [it.int && `+${it.int} ${tr('Intelekt', 'Intellect', 'Інтелект')}`, it.sta && `+${it.sta} ${tr('Výdrž', 'Stamina', 'Витривалість')}`].filter(Boolean);
     return `<div class="itip"><b style="color:${QCOL[it.q]}">${it.name}</b>`
       + (it.slot ? `<div>${SLOT_NAME[it.slot]}<span class="r">${QNAME[it.q]}</span></div>` : '')
       + st.map((x) => `<div>${x}</div>`).join('')
-      + (it.slot ? `<div class="g">${tr('Intelekt: viac many a sily kúziel · Výdrž: viac zdravia', 'Intellect: more mana and spell power · Stamina: more health')}</div>` : '')
+      + (it.slot ? `<div class="g">${tr('Intelekt: viac many a sily kúziel · Výdrž: viac zdravia', 'Intellect: more mana and spell power · Stamina: more health', 'Інтелект: більше мани й сили заклять · Витривалість: більше здоров’я')}</div>` : '')
       + (it.text ? `<div class="g">${it.text}</div>` : '')
       + (it.flavor ? `<div class="fl">„${it.flavor}“</div>` : '')
-      + (it.sell ? `<div>${tr('Predajná cena', 'Sell price')}: ${fmtMoney(it.sell)}</div>` : '')
+      + (it.sell ? `<div>${tr('Predajná cena', 'Sell price', 'Ціна продажу')}: ${fmtMoney(it.sell)}</div>` : '')
       + extra + '</div>';
   },
 
@@ -376,24 +376,24 @@ const Wow = {
     return null;
   },
   press(sp) {
-    if (this.dead) return this.err(tr('Si mŕtvy(a).', 'You are dead.'));
+    if (this.dead) return this.err(tr('Si mŕtvy(a).', 'You are dead.', 'Ти мертвий(-а).'));
     if (sp.item) return this.useItem(sp.item);
     const s = this.S, st = this.spellState(sp);
-    if (st === 'lvl') return this.err(sp.needMount ? tr('Najprv si kúp Blochovu guľu u Plancka.', 'Buy the Bloch Sphere from Planck first.') : tr(`Toto kúzlo sa naučíš na úrovni ${sp.lvl}.`, `You learn this spell at level ${sp.lvl}.`));
-    if (st === 'inst') return this.err(tr('Tu sa bojuje vedomosťami — kúzla fungujú na ostrove.', 'Here you fight with knowledge — spells work on the island.'));
+    if (st === 'lvl') return this.err(sp.needMount ? tr('Najprv si kúp Blochovu guľu u Plancka.', 'Buy the Bloch Sphere from Planck first.', 'Спершу купи сферу Блоха в Планка.') : tr(`Toto kúzlo sa naučíš na úrovni ${sp.lvl}.`, `You learn this spell at level ${sp.lvl}.`, `Це закляття ти вивчиш на рівні ${sp.lvl}.`));
+    if (st === 'inst') return this.err(tr('Tu sa bojuje vedomosťami — kúzla fungujú na ostrove.', 'Here you fight with knowledge — spells work on the island.', 'Тут ти б’єшся знаннями — закляття діють на острові.'));
     if (sp.id === 'shoot') {
-      if (!this.hostile()) return this.err(tr('Nemáš cieľ.', 'You have no target.'));
+      if (!this.hostile()) return this.err(tr('Nemáš cieľ.', 'You have no target.', 'У тебе немає цілі.'));
       this.auto = !this.auto; this.autoT = Math.min(this.autoT, 0.3); return;
     }
-    if (st === 'oom') return this.err(tr('Nedostatok koherencie.', 'Not enough coherence.'));
-    if (this.cast) return this.err(tr('Už zosielaš iné kúzlo.', 'You are already casting.'));
-    if ((this.cd[sp.id] || 0) > 0) return this.err(tr('Kúzlo ešte nie je pripravené.', 'That spell isn’t ready yet.'));
+    if (st === 'oom') return this.err(tr('Nedostatok koherencie.', 'Not enough coherence.', 'Недостатньо когерентності.'));
+    if (this.cast) return this.err(tr('Už zosielaš iné kúzlo.', 'You are already casting.', 'Ти вже чаклуєш.'));
+    if ((this.cd[sp.id] || 0) > 0) return this.err(tr('Kúzlo ešte nie je pripravené.', 'That spell isn’t ready yet.', 'Це закляття ще не готове.'));
     if (sp.id !== 'hearth' && sp.id !== 'mount' && this.gcd > 0) return;
     if (!sp.self && !sp.aoe && sp.range && sp.id !== 'hearth' && sp.id !== 'mount') {
-      if (!this.hostile()) return this.err(tr('Nemáš cieľ.', 'You have no target.'));
-      if (st === 'range') return this.err(tr('Cieľ je príliš ďaleko.', 'Out of range.'));
+      if (!this.hostile()) return this.err(tr('Nemáš cieľ.', 'You have no target.', 'У тебе немає цілі.'));
+      if (st === 'range') return this.err(tr('Cieľ je príliš ďaleko.', 'Out of range.', 'Поза досяжністю.'));
     }
-    if (sp.cast && this.moving) return this.err(tr('Počas pohybu sa to nedá.', 'You can’t do that while moving.'));
+    if (sp.cast && this.moving) return this.err(tr('Počas pohybu sa to nedá.', 'You can’t do that while moving.', 'Цього не можна робити під час руху.'));
     if (this.mounted && sp.id !== 'mount') this.mounted = false; // kúzlenie zosadí z gule
     if (this.target && !sp.self) this.face(this.target.p);
     if (sp.id !== 'hearth' && sp.id !== 'mount') this.gcd = GCD;
@@ -426,8 +426,8 @@ const Wow = {
         const P1 = clamp((1 - tg.r[2]) / 2, 0, 1), hit = rand() < P1;
         this.fx.push({ kind: 'slash', t: 0, m: tg, hit });
         if (hit) { tg.r = [0, 0, -1]; this.hurt(tg, Math.round(this.roll(sp)), sp, true); Sound.sfx('clang'); }
-        else { tg.r = [0, 0, 1]; this.addFct(V3.add(tg.p, [0, 2.2, 0]), tr('Kolaps na |0⟩', 'Collapsed to |0⟩'), 'miss'); Sound.sfx('whiff'); this.aggro(tg); }
-        this.feed(`⚔ ${sp.name}: P(|1⟩) = ${Fmt.pct(P1)} → ${hit ? tr('<b>zásah</b>', '<b>hit</b>') : tr('vedľa', 'miss')}`);
+        else { tg.r = [0, 0, 1]; this.addFct(V3.add(tg.p, [0, 2.2, 0]), tr('Kolaps na |0⟩', 'Collapsed to |0⟩', 'Колапс у |0⟩'), 'miss'); Sound.sfx('whiff'); this.aggro(tg); }
+        this.feed(`⚔ ${sp.name}: P(|1⟩) = ${Fmt.pct(P1)} → ${hit ? tr('<b>zásah</b>', '<b>hit</b>', '<b>влучання</b>') : tr('vedľa', 'miss', 'промах')}`);
         break;
       }
       case 'mount': this.mounted = !this.mounted; Sound.sfx('portal'); break;
@@ -452,7 +452,7 @@ const Wow = {
   aggro(m) { if (m.state === 'idle') { m.state = 'chase'; m.atk = 0.8; Sound.sfx('aggro'); } },
   hurt(m, d, sp, crit) {
     if (m.state === 'dead') return;
-    if (m.state === 'evade') { this.addFct(V3.add(m.p, [0, 2, 0]), tr('Unikol', 'Evade'), 'miss'); return; }
+    if (m.state === 'evade') { this.addFct(V3.add(m.p, [0, 2, 0]), tr('Unikol', 'Evade', 'Ухилення'), 'miss'); return; }
     m.hp -= d; m.flash = 0.15; this.combatT = 0;
     this.addFct(V3.add(m.p, [0, 2, 0]), crit ? `${d}!` : `${d}`, crit ? 'crit' : 'dmg');
     this.aggro(m);
@@ -472,7 +472,7 @@ const Wow = {
     if (q && s.q.on && q.mob === m.type && s.q.k < q.n) {
       s.q.k++;
       this.feed(`<span class="qp">${q.title}: ${T.name} ${s.q.k}/${q.n}</span>`);
-      if (s.q.k >= q.n) { Sound.sfx('good'); UI.toast(tr(`✔ Úloha splnená: <b>${q.title}</b> — vráť sa k Amplitúde.`, `✔ Quest complete: <b>${q.title}</b> — return to Amplitude.`), 3600); }
+      if (s.q.k >= q.n) { Sound.sfx('good'); UI.toast(tr(`✔ Úloha splnená: <b>${q.title}</b> — vráť sa k Amplitúde.`, `✔ Quest complete: <b>${q.title}</b> — return to Amplitude.`, `✔ Завдання виконано: <b>${q.title}</b> — повернися до Амплітуди.`), 3600); }
     }
     Game.save();
   },
@@ -483,9 +483,9 @@ const Wow = {
     d = Math.max(1, Math.round(d));
     s.hp -= d; this.combatT = 0; this.ui.pf.classList.add('hit'); setTimeout(() => this.ui.pf.classList.remove('hit'), 160);
     if (this.inHub()) this.playerFct(`−${d}`, 'hurt');
-    if (this.cast && this.cast.sp.id === 'hearth') { this.cast = null; this.err(tr('Prerušené.', 'Interrupted.')); }
+    if (this.cast && this.cast.sp.id === 'hearth') { this.cast = null; this.err(tr('Prerušené.', 'Interrupted.', 'Перервано.')); }
     if (s.hp <= 0) {
-      if (!this.inHub()) { s.hp = Math.round(this.maxHp * 0.5); UI.toast(tr('💀 Padol(a) si — Amplitúda ťa oživila. Chyby sa počítajú do hviezdičiek.', '💀 You fell — Amplitude revived you. Mistakes count towards the stars.'), 3200); return; }
+      if (!this.inHub()) { s.hp = Math.round(this.maxHp * 0.5); UI.toast(tr('💀 Padol(a) si — Amplitúda ťa oživila. Chyby sa počítajú do hviezdičiek.', '💀 You fell — Amplitude revived you. Mistakes count towards the stars.', '💀 Ти впав(-ла) — Амплітуда тебе оживила. Помилки враховуються в зірках.'), 3200); return; }
       this.die();
     }
   },
@@ -526,7 +526,7 @@ const Wow = {
   tabTarget() {
     if (!this.inHub()) return;
     const pl = this.pl(), list = this.mobs.filter((m) => m.state !== 'dead' && this.dist(m.p, pl.p) < 30).sort((a, b) => this.dist(a.p, pl.p) - this.dist(b.p, pl.p));
-    if (!list.length) return this.err(tr('Nablízku nie je žiadny nepriateľ.', 'No enemies nearby.'));
+    if (!list.length) return this.err(tr('Nablízku nie je žiadny nepriateľ.', 'No enemies nearby.', 'Поблизу немає ворогів.'));
     const i = list.indexOf(this.target);
     this.target = list[(i + 1) % Math.min(list.length, 5)];
     this.auto = false;
@@ -565,7 +565,7 @@ const Wow = {
     for (const n of npcs) {
       const q = Game.r.project(V3.add(n.p, [0, 1.4, 0]));
       if (q && Math.hypot(q[0] - x, q[1] - y) < 50) {
-        if (button === 2) { if (this.dist(n.p, pl.p) < 7.5) n.f(); else this.err(tr('Si príliš ďaleko.', 'You are too far away.')); }
+        if (button === 2) { if (this.dist(n.p, pl.p) < 7.5) n.f(); else this.err(tr('Si príliš ďaleko.', 'You are too far away.', 'Ти надто далеко.')); }
         return true;
       }
     }
@@ -581,13 +581,13 @@ const Wow = {
     this.target = { npc: true, boss: true };
     this.closeVendor();
     document.body.dataset.scene = 'inst';
-    this.banner(L.title, 'zone', tr('Vstupuješ do inštancie', 'Entering instance'));
+    this.banner(L.title, 'zone', tr('Vstupuješ do inštancie', 'Entering instance', 'Вхід до інстансу'));
   },
   onHub() {
     if (!Settings.wow) return;
     this.inst = null; this.target = null; this.cast = null;
     document.body.dataset.scene = 'hub';
-    this.banner(tr('Hilbertov ostrov', 'Hilbert Island'), 'zone');
+    this.banner(tr('Hilbertov ostrov', 'Hilbert Island', 'Острів Гільберта'), 'zone');
   },
   bossHp() {
     const L = Game.scene, I = this.inst;
@@ -621,7 +621,7 @@ const Wow = {
       Sound.sfx('bolt');
     } else {
       this.hitPlayer(this.maxHp * 0.18);
-      this.bossFct(tr('úder!', 'smash!'), 'hurt', true);
+      this.bossFct(tr('úder!', 'smash!', 'удар!'), 'hurt', true);
       Sound.sfx('hit');
     }
   },
@@ -629,13 +629,13 @@ const Wow = {
     if (!Settings.wow) return;
     const s = this.S, B = BOSSES[n];
     if (this.inst) this.inst.dead = true;
-    this.banner(tr(`${B.name} porazený!`, `${B.name} defeated!`), 'boss');
+    this.banner(tr(`${B.name} porazený!`, `${B.name} defeated!`, `${B.name} переможено!`), 'boss');
     Sound.sfx('bossdown');
     const id = `boss${n}_${stars}`, had = s.loot[n] || 0, coins = 2500 * n + 1500 * stars;
     const items = [];
     if (stars > had) { s.loot[n] = stars; items.push(id); }
     items.push(['pot_hp', 'pot_mana'][n % 2]);
-    this.gainXp(xpNeed(s.lvl) * (0.55 + 0.1 * stars) * (had ? 0.3 : 1), tr('boss', 'boss'));
+    this.gainXp(xpNeed(s.lvl) * (0.55 + 0.1 * stars) * (had ? 0.3 : 1), tr('boss', 'boss', 'бос'));
     s.money += coins; Sound.sfx('coin');
     for (const it of items) this.addItem(it, 1, true);
     s.hp = this.maxHp; s.mana = this.maxMana;
@@ -668,7 +668,7 @@ const Wow = {
       UI.say(q.offer.map(A), () => {
         s.q.on = true; s.q.k = 0; Game.save();
         Sound.sfx('quest');
-        UI.toast(tr(`📜 Prijatá úloha: <b>${q.title}</b>`, `📜 Quest accepted: <b>${q.title}</b>`));
+        UI.toast(tr(`📜 Prijatá úloha: <b>${q.title}</b>`, `📜 Quest accepted: <b>${q.title}</b>`, `📜 Завдання прийнято: <b>${q.title}</b>`));
       });
       return true;
     }
@@ -680,7 +680,7 @@ const Wow = {
         this.money(q.c, q.title);
         for (const [id, n] of q.items) this.addItem(id, n);
         this.gainXp(xp, q.title);
-        UI.toast(tr(`✔ Úloha dokončená: <b>${q.title}</b>`, `✔ Quest completed: <b>${q.title}</b>`));
+        UI.toast(tr(`✔ Úloha dokončená: <b>${q.title}</b>`, `✔ Quest completed: <b>${q.title}</b>`, `✔ Завдання здано: <b>${q.title}</b>`));
       });
       return true;
     }
@@ -698,7 +698,7 @@ const Wow = {
     if (pl.vy || pl.y) { pl.y = (pl.y || 0) + (pl.vy || 0) * dt; pl.vy = (pl.vy || 0) - 18 * dt; if (pl.y <= 0) { pl.y = 0; pl.vy = 0; } }
     // zosielanie
     if (this.cast) {
-      if (this.moving && this.inHub()) { this.cast = null; this.err(tr('Prerušené.', 'Interrupted.')); }
+      if (this.moving && this.inHub()) { this.cast = null; this.err(tr('Prerušené.', 'Interrupted.', 'Перервано.')); }
       else if (!paused || !this.inHub()) {
         this.cast.t += dt;
         if (this.cast.t >= this.cast.sp.cast) { const c = this.cast; this.cast = null; if (!c.sp.range || c.sp.self || this.hostile() === c.target) this.fire(c.sp, c.target); else if (c.sp.id === 'hearth' || c.sp.id === 'mount') this.fire(c.sp); }
@@ -892,9 +892,9 @@ const Wow = {
     r.draw('box', M4.trs(V3.add(V, [Math.sin(vh) * 0.75, 0.45, Math.cos(vh) * 0.75]), vh, [2.4, 0.9, 0.5]), [0.55, 0.38, 0.22], { pattern: 5 });
     for (const [x, z, s] of [[1.6, 1.2, 0.5], [2.1, 0.7, 0.4], [-1.8, 1.3, 0.55]]) r.draw('box', M4.trs(V3.add(V, [x, s / 2, z]), x, s), [0.5, 0.36, 0.22], { pattern: 5 });
     this.humanoid(r, V3.add(V, [-Math.sin(vh) * 0.2, 0, -Math.cos(vh) * 0.2]), vh, { robe: [0.22, 0.24, 0.3], trim: [0.75, 0.65, 0.4], hat: 'top', hair: [0.85, 0.85, 0.85], walk: 0 });
-    UI.label('vendor', V3.add(V, [0, 2.95, 0]), `<b>Max Planck</b><br><small>&lt;${tr('Kvantové potreby', 'Quantum Provisions')}&gt;</small>`, 'npc friendly');
+    UI.label('vendor', V3.add(V, [0, 2.95, 0]), `<b>Max Planck</b><br><small>&lt;${tr('Kvantové potreby', 'Quantum Provisions', 'Квантові припаси')}&gt;</small>`, 'npc friendly');
     UI.label('vendorcoin', V3.add(V, [0, 3.75, 0]), '💰', 'qmark');
-    UI.hot(V3.add(V, [0, 1.4, 0]), tr('<b>Max Planck</b> — obchodník. Elixíry, výstroj, jazdecká Blochova guľa. Podíď a stlač E (alebo pravý klik).', '<b>Max Planck</b> — merchant. Potions, gear, a rideable Bloch sphere. Walk up and press E (or right-click).'), 40);
+    UI.hot(V3.add(V, [0, 1.4, 0]), tr('<b>Max Planck</b> — obchodník. Elixíry, výstroj, jazdecká Blochova guľa. Podíď a stlač E (alebo pravý klik).', '<b>Max Planck</b> — merchant. Potions, gear, a rideable Bloch sphere. Walk up and press E (or right-click).', '<b>Макс Планк</b> — торговець. Зілля, спорядження, сфера Блоха для верхової їзди. Підійди й натисни E (або правий клік).'), 40);
     // nepriatelia
     for (const m of this.mobs) {
       if (this.dist(m.p, pl.p) > 60) continue;
@@ -905,7 +905,7 @@ const Wow = {
         const T = MOB_TYPES[m.type], hpw = Math.round(100 * m.hp / m.max);
         UI.label('mob' + m.id, V3.add(m.p, [0, m.type === 'cultist' ? 2.5 : 2, 0]),
           `<div class="np${m === this.target ? ' tg' : ''}"><span style="color:${this.con(m.lvl)}">${m.lvl}</span> ${T.name}<i><b style="width:${hpw}%"></b></i>${m === this.target ? `<u><b style="width:${Math.round(50 * (1 - m.r[2]))}%"></b></u>` : ''}</div>`, 'nameplate', null);
-        UI.hot(V3.add(m.p, [0, 0.9, 0]), `<b>${T.name}</b> (${tr('úroveň', 'level')} ${m.lvl})<br>${T.tip}<br><small>${tr('Neutrálny — zaútočí, až keď ho napadneš. Ľavý klik = zamerať · pravý = útok · Tab = ďalší cieľ', 'Neutral — fights back only once you attack it. Left click = target · right = attack · Tab = next target')}</small>`, 36);
+        UI.hot(V3.add(m.p, [0, 0.9, 0]), `<b>${T.name}</b> (${tr('úroveň', 'level', 'рівень')} ${m.lvl})<br>${T.tip}<br><small>${tr('Neutrálny — zaútočí, až keď ho napadneš. Ľavý klik = zamerať · pravý = útok · Tab = ďalší cieľ', 'Neutral — fights back only once you attack it. Left click = target · right = attack · Tab = next target', 'Нейтральний — відбивається, лише коли ти нападеш. Лівий клік = ціль · правий = атака · Tab = наступна ціль')}</small>`, 36);
       }
     }
     // kruh pod cieľom
@@ -985,16 +985,16 @@ const Wow = {
     this.ui = { root, pf: q('#wow-pf'), tf: q('#wow-tf'), cast: q('#wow-cast'), bar: q('#wow-bar .ab'), xp: q('#wow-bar .xp'), gold: q('#wow-bagbar .gold'), feed: q('#wow-feed'), err: q('#wow-err'),
       banner: q('#wow-banner'), mini: q('#wow-mini'), track: q('#wow-track'), bags: q('#wow-bags'), vendor: q('#wow-vendor'), loot: q('#wow-loot'), death: q('#wow-death') };
     q('#wow-bagbar .bagbtn').onclick = () => this.toggleBags();
-    q('#wow-bagbar .bagbtn').dataset.tip = tr('Taška a výstroj (B)', 'Bags and gear (B)');
+    q('#wow-bagbar .bagbtn').dataset.tip = tr('Taška a výstroj (B)', 'Bags and gear (B)', 'Сумки та спорядження (B)');
     q('#wow-bags .x').onclick = () => this.toggleBags(false);
     q('#wow-vendor .x').onclick = () => this.closeVendor();
     q('#wow-loot .x').onclick = () => this.ui.loot.classList.remove('show');
-    q('#wow-death h2').textContent = tr('Zomrel(a) si', 'You died');
-    q('#wow-death p').textContent = tr('Klasické omyly ťa premohli. Duch sa vráti k Amplitúde v strede ostrova.', 'The classical misconceptions overwhelmed you. Your spirit returns to Amplitude in the middle of the island.');
-    q('#wow-death button').textContent = tr('Uvoľniť ducha', 'Release Spirit');
+    q('#wow-death h2').textContent = tr('Zomrel(a) si', 'You died', 'Ти загинув(-ла)');
+    q('#wow-death p').textContent = tr('Klasické omyly ťa premohli. Duch sa vráti k Amplitúde v strede ostrova.', 'The classical misconceptions overwhelmed you. Your spirit returns to Amplitude in the middle of the island.', 'Класичні хибні уявлення тебе здолали. Твій дух повертається до Амплітуди в центрі острова.');
+    q('#wow-death button').textContent = tr('Uvoľniť ducha', 'Release Spirit', 'Звільнити дух');
     q('#wow-death button').onclick = () => this.release();
     q('#wow-mini canvas').onclick = () => Game.toggleMap(true);
-    q('#wow-mini canvas').dataset.tip = tr('Minimapa — klik otvorí mapu (M). Žltá ! = úloha, žlté bodky = neutrálne omyly, 💰 = obchodník.', 'Minimap — click to open the map (M). Yellow ! = quest, yellow dots = neutral misconceptions, 💰 = merchant.');
+    q('#wow-mini canvas').dataset.tip = tr('Minimapa — klik otvorí mapu (M). Žltá ! = úloha, žlté bodky = neutrálne omyly, 💰 = obchodník.', 'Minimap — click to open the map (M). Yellow ! = quest, yellow dots = neutral misconceptions, 💰 = merchant.', 'Мінімапа — клікни, щоб відкрити мапу (M). Жовтий ! = завдання, жовті точки = нейтральні хибні уявлення, 💰 = торговець.');
     this.ui.pf.dataset.tip = '';
     // lišta kúziel
     for (const sp of SPELLS) {
@@ -1008,10 +1008,10 @@ const Wow = {
     this.renderBar(true); this.renderFrames(); this.renderBags();
   },
   spellTip(sp) {
-    if (sp.item) return this.tipItem(sp.item, `<div class="g">${tr('V taške', 'In bags')}: ${this.count(sp.item)} · ${tr('Kláves', 'Key')} ${sp.label} · ${tr('cooldown elixírov 30 s', 'potion cooldown 30 s')}</div>`);
-    const st = [sp.mana && `${sp.mana} ${tr('koherencie', 'coherence')}`, sp.range && !sp.self && `${sp.range} m`, sp.cast ? `${tr('Zosielanie', 'Cast')} ${sp.cast} s` : tr('Okamžité', 'Instant'), sp.cd && `${tr('Obnova', 'Cooldown')} ${sp.cd} s`].filter(Boolean);
-    const lock = sp.lvl > this.S.lvl ? `<div class="bad">${tr(`Naučíš sa na úrovni ${sp.lvl}.`, `Learned at level ${sp.lvl}.`)}</div>` : '';
-    const dmg = sp.dmg ? `<div>${tr('Poškodenie', 'Damage')}: ${Math.round(sp.dmg[0] + this.sp * (sp.sp || 0))}–${Math.round(sp.dmg[1] + this.sp * (sp.sp || 0))}</div>` : '';
+    if (sp.item) return this.tipItem(sp.item, `<div class="g">${tr('V taške', 'In bags', 'У сумках')}: ${this.count(sp.item)} · ${tr('Kláves', 'Key', 'Клавіша')} ${sp.label} · ${tr('cooldown elixírov 30 s', 'potion cooldown 30 s', 'перезарядка зілля 30 с')}</div>`);
+    const st = [sp.mana && `${sp.mana} ${tr('koherencie', 'coherence', 'когерентності')}`, sp.range && !sp.self && `${sp.range} m`, sp.cast ? `${tr('Zosielanie', 'Cast', 'Чаклування')} ${sp.cast} s` : tr('Okamžité', 'Instant', 'Миттєво'), sp.cd && `${tr('Obnova', 'Cooldown', 'Перезарядка')} ${sp.cd} s`].filter(Boolean);
+    const lock = sp.lvl > this.S.lvl ? `<div class="bad">${tr(`Naučíš sa na úrovni ${sp.lvl}.`, `Learned at level ${sp.lvl}.`, `Вивчається на рівні ${sp.lvl}.`)}</div>` : '';
+    const dmg = sp.dmg ? `<div>${tr('Poškodenie', 'Damage', 'Шкода')}: ${Math.round(sp.dmg[0] + this.sp * (sp.sp || 0))}–${Math.round(sp.dmg[1] + this.sp * (sp.sp || 0))}</div>` : '';
     return `<div class="itip"><b>${sp.name}</b> <span class="r">${sp.label}</span><div>${st.join(' · ')}</div>${dmg}<div class="g">${sp.text}</div>${lock}</div>`;
   },
   flashBtn(sp) { if (sp.btn) { sp.btn.classList.add('press'); setTimeout(() => sp.btn.classList.remove('press'), 120); } },
@@ -1030,8 +1030,8 @@ const Wow = {
     }
     const need = xpNeed(s.lvl);
     this.ui.xp.querySelector('i').style.width = (s.lvl >= MAX_LVL ? 100 : 100 * s.xp / need).toFixed(1) + '%';
-    this.ui.xp.querySelector('span').textContent = s.lvl >= MAX_LVL ? tr('Maximálna úroveň', 'Max level') : `XP ${s.xp} / ${need}`;
-    this.ui.xp.dataset.tip = tr(`Skúsenosti: ${s.xp} / ${need}. Získaš ich za omyly (nepriateľov), úlohy a hlavne za dokončené levely.`, `Experience: ${s.xp} / ${need}. Earned from misconceptions (enemies), quests and above all completed levels.`);
+    this.ui.xp.querySelector('span').textContent = s.lvl >= MAX_LVL ? tr('Maximálna úroveň', 'Max level', 'Макс. рівень') : `XP ${s.xp} / ${need}`;
+    this.ui.xp.dataset.tip = tr(`Skúsenosti: ${s.xp} / ${need}. Získaš ich za omyly (nepriateľov), úlohy a hlavne za dokončené levely.`, `Experience: ${s.xp} / ${need}. Earned from misconceptions (enemies), quests and above all completed levels.`, `Досвід: ${s.xp} / ${need}. Отримуєш його за хибні уявлення (ворогів), завдання й передусім за пройдені рівні.`);
     this.ui.gold.innerHTML = fmtMoney(s.money);
     // zosielanie
     const c = this.cast, cb = this.ui.cast;
@@ -1045,27 +1045,27 @@ const Wow = {
     // hráč (v drakovom leveli zdravie zo súboja)
     let hp = s.hp, hpMax = this.maxHp;
     if (inst && L && L.boss && L.hpMax && L.phase >= 0) { hp = L.hp; hpMax = L.hpMax; }
-    const pfHtml = `<div class="por">ψ<span class="lv">${s.lvl}</span></div><div class="info"><div class="nm">${tr('Psíčko', 'Little Psi')}${this.inCombat ? ' <span class="cmb">⚔</span>' : ''}</div>${this.bar('hp', hp, hpMax)}${this.bar('mp', s.mana, this.maxMana)}</div>`;
+    const pfHtml = `<div class="por">ψ<span class="lv">${s.lvl}</span></div><div class="info"><div class="nm">${tr('Psíčko', 'Little Psi', 'Псічко')}${this.inCombat ? ' <span class="cmb">⚔</span>' : ''}</div>${this.bar('hp', hp, hpMax)}${this.bar('mp', s.mana, this.maxMana)}</div>`;
     if (this.ui.pf._h !== pfHtml) {
       [...this.ui.pf.children].filter((c) => !c.classList.contains('wow-ffct')).forEach((c) => c.remove());
       this.ui.pf.insertAdjacentHTML('afterbegin', pfHtml); this.ui.pf._h = pfHtml;
-      this.ui.pf.dataset.tip = `<div class="itip"><b>${tr('Psíčko — kvantový mág', 'Little Psi — quantum mage')}</b> <span class="r">${tr('úroveň', 'level')} ${s.lvl}</span>`
-        + `<div>${tr('Zdravie', 'Health')}: ${Math.round(s.hp)} / ${this.maxHp} · ${tr('Koherencia (mana)', 'Coherence (mana)')}: ${Math.round(s.mana)} / ${this.maxMana}</div>`
-        + `<div>${tr('Intelekt', 'Intellect')} ${this.stat('int')} · ${tr('Výdrž', 'Stamina')} ${this.stat('sta')} · ${tr('Sila kúziel', 'Spell power')} ${Math.round(this.sp)}</div>`
-        + `<div class="g">${tr('Mimo boja sa zdravie aj koherencia rýchlo obnovujú.', 'Out of combat, health and coherence regenerate quickly.')}</div></div>`;
+      this.ui.pf.dataset.tip = `<div class="itip"><b>${tr('Psíčko — kvantový mág', 'Little Psi — quantum mage', 'Псічко — квантовий маг')}</b> <span class="r">${tr('úroveň', 'level', 'рівень')} ${s.lvl}</span>`
+        + `<div>${tr('Zdravie', 'Health', 'Здоров’я')}: ${Math.round(s.hp)} / ${this.maxHp} · ${tr('Koherencia (mana)', 'Coherence (mana)', 'Когерентність (мана)')}: ${Math.round(s.mana)} / ${this.maxMana}</div>`
+        + `<div>${tr('Intelekt', 'Intellect', 'Інтелект')} ${this.stat('int')} · ${tr('Výdrž', 'Stamina', 'Витривалість')} ${this.stat('sta')} · ${tr('Sila kúziel', 'Spell power', 'Сила заклять')} ${Math.round(this.sp)}</div>`
+        + `<div class="g">${tr('Mimo boja sa zdravie aj koherencia rýchlo obnovujú.', 'Out of combat, health and coherence regenerate quickly.', 'Поза боєм здоров’я та когерентність швидко відновлюються.')}</div></div>`;
     }
     // cieľ / boss
     let tf = '';
     const tg = this.target;
     if (inst && this.inst) {
       const B = BOSSES[L.num] || BOSSES[1], hpF = this.bossHp();
-      tf = `<div class="por boss">${B.icon}<span class="lv">💀</span></div><div class="info"><div class="nm elite">${B.name}</div>${this.bar('hp', hpF, 1, `${Math.round(hpF * 100)} %`)}<div class="sub">${L.boss ? tr(`Zraní ho len úder s P(zásah) ≥ ${Fmt.pct(L.thr)}`, `Only a strike with P(hit) ≥ ${Fmt.pct(L.thr)} wounds him`) : tr('Porazí ho len poznanie: kroky a správne odpovede', 'Only knowledge defeats it: steps and correct answers')}</div></div>`;
-      this.ui.tf.dataset.tip = `<b>${B.name}</b> — ${B.tip}<br><small>${tr('Každý dokončený krok levelu a každá správna odpoveď mu uberie zdravie. Nesprávna odpoveď = jeho úder.', 'Every completed step of the level and every correct answer takes away its health. A wrong answer = its strike.')}</small>`;
+      tf = `<div class="por boss">${B.icon}<span class="lv">💀</span></div><div class="info"><div class="nm elite">${B.name}</div>${this.bar('hp', hpF, 1, `${Math.round(hpF * 100)} %`)}<div class="sub">${L.boss ? tr(`Zraní ho len úder s P(zásah) ≥ ${Fmt.pct(L.thr)}`, `Only a strike with P(hit) ≥ ${Fmt.pct(L.thr)} wounds him`, `Поранить його лише удар із P(влучання) ≥ ${Fmt.pct(L.thr)}`) : tr('Porazí ho len poznanie: kroky a správne odpovede', 'Only knowledge defeats it: steps and correct answers', 'Перемогти його можна лише знаннями: кроки й правильні відповіді')}</div></div>`;
+      this.ui.tf.dataset.tip = `<b>${B.name}</b> — ${B.tip}<br><small>${tr('Každý dokončený krok levelu a každá správna odpoveď mu uberie zdravie. Nesprávna odpoveď = jeho úder.', 'Every completed step of the level and every correct answer takes away its health. A wrong answer = its strike.', 'Кожен пройдений крок рівня й кожна правильна відповідь забирають його здоров’я. Неправильна відповідь = його удар.')}</small>`;
     } else if (tg && tg.p && !tg.npc) {
       const T = MOB_TYPES[tg.type], P1 = clamp((1 - tg.r[2]) / 2, 0, 1), L2 = V3.len(tg.r);
       tf = `<div class="por">${{ hidden: '📦', billiard: '🎱', planet: '🪐', ftl: '⚡', cat: '🐈', cultist: '🕯' }[tg.type]}<span class="lv" style="color:${this.con(tg.lvl)}">${tg.lvl}</span></div><div class="info"><div class="nm">${T.name}</div>${this.bar('hp', tg.hp, tg.max)}`
-        + `<div class="qb" ><i style="width:${(P1 * 100).toFixed(0)}%"></i><span>|ψ⟩ P(|1⟩) = ${Fmt.pct(P1)}${L2 < 0.9 ? ' · ' + tr('zmiešaný', 'mixed') : ''}</span></div></div>`;
-      this.ui.tf.dataset.tip = `<b>${T.name}</b><br>${T.tip}<br><br>${tr('<b>Štít = qubit.</b> Bornova čepeľ (4) zasiahne s P(|1⟩) = (1 − z)/2. X (2) preklopí |0⟩ ↔ |1⟩, H (3) pošle štít na rovník (50 %). Relaxácia T₁ ho ťahá späť na |0⟩ — konaj rýchlo.', '<b>Ward = qubit.</b> Born’s Blade (4) hits with P(|1⟩) = (1 − z)/2. X (2) flips |0⟩ ↔ |1⟩, H (3) sends the ward to the equator (50%). T₁ relaxation pulls it back to |0⟩ — act fast.')}`;
+        + `<div class="qb" ><i style="width:${(P1 * 100).toFixed(0)}%"></i><span>|ψ⟩ P(|1⟩) = ${Fmt.pct(P1)}${L2 < 0.9 ? ' · ' + tr('zmiešaný', 'mixed', 'змішаний') : ''}</span></div></div>`;
+      this.ui.tf.dataset.tip = `<b>${T.name}</b><br>${T.tip}<br><br>${tr('<b>Štít = qubit.</b> Bornova čepeľ (4) zasiahne s P(|1⟩) = (1 − z)/2. X (2) preklopí |0⟩ ↔ |1⟩, H (3) pošle štít na rovník (50 %). Relaxácia T₁ ho ťahá späť na |0⟩ — konaj rýchlo.', '<b>Ward = qubit.</b> Born’s Blade (4) hits with P(|1⟩) = (1 − z)/2. X (2) flips |0⟩ ↔ |1⟩, H (3) sends the ward to the equator (50%). T₁ relaxation pulls it back to |0⟩ — act fast.', '<b>Захист = кубіт.</b> Борнів клинок (4) влучає з P(|1⟩) = (1 − z)/2. X (2) перевертає |0⟩ ↔ |1⟩, H (3) переводить захист на екватор (50%). Релаксація T₁ тягне його назад до |0⟩ — дій швидко.')}`;
     }
     if (this.ui.tf._h !== tf) {
       [...this.ui.tf.children].filter((c) => !c.classList.contains('wow-ffct')).forEach((c) => c.remove());
@@ -1077,9 +1077,9 @@ const Wow = {
     let tr2 = '';
     if (!inst) {
       const nl = LEVELS.find((Lv) => Game.progress.stars[Lv.num] === undefined);
-      if (nl) tr2 += `<div class="qt">${tr('Ďalší level', 'Next level')}</div><div class="qo">• ${nl.num} · ${nl.title}${Game.isUnlocked(nl.num) ? '' : ' 🔒'}</div>`;
+      if (nl) tr2 += `<div class="qt">${tr('Ďalší level', 'Next level', 'Наступний рівень')}</div><div class="qo">• ${nl.num} · ${nl.title}${Game.isUnlocked(nl.num) ? '' : ' 🔒'}</div>`;
       if (q && s.q.on) tr2 += `<div class="qt">${q.title}</div><div class="qo${s.q.k >= q.n ? ' done' : ''}">• ${MOB_TYPES[q.mob].name}: ${Math.min(s.q.k, q.n)}/${q.n}${s.q.k >= q.n ? ' ✔' : ''}</div>`;
-      else if (q && Game.progress.introSeen) tr2 += `<div class="qo muted">${tr('Amplitúda má pre teba úlohu (!)', 'Amplitude has a quest for you (!)')}</div>`;
+      else if (q && Game.progress.introSeen) tr2 += `<div class="qo muted">${tr('Amplitúda má pre teba úlohu (!)', 'Amplitude has a quest for you (!)', 'Амплітуда має для тебе завдання (!)')}</div>`;
     }
     if (this.ui.track._h !== tr2) { this.ui.track.innerHTML = tr2; this.ui.track._h = tr2; }
     this.ui.track.classList.toggle('show', !!tr2);
@@ -1119,7 +1119,7 @@ const Wow = {
     g.save(); g.translate(R, R); g.rotate(-pl.heading + Math.PI);
     g.fillStyle = '#fff'; g.strokeStyle = '#000'; g.lineWidth = 1.5; g.beginPath(); g.moveTo(0, -9); g.lineTo(6, 7); g.lineTo(0, 3); g.lineTo(-6, 7); g.closePath(); g.fill(); g.stroke();
     g.restore();
-    const z = this.ui.mini.querySelector('.zone'), zt = tr('Hilbertov ostrov', 'Hilbert Island') + (this.safe(pl.p) ? ` <small>(${tr('bezpečné', 'sanctuary')})</small>` : '');
+    const z = this.ui.mini.querySelector('.zone'), zt = tr('Hilbertov ostrov', 'Hilbert Island', 'Острів Гільберта') + (this.safe(pl.p) ? ` <small>(${tr('bezpečné', 'sanctuary', 'святилище')})</small>` : '');
     if (z._h !== zt) { z.innerHTML = zt; z._h = zt; }
   },
 
@@ -1132,16 +1132,16 @@ const Wow = {
   renderBags() {
     if (!this.ui) return;
     const s = this.S, b = this.ui.bags;
-    b.querySelector('h3').textContent = tr('🎒 Taška a výstroj', '🎒 Bags and gear');
+    b.querySelector('h3').textContent = tr('🎒 Taška a výstroj', '🎒 Bags and gear', '🎒 Сумки та спорядження');
     const eq = b.querySelector('.eq'); eq.innerHTML = '';
     for (const sl of ['head', 'chest', 'weapon', 'trinket']) {
       const id = s.equip[sl], it = this.item(id), c = el('button', 'slot eqs' + (it ? '' : ' empty'), it ? it.icon : `<small>${SLOT_NAME[sl]}</small>`);
-      if (it) { c.style.borderColor = QCOL[it.q]; c.dataset.tip = this.tipItem(id, `<div class="g">${tr('Klik = zložiť', 'Click = unequip')}</div>`); c.onclick = () => this.unequip(sl); }
+      if (it) { c.style.borderColor = QCOL[it.q]; c.dataset.tip = this.tipItem(id, `<div class="g">${tr('Klik = zložiť', 'Click = unequip', 'Клік = зняти')}</div>`); c.onclick = () => this.unequip(sl); }
       else c.dataset.tip = SLOT_NAME[sl];
       eq.appendChild(c);
     }
-    const mnt = el('button', 'slot eqs' + (s.mount ? '' : ' empty'), s.mount ? '🔮' : `<small>${tr('Jazda', 'Mount')}</small>`);
-    mnt.dataset.tip = s.mount ? this.tipItem('mount_bloch') : tr('Jazdecké zviera — kúpiš u Plancka.', 'Mount — buy one from Planck.');
+    const mnt = el('button', 'slot eqs' + (s.mount ? '' : ' empty'), s.mount ? '🔮' : `<small>${tr('Jazda', 'Mount', 'Верхове')}</small>`);
+    mnt.dataset.tip = s.mount ? this.tipItem('mount_bloch') : tr('Jazdecké zviera — kúpiš u Plancka.', 'Mount — buy one from Planck.', 'Верхове — купи в Планка.');
     if (s.mount) mnt.onclick = () => this.press(SPELLS.find((x) => x.id === 'mount'));
     eq.appendChild(mnt);
     const grid = b.querySelector('.grid'); grid.innerHTML = '';
@@ -1151,7 +1151,7 @@ const Wow = {
         const it = this.item(sl[0]);
         c.innerHTML = `${it.icon}${sl[1] > 1 ? `<span class="cnt">${sl[1]}</span>` : ''}`;
         c.style.borderColor = QCOL[it.q];
-        c.onmouseenter = () => { c.dataset.tip = this.tipItem(sl[0], `<div class="g">${this.vendorOpen ? tr('Klik = predať', 'Click = sell') : it.slot ? tr('Klik = obliecť', 'Click = equip') : it.use || it.mount ? tr('Klik = použiť', 'Click = use') : tr('Predaj u obchodníka', 'Sell to a merchant')}</div>`); };
+        c.onmouseenter = () => { c.dataset.tip = this.tipItem(sl[0], `<div class="g">${this.vendorOpen ? tr('Klik = predať', 'Click = sell', 'Клік = продати') : it.slot ? tr('Klik = obliecť', 'Click = equip', 'Клік = одягнути') : it.use || it.mount ? tr('Klik = použiť', 'Click = use', 'Клік = використати') : tr('Predaj u obchodníka', 'Sell to a merchant', 'Продати торговцеві')}</div>`); };
         c.onclick = () => (this.vendorOpen ? this.sell(i) : this.useItem(sl[0]));
       }
       grid.appendChild(c);
@@ -1159,7 +1159,7 @@ const Wow = {
     b.querySelector('.foot').innerHTML = `${s.bags.length}/16 · ${fmtMoney(s.money)}`;
   },
   openVendor() {
-    if (this.dist(this.pl().p, VENDOR_POS) > 7) return this.err(tr('Si príliš ďaleko.', 'You are too far away.'));
+    if (this.dist(this.pl().p, VENDOR_POS) > 7) return this.err(tr('Si príliš ďaleko.', 'You are too far away.', 'Ти надто далеко.'));
     this.vendorOpen = true; this.ui.vendor.classList.add('show'); Sound.sfx('coin');
     this.renderVendor(); this.toggleBags(true);
   },
@@ -1167,23 +1167,23 @@ const Wow = {
   renderVendor() {
     if (!this.vendorOpen) return;
     const v = this.ui.vendor, s = this.S;
-    v.querySelector('h3').innerHTML = `💰 Max Planck <small>— ${tr('Kvantové potreby', 'Quantum Provisions')}</small>`;
+    v.querySelector('h3').innerHTML = `💰 Max Planck <small>— ${tr('Kvantové potreby', 'Quantum Provisions', 'Квантові припаси')}</small>`;
     const list = v.querySelector('.list'); list.innerHTML = '';
     for (const id of VENDOR_STOCK) {
       const it = this.item(id), have = it.mount && (s.mount || this.count(id)), row = el('button', 'vrow' + (s.money < it.buy || have ? ' poor' : ''));
-      row.innerHTML = `<span class="slot" style="border-color:${QCOL[it.q]}">${it.icon}</span><span class="vn" style="color:${QCOL[it.q]}">${it.name}</span><span class="vp">${have ? tr('máš', 'owned') : fmtMoney(it.buy)}</span>`;
-      row.dataset.tip = this.tipItem(id, `<div class="g">${tr('Klik = kúpiť', 'Click = buy')}</div>`);
+      row.innerHTML = `<span class="slot" style="border-color:${QCOL[it.q]}">${it.icon}</span><span class="vn" style="color:${QCOL[it.q]}">${it.name}</span><span class="vp">${have ? tr('máš', 'owned', 'є') : fmtMoney(it.buy)}</span>`;
+      row.dataset.tip = this.tipItem(id, `<div class="g">${tr('Klik = kúpiť', 'Click = buy', 'Клік = купити')}</div>`);
       row.onclick = () => this.buy(id);
       list.appendChild(row);
     }
     const f = v.querySelector('.foot'); f.innerHTML = '';
-    const sj = el('button', null, tr('Predať haraburdie', 'Sell junk')); sj.onclick = () => this.sellJunk();
-    sj.dataset.tip = tr('Predá všetky šedé (bezcenné) predmety z tašky.', 'Sells every grey (poor) item in your bags.');
-    f.append(sj, el('span', 'muted', tr(' Klik na predmet v taške = predaj.', ' Click an item in your bags = sell.')));
+    const sj = el('button', null, tr('Predať haraburdie', 'Sell junk', 'Продати мотлох')); sj.onclick = () => this.sellJunk();
+    sj.dataset.tip = tr('Predá všetky šedé (bezcenné) predmety z tašky.', 'Sells every grey (poor) item in your bags.', 'Продає всі сірі (убогі) предмети з твоїх сумок.');
+    f.append(sj, el('span', 'muted', tr(' Klik na predmet v taške = predaj.', ' Click an item in your bags = sell.', ' Клікни предмет у сумках = продати.')));
   },
   showLoot(B, items, coins) {
     const l = this.ui.loot;
-    l.querySelector('h3').innerHTML = `${B.icon} ${tr('Korisť', 'Loot')}: ${B.name}`;
+    l.querySelector('h3').innerHTML = `${B.icon} ${tr('Korisť', 'Loot', 'Здобич')}: ${B.name}`;
     const list = l.querySelector('.list'); list.innerHTML = '';
     for (const id of items) {
       const it = this.item(id), row = el('div', 'vrow');
@@ -1192,7 +1192,7 @@ const Wow = {
       list.appendChild(row);
     }
     list.appendChild(el('div', 'vrow', `<span class="slot">💰</span><span class="vn">${fmtMoney(coins)}</span>`));
-    list.appendChild(el('p', 'muted', tr('Všetko je v taške (B). Výstroj si oblečieš klikom.', 'Everything is in your bags (B). Click gear to equip it.')));
+    list.appendChild(el('p', 'muted', tr('Všetko je v taške (B). Výstroj si oblečieš klikom.', 'Everything is in your bags (B). Click gear to equip it.', 'Усе в сумках (B). Клікни спорядження, щоб одягнути.')));
     l.classList.add('show');
     Sound.sfx('loot');
     setTimeout(() => l.classList.remove('show'), 12000);

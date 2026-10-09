@@ -53,7 +53,34 @@ const PHILOSOPHERS_EN = {
       'The lecture says: <b>before a measurement the spin exists as a symmetry</b> — a structure of possibilities; <b>after the measurement, as a fact</b>. Symmetry tells you what <i>can</i> happen, not what will happen.'],
     q: { q: 'According to the lecture, before a measurement the spin exists as…', options: ['a symmetry — a structure of possible answers', 'a definite arrow up or down', 'nothing, spin does not exist at all'], correct: 0, why: 'The value arises only within a concrete experimental framework.' } },
 };
-if (LANG === 'en') for (const p of PHILOSOPHERS) Object.assign(p, PHILOSOPHERS_EN[p.id]);
+const PHILOSOPHERS_UK = {
+  kant: { name: 'Іммануїл Кант',
+    lines: ['Моя <i>Критика чистого розуму</i> каже: «Умови можливості досвіду водночас є умовами можливості предметів досвіду».',
+      'Ваша квантова механіка це радикалізує: <b>квантовий стан репрезентує умови можливості результату</b>, а не сам результат.'],
+    q: { q: 'Що, згідно з лекцією, репрезентує квантовий стан?', options: ['умови можливості результату (структуру можливих відповідей)', 'прихований список значень усіх величин', 'свідомість спостерігача'], correct: 0, why: 'Стан — це правило для передбачень, а не список класичних властивостей.' } },
+  wittg: { name: 'Людвіг Вітгенштейн',
+    lines: ['«Межі моєї мови означають межі мого світу». А пізніше: «Значення слова — це його вживання в мові».',
+      'Вирази на кшталт «спін угору» чи «вимірювання вздовж осі z» — це правила <b>граматики</b> фізичних висловлювань. До речі, спершу я вивчав інженерію — літаки.'],
+    q: { q: 'Говорити про «значення спіну без вимірювання», згідно з лекцією, — це…', options: ['порушення граматики квантової теорії', 'глибший онтологічний опис', 'заборонено законом'], correct: 0, why: 'Значення спіну має сенс лише в контексті процедури вимірювання.' } },
+  stodola: { name: 'Аурел Стодола',
+    lines: ['Добрий день — я народився в Ліптовському Мікулаші й став професором ETH у Цюриху: парові та газові турбіни.',
+      'Я оцінюю теорії за тим, чи можуть вони <b>надійно конструювати</b> зв’язки між причинами й наслідками. Квантова механіка — робоча конструкторська рамка, а не «образ мікросвіту, яким він є».'],
+    q: { q: 'Колапс у квантовій інженерії — це…', options: ['фізичний процес зчитування: підсилення, зв’язок із макросвітом, запис у регістр', 'метафізичний стрибок без причини', 'наслідок того, що на кубіт подивилася людина'], correct: 0, why: 'Він незворотний і дисипативний — інженерна операція, а не додаткова аксіома.' } },
+  bohm: { name: 'Девід Бом',
+    lines: ['Я стверджую, що частинка <b>завжди має точне положення</b> і її веде <b>хвиля-пілот</b>. Хвильова функція ніколи не колапсує. Результат вимірювання розкривається, а не створюється.',
+      'Я плачу за це високу ціну: моя теорія мусить бути <b>нелокальною</b>.'],
+    q: { q: 'Яку ціну платить бомівська механіка за детермінізм?', options: ['нелокальність', 'порушення закону збереження енергії', 'розбіжність з експериментом'], correct: 0, why: 'Нерівності Белла виключають ЛОКАЛЬНІ приховані змінні; Бомові — нелокальні.' } },
+  heis: { name: 'Вернер Гейзенберг',
+    lines: ['На острові Гельголанд 1925 року я знайшов матричну механіку. У книжці <i>Фізика і філософія</i> я пишу: ми спостерігаємо не природу саму по собі, а природу, підставлену <b>нашому способові ставити питання</b>.',
+      'А про невизначеність: Δx · Δp ≥ ħ/2.'],
+    q: { q: 'Що виражає Δx · Δp ≥ ħ/2?', options: ['властивість стану: положення та імпульс не можуть бути водночас чітко визначені', 'лише неточність вимірювального приладу', 'Δ = зміна положення з часом'], correct: 0, why: 'Δ тут означає стандартне відхилення (невизначеність) результатів на однаково приготованих системах.' } },
+  noether: { name: 'Еммі Нетер',
+    lines: ['Моя теорема: кожній неперервній симетрії відповідає закон збереження. Час → енергія, обертання → момент імпульсу.',
+      'Лекція каже: <b>до вимірювання спін існує як симетрія</b> — структура можливостей; <b>після вимірювання — як факт</b>. Симетрія каже, що <i>може</i> статися, а не що станеться.'],
+    q: { q: 'Згідно з лекцією, до вимірювання спін існує як…', options: ['симетрія — структура можливих відповідей', 'певна стрілка вгору чи вниз', 'ніщо, спіну взагалі не існує'], correct: 0, why: 'Значення виникає лише в конкретній експериментальній рамці.' } },
+};
+const PHILOSOPHERS_TR = tr(null, PHILOSOPHERS_EN, PHILOSOPHERS_UK);
+if (PHILOSOPHERS_TR) for (const p of PHILOSOPHERS) Object.assign(p, PHILOSOPHERS_TR[p.id]);
 
 class L8Philo extends Level {
   get steps() { return [this.intro, this.statues, this.sorting]; }
@@ -64,7 +91,7 @@ class L8Philo extends Level {
   }
 
   intro() {
-    this.quest(tr('Vypočuj si Bohra', 'Listen to Bohr'), { easy: '💬 Bohr', hard: tr('Bohr: komplementarita', 'Bohr: complementarity') });
+    this.quest(tr('Vypočuj si Bohra', 'Listen to Bohr', 'Послухай Бора'), { easy: tr('💬 Bohr', '💬 Bohr', '💬 Бор'), hard: tr('Bohr: komplementarita', 'Bohr: complementarity', 'Бор: доповнювальність') });
     this.say(tr([
       'Velkommen! Som Niels Bohr. Na mojom erbe je jin-jang a nápis <i>Contraria sunt complementa</i> — protiklady sa dopĺňajú.',
       'Fyzik musí vedieť počítať. Ale musí vedieť aj <b>hovoriť</b> — a nehovoriť nezmysly. V tejto sieni stoja myslitelia, ktorých spomínajú vaše prednášky.',
@@ -75,18 +102,23 @@ class L8Philo extends Level {
       'A physicist must be able to calculate. But he must also be able to <b>speak</b> — and not speak nonsense. In this hall stand the thinkers your lectures mention.',
       '<b>Complementarity</b>: a quantum object cannot be described by a single classical picture. Wave and particle are both precise descriptions, each within its own experimental arrangement. This is not relativism!',
       'Talk to all six of them. Each will ask you a question.',
+    ], [
+      'Velkommen! Я Нільс Бор. На моєму гербі — інь-ян і девіз <i>Contraria sunt complementa</i> — протилежності доповнюють одна одну.',
+      'Фізик мусить уміти рахувати. Але він мусить уміти й <b>говорити</b> — і не говорити дурниць. У цій залі стоять мислителі, яких згадують твої лекції.',
+      '<b>Доповнювальність</b>: квантовий об’єкт не можна описати однією класичною картиною. Хвиля й частинка — обидва точні описи, кожен у своєму експериментальному влаштуванні. Це не релятивізм!',
+      'Поговори з усіма шістьма. Кожен поставить тобі питання.',
     ]), () => this.next());
   }
 
   statues() {
     this.talked = new Set(this.sub.talked || []);
-    this.quest(tr('Porozprávaj sa so všetkými 6 mysliteľmi (tlačidlá vpravo).', 'Talk to all 6 thinkers (buttons on the right).'), { easy: tr('🗣 6 mysliteľov', '🗣 6 thinkers'), hard: 'Kant · Wittgenstein · Stodola · Bohm · Heisenberg · Noether' });
+    this.quest(tr('Porozprávaj sa so všetkými 6 mysliteľmi (tlačidlá vpravo).', 'Talk to all 6 thinkers (buttons on the right).', 'Поговори з усіма 6 мислителями (кнопки праворуч).'), { easy: tr('🗣 6 mysliteľov', '🗣 6 thinkers', '🗣 6 мислителів'), hard: tr('Kant · Wittgenstein · Stodola · Bohm · Heisenberg · Noether', 'Kant · Wittgenstein · Stodola · Bohm · Heisenberg · Noether', 'Кант · Вітгенштейн · Стодола · Бом · Гейзенберг · Нетер') });
     this.buildPanel();
   }
   buildPanel() {
-    UI.panelSet(tr('Sieň výkladov', 'Hall of Interpretations'), [
+    UI.panelSet(tr('Sieň výkladov', 'Hall of Interpretations', 'Зала тлумачень'), [
       ...PHILOSOPHERS.map((p) => UI.button(`${this.talked.has(p.id) ? '✅' : p.face} ${p.name}`, () => this.talk(p))),
-      UI.info(`${tr('Hotovo', 'Done')}: ${this.talked.size} / ${PHILOSOPHERS.length}`),
+      UI.info(`${tr('Hotovo', 'Done', 'Готово')}: ${this.talked.size} / ${PHILOSOPHERS.length}`),
     ]);
   }
   talk(p) {
@@ -104,13 +136,16 @@ class L8Philo extends Level {
   sorting() {
     this.active = null;
     UI.panelHide();
-    this.quest(tr('Záverečná úloha Bohra: tri roviny otázok a štyri otázky ku každému pojmu', 'Bohr’s final task: three levels of questions and four questions for every concept'), { easy: tr('🗂 zatrieď otázky', '🗂 sort the questions'), hard: tr('ontológia / epistemológia / fenomenológia · 4 otázky', 'ontology / epistemology / phenomenology · 4 questions') });
+    this.quest(tr('Záverečná úloha Bohra: tri roviny otázok a štyri otázky ku každému pojmu', 'Bohr’s final task: three levels of questions and four questions for every concept', 'Підсумкове завдання Бора: три рівні питань і чотири питання до кожного поняття'), { easy: tr('🗂 zatrieď otázky', '🗂 sort the questions', '🗂 розсортуй питання'), hard: tr('ontológia / epistemológia / fenomenológia · 4 otázky', 'ontology / epistemology / phenomenology · 4 questions', 'онтологія / епістемологія / феноменологія · 4 питання') });
     this.say(tr([
       'Výborne. Prednáška ťa varuje: nezamieňaj <b>tri otázky</b> — <b>ontológia</b> (Čo existuje?), <b>epistemológia</b> (Čo o tom môžeme vedieť?), <b>fenomenológia</b> (Ako sa nám jav ukazuje?).',
       'Zatrieď nasledujúce vety.',
     ], [
       'Excellent. The lecture warns you: don’t mix up <b>three questions</b> — <b>ontology</b> (What exists?), <b>epistemology</b> (What can we know about it?), <b>phenomenology</b> (How does the phenomenon appear to us?).',
       'Classify the following sentences.',
+    ], [
+      'Чудово. Лекція застерігає: не змішуй <b>три питання</b> — <b>онтологію</b> (Що існує?), <b>епістемологію</b> (Що ми можемо про це знати?), <b>феноменологію</b> (Як явище нам постає?).',
+      'Класифікуй такі речення.',
     ]), () => UI.quizSeries(tr([
       { who: 'Niels Bohr', face: '☯', q: '„Je vlnová funkcia ψ fyzikálna realita, alebo len nástroj predikcie?“ — Aká je to otázka?', options: ['ontologická', 'epistemologická', 'fenomenologická'], correct: 0, why: 'Pýta sa, čo existuje. Schrödingerova rovnica ani experimenty tento spor samy neuzatvárajú.' },
       { who: 'Niels Bohr', face: '☯', q: '„Čo o polohe a hybnosti elektrónu môžeme zároveň vedieť?“', options: ['epistemologická', 'ontologická', 'fenomenologická'], correct: 0, why: 'Otázka o hraniciach poznania.' },
@@ -121,10 +156,15 @@ class L8Philo extends Level {
       { who: 'Niels Bohr', face: '☯', q: '“What can we know at the same time about the position and momentum of an electron?”', options: ['epistemological', 'ontological', 'phenomenological'], correct: 0, why: 'A question about the limits of knowledge.' },
       { who: 'Niels Bohr', face: '☯', q: '“How does spin appear to us in the Stern–Gerlach experiment — two spots on the screen?”', options: ['phenomenological', 'ontological', 'epistemological'], correct: 0, why: 'A question about how a phenomenon appears in experience/experiment.' },
       { who: 'Niels Bohr', face: '☯', q: 'Which of these is NOT one of the “four questions” to ask about every new quantum concept?', options: ['Which observer is right?', 'What system have we prepared?', 'In what experiment do the properties show up?', 'What does this description still NOT imply?'], correct: 0, why: 'The four questions: the system, the equation and assumptions, the experiment, and what does (not) follow from the description.' },
+    ], [
+      { who: 'Нільс Бор', face: '☯', q: '«Хвильова функція ψ — це фізична реальність чи лише інструмент для передбачень?» — Що це за питання?', options: ['онтологічне', 'епістемологічне', 'феноменологічне'], correct: 0, why: 'Воно питає, що існує. Ні рівняння Шредінгера, ні експерименти самі по собі цієї суперечки не розв’язують.' },
+      { who: 'Нільс Бор', face: '☯', q: '«Що ми можемо водночас знати про положення та імпульс електрона?»', options: ['епістемологічне', 'онтологічне', 'феноменологічне'], correct: 0, why: 'Питання про межі пізнання.' },
+      { who: 'Нільс Бор', face: '☯', q: '«Як нам постає спін в експерименті Штерна–Ґерлаха — дві плями на екрані?»', options: ['феноменологічне', 'онтологічне', 'епістемологічне'], correct: 0, why: 'Питання про те, як явище постає в досвіді/експерименті.' },
+      { who: 'Нільс Бор', face: '☯', q: 'Що з цього НЕ є одним із «чотирьох питань», які варто ставити до кожного нового квантового поняття?', options: ['Який спостерігач має рацію?', 'Яку систему ми приготували?', 'У якому експерименті проявляються властивості?', 'Чого цей опис досі НЕ означає?'], correct: 0, why: 'Чотири питання: система, рівняння й припущення, експеримент і що з опису (не) випливає.' },
     ]), (m) => {
       this.mistakes += m;
       this.grant(['bohr', 'collapse', 'onto', 'four']);
-      this.say([tr('„Nie je potrebné prestať svet počítať. Je potrebné nezabudnúť, čo je to za svet, ktorý počítame.“ — tak končí prednáška o jazyku kvantovej mechaniky.', '“There is no need to stop calculating the world. What we must not forget is what kind of world it is that we are calculating.” — so ends the lecture on the language of quantum mechanics.')], () => this.next());
+      this.say([tr('„Nie je potrebné prestať svet počítať. Je potrebné nezabudnúť, čo je to za svet, ktorý počítame.“ — tak končí prednáška o jazyku kvantovej mechaniky.', '“There is no need to stop calculating the world. What we must not forget is what kind of world it is that we are calculating.” — so ends the lecture on the language of quantum mechanics.', '«Не треба переставати обчислювати світ. Не можна лише забувати, що це за світ, який ми обчислюємо». — так закінчується лекція про мову квантової механіки.')], () => this.next());
     }));
   }
 
@@ -146,7 +186,7 @@ class L8Philo extends Level {
     const yy = [0, 3.2, 0];
     r.sphere(V3.add(yy, [Math.cos(this.t) * 0.25, 0, Math.sin(this.t) * 0.25]), 0.25, [1, 1, 1], { emissive: 0.5 });
     r.sphere(V3.add(yy, [-Math.cos(this.t) * 0.25, 0, -Math.sin(this.t) * 0.25]), 0.25, [0.05, 0.05, 0.05]);
-    UI.label('bohr', [0, 3.9, 0], '☯ Niels Bohr', 'npc', CODEX.find((c) => c.id === 'bohr').text);
+    UI.label('bohr', [0, 3.9, 0], tr('☯ Niels Bohr', '☯ Niels Bohr', '☯ Нільс Бор'), 'npc', CODEX.find((c) => c.id === 'bohr').text);
     PHILOSOPHERS.forEach((p, i) => {
       const a = i / PHILOSOPHERS.length * Math.PI * 2, pos = [Math.sin(a) * 5.5, 0, Math.cos(a) * 5.5];
       const done = this.talked.has(p.id), act = this.active === p.id;

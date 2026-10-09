@@ -8,11 +8,11 @@ Dvojklik na `index.html` (Chrome, Edge alebo Firefox). Netreba server ani inšta
 Postup sa ukladá v prehliadači (localStorage).
 
 ## Jazyk / Language
-Hra je po slovensky a po anglicky. Bez uloženej voľby sa jazyk určí podľa prehliadača: čeština a slovenčina → SK, všetky ostatné → EN.
-Prepínač **SK / EN** je vpravo hore (zmena znovu načíta stránku, postup zostane uložený).
-Texty sú v kóde ako `tr('slovensky', 'English')` (`js/i18n.js`); väčšie tabuľky majú anglickú verziu vedľa slovenskej (`CODEX_EN`, `TRAPS_EN`, `TIPS_EN`, …).
+Hra je po slovensky, po anglicky a po ukrajinsky. Bez uloženej voľby sa jazyk určí podľa prehliadača: čeština a slovenčina → SK, ukrajinčina, ruština a bieloruština (ktorýkoľvek z jazykov prehliadača) → UA, všetky ostatné → EN.
+Prepínač **SK / EN / UA** je vpravo hore aj na uvítacej obrazovke (zmena znovu načíta stránku, postup zostane uložený).
+Texty sú v kóde ako `tr('slovensky', 'English', 'українською')` (`js/i18n.js`; chýbajúci ukrajinský text nahradí anglický); väčšie tabuľky majú anglickú a ukrajinskú verziu vedľa slovenskej (`CODEX_EN`/`CODEX_UK`, `TRAPS_EN`/`TRAPS_UK`, `TIPS_EN`/`TIPS_UK`, …), páry v zvitkoch a teórii sú trojice `[sk, en, uk]`.
 
-*The game is in Slovak and English. Without a saved choice, Czech and Slovak browsers get SK, everyone else EN. Switch with the SK / EN selector in the top-right corner.*
+*The game is in Slovak, English and Ukrainian. Without a saved choice, Czech and Slovak browsers get SK, browsers with Ukrainian, Russian or Belarusian among their languages get UA, everyone else EN. Switch with the SK / EN / UA selector in the top-right corner or on the welcome screen.*
 
 ## Témy
 - V nastaveniach (⚙ → 🎨 Téma) sa volí **téma** hry; zmena znovu načíta hru, postup ostáva.

@@ -13,38 +13,38 @@ const UI = {
   init() {
     this.labelsRoot = $('#labels'); this.labelPool = new Map(); this.labelUsed = new Set();
     this.dialog = $('#dialog'); this.panel = $('#panel'); this.hud = $('#hud'); this.tip = $('#tip');
-    document.title = tr('Psíčko v kvantovom svete', 'Little Psi in the Quantum World');
+    document.title = tr('Psíčko v kvantovom svete', 'Little Psi in the Quantum World', 'Псічко у квантовому світі');
     for (const [id, text, title] of [
-      ['#btn-hub', tr('🏝 Ostrov', '🏝 Island'), tr('Späť na ostrov', 'Back to the island')],
-      ['#btn-map', tr('🗺 Mapa', '🗺 Map'), tr('Mapa (M)', 'Map (M)')],
-      ['#btn-codex', tr('📖 Kódex', '📖 Codex'), tr('Kódex symbolov (C)', 'Codex of symbols (C)')],
-      ['#btn-log', tr('📜 Denník', '📜 Journal'), tr('Denník rozhovorov (L)', 'Conversation journal (L)')],
-      ['#btn-views', '👁', tr('Pohľady: ten istý stav ako obrázky — ručičky, Blochove rezy, bázy, matica ρ (V)', 'Views: the same state as pictures — hands, Bloch cuts, bases, ρ matrix (V)')],
-      ['#btn-settings', '⚙', tr('Nastavenia: vizualizácie a geometria (O)', 'Settings: visualizations and geometry (O)')],
-      ['#btn-help', '❔', tr('Pomoc (H)', 'Help (H)')],
-      ['#btn-sound', Settings.audio.muted ? '🔇' : '🔊', tr('Hudba a zvuky: zapnúť / stlmiť (N). Hlasitosť nájdeš v nastaveniach.', 'Music and sounds: on / mute (N). Volume is in the settings.')],
+      ['#btn-hub', tr('🏝 Ostrov', '🏝 Island', '🏝 Острів'), tr('Späť na ostrov', 'Back to the island', 'Назад на острів')],
+      ['#btn-map', tr('🗺 Mapa', '🗺 Map', '🗺 Мапа'), tr('Mapa (M)', 'Map (M)', 'Мапа (M)')],
+      ['#btn-codex', tr('📖 Kódex', '📖 Codex', '📖 Кодекс'), tr('Kódex symbolov (C)', 'Codex of symbols (C)', 'Кодекс символів (C)')],
+      ['#btn-log', tr('📜 Denník', '📜 Journal', '📜 Щоденник'), tr('Denník rozhovorov (L)', 'Conversation journal (L)', 'Щоденник розмов (L)')],
+      ['#btn-views', '👁', tr('Pohľady: ten istý stav ako obrázky — ručičky, Blochove rezy, bázy, matica ρ (V)', 'Views: the same state as pictures — hands, Bloch cuts, bases, ρ matrix (V)', 'Погляди: той самий стан у вигляді картинок — стрілки, перерізи Блоха, базиси, матриця ρ (V)')],
+      ['#btn-settings', '⚙', tr('Nastavenia: vizualizácie a geometria (O)', 'Settings: visualizations and geometry (O)', 'Налаштування: візуалізації та геометрія (O)')],
+      ['#btn-help', '❔', tr('Pomoc (H)', 'Help (H)', 'Довідка (H)')],
+      ['#btn-sound', Settings.audio.muted ? '🔇' : '🔊', tr('Hudba a zvuky: zapnúť / stlmiť (N). Hlasitosť nájdeš v nastaveniach.', 'Music and sounds: on / mute (N). Volume is in the settings.', 'Музика та звуки: увімкнути / вимкнути (N). Гучність — у налаштуваннях.')],
     ]) { $(id).textContent = text; $(id).title = title; }
     const ls = $('#lang-select');
     ls.value = LANG;
-    ls.dataset.tip = tr('Jazyk / Language — zmena znovu načíta hru (postup zostane uložený).', 'Language / Jazyk — switching reloads the game (your progress stays saved).');
+    ls.dataset.tip = tr('Jazyk / Language — zmena znovu načíta hru (postup zostane uložený).', 'Language / Jazyk — switching reloads the game (your progress stays saved).', 'Мова / Language — зміна перезавантажить гру (поступ залишиться збереженим).');
     ls.onchange = () => setLang(ls.value);
     const ua = $('#btn-unlock-all');
-    ua.textContent = tr('🔓 Odomknúť všetky levely', '🔓 Unlock all levels');
+    ua.textContent = tr('🔓 Odomknúť všetky levely', '🔓 Unlock all levels', '🔓 Відкрити всі рівні');
     ua.onclick = () => {
-      if (!confirm(tr('Naozaj odomknúť všetky levely? Preskočíš postupný výklad.', 'Really unlock all levels? You will skip the step-by-step explanations.'))) return;
+      if (!confirm(tr('Naozaj odomknúť všetky levely? Preskočíš postupný výklad.', 'Really unlock all levels? You will skip the step-by-step explanations.', 'Справді відкрити всі рівні? Ти пропустиш поступове пояснення.'))) return;
       Game.unlockAll();
       this.toggleHelp(false);
     };
     const rb = $('#btn-reset');
-    rb.textContent = tr('🗑 Reset hry', '🗑 Reset game');
+    rb.textContent = tr('🗑 Reset hry', '🗑 Reset game', '🗑 Скинути гру');
     rb.onclick = () => {
       if (!confirm(tr('Naozaj zmazať celý postup (hviezdičky, Kódex, Denník, rozohranú hru)? Nedá sa to vrátiť.',
-        'Really erase all progress (stars, Codex, Journal, game in progress)? This cannot be undone.'))) return;
+        'Really erase all progress (stars, Codex, Journal, game in progress)? This cannot be undone.', 'Справді стерти весь поступ (зірки, Кодекс, Щоденник, розпочату гру)? Це не можна скасувати.'))) return;
       Game.resetAll();
     };
     const ds = $('#diff-select');
     for (const d of DIFFS) { const o = el('option', null, DIFF_NAME[d]); o.value = d; ds.appendChild(o); }
-    const diffUi = () => { ds.value = Settings.diff; ds.className = Settings.diff; ds.dataset.tip = `<b>${tr('Obťažnosť', 'Difficulty')}: ${DIFF_NAME[Settings.diff]}</b> — ${DIFF_DESC[Settings.diff]}.<br>${tr('Dá sa zmeniť kedykoľvek.', 'Can be changed at any time.')}`; };
+    const diffUi = () => { ds.value = Settings.diff; ds.className = Settings.diff; ds.dataset.tip = `<b>${tr('Obťažnosť', 'Difficulty', 'Складність')}: ${DIFF_NAME[Settings.diff]}</b> — ${DIFF_DESC[Settings.diff]}.<br>${tr('Dá sa zmeniť kedykoľvek.', 'Can be changed at any time.', 'Можна змінити будь-коли.')}`; };
     diffUi();
     ds.onchange = () => { Game.setDifficulty(ds.value); diffUi(); ds.blur(); };
     this.diffUi = diffUi;
@@ -145,7 +145,7 @@ const UI = {
   },
 
   // ---------- denník ----------
-  scene() { return Game.scene && Game.scene !== Hub ? `${Game.scene.num} · ${Game.scene.title}` : tr('Hilbertov ostrov', 'Hilbert Island'); },
+  scene() { return Game.scene && Game.scene !== Hub ? `${Game.scene.num} · ${Game.scene.title}` : tr('Hilbertov ostrov', 'Hilbert Island', 'Острів Гільберта'); },
   record(entry) {
     this.log.push({ scene: this.scene(), ...entry });
     if (this.log.length > 400) this.log.splice(0, this.log.length - 400);
@@ -160,7 +160,7 @@ const UI = {
   renderLog() {
     const list = $('#journal .list');
     list.innerHTML = '';
-    if (!this.log.length) { list.appendChild(el('p', 'muted', tr('Zatiaľ prázdny. Každý rozhovor a vysvetlenie z kvízu sa sem uloží.', 'Empty so far. Every conversation and quiz explanation will be saved here.'))); return; }
+    if (!this.log.length) { list.appendChild(el('p', 'muted', tr('Zatiaľ prázdny. Každý rozhovor a vysvetlenie z kvízu sa sem uloží.', 'Empty so far. Every conversation and quiz explanation will be saved here.', 'Поки що порожньо. Тут зберігатиметься кожна розмова й кожне пояснення з вікторин.'))); return; }
     let lastScene = null;
     [...this.log].reverse().forEach((en, idx) => {
       if (en.scene !== lastScene) { list.appendChild(el('h3', null, en.scene)); lastScene = en.scene; }
@@ -169,15 +169,15 @@ const UI = {
         const first = en.lines[0];
         box.appendChild(el('summary', null, `💬 <b>${first.who || ''}</b>: ${first.text.replace(/<[^>]+>/g, '').slice(0, 90)}…`));
         for (const l of en.lines) box.appendChild(el('div', 'line', `<span class="who">${l.face || ''} ${l.who || ''}</span> ${annotate(l.text)}`));
-        const rb = el('button', null, tr('▶ Prehrať znova', '▶ Replay'));
+        const rb = el('button', null, tr('▶ Prehrať znova', '▶ Replay', '▶ Відтворити знову'));
         rb.onclick = () => {
-          if (this.busy) { this.toast(tr('Najprv dokonči aktuálny dialóg — text si však môžeš prečítať tu.', 'Finish the current dialogue first — but you can read the text here.')); return; }
+          if (this.busy) { this.toast(tr('Najprv dokonči aktuálny dialóg — text si však môžeš prečítať tu.', 'Finish the current dialogue first — but you can read the text here.', 'Спершу заверши поточний діалог — але текст можна прочитати тут.')); return; }
           this.toggleLog(false);
           this.say(en.lines, null, { replay: true });
         };
         box.appendChild(rb);
       } else {
-        box.appendChild(el('summary', null, `${en.ok ? '✅' : '❌'} <b>${tr('Otázka', 'Question')}:</b> ${en.q.replace(/<[^>]+>/g, '').slice(0, 90)}`));
+        box.appendChild(el('summary', null, `${en.ok ? '✅' : '❌'} <b>${tr('Otázka', 'Question', 'Питання')}:</b> ${en.q.replace(/<[^>]+>/g, '').slice(0, 90)}`));
         box.appendChild(el('div', 'line', annotate(en.q)));
         box.appendChild(el('div', 'line good', '✔ ' + en.answer));
         if (en.why) box.appendChild(el('div', 'line', annotate(en.why)));
@@ -201,16 +201,16 @@ const UI = {
       const l = lines[i];
       Sound.sfx(l.cls === 'scroll' ? 'scroll' : !opened ? 'dialog' : 'page'); opened = true;
       this.dialog.innerHTML = '';
-      this.dialog.appendChild(el('div', 'who', (l.face || '💬') + ' ' + (l.who || '') + (opts.replay ? ` <small>(${tr('opakovanie', 'replay')})</small>` : '')));
+      this.dialog.appendChild(el('div', 'who', (l.face || '💬') + ' ' + (l.who || '') + (opts.replay ? ` <small>(${tr('opakovanie', 'replay', 'повтор')})</small>` : '')));
       this.dialog.appendChild(el('div', 'txt', l.raw ? l.text : TextMode.render(l.text)));
       this.dialog.className = 'show ' + Settings.diff + (Settings.layman ? ' easy' : '') + (Settings.hard ? ' hard' : '') + (l.cls ? ' ' + l.cls : '');
       const nav = el('div', 'nav');
-      const back = el('button', null, tr('◂ Späť', '◂ Back'));
-      back.disabled = i === 0; back.onclick = prev; back.dataset.tip = tr('Predchádzajúca replika (← alebo Backspace). Celé rozhovory nájdeš v Denníku (L).', 'Previous line (← or Backspace). Full conversations are in the Journal (L).');
+      const back = el('button', null, tr('◂ Späť', '◂ Back', '◂ Назад'));
+      back.disabled = i === 0; back.onclick = prev; back.dataset.tip = tr('Predchádzajúca replika (← alebo Backspace). Celé rozhovory nájdeš v Denníku (L).', 'Previous line (← or Backspace). Full conversations are in the Journal (L).', 'Попередня репліка (← або Backspace). Повні розмови — у Щоденнику (L).');
       nav.appendChild(back);
       nav.appendChild(this.askButton(l.text));
-      nav.appendChild(el('span', 'hint', `${i + 1} / ${lines.length} · ${tr('Enter = ďalej, ← = späť', 'Enter = next, ← = back')}`));
-      const b = el('button', 'primary', i < lines.length - 1 ? tr('Ďalej ▸', 'Next ▸') : tr('Rozumiem ✓', 'Got it ✓'));
+      nav.appendChild(el('span', 'hint', `${i + 1} / ${lines.length} · ${tr('Enter = ďalej, ← = späť', 'Enter = next, ← = back', 'Enter = далі, ← = назад')}`));
+      const b = el('button', 'primary', i < lines.length - 1 ? tr('Ďalej ▸', 'Next ▸', 'Далі ▸') : tr('Rozumiem ✓', 'Got it ✓', 'Зрозуміло ✓'));
       b.onclick = next;
       nav.appendChild(b);
       this.dialog.appendChild(nav);
@@ -240,7 +240,7 @@ const UI = {
     this._next = null; this._prev = null;
     this.dialog.innerHTML = '';
     Sound.sfx('dialog');
-    this.dialog.appendChild(el('div', 'who', (q.face || '❓') + ' ' + (q.who || tr('Otázka', 'Question'))));
+    this.dialog.appendChild(el('div', 'who', (q.face || '❓') + ' ' + (q.who || tr('Otázka', 'Question', 'Питання'))));
     this.dialog.appendChild(el('div', 'txt', annotate(q.q, true)));
     const box = el('div', 'choices');
     let order = q.options.map((_, i) => i);
@@ -261,13 +261,13 @@ const UI = {
         [...box.children].forEach((c) => (c.disabled = true));
         b.classList.add(ok ? 'good' : 'bad');
         if (!ok) box.children[order.indexOf(q.correct)].classList.add('good');
-        const fb = el('div', 'why ' + (ok ? 'ok' : 'no'), (ok ? tr('✅ Správne. ', '✅ Correct. ') : tr('❌ Nie celkom. ', '❌ Not quite. ')) + annotate(q.why || '', true));
+        const fb = el('div', 'why ' + (ok ? 'ok' : 'no'), (ok ? tr('✅ Správne. ', '✅ Correct. ', '✅ Правильно. ') : tr('❌ Nie celkom. ', '❌ Not quite. ', '❌ Не зовсім. ')) + annotate(q.why || '', true));
         this.dialog.appendChild(fb);
-        const c = el('button', 'primary', tr('Pokračovať ▸', 'Continue ▸'));
+        const c = el('button', 'primary', tr('Pokračovať ▸', 'Continue ▸', 'Продовжити ▸'));
         c.onclick = () => { this.dialog.classList.remove('show'); this.busy = false; this._next = null; cb && cb(ok); };
         this.dialog.appendChild(c);
         // až po odpovedi (inak by sa dala odpoveď len vyhľadať): otázka, správna odpoveď a vysvetlenie
-        this.dialog.appendChild(this.askButton(`${q.q}\n${tr('Správna odpoveď', 'Correct answer')}: ${q.options[q.correct]}\n${q.why || ''}`));
+        this.dialog.appendChild(this.askButton(`${q.q}\n${tr('Správna odpoveď', 'Correct answer', 'Правильна відповідь')}: ${q.options[q.correct]}\n${q.why || ''}`));
         this._next = c.onclick;
         c.focus();
       };
@@ -279,8 +279,8 @@ const UI = {
 
   // „Opýtaj sa Google“: otvorí text repliky v novej karte v režime AI vyhľadávania Google (udm=50, ako udm=2 pre obrázky)
   askButton(html) {
-    const b = el('button', 'ask', tr('🔎 Opýtaj sa Google', '🔎 Ask Google more'));
-    b.dataset.tip = tr('Otvorí v novej karte AI vyhľadávanie Google s textom tejto repliky — ak chceš vedieť viac.', 'Opens Google AI search in a new tab with the text of this line — if you want to know more.');
+    const b = el('button', 'ask', tr('🔎 Opýtaj sa Google', '🔎 Ask Google more', '🔎 Запитати Google'));
+    b.dataset.tip = tr('Otvorí v novej karte AI vyhľadávanie Google s textom tejto repliky — ak chceš vedieť viac.', 'Opens Google AI search in a new tab with the text of this line — if you want to know more.', 'Відкриє пошук Google AI у новій вкладці з текстом цієї репліки — якщо хочеш дізнатися більше.');
     b.onclick = (e) => { e.stopPropagation(); this.askGoogle(html); };
     return b;
   },
@@ -288,7 +288,7 @@ const UI = {
     const d = document.createElement('div');
     d.innerHTML = String(html).replace(/<sup>(.*?)<\/sup>/g, '^($1)').replace(/<sub>(.*?)<\/sub>/g, '_$1').replace(/<br\s*\/?>/g, '\n');
     const text = d.textContent.replace(/[ \t]+/g, ' ').replace(/\s*\n\s*/g, '\n').trim().slice(0, 1500);
-    const q = tr('Vysvetli mi to podrobnejšie (kvantová mechanika): ', 'Explain this to me in more detail (quantum mechanics): ') + text;
+    const q = tr('Vysvetli mi to podrobnejšie (kvantová mechanika): ', 'Explain this to me in more detail (quantum mechanics): ', 'Поясни мені це докладніше (квантова механіка): ') + text;
     window.open(`https://www.google.com/search?udm=50&hl=${LANG}&q=${encodeURIComponent(q)}`, '_blank', 'noopener');
   },
 
@@ -324,11 +324,11 @@ const UI = {
     if (!parts) return;
     const d = el('details', 'theory');
     d.open = Settings.hard;
-    d.appendChild(el('summary', null, tr('📐 Teória a rovnice', '📐 Theory and equations')));
+    d.appendChild(el('summary', null, tr('📐 Teória a rovnice', '📐 Theory and equations', '📐 Теорія та рівняння')));
     for (const p of parts) {
       d.appendChild(el('h4', null, p.h));
       d.appendChild(el('div', 'th', annotate(p.html)));
-      if (p.view) d.appendChild(this.button(tr('👁 Ukáž to obrázkom', '👁 Show it as a picture'), () => Views.open(p.view), '', tr('Otvorí pohľad, v ktorom túto rovnicu vidno.', 'Opens the view in which this equation can be seen.')));
+      if (p.view) d.appendChild(this.button(tr('👁 Ukáž to obrázkom', '👁 Show it as a picture', '👁 Показати як картинку'), () => Views.open(p.view), '', tr('Otvorí pohľad, v ktorom túto rovnicu vidno.', 'Opens the view in which this equation can be seen.', 'Відкриє погляд, у якому видно це рівняння.')));
     }
     this.panel.appendChild(d);
   },
@@ -415,7 +415,7 @@ const UI = {
   renderSettings() {
     const body = $('#settings .body'), V = Settings.view, ch = () => Settings.save();
     body.innerHTML = '';
-    body.appendChild(el('h3', null, tr('🎚 Obťažnosť', '🎚 Difficulty')));
+    body.appendChild(el('h3', null, tr('🎚 Obťažnosť', '🎚 Difficulty', '🎚 Складність')));
     const diffs = el('div', 'diffs');
     for (const d of DIFFS) {
       const l = el('label'), r = el('input');
@@ -425,31 +425,31 @@ const UI = {
       diffs.appendChild(l);
     }
     body.appendChild(diffs);
-    body.appendChild(el('h3', null, tr('📊 Vizualizácie', '📊 Visualizations')));
+    body.appendChild(el('h3', null, tr('📊 Vizualizácie', '📊 Visualizations', '📊 Візуалізації')));
     const g1 = el('div', 'grid2');
     for (const [k, label, tip] of [
-      ['grid', tr('mriežka: rovnobežky a poludníky sféry, polárna mriežka komplexnej roviny', 'grid: sphere latitudes and meridians, polar grid of the complex plane'), tr('Pomáha odčítať uhly θ, φ a veľkosť amplitúdy.', 'Helps to read off the angles θ, φ and the magnitude of an amplitude.')],
-      ['proj', tr('projekcie Blochovho vektora na osi (⟨X⟩, ⟨Y⟩, ⟨Z⟩)', 'projections of the Bloch vector onto the axes (⟨X⟩, ⟨Y⟩, ⟨Z⟩)'), tr('Prerušované čiary od šípky k osi z a do rovníkovej roviny.', 'Dashed lines from the arrow to the z axis and to the equatorial plane.')],
-      ['angles', tr('oblúky uhlov θ, φ a fázy amplitúdy', 'arcs of the angles θ, φ and of the amplitude phase'), null],
-      ['bars', tr('stĺpce P(0), P(1) pri Blochovej sfére', 'P(0), P(1) bars next to the Bloch sphere'), null],
-      ['trail', tr('stopa šípky počas rotácie', 'trail of the arrow during rotations'), null],
-      ['charts', tr('grafy v paneli levelu (teória vs. meranie)', 'charts in the level panel (theory vs. measurement)'), tr('Zmena sa prejaví pri ďalšom otvorení panelu.', 'Takes effect the next time a panel opens.')],
+      ['grid', tr('mriežka: rovnobežky a poludníky sféry, polárna mriežka komplexnej roviny', 'grid: sphere latitudes and meridians, polar grid of the complex plane', 'сітка: паралелі й меридіани сфери, полярна сітка комплексної площини'), tr('Pomáha odčítať uhly θ, φ a veľkosť amplitúdy.', 'Helps to read off the angles θ, φ and the magnitude of an amplitude.', 'Допомагає зчитати кути θ, φ і модуль амплітуди.')],
+      ['proj', tr('projekcie Blochovho vektora na osi (⟨X⟩, ⟨Y⟩, ⟨Z⟩)', 'projections of the Bloch vector onto the axes (⟨X⟩, ⟨Y⟩, ⟨Z⟩)', 'проєкції вектора Блоха на осі (⟨X⟩, ⟨Y⟩, ⟨Z⟩)'), tr('Prerušované čiary od šípky k osi z a do rovníkovej roviny.', 'Dashed lines from the arrow to the z axis and to the equatorial plane.', 'Пунктирні лінії від стрілки до осі z та до екваторіальної площини.')],
+      ['angles', tr('oblúky uhlov θ, φ a fázy amplitúdy', 'arcs of the angles θ, φ and of the amplitude phase', 'дуги кутів θ, φ і фази амплітуди'), null],
+      ['bars', tr('stĺpce P(0), P(1) pri Blochovej sfére', 'P(0), P(1) bars next to the Bloch sphere', 'стовпчики P(0), P(1) біля сфери Блоха'), null],
+      ['trail', tr('stopa šípky počas rotácie', 'trail of the arrow during rotations', 'слід стрілки під час обертань'), null],
+      ['charts', tr('grafy v paneli levelu (teória vs. meranie)', 'charts in the level panel (theory vs. measurement)', 'графіки в панелі рівня (теорія проти вимірювання)'), tr('Zmena sa prejaví pri ďalšom otvorení panelu.', 'Takes effect the next time a panel opens.', 'Діє з наступного відкриття панелі.')],
     ]) g1.appendChild(this.checkbox(label, V[k], (v) => { V[k] = v; ch(); }, tip));
     body.appendChild(g1);
-    body.appendChild(el('h3', null, tr('🎵 Hudba a zvuky', '🎵 Music and sounds')));
+    body.appendChild(el('h3', null, tr('🎵 Hudba a zvuky', '🎵 Music and sounds', '🎵 Музика та звуки')));
     const A = Settings.audio, ga = el('div', 'grid2'), chA = () => { Settings.save(); Sound.apply(); };
     ga.append(
-      this.slider(tr('hlasitosť hudby (pokojná, pre sústredenie)', 'music volume (calm, for focus)'), 0, 1, 0.05, A.music, (v) => { A.music = v; chA(); return v ? Math.round(v * 100) + ' %' : tr('vypnutá', 'off'); }),
-      this.slider(tr('hlasitosť zvukových efektov', 'sound effects volume'), 0, 1, 0.05, A.sfx, (v) => { A.sfx = v; chA(); return v ? Math.round(v * 100) + ' %' : tr('vypnuté', 'off'); }),
-      this.checkbox(tr('stlmiť všetko (N)', 'mute everything (N)'), A.muted, (v) => { A.muted = v; Sound.init(); chA(); Sound.muteUi(); }),
+      this.slider(tr('hlasitosť hudby (pokojná, pre sústredenie)', 'music volume (calm, for focus)', 'гучність музики (спокійна, для зосередження)'), 0, 1, 0.05, A.music, (v) => { A.music = v; chA(); return v ? Math.round(v * 100) + ' %' : tr('vypnutá', 'off', 'вимкнено'); }),
+      this.slider(tr('hlasitosť zvukových efektov', 'sound effects volume', 'гучність звукових ефектів'), 0, 1, 0.05, A.sfx, (v) => { A.sfx = v; chA(); return v ? Math.round(v * 100) + ' %' : tr('vypnuté', 'off', 'вимкнено'); }),
+      this.checkbox(tr('stlmiť všetko (N)', 'mute everything (N)', 'вимкнути все (N)'), A.muted, (v) => { A.muted = v; Sound.init(); chA(); Sound.muteUi(); }),
     );
     body.appendChild(ga);
-    body.appendChild(el('h3', null, tr('🎨 Téma', '🎨 Theme')));
+    body.appendChild(el('h3', null, tr('🎨 Téma', '🎨 Theme', '🎨 Тема')));
     const th = el('div', 'diffs');
     for (const [k, name, desc] of [
-      ['classic', tr('Klasická', 'Classic'), tr('pôvodný modrý Hilbertov ostrov, 8 levelov', 'the original blue Hilbert Island, 8 levels')],
-      ['nordic', tr('🐉 Severská (Skyrim)', '🐉 Nordic (Skyrim)'), tr('zasnežený ostrov s borovicami a menhirmi, severské písmo a farby, detailné textúry a záverečný 9. level: ťahový súboj s kvantovým drakom Ketvarrom', 'a snowy island with pines and standing stones, Nordic lettering and colours, detailed textures and a final 9th level: a turn-based battle with the quantum dragon Ketvarr')],
-      ['wow', tr('⚔ MMO (World of Warcraft)', '⚔ MMO (World of Warcraft)'), tr('hrá sa ako MMO: kvantový mág s úrovňami, lišta kúziel (hradlá X, H, meranie…), nepriatelia „klasické omyly“, úlohy, obchodník, taška a korisť; levely sú dungeony s bossom, ktorého porazíš vedomosťami; aj drak Ketvarr', 'plays like an MMO: a quantum mage with levels, a spell bar (X and H gates, measurement…), “classical misconception” enemies, quests, a merchant, bags and loot; levels are dungeons with a boss you defeat with knowledge; Ketvarr the dragon too')],
+      ['classic', tr('Klasická', 'Classic', 'Класична'), tr('pôvodný modrý Hilbertov ostrov, 8 levelov', 'the original blue Hilbert Island, 8 levels', 'оригінальний синій Острів Гільберта, 8 рівнів')],
+      ['nordic', tr('🐉 Severská (Skyrim)', '🐉 Nordic (Skyrim)', '🐉 Північна (Skyrim)'), tr('zasnežený ostrov s borovicami a menhirmi, severské písmo a farby, detailné textúry a záverečný 9. level: ťahový súboj s kvantovým drakom Ketvarrom', 'a snowy island with pines and standing stones, Nordic lettering and colours, detailed textures and a final 9th level: a turn-based battle with the quantum dragon Ketvarr', 'засніжений острів із соснами та кам’яними брилами, північні шрифти й кольори, детальні текстури та фінальний 9-й рівень: покроковий бій із квантовим драконом Кетварром')],
+      ['wow', tr('⚔ MMO (World of Warcraft)', '⚔ MMO (World of Warcraft)', '⚔ MMO (World of Warcraft)'), tr('hrá sa ako MMO: kvantový mág s úrovňami, lišta kúziel (hradlá X, H, meranie…), nepriatelia „klasické omyly“, úlohy, obchodník, taška a korisť; levely sú dungeony s bossom, ktorého porazíš vedomosťami; aj drak Ketvarr', 'plays like an MMO: a quantum mage with levels, a spell bar (X and H gates, measurement…), “classical misconception” enemies, quests, a merchant, bags and loot; levels are dungeons with a boss you defeat with knowledge; Ketvarr the dragon too', 'грається як MMO: квантовий маг із рівнями, панель заклять (гейти X і H, вимірювання…), вороги — «класичні хибні уявлення», завдання, торговець, сумки та здобич; рівні — підземелля з босом, якого перемагаєш знаннями; є й дракон Кетварр')],
     ]) {
       const l = el('label'), r = el('input');
       r.type = 'radio'; r.name = 'theme'; r.checked = Settings.theme === k;
@@ -458,14 +458,14 @@ const UI = {
       th.appendChild(l);
     }
     body.appendChild(th);
-    body.appendChild(el('p', 'muted', tr('Zmena témy znovu načíta hru; postup, hudba a zvuky ostávajú.', 'Changing the theme reloads the game; progress, music and sounds stay.')));
+    body.appendChild(el('p', 'muted', tr('Zmena témy znovu načíta hru; postup, hudba a zvuky ostávajú.', 'Changing the theme reloads the game; progress, music and sounds stay.', 'Зміна теми перезавантажить гру; поступ, музика та звуки залишаться.')));
     if (Settings.nordic || Settings.wow) {
-    body.appendChild(el('h3', null, tr('🖼 Textúry', '🖼 Textures')));
+    body.appendChild(el('h3', null, tr('🖼 Textúry', '🖼 Textures', '🖼 Текстури')));
     const tx = el('div', 'diffs');
     for (const [k, name, desc] of [
-      ['auto', tr('automaticky', 'automatic'), tr(`podľa výkonu počítača — teraz: ${Settings.view.tex === 'auto' && Settings.texHigh ? 'vysoké' : 'pôvodné'}`, `by computer performance — now: ${Settings.view.tex === 'auto' && Settings.texHigh ? 'high' : 'original'}`)],
-      ['low', tr('pôvodné', 'original'), tr('lacné procedurálne textúry, vhodné pre slabšie počítače a notebooky', 'cheap procedural textures, suited to weaker computers and laptops')],
-      ['high', tr('vysoké rozlíšenie', 'high resolution'), tr('viac detailov, reliéf kameňa a snehu, lišajník, trblietanie snehu — náročnejšie na grafiku', 'more detail, relief on stone and snow, lichen, snow sparkle — heavier on the graphics card')],
+      ['auto', tr('automaticky', 'automatic', 'автоматично'), tr(`podľa výkonu počítača — teraz: ${Settings.view.tex === 'auto' && Settings.texHigh ? 'vysoké' : 'pôvodné'}`, `by computer performance — now: ${Settings.view.tex === 'auto' && Settings.texHigh ? 'high' : 'original'}`, `за продуктивністю комп’ютера — зараз: ${Settings.view.tex === 'авто' && Settings.texHigh ? 'високі' : 'оригінальні'}`)],
+      ['low', tr('pôvodné', 'original', 'оригінальні'), tr('lacné procedurálne textúry, vhodné pre slabšie počítače a notebooky', 'cheap procedural textures, suited to weaker computers and laptops', 'дешеві процедурні текстури, придатні для слабших комп’ютерів і ноутбуків')],
+      ['high', tr('vysoké rozlíšenie', 'high resolution', 'висока роздільність'), tr('viac detailov, reliéf kameňa a snehu, lišajník, trblietanie snehu — náročnejšie na grafiku', 'more detail, relief on stone and snow, lichen, snow sparkle — heavier on the graphics card', 'більше деталей, рельєф на камені та снігу, лишайник, іскріння снігу — важче для відеокарти')],
     ]) {
       const l = el('label'), r = el('input');
       r.type = 'radio'; r.name = 'tex'; r.checked = Settings.view.tex === k;
@@ -475,18 +475,18 @@ const UI = {
     }
     body.appendChild(tx);
     }
-    body.appendChild(el('h3', null, tr('📐 Geometria zobrazenia', '📐 View geometry')));
+    body.appendChild(el('h3', null, tr('📐 Geometria zobrazenia', '📐 View geometry', '📐 Геометрія вигляду')));
     const g2 = el('div', 'grid2');
     const deg = (v) => Math.round(v * 180 / Math.PI) + '°';
     g2.append(
-      this.slider(tr('zorný uhol kamery', 'camera field of view'), 0.5, 1.6, 0.05, V.fov, (v) => { V.fov = v; ch(); return deg(v); }, tr('Menší uhol = teleobjektív (menej skreslenia), väčší = širokouhlý pohľad.', 'Smaller = telephoto (less distortion), larger = wide-angle view.')),
-      this.slider(tr('veľkosť popiskov', 'label size'), 0.6, 1.8, 0.05, V.labelScale, (v) => { V.labelScale = v; ch(); return Math.round(v * 100) + ' %'; }),
-      this.slider(tr('nepriehľadnosť Blochovej sféry', 'Bloch sphere opacity'), 0, 0.45, 0.01, V.glass, (v) => { V.glass = v; ch(); return Math.round(v * 100) + ' %'; }),
-      this.slider(tr('automatické otáčanie kamery (v leveloch)', 'automatic camera rotation (in levels)'), 0, 0.6, 0.05, V.autoRotate, (v) => { V.autoRotate = v; ch(); return v ? Fmt.num(v, 2) + ' rad/s' : tr('vypnuté', 'off'); }),
+      this.slider(tr('zorný uhol kamery', 'camera field of view', 'поле зору камери'), 0.5, 1.6, 0.05, V.fov, (v) => { V.fov = v; ch(); return deg(v); }, tr('Menší uhol = teleobjektív (menej skreslenia), väčší = širokouhlý pohľad.', 'Smaller = telephoto (less distortion), larger = wide-angle view.', 'Менше = телеоб’єктив (менше спотворень), більше = ширококутний вигляд.')),
+      this.slider(tr('veľkosť popiskov', 'label size', 'розмір написів'), 0.6, 1.8, 0.05, V.labelScale, (v) => { V.labelScale = v; ch(); return Math.round(v * 100) + ' %'; }),
+      this.slider(tr('nepriehľadnosť Blochovej sféry', 'Bloch sphere opacity', 'непрозорість сфери Блоха'), 0, 0.45, 0.01, V.glass, (v) => { V.glass = v; ch(); return Math.round(v * 100) + ' %'; }),
+      this.slider(tr('automatické otáčanie kamery (v leveloch)', 'automatic camera rotation (in levels)', 'автоматичне обертання камери (у рівнях)'), 0, 0.6, 0.05, V.autoRotate, (v) => { V.autoRotate = v; ch(); return v ? Fmt.num(v, 2) + tr(' rad/s', ' rad/s', ' рад/с') : tr('vypnuté', 'off', 'вимкнено'); }),
     );
     body.appendChild(g2);
     body.appendChild(el('p', 'muted', tr('Nastavenia sa ukladajú automaticky. Ďalšie geometrické ovládanie (uhly magnetov, os rotácie, fázový posun, sila poľa B₀…) nájdeš priamo v paneloch levelov.',
-      'Settings are saved automatically. More geometric controls (magnet angles, rotation axis, phase shifter, field strength B₀…) are in the level panels.')));
+      'Settings are saved automatically. More geometric controls (magnet angles, rotation axis, phase shifter, field strength B₀…) are in the level panels.', 'Налаштування зберігаються автоматично. Більше геометричних елементів керування (кути магнітів, вісь обертання, фазозсувач, сила поля B₀…) — у панелях рівнів.')));
   },
 
   // ---------- kódex ----------
@@ -500,31 +500,31 @@ const UI = {
     const list = $('#codex .list'), got = Game.progress.codex;
     list.innerHTML = '';
     const tabs = $('#codex .tabs'); tabs.innerHTML = '';
-    for (const [k, n] of [['all', tr('Všetko', 'All')], ['symbol', tr('🔣 Symboly', '🔣 Symbols')], ['osobnost', tr('👤 Osobnosti', '👤 People')], ['pojem', tr('💡 Pojmy', '💡 Concepts')], ['scroll', tr('📜 Zvitky', '📜 Scrolls')]]) {
+    for (const [k, n] of [['all', tr('Všetko', 'All', 'Усе')], ['symbol', tr('🔣 Symboly', '🔣 Symbols', '🔣 Символи')], ['osobnost', tr('👤 Osobnosti', '👤 People', '👤 Особистості')], ['pojem', tr('💡 Pojmy', '💡 Concepts', '💡 Поняття')], ['scroll', tr('📜 Zvitky', '📜 Scrolls', '📜 Сувої')]]) {
       const b = el('button', filter === k ? 'on' : '', n); b.onclick = () => this.renderCodex(k); tabs.appendChild(b);
     }
     if (filter === 'scroll') return this.renderScrolls(list);
     const entries = CODEX.filter((e) => filter === 'all' || e.type === filter);
-    $('#codex .count').textContent = `${got.size} / ${CODEX.length} ${tr('odomknutých', 'unlocked')}`;
+    $('#codex .count').textContent = `${got.size} / ${CODEX.length} ${tr('odomknutých', 'unlocked', 'відкрито')}`;
     for (const e of entries) {
       const have = got.has(e.id), card = el('div', 'card ' + (have ? '' : 'locked'));
       card.innerHTML = have
         ? `<div class="sym">${e.sym}</div><div class="nm">${e.name}</div><div class="ds">${annotate(e.text)}</div>`
           + (e.do ? `<div class="do">✅ ${e.do}</div>` : '') + (e.dont ? `<div class="dont">❌ ${e.dont}</div>` : '')
-          + `<div class="src">Level ${e.level}</div>`
-        : `<div class="sym">?</div><div class="nm">${tr('zamknuté', 'locked')}</div><div class="ds">${tr(`Odomkneš v leveli ${e.level}.`, `Unlocked in level ${e.level}.`)}</div>`;
-      if (!have) card.dataset.tip = tr(`Dokonči level ${e.level} (${LEVELS[e.level - 1].title}).`, `Complete level ${e.level} (${LEVELS[e.level - 1].title}).`);
+          + `<div class="src">${tr('Level', 'Level', 'Рівень')} ${e.level}</div>`
+        : `<div class="sym">?</div><div class="nm">${tr('zamknuté', 'locked', 'закрито')}</div><div class="ds">${tr(`Odomkneš v leveli ${e.level}.`, `Unlocked in level ${e.level}.`, `Відкриється в рівні ${e.level}.`)}</div>`;
+      if (!have) card.dataset.tip = tr(`Dokonči level ${e.level} (${LEVELS[e.level - 1].title}).`, `Complete level ${e.level} (${LEVELS[e.level - 1].title}).`, `Пройди рівень ${e.level} (${LEVELS[e.level - 1].title}).`);
       list.appendChild(card);
     }
   },
   renderScrolls(list) {
     const got = Game.progress.scrolls;
-    $('#codex .count').textContent = `${got.size} / ${SCROLLS.length} ${tr('zvitkov', 'scrolls')} · ${tr('rozvinú sa v obťažnosti 📜 Prastará', 'they unroll in the 📜 Ancient difficulty')}`;
+    $('#codex .count').textContent = `${got.size} / ${SCROLLS.length} ${tr('zvitkov', 'scrolls', 'сувої')} · ${tr('rozvinú sa v obťažnosti 📜 Prastará', 'they unroll in the 📜 Ancient difficulty', 'розгортаються на складності 📜 Прадавня')}`;
     for (const s of SCROLLS) {
       const have = got.has(s.id), card = el('div', 'card scrollcard ' + (have ? '' : 'locked'));
       card.innerHTML = have
-        ? `<div class="sym">📜 ${s.year}</div>${scrollHtml(s)}<div class="src">Level ${s.level}</div>`
-        : `<div class="sym">📜 ?</div><div class="nm">${tr('zvinutý zvitok', 'a rolled-up scroll')}</div><div class="ds">${tr(`Level ${s.level} v obťažnosti Prastará.`, `Level ${s.level} on Ancient difficulty.`)}</div>`;
+        ? `<div class="sym">📜 ${s.year}</div>${scrollHtml(s)}<div class="src">${tr('Level', 'Level', 'Рівень')} ${s.level}</div>`
+        : `<div class="sym">📜 ?</div><div class="nm">${tr('zvinutý zvitok', 'a rolled-up scroll', 'згорнутий сувій')}</div><div class="ds">${tr(`Level ${s.level} v obťažnosti Prastará.`, `Level ${s.level} on Ancient difficulty.`, `Рівень ${s.level} на складності «Прадавня».`)}</div>`;
       list.appendChild(card);
     }
   },
@@ -554,6 +554,15 @@ const SLIDER_TIPS = tr([
   [/pulse area/, 'Ω_R·t = the angle by which the pulse rotates the Bloch vector. π = flip, π/2 = equator.'],
   [/RF frequency/, 'Generator frequency. At resonance the spin rotates about an axis in the xy plane and can be fully flipped.'],
   [/Alice|Bob/, 'Angle of the measurement axis in the xz plane of the Bloch sphere (0° = z, 90° = x).'],
+], [
+  [/magnitude/, 'Довжина стрілки |α|. Імовірність — її квадрат.'],
+  [/phase φ/, 'Кут стрілки (фаза). На ймовірність |α|² не впливає — лише в інтерференції.'],
+  [/phase of path/, 'Відносна фаза другого шляху щодо першого. π = протилежно (гасіння), 0 = разом (підсилення).'],
+  [/^axis/, 'Поворот магніту навколо пучка: 0° = вимірюємо S_z, 90° = вимірюємо S_x.'],
+  [/strength p/, 'Сила декогеренції: когерентності (позадіагональні елементи ρ) множаться на (1 − p).'],
+  [/pulse area/, 'Ω_R·t = кут, на який імпульс повертає вектор Блоха. π = переворот, π/2 = екватор.'],
+  [/RF frequency/, 'Частота генератора. У резонансі спін обертається навколо осі в площині xy і може повністю перевернутися.'],
+  [/Alice|Bob/, 'Кут осі вимірювання в площині xz сфери Блоха (0° = z, 90° = x).'],
 ]);
 
 // ---------- čitateľnosť textu podľa obťažnosti ----------
