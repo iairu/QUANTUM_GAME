@@ -411,6 +411,7 @@ function tipFor(html) {
 // do HTML textu dialógu pridá podčiarknuté pojmy s vysvetlivkou (prvý výskyt každého pojmu)
 // inline: v laickej obťažnosti aj krátky preklad žargónu v zátvorke (dialógy a kvízy, nie HUD)
 function annotate(html, inline = false) {
+  if (Settings.eq && typeof EqM !== 'undefined') html = EqM.paint(html); // rovnice najprv: symboly vo farbách mnemotechniky
   if (Settings.layman) return annotateLayman(html, inline);
   const used = new Set(), tips = [];
   return String(html).split(/(<[^>]+>)/).map((seg) => {

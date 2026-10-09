@@ -39,7 +39,8 @@ class Level {
   // text = normálna úloha; alt.easy = len kľúčové slová, alt.hard = stručne a husto (vzorce, čísla)
   quest(text, alt = {}) {
     this.questArgs = [text, alt];
-    UI.setHud(`${this.num} · ${this.title}`, byDiff(alt.easy ?? text, text, alt.hard ?? text));
+    const eqHud = Settings.eq && alt.hard && alt.hard !== text ? `${alt.hard}<br><small>${text}</small>` : null;
+    UI.setHud(`${this.num} · ${this.title}`, eqHud || byDiff(alt.easy ?? text, text, alt.hard ?? text));
   }
   request() { if (this.questArgs) this.quest(...this.questArgs); }
   next() {
@@ -50,6 +51,12 @@ class Level {
     Settings.wow && Wow.onStep(this); // MMO: dokončený krok = zásah bossa
     const s = this.steps[this.stepIdx], run = () => (s ? s.call(this) : this.finale()), name = s ? s.name : 'finale';
     const pre = [];
+    // rovnice najprv: pred krokom jeho rovnica vo farbách mnemotechniky
+    if (Settings.eq && !Game.progress.eqIntroSeen) pre.push(...Game.eqIntroLines()); // mnemotechnika sa ešte nepredstavila (prepnuté počas rozhovoru)
+    if (Settings.eq && !this.seenScrolls.has('eq:' + name)) {
+      this.seenScrolls.add('eq:' + name);
+      pre.push(...EqM.cardsFor(this.num, name));
+    }
     // laická obťažnosť: pred krokom ho sprievodkyňa vysvetlí bežnými slovami
     if (!this.seenScrolls.has('plain:' + name)) {
       this.seenScrolls.add('plain:' + name);
@@ -407,6 +414,7 @@ const Game = {
     catch (e) { $('#fatal').style.display = 'flex'; $('#fatal').innerHTML = '<div>' + tr('Tvoj prehliadač nepodporuje WebGL2 (OpenGL ES 3.0).', 'Your browser does not support WebGL2 (OpenGL ES 3.0).', 'Твій браузер не підтримує WebGL2 (OpenGL ES 3.0).') + '<br><small>' + e.message + '</small></div>'; return; }
     UI.init();
     Views.init();
+    EqM.init();
     this.load();
     if (this.fresh) Welcome.show(() => this.start()); // nový hráč alebo po resete: najprv výber témy a obťažnosti
     else this.start();
@@ -422,6 +430,7 @@ const Game = {
     this.last = performance.now();
     requestAnimationFrame((t) => this.loop(t));
     if (!this.progress.introSeen) setTimeout(() => this.guideTalk(), 400);
+    else if (Settings.eq && !this.progress.eqIntroSeen) setTimeout(() => this.eqIntro(), 400);
   },
   loop(now) {
     const dt = Math.min((now - this.last) / 1000, 0.05);
@@ -435,6 +444,7 @@ const Game = {
     const pw = UI.panel.classList.contains('show') && window.innerWidth > 720 ? (UI.panel.offsetWidth + 14) / window.innerWidth : 0;
     this.r.shiftX += (pw - this.r.shiftX) * Math.min(1, dt * 6);
     Views.update();
+    EqM.update();
     UI.labelsBegin();
     this.scene.draw(this.r);
     UI.labelsEnd();
@@ -531,6 +541,35 @@ const Game = {
     Settings.theme = t; Settings.save();
     location.reload();
   },
+  // typ hry sa mení za behu (bez znovunačítania): javisko rovnice, farbenie symbolov, karty a panel teórie
+  setMode(m) {
+    if (!MODES.includes(m) || m === Settings.mode) return;
+    Settings.mode = m; Settings.save();
+    EqM.apply();
+    UI.labelsClear();
+    if (this.scene && this.scene !== Hub) { this.scene.request(); UI.refreshTheory(); } else UI.setHud(tr('Hilbertov ostrov', 'Hilbert Island', 'Острів Гільберта'), this.nextQuestText());
+    UI.refreshDialog && UI.refreshDialog();
+    UI.toast(tr(`🎮 Typ hry: <b>${MODE_NAME[m]}</b>`, `🎮 Game type: <b>${MODE_NAME[m]}</b>`, `🎮 Тип гри: <b>${MODE_NAME[m]}</b>`), 3000);
+    if (Settings.eq && !this.progress.eqIntroSeen && !UI.busy) { UI.toggleSettings(false); this.eqIntro(); }
+  },
+  // sprievodkyňa predstaví rovnicovú mnemotechniku (raz, pri prvom zapnutí typu „Rovnice najprv“)
+  eqIntro() { UI.say(this.eqIntroLines()); },
+  eqIntroLines() {
+    this.progress.eqIntroSeen = true; this.save();
+    const A = (text, raw) => ({ who: tr('Amplitúda (sprievodkyňa)', 'Amplitude (your guide)', 'Амплітуда (твоя провідниця)'), face: '✨', text, raw });
+    return [
+      A(tr('Hráš typ <b>∑ Rovnice najprv</b>. Hore nad scénou sa vznáša <b>skutočná rovnica</b>, ktorá práve platí — s hodnotami, ktoré sa menia, keď niečo urobíš. Je to rovina v tom istom 3D svete: nakláňa sa s kamerou.',
+        'You are playing <b>∑ Equations first</b>. Above the scene floats the <b>real equation</b> that holds right now — with values that change when you do something. It is a plane in the same 3D world: it tilts with the camera.',
+        'Ти граєш у режимі <b>∑ Спершу рівняння</b>. Над сценою ширяє <b>справжнє рівняння</b>, що діє саме зараз, — зі значеннями, які змінюються, коли ти щось робиш. Це площина в тому самому 3D-світі: вона нахиляється разом із камерою.')),
+      A(tr('Aby sa rovnica dala čítať očami, má <b>mnemotechniku</b>. Tri hlavné pravidlá: <b>farba = KTO</b>, <b>veľkosť = KOĽKO</b>, <b>otáčanie = FÁZA</b>. Ďalšie nájdeš pod 🔑:',
+        'So that you can read the equation with your eyes, it has <b>mnemonics</b>. Three main rules: <b>colour = WHO</b>, <b>size = HOW MUCH</b>, <b>spin = PHASE</b>. More under 🔑:',
+        'Щоб рівняння можна було читати очима, воно має <b>мнемоніку</b>. Три головні правила: <b>колір = ХТО</b>, <b>розмір = СКІЛЬКИ</b>, <b>обертання = ФАЗА</b>. Решта — під 🔑:')),
+      A(`<div class="eqlegend inline">${EqM.legendHtml()}</div>`, true),
+      A(tr('Pred každou úlohou ti najprv ukážem jej <b>rovnicu</b> (karta ∑) a až potom obraz. Symboly v rozhovoroch majú tie isté farby — α vždy modrá, β vždy červená.',
+        'Before every task I will first show you its <b>equation</b> (the ∑ card) and only then the picture. Symbols in conversations have the same colours — α always blue, β always red.',
+        'Перед кожним завданням я спершу покажу тобі його <b>рівняння</b> (картка ∑), а вже потім образ. Символи в розмовах мають ті самі кольори — α завжди синя, β завжди червона.')),
+    ];
+  },
   // zmaže postup (nastavenia a jazyk ponechá) a začne odznova
   resetAll() {
     this.resetting = true;
@@ -602,7 +641,7 @@ const Game = {
     this.progress.introSeen = true;
     if (Settings.layman && !this.progress.laymanSeen) {
       this.progress.laymanSeen = true; this.save();
-      return UI.say(LAYMAN_INTRO.map(A));
+      return UI.say(LAYMAN_INTRO.map(A).concat(Settings.eq && !this.progress.eqIntroSeen ? this.eqIntroLines() : []));
     }
     this.save();
     if (Settings.wow && !first && Wow.guideQuest(A)) return; // MMO: úlohy od Amplitúdy
@@ -636,7 +675,8 @@ const Game = {
       A('Керування: <b>WASD</b> рух, <b>тягни мишею</b> — камера, <b>E</b> увійти/говорити, <b>C</b> Кодекс символів, <b>M</b> мапа, <b>H</b> довідка. Почни з порталу <b>1</b>!'),
       A('Ти новачок у квантовому світі? Перемкни складність (праворуч угорі) на <b>🫶 Для новачків</b> — я все поясню звичайними словами.'),
       Settings.wow && A('І ще одне: острів повний <b>класичних хибних уявлень</b>. Борися з ними закляттями <b>1–7</b> (Tab = ціль, правий клік = атака), збирай досвід і гроші, купуй у <b>Планка</b> біля фонтана (B = сумки). Поговори зі мною ще раз — і я дам тобі перше завдання.'),
-    ]) : [A(this.nextQuestText() + tr('. Nezabudni: <i>amplitúdy interferujú, pravdepodobnosti sa len merajú.</i>', '. Don’t forget: <i>amplitudes interfere, probabilities are only measured.</i>', '. Не забувай: <i>амплітуди інтерферують, імовірності лише вимірюються.</i>'))]).filter(Boolean));
+    ]) : [A(this.nextQuestText() + tr('. Nezabudni: <i>amplitúdy interferujú, pravdepodobnosti sa len merajú.</i>', '. Don’t forget: <i>amplitudes interfere, probabilities are only measured.</i>', '. Не забувай: <i>амплітуди інтерферують, імовірності лише вимірюються.</i>'))]).filter(Boolean)
+      .concat(first && Settings.eq && !this.progress.eqIntroSeen ? this.eqIntroLines() : []));
   },
   toggleMap(force) {
     const m = $('#map'), show = force ?? !m.classList.contains('show');
@@ -706,7 +746,7 @@ const Game = {
     try {
       const d = JSON.parse(localStorage.getItem('kvantp-game1') || 'null');
       this.fresh = !d;
-      if (d) this.progress = { stars: d.stars || {}, diff: d.diff || {}, codex: new Set(d.codex || []), scrolls: new Set(d.scrolls || []), introSeen: !!d.introSeen, laymanSeen: !!d.laymanSeen, moved: !!d.moved, allUnlocked: !!d.allUnlocked, session: d.session || null, wow: d.wow || null };
+      if (d) this.progress = { stars: d.stars || {}, diff: d.diff || {}, codex: new Set(d.codex || []), scrolls: new Set(d.scrolls || []), introSeen: !!d.introSeen, eqIntroSeen: !!d.eqIntroSeen, laymanSeen: !!d.laymanSeen, moved: !!d.moved, allUnlocked: !!d.allUnlocked, session: d.session || null, wow: d.wow || null };
     } catch (e) { /* čistý začiatok */ }
   },
 };

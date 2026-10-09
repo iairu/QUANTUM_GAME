@@ -230,9 +230,9 @@ const TRAPS_HARD = {
 
 function theoryFor(num, step) {
   const T = THEORY[num];
-  if (!T || Settings.easy) return null;
+  if (!T || (Settings.easy && !Settings.eq)) return null; // rovnice najprv: teória vždy, aj v ľahkej
   const parts = [{ h: tr('Jadro levelu', 'Core of the level', 'Ядро рівня'), html: pick(T.core) }];
-  if (Settings.hard && T[step]) parts.push({ h: tr('K tejto úlohe', 'For this task', 'До цього завдання'), html: pick(T[step]), view: T.views?.[step] });
+  if ((Settings.hard || Settings.eq) && T[step]) parts.push({ h: tr('K tejto úlohe', 'For this task', 'До цього завдання'), html: pick(T[step]), view: T.views?.[step] });
   return parts;
 }
 function hardTraps(num) { return Settings.hard ? (TRAPS_HARD[num] || []).map(pick) : []; }

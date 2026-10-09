@@ -29,6 +29,10 @@ const WELCOME_DESC = {
 const DIFF_TITLE = {
   layman: tr('Laická', 'Layman', 'Для новачків'), easy: tr('Ľahká', 'Easy', 'Легка'), normal: tr('Normálna', 'Normal', 'Звичайна'), hard: tr('Ťažká', 'Hard', 'Складна'), ancient: tr('Prastará', 'Ancient', 'Прадавня'),
 };
+const MODE_TAG = {
+  pictures: tr('Intuícia cez obrazy a pokusy', 'Intuition through pictures and experiments', 'Інтуїція через образи й досліди'),
+  equations: tr('Skutočná rovnica žije v 3D', 'The real equation comes alive in 3D', 'Справжнє рівняння оживає в 3D'),
+};
 const THEME_INFO = {
   classic: {
     name: tr('Klasická', 'Classic', 'Класична'), icon: '🔬',
@@ -53,7 +57,7 @@ const THEME_INFO = {
 const Welcome = {
   show(done) {
     this.done = done;
-    this.theme = Settings.theme; this.diff = Settings.diff;
+    this.theme = Settings.theme; this.diff = Settings.diff; this.mode = Settings.mode;
     this.prevTheme = Settings.theme;
     document.documentElement.dataset.theme = 'classic'; // neutrálny vzhľad, kým nie je zvolená téma
     document.body.classList.add('welcoming');
@@ -67,7 +71,14 @@ const Welcome = {
         <p>${tr('Vyber si, ako bude svet vyzerať a ako veľmi ťa má potrápiť. Obe voľby sa dajú neskôr zmeniť v nastaveniach.',
           'Choose how the world should look and how hard it should push you. Both can be changed later in the settings.', 'Обери, як виглядатиме світ і наскільки сильно він має тебе випробувати. Обидва вибори можна згодом змінити в налаштуваннях.')}</p>
       </div>
-      <h2>${tr('1 · Téma', '1 · Theme', '1 · Тема')}</h2>
+      <h2>${tr('1 · Typ hry', '1 · Game type', '1 · Тип гри')}</h2>
+      <div class="wmodes">${MODES.map((m) => `
+        <button class="wmode" data-v="${m}">
+          <span class="shot"><img src="assets/mode-${m}.webp" alt="" loading="eager"></span>
+          <span class="mtext"><b>${MODE_NAME[m]}</b><i>${MODE_TAG[m]}</i><span class="d">${MODE_DESC[m].replace(/^./, (c) => c.toUpperCase())}.</span></span>
+        </button>`).join('')}
+      </div>
+      <h2>${tr('2 · Téma', '2 · Theme', '2 · Тема')}</h2>
       <div class="wthemes">${THEMES.map((t) => `
         <button class="wtheme" data-v="${t}">
           <span class="shot"><img src="assets/theme-${t}.webp" alt="" loading="eager"><span class="ticon">${THEME_INFO[t].icon}</span></span>
@@ -75,7 +86,7 @@ const Welcome = {
           <span class="d">${THEME_INFO[t].desc}</span>
         </button>`).join('')}
       </div>
-      <h2>${tr('2 · Obťažnosť', '2 · Difficulty', '2 · Складність')}</h2>
+      <h2>${tr('3 · Obťažnosť', '3 · Difficulty', '3 · Складність')}</h2>
       <div class="wdiffs">${DIFFS.map((d) => `
         <button class="wdiff ${d}" data-v="${d}">
           <span class="dicon">${DIFF_ICON[d]}</span>
@@ -88,20 +99,22 @@ const Welcome = {
     document.body.appendChild(el);
     const sync = () => {
       el.querySelectorAll('.wtheme').forEach((b) => b.classList.toggle('on', b.dataset.v === this.theme));
+      el.querySelectorAll('.wmode').forEach((b) => b.classList.toggle('on', b.dataset.v === this.mode));
       el.querySelectorAll('.wdiff').forEach((b) => b.classList.toggle('on', b.dataset.v === this.diff));
     };
+    el.querySelectorAll('.wmode').forEach((b) => { b.onclick = () => { this.mode = b.dataset.v; Sound.sfx('click'); sync(); }; });
     el.querySelectorAll('.wtheme').forEach((b) => { b.onclick = () => { this.theme = b.dataset.v; Sound.sfx('click'); sync(); }; });
     el.querySelectorAll('.wdiff').forEach((b) => { b.onclick = () => { this.diff = b.dataset.v; Sound.sfx('click'); sync(); }; });
     const ls = el.querySelector('.wlang');
     ls.value = LANG;
-    ls.onchange = () => { Settings.theme = this.theme; Settings.diff = this.diff; Settings.save(); setLang(ls.value); }; // voľby prežijú znovunačítanie
+    ls.onchange = () => { Settings.theme = this.theme; Settings.diff = this.diff; Settings.mode = this.mode; Settings.save(); setLang(ls.value); }; // voľby prežijú znovunačítanie
     el.querySelector('.wgo button').onclick = () => this.start();
     sync();
     this.running = true;
     requestAnimationFrame((t) => this.frame(t));
   },
   start() {
-    Settings.theme = this.theme; Settings.diff = this.diff; Settings.save();
+    Settings.theme = this.theme; Settings.diff = this.diff; Settings.mode = this.mode; Settings.save();
     // značka „hra začatá“: prázdny postup, aby sa uvítanie znovu neukázalo
     try { localStorage.setItem('kvantp-game1', '{}'); } catch (e) { /* bez ukladania */ }
     if (this.theme !== this.prevTheme) { location.reload(); return; } // téma mení obsah hry (levely, ostrov)
@@ -110,6 +123,7 @@ const Welcome = {
     document.body.classList.remove('welcoming');
     document.documentElement.dataset.theme = Settings.theme;
     UI.diffUi && UI.diffUi();
+    EqM.apply();
     this.done();
   },
   // jednoduché pozadie: sklenená Blochova sféra s precesujúcim stavom a 8 farebných portálov na obežnej dráhe

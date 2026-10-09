@@ -22,6 +22,20 @@ Texty sú v kóde ako `tr('slovensky', 'English', 'українською')` (`j
 - Hudba a zvukové efekty sú v oboch témach rovnaké.
 - Každá téma má vlastný kurzor (šípka + varianta nad klikateľným; v MMO téme aj meč nad omylmi a bublina nad postavami). Počas otáčania kamery kurzor zmizne.
 
+## Typ hry: 🖼 Obrazy najprv / ∑ Rovnice najprv
+Volí sa na uvítacej obrazovke aj v nastaveniach (⚙ → 🎮 Typ hry); prepína sa za behu, bez znovunačítania.
+- **🖼 Obrazy najprv** — pôvodná hra: najprv obraz a intuícia (ručičky, Blochova guľa, pokusy), rovnice len v paneli 📐.
+- **∑ Rovnice najprv** — skutočná rovnica, ktorá práve platí, sa vznáša v 3D nad scénou (nakláňa sa s kamerou) a jej hodnoty sa menia s hrou:
+  ostrov e<sup>iγ</sup>(α|0⟩ + β|1⟩) s točiacou sa globálnou fázou, |α|², interferencia |A₁ + A₂|², SG P(↑) = ½(1 + r·n), hradlo G|ψ⟩ počas rotácie,
+  dekoherencia ρ₀₁ → (1 − p)e<sup>−iφ</sup>ρ₀₁, Diracov výraz a jeho typ, H̃ = (ħ/2)(ΔZ + Ω<sub>R</sub>X), dva qubity a determinant previazanosti,
+  Schrödingerova rovnica, P(zásah) = ½(1 + r·n) v boji s drakom. Pred každou úlohou karta „∑ Rovnica najprv“, teória je vždy otvorená,
+  symboly v textoch sú vo farbách mnemotechniky a pri póloch Blochovej gule visia |α|, |β|.
+- **Rovnicová mnemotechnika** (🔑 na javisku): *farba = KTO* (α modrá, β červená, kety tyrkysové, θ ružová, φ zelená, globálna fáza zlatá),
+  *veľkosť = KOĽKO* (symbol rastie s |amplitúdou|), *otáčanie = FÁZA* (ručička okolo amplitúdy), *krabička = operátor* (pôsobí doprava, ket sa preklopí),
+  *|…|² = fáza zamrzne*, *bledne = dekoherencia*, *záblesk a pád = kolaps*, *sivé a nehybné = konštanta*.
+
+*Game type: 🖼 Pictures first (the original) or ∑ Equations first — the real equation of the moment lives in 3D above the scene, with equation mnemonics: colour = WHO, size = HOW MUCH, spin = PHASE.*
+
 ## MMO téma (⚔ World of Warcraft)
 Dialógy, kvízy, levely, Kódex, Denník aj tlačidlá ostávajú rovnaké — mení sa spôsob hry (`js/wow.js`).
 - **Postava:** Psíčko je kvantový mág s úrovňou (1–20), zdravím a *koherenciou* (manou), palicou a rúchom; mimo boja sa obnovuje. Medzerník = skok.
@@ -89,5 +103,5 @@ Každý level končí **jazykovými pascami** (kvíz o správnych formuláciách
 - `js/math.js` vektory, matice, komplexné čísla · `js/quantum.js` simulátor 1 a 2 qubitov
 - `js/gl.js` renderer (shader, procedurálne siete, Blochova sféra) · `js/ui.js` dialógy, kvízy, denník, vysvetlivky
 - `js/wow.js` MMO téma: postava, kúzla, nepriatelia, úlohy, obchodník, taška, korisť, bossovia, rámy jednotiek, minimapa
-- `js/i18n.js` voľba jazyka a `tr()` · `js/settings.js` obťažnosť (`byDiff`) a nastavenia zobrazenia · `js/knowledge.js` teória a rovnice, extra otázky · `js/scrolls.js` starobylé zvitky · `js/views.js` pohľady 👁 · `js/tips.js` slovník vysvetliviek · `js/content.js` kódex a jazykové pasce · `js/main.js` hub, kamera, hra
+- `js/i18n.js` voľba jazyka a `tr()` · `js/settings.js` obťažnosť (`byDiff`) a nastavenia zobrazenia · `js/knowledge.js` teória a rovnice, extra otázky · `js/eqmnemo.js` typ hry „Rovnice najprv“: 3D javisko rovnice a mnemotechnika · `js/scrolls.js` starobylé zvitky · `js/views.js` pohľady 👁 · `js/tips.js` slovník vysvetliviek · `js/content.js` kódex a jazykové pasce · `js/main.js` hub, kamera, hra
 - `js/levels/*.js` jednotlivé levely, `registry.js` ich poradie

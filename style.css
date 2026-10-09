@@ -559,3 +559,97 @@ body.welcoming #hud, body.welcoming #topbar, body.welcoming #panel, body.welcomi
   #welcome .wbox { padding: 16px; }
   #welcome h1 { font-size: 22px; padding: 0 44px; }
 }
+
+/* ∑ rovnice najprv: rovnicová mnemotechnika — farba = KTO, veľkosť = KOĽKO, otáčanie = FÁZA */
+:root { --mn-a: #4f8cff; --mn-b: #ff6b7d; --mn-ket: #5fe3ff; --mn-op: #b98cff; --mn-th: #ff99e6; --mn-ph: #7dffa0; --mn-g: #ffd25a; --mn-P: #ffffff; --mn-k: #8f9bc8; --mn-coh: #c9a2ff; --mn-m: #fff3b0; }
+.mn { font-weight: 700; font-family: "Cambria Math", Georgia, serif; }
+.mn-a { color: var(--mn-a); } .mn-b { color: var(--mn-b); } .mn-ket { color: var(--mn-ket); } .mn-bra { color: var(--mn-ket); font-style: italic; }
+.mn-op { color: var(--mn-op); border: 1px solid currentColor; border-radius: 3px; padding: 0 2px; box-shadow: 2px 2px 0 rgba(185, 140, 255, 0.35); }
+.mn-th { color: var(--mn-th); } .mn-ph { color: var(--mn-ph); } .mn-g { color: var(--mn-g); } .mn-rho, .mn-coh { color: var(--mn-coh); }
+.mn-k { color: var(--mn-k); font-weight: 400; } .mn-P { color: var(--mn-P); text-decoration: underline 2px; } .mn-m { color: var(--mn-m); text-shadow: 0 0 8px var(--mn-m); }
+#tip .mn { color: inherit; border-color: currentColor; }
+body.eqmode #hud { max-width: min(380px, calc(100vw - 32px)); }
+body.eqmode #hud-quest small { display: block; margin-top: 3px; opacity: 0.75; }
+body.eqmode #toasts { top: 210px; }
+
+#eqstage { position: fixed; left: 50%; top: 56px; transform: translateX(-50%); z-index: 4; width: max-content; max-width: min(640px, calc(100vw - 780px)); min-width: 300px;
+  display: none; pointer-events: auto; }
+body.eqmode #eqstage { display: block; }
+#eqstage .eqh { display: flex; align-items: center; gap: 6px; justify-content: center; font-size: 12px; color: var(--muted); }
+#eqstage .eqh b { font-weight: 600; letter-spacing: 0.04em; }
+#eqstage .eqh button { padding: 0 6px; font-size: 12px; line-height: 18px; }
+#eqstage .eqscene { perspective: 1100px; perspective-origin: 50% 0; padding: 4px 0 10px; }
+#eqstage .eqrows { transform-style: preserve-3d; transform: rotateX(var(--tx, 10deg)) rotateY(var(--ty, 0deg)); transform-origin: 50% 0;
+  background: radial-gradient(ellipse at 50% 20%, rgba(28, 40, 92, 0.93), rgba(9, 13, 32, 0.9) 75%); backdrop-filter: blur(3px); border-radius: 16px; padding: 8px 16px 12px;
+  border: 1px solid rgba(140, 170, 255, 0.18); box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35); }
+#eqstage.min .eqscene, #eqstage.min .eqlegend { display: none; }
+#eqstage.flash .eqrows { animation: eqflash .5s ease-out; }
+@keyframes eqflash { 0% { box-shadow: 0 0 0 2px #fff, 0 0 40px #fff8; } 100% { box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35); } }
+.eqrow { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px 8px; transform-style: preserve-3d; margin: 6px 0; }
+.eqrow + .eqrow { font-size: 0.82em; }
+.eqrow + .eqrow .tk { font-size: 16px; }
+.tk { --c: #e8ecff; --s: 1; --o: 1; --ph: 0deg; display: inline-flex; flex-direction: column; align-items: center; transform-style: preserve-3d; position: relative;
+  color: var(--c); font-family: "Cambria Math", Georgia, serif; font-size: 19px; line-height: 1.15; opacity: var(--o); transition: opacity .25s; }
+.tk .tv { position: relative; display: inline-flex; align-items: center; justify-content: center; transform: translateZ(calc(var(--s) * 10px)) scale(var(--s)); transition: transform .12s linear;
+  text-shadow: 0 0 10px color-mix(in srgb, var(--c) 55%, transparent), 0 2px 0 rgba(0, 0, 0, 0.6); }
+.tk .gl { position: relative; z-index: 1; white-space: nowrap; }
+.tk .lb { font-size: 11px; opacity: 0.8; margin-top: -1px; font-style: italic; }
+.tk .halo { display: none; position: absolute; inset: -3px -4px; border-radius: 50%; border: 1px dashed color-mix(in srgb, var(--c) 40%, transparent); transform: rotate(var(--ph)); opacity: 0.85; }
+.tk .halo i { position: absolute; left: 50%; top: 50%; width: 55%; height: 2px; background: var(--c); transform-origin: 0 50%; box-shadow: 0 0 5px var(--c); border-radius: 2px; opacity: 0.75; }
+.tk.hasph .halo, .tk.frozen .halo { display: block; }
+.tk.frozen .halo { border-color: #6a7090; transform: none; }
+.tk.frozen .halo i { background: #6a7090; box-shadow: none; transform: rotate(-90deg); }
+.t-a { --c: var(--mn-a); } .t-b { --c: var(--mn-b); } .t-ket { --c: var(--mn-ket); } .t-bra { --c: var(--mn-ket); font-style: italic; }
+.t-th { --c: var(--mn-th); } .t-ph { --c: var(--mn-ph); } .t-g { --c: var(--mn-g); } .t-k { --c: var(--mn-k); font-size: 16px; }
+.t-n { --c: #c9d2f5; font-size: 16px; } .t-m { --c: var(--mn-m); font-family: system-ui, sans-serif; font-size: 13px; font-weight: 700; }
+.t-c { --c: #e8ecff; } .t-coh { --c: var(--hue, var(--mn-coh)); }
+.t-P { --c: var(--mn-P); font-weight: 700; }
+.t-P.col-a .bar i { background: var(--mn-a); } .t-P.col-b .bar i { background: var(--mn-b); }
+.tk .bar { position: absolute; left: 50%; bottom: -5px; width: 80%; height: 4px; transform: translateX(-50%); background: rgba(255, 255, 255, 0.12); border-radius: 2px; overflow: hidden; }
+.tk .bar i { display: block; height: 100%; width: var(--bar, 0%); background: #fff; border-radius: 2px; transition: width .15s; }
+/* operátor = fialová 3D krabička; keď pôsobí, otáča sa */
+.t-op .tv { border: 1.5px solid var(--mn-op); border-radius: 4px; padding: 0 5px; background: rgba(120, 80, 200, 0.22);
+  box-shadow: 3px 3px 0 rgba(150, 110, 230, 0.55), 6px 6px 0 rgba(110, 80, 180, 0.35); transform: translateZ(22px) rotateY(-16deg) scale(var(--s)); }
+.t-op { --c: var(--mn-op); }
+.tk.acting .tv { animation: eqspin .9s linear infinite; }
+@keyframes eqspin { from { transform: translateZ(22px) rotateY(0deg); } to { transform: translateZ(22px) rotateY(360deg); } }
+.tk.acting ~ .t-ket .tv, .tk.acting ~ .t-a .tv, .tk.acting ~ .t-b .tv { animation: eqwobble .9s ease-in-out infinite; }
+@keyframes eqwobble { 50% { transform: translateZ(30px) rotateX(35deg) scale(var(--s)); } }
+.tk.flip { animation: eqflip .6s ease-out; }
+@keyframes eqflip { 0% { transform: none; } 45% { transform: translateZ(50px) rotateX(180deg); } 100% { transform: rotateX(360deg); } }
+.tk.collapse { animation: eqdrop .8s ease-in; }
+@keyframes eqdrop { 0% { transform: none; filter: brightness(3); } 60% { transform: translateY(26px) translateZ(-30px) rotateX(-70deg); opacity: 0.2; } 100% { transform: none; } }
+.qa { color: #ffb44f; font-weight: 400; } .qb { color: #5fe08a; font-weight: 400; }
+/* kľúč mnemotechniky */
+#eqstage .eqlegend { display: none; margin-top: 4px; }
+#eqstage.legend .eqlegend { display: grid; }
+.eqlegend { grid-template-columns: 1fr 1fr; gap: 6px 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; font-size: 12.5px; }
+.eqlegend.inline { display: grid; background: none; border: 0; padding: 0; margin-top: 4px; }
+.eqlegend .rule { display: flex; gap: 8px; align-items: flex-start; }
+.eqlegend .rule .demo { flex: 0 0 64px; text-align: center; font-size: 17px; }
+.eqlegend .rule .demo .mn { margin: 0 1px; }
+.eqlegend .rule b { display: block; color: var(--gold); font-size: 13px; }
+.eqlegend .rule small { color: var(--muted); line-height: 1.4; }
+.mn-demo-halo { display: inline-block; width: 26px; height: 26px; border-radius: 50%; border: 1.5px dashed var(--mn-a); position: relative; vertical-align: middle; animation: eqspin2 3s linear infinite; }
+.mn-demo-halo i { position: absolute; left: 50%; top: 50%; width: 50%; height: 2px; background: var(--mn-a); transform-origin: 0 50%; }
+@keyframes eqspin2 { to { transform: rotate(-360deg); } }
+/* karta „∑ Rovnica najprv“ v dialógu */
+#dialog.eqcard { border-color: var(--mn-op); box-shadow: 0 0 0 1px rgba(185, 140, 255, 0.4), 0 10px 40px #000a; }
+#dialog.eqcard .who { color: var(--mn-op); }
+#dialog .eqlegend { font-size: 13px; }
+/* 3D popisky pri Blochovej guli */
+.lbl.eqlbl { font-family: "Cambria Math", Georgia, serif; font-weight: 700; pointer-events: auto; }
+.mnt.a { color: var(--mn-a); text-shadow: 0 0 10px rgba(79, 140, 255, 0.8), 0 1px 3px #000; }
+.mnt.b { color: var(--mn-b); text-shadow: 0 0 10px rgba(255, 107, 125, 0.8), 0 1px 3px #000; }
+.lbl.mnl-th { color: var(--mn-th); font-weight: 700; } .lbl.mnl-ph { color: var(--mn-ph); font-weight: 700; }
+.lbl.mnl-ket { color: var(--mn-ket); } .lbl.mnl-a { text-decoration: underline 2px var(--mn-a); } .lbl.mnl-b { text-decoration: underline 2px var(--mn-b); }
+@media (max-width: 1100px) { #eqstage { top: auto; bottom: 112px; max-width: calc(100vw - 24px); } body.eqmode #toasts { top: 70px; } }
+/* uvítanie: typ hry */
+#welcome .wmodes { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+#welcome button.wmode { display: flex; flex-direction: row; gap: 12px; align-items: stretch; text-align: left; padding: 10px; border-radius: 12px;
+  background: rgba(20, 30, 66, 0.75); border: 2px solid var(--line); transition: transform .15s, border-color .15s, box-shadow .15s; }
+#welcome button.wmode:hover { transform: translateY(-2px); background: rgba(30, 44, 92, 0.85); }
+#welcome .wmode .shot { flex: 0 0 44%; aspect-ratio: 16 / 10; margin: 0; }
+#welcome .wmode .mtext { display: flex; flex-direction: column; gap: 3px; }
+#welcome .wmode[data-v="equations"].on { border-color: var(--mn-op); box-shadow: 0 0 0 1px var(--mn-op), 0 0 22px rgba(185, 140, 255, 0.35); }
+@media (max-width: 900px) { #welcome .wmodes { grid-template-columns: 1fr; } }

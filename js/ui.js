@@ -323,7 +323,7 @@ const UI = {
     const step = L.steps[L.stepIdx], parts = theoryFor(L.num, step ? step.name : '');
     if (!parts) return;
     const d = el('details', 'theory');
-    d.open = Settings.hard;
+    d.open = Settings.hard || Settings.eq;
     d.appendChild(el('summary', null, tr('📐 Teória a rovnice', '📐 Theory and equations', '📐 Теорія та рівняння')));
     for (const p of parts) {
       d.appendChild(el('h4', null, p.h));
@@ -331,6 +331,12 @@ const UI = {
       if (p.view) d.appendChild(this.button(tr('👁 Ukáž to obrázkom', '👁 Show it as a picture', '👁 Показати як картинку'), () => Views.open(p.view), '', tr('Otvorí pohľad, v ktorom túto rovnicu vidno.', 'Opens the view in which this equation can be seen.', 'Відкриє погляд, у якому видно це рівняння.')));
     }
     this.panel.appendChild(d);
+  },
+  // po zmene typu hry: panel teórie sa zostaví znova (rovnice najprv = vždy a rozbalený)
+  refreshTheory() {
+    if (!this.panel.classList.contains('show')) return;
+    this.panel.querySelectorAll('details.theory').forEach((d) => d.remove());
+    this.appendTheory();
   },
   panelHide() { this.panel.classList.remove('show'); this.panel.innerHTML = ''; },
   button(html, onclick, cls = '', tip) {
@@ -415,6 +421,16 @@ const UI = {
   renderSettings() {
     const body = $('#settings .body'), V = Settings.view, ch = () => Settings.save();
     body.innerHTML = '';
+    body.appendChild(el('h3', null, tr('🎮 Typ hry', '🎮 Game type', '🎮 Тип гри')));
+    const modes = el('div', 'diffs');
+    for (const m of MODES) {
+      const l = el('label'), r = el('input');
+      r.type = 'radio'; r.name = 'mode'; r.checked = Settings.mode === m;
+      r.onchange = () => Game.setMode(m);
+      l.append(r, el('b', null, MODE_NAME[m]), el('small', null, MODE_DESC[m]));
+      modes.appendChild(l);
+    }
+    body.appendChild(modes);
     body.appendChild(el('h3', null, tr('🎚 Obťažnosť', '🎚 Difficulty', '🎚 Складність')));
     const diffs = el('div', 'diffs');
     for (const d of DIFFS) {
