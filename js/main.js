@@ -29,7 +29,7 @@ class Level {
       this.keepSub = true;
     }
     UI.setHud(`${this.num} · ${this.title}`, '');
-    Settings.wow && Wow.onEnterLevel(this);
+    Settings.wow && this.num > 0 && Wow.onEnterLevel(this); // Sieň symbolov (level 0) nie je inštancia s bossom
     this.next();
   }
   exit() { UI.panelHide(); }
@@ -48,7 +48,7 @@ class Level {
     if (!this.keepSub) this.sub = {}; // sub = rozpracovaný stav kroku (napr. číslo hádanky), ukladá sa
     this.keepSub = false;
     Game.save();
-    Settings.wow && Wow.onStep(this); // MMO: dokončený krok = zásah bossa
+    Settings.wow && this.num > 0 && Wow.onStep(this); // MMO: dokončený krok = zásah bossa
     const s = this.steps[this.stepIdx], run = () => (s ? s.call(this) : this.finale()), name = s ? s.name : 'finale';
     const pre = [];
     // rovnice najprv: pred krokom jeho rovnica vo farbách mnemotechniky
@@ -108,10 +108,13 @@ const Hub = {
       const a = -Math.PI / 2 + ((ring.indexOf(L) + off) / n) * Math.PI * 2, p = [Math.cos(a) * 20, 0, Math.sin(a) * 20];
       return { L, p, dir: V3.norm(V3.scale(p, -1)), npc: V3.add(p, V3.scale(V3.norm([-Math.sin(a), 0, Math.cos(a)]), 3.2)) };
     });
+    // portál 0 (Sieň symbolov) stojí vnútri kruhu, severne od stredu — vidno ho hneď od štartu
+    const p0 = [-3.2, 0, -8.6];
+    this.portal0 = { L: LEVEL0, p: p0, dir: V3.norm(V3.scale(p0, -1)), zero: true };
     // severská krajina: borovice a balvany (deterministicky, mimo portálov a stredu)
     let seed = 7;
     const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-    const free = (p, d) => V3.len(p) > (Settings.wow ? 8 : 6) && this.portals.every((pt) => V3.len(V3.sub(pt.p, p)) > d) && Math.abs(p[0]) + Math.max(0, -p[2] - 14) * 0.2 > 2.5
+    const free = (p, d) => V3.len(p) > (Settings.wow ? 8 : 6) && [...this.portals, this.portal0].every((pt) => V3.len(V3.sub(pt.p, p)) > d) && Math.abs(p[0]) + Math.max(0, -p[2] - 14) * 0.2 > 2.5
       && (!Settings.wow || Math.abs(V3.len(p) - 20) > 2); // MMO: stromy nie na kruhovej ceste
     this.pines = []; this.rocks = [];
     const scenery = Settings.nordic || Settings.wow; // severská: borovice; MMO: listnaté stromy
@@ -132,8 +135,8 @@ const Hub = {
   enter(fromLevel) {
     Game.r.fog = Settings.wow ? 0.009 : 0.012; Game.r.fogColor = Settings.wow ? [0.62, 0.75, 0.88] : Settings.nordic ? [0.29, 0.34, 0.4] : [0.06, 0.08, 0.16];
     UI.setHud(tr('Hilbertov ostrov', 'Hilbert Island', 'Острів Гільберта'), Game.nextQuestText());
-    if (fromLevel) {
-      const pt = this.portals[fromLevel - 1];
+    if (fromLevel != null) {
+      const pt = fromLevel === 0 ? this.portal0 : this.portals[fromLevel - 1];
       this.player.p = V3.add(pt.p, V3.scale(pt.dir, 4.5));
       this.player.heading = Math.atan2(pt.dir[0], pt.dir[2]);
       this.cam.yaw = this.player.heading + Math.PI;
@@ -164,7 +167,7 @@ const Hub = {
         const dir = V3.norm(V3.add(V3.scale(fw, f), V3.scale(rt, s))), sp = (k.ShiftLeft ? 11 : 7) * (W && Wow.mounted ? 1.6 : 1) * dt;
         let np = V3.add(pl.p, V3.scale(dir, sp));
         if (V3.len(np) > 33) np = V3.scale(V3.norm(np), 33);
-        for (const pt of this.portals) { // nevojdi do podstavca portálu
+        for (const pt of [...this.portals, this.portal0]) { // nevojdi do podstavca portálu
           const d = V3.sub(np, pt.p);
           if (V3.len(d) < 1.6) np = V3.add(pt.p, V3.scale(V3.norm(d), 1.6));
         }
@@ -185,7 +188,7 @@ const Hub = {
     this.cam.target = V3.add(pl.p, [0, 1.2 + (W ? (pl.y || 0) * 0.5 + (Wow.mounted ? 0.9 : 0.3) : 0), 0]);
     // najbližší portál
     this.near = null;
-    for (const pt of this.portals) if (V3.len(V3.sub(pt.p, pl.p)) < 4.2) this.near = pt;
+    for (const pt of [...this.portals, this.portal0]) if (V3.len(V3.sub(pt.p, pl.p)) < 4.2) this.near = pt;
     this.nearGuide = V3.len(pl.p) < (W ? 4.2 : 3.6);
     this.nearVendor = W && V3.len(V3.sub(pl.p, VENDOR_POS)) < 3.6;
   },
@@ -253,6 +256,7 @@ const Hub = {
       UI.hot(V3.add(np, [0, 1.2, 0]), tr(`<b>${L.mentor}</b> — mentor levelu ${L.num}.`, `<b>${L.mentor}</b> — mentor of level ${L.num}.`, `<b>${L.mentor}</b> — наставник рівня ${L.num}.`), 30);
       UI.label('portal' + L.num, V3.add(c, [0, 2.9, 0]), `<b>${L.num} · ${L.title}</b>${st}<br><small>${open ? L.face + ' ' + L.mentor : tr('🔒 zamknuté', '🔒 locked', '🔒 закрито')}</small>`, 'portal' + (open ? '' : ' locked'));
     }
+    this.drawPortal0(r, t);
     // plávajúce kryštály so symbolmi
     for (const c of this.crystals) {
       const p = V3.add(c.p, [0, Math.sin(t * 0.8 + c.k) * 0.3, 0]);
@@ -305,6 +309,22 @@ const Hub = {
       if (qm) UI.label('guideq', [0, gy + 2.3, 0], qm === '…' ? '?' : qm, 'qmark' + (qm === '…' ? ' gray' : ''),
         qm === '!' ? tr('Amplitúda má pre teba úlohu.', 'Amplitude has a quest for you.', 'Амплітуда має для тебе завдання.') : qm === '?' ? tr('Úloha splnená — odovzdaj ju Amplitúde.', 'Quest complete — turn it in to Amplitude.', 'Завдання виконано — здай його Амплітуді.') : tr('Úloha prebieha.', 'Quest in progress.', 'Завдання виконується.'));
     }
+  },
+
+  // portál 0 — Sieň symbolov: tyrkysový prstenec a okolo neho krúžia farebné glyfy mnemotechniky (rovnaké farby ako v rovniciach)
+  drawPortal0(r, t) {
+    const pt = this.portal0, L = pt.L, c = V3.add(pt.p, [0, 2.6, 0]), done = Game.progress.stars[0], N = Settings.nordic;
+    r.draw('cylinder', M4.trs(pt.p, 0, [1.4, 0.4, 1.4]), N ? [0.46, 0.45, 0.43] : Settings.wow ? [0.62, 0.58, 0.52] : [0.3, 0.33, 0.45], { pattern: N ? 4 : Settings.wow ? 11 : 0 });
+    r.draw('torus', M4.orient(c, pt.dir, 2.1), L.color, { emissive: 0.5 });
+    r.draw('disk', M4.orient(c, pt.dir, 2.0), L.color, { alpha: 0.3 + 0.1 * Math.sin(t * 2), emissive: 0.8, unlit: 1 });
+    const side = V3.norm(V3.cross(pt.dir, [0, 1, 0])), cols = [[0.31, 0.55, 1], [1, 0.42, 0.49], [0.37, 0.89, 1], [0.73, 0.55, 1], [1, 0.6, 0.9], [0.49, 1, 0.63], [1, 0.82, 0.35], [1, 1, 1]];
+    cols.forEach((col, k) => {
+      const a = t * 0.8 + k * Math.PI / 4;
+      r.sphere(V3.add(c, V3.add(V3.scale(side, Math.cos(a) * 2.45), [0, Math.sin(a) * 2.45, 0])), 0.13, col, { emissive: 0.7 });
+    });
+    const st = done ? ' ' + '★'.repeat(done) + '☆'.repeat(3 - done) : '';
+    UI.hot(c, `<b>${tr('Portál', 'Portal', 'Портал')} 0: ${L.title}</b><br>${tr('Všetky symboly, farby a tvary rovníc v 3D — s vysvetlením a kvízmi. Odporúčaný začiatok.', 'Every symbol, colour and shape of the equations in 3D — explained and quizzed. A recommended start.', 'Усі символи, кольори й форми рівнянь у 3D — з поясненнями та тестами. Рекомендований початок.')}`, 60);
+    UI.label('portal0', V3.add(c, [0, 2.9, 0]), `<b>0 · ${L.title}</b>${st}<br><small>${L.face} ${L.mentor} · ∑ 🔑</small>`, 'portal');
   },
 
   // ---------- MMO téma: krajina a portály inštancií ----------
@@ -422,6 +442,7 @@ const Game = {
   start() {
     const canvas = $('#gl');
     this.levels = LEVELS.map((L) => new L.cls(L));
+    this.level0 = new LEVEL0.cls(LEVEL0); // Sieň symbolov
     Hub.init();
     Wow.init(); // MMO téma: postava, nepriatelia, lišta kúziel (inak nič)
     this.scene = Hub; Hub.enter();
@@ -504,7 +525,7 @@ const Game = {
     Sound.sfx('portal');
     this.scene.exit();
     UI.labelsClear();
-    this.scene = this.levels[num - 1];
+    this.scene = this.levelOf(num);
     this.scene.enter(resume);
     this.save();
   },
@@ -520,7 +541,8 @@ const Game = {
     Settings.wow && Wow.onHub();
     this.save();
   },
-  isUnlocked(n) { return n === 1 || this.progress.allUnlocked || this.progress.stars[n - 1] !== undefined || this.progress.stars[n] !== undefined; },
+  levelOf(n) { return n === 0 ? this.level0 : this.levels[n - 1]; },
+  isUnlocked(n) { return n === 0 || n === 1 || this.progress.allUnlocked || this.progress.stars[n - 1] !== undefined || this.progress.stars[n] !== undefined; },
   setDifficulty(d) {
     if (!DIFFS.includes(d) || d === Settings.diff) return;
     Settings.diff = d; Settings.save();
@@ -581,13 +603,13 @@ const Game = {
   snapshot() {
     const s = this.scene;
     if (!s || s === Hub) return { scene: 0, p: Hub.player.p, h: Hub.player.heading, yaw: Hub.cam.yaw };
-    return { scene: s.num, step: s.stepIdx, sub: s.sub, mistakes: s.mistakes };
+    return { scene: s.num === 0 ? 'L0' : s.num, step: s.stepIdx, sub: s.sub, mistakes: s.mistakes };
   },
   restoreSession() {
     const ss = this.progress.session;
     if (!ss) return;
-    if (ss.scene > 0 && ss.scene <= this.levels.length && this.isUnlocked(ss.scene)) {
-      this.enterLevel(ss.scene, ss);
+    if (ss.scene === 'L0' || (ss.scene > 0 && ss.scene <= this.levels.length && this.isUnlocked(ss.scene))) {
+      this.enterLevel(ss.scene === 'L0' ? 0 : ss.scene, ss);
       UI.toast(tr('↩ Pokračuješ tam, kde si skončil(a).', '↩ Continuing where you left off.', '↩ Продовжуєш там, де зупинився(-лася).'));
     } else if (Array.isArray(ss.p)) {
       Hub.player.p = ss.p; Hub.player.heading = ss.h || 0; Hub.cam.yaw = ss.yaw || 0;
@@ -604,8 +626,8 @@ const Game = {
     const fresh = this.progress.stars[n] === undefined;
     Sound.sfx('fanfare');
     this.progress.stars[n] = Math.max(stars, this.progress.stars[n] || 0);
-    Settings.wow && Wow.onLevelComplete(n, stars); // MMO: boss padol, korisť, skúsenosti
-    if (fresh && Settings.dragon && !LEVELS[n - 1].boss) { // každý mentor naučí jedno slovo moci proti drakovi
+    Settings.wow && n > 0 && Wow.onLevelComplete(n, stars); // MMO: boss padol, korisť, skúsenosti
+    if (fresh && Settings.dragon && n > 0 && !LEVELS[n - 1].boss) { // každý mentor naučí jedno slovo moci proti drakovi
       const ring = LEVELS.filter((L) => !L.boss), k = ring.filter((L) => this.progress.stars[L.num] !== undefined).length;
       setTimeout(() => UI.toast(k < ring.length
         ? tr(`🐉 Slovo moci ${k}/${ring.length} — Ketvarr nad ostrovom nepokojne krúži.`, `🐉 Word of Power ${k}/${ring.length} — Ketvarr circles the island restlessly.`, `🐉 Слово сили ${k}/${ring.length} — Кетварр неспокійно кружляє над островом.`)
@@ -653,7 +675,7 @@ const Game = {
       A('Okolo ostrova je 8 portálov. Za každým čaká mentor — Euler, Stern, Bloch, Feynman, Dirac, Rabi, Bell a Bohr. Naučia ťa <b>jazyk</b>, <b>symboly</b> a <b>správne obrazy</b> kvantového sveta.'),
       Settings.dragon && A('Nad ostrovom krúži <b>Ketvarr</b>, kvantový drak. Každý mentor ťa naučí jedno <b>slovo moci</b>. Keď ich budeš mať všetkých osem, vystúp na <b>Dračí štít</b> na severe a poraz ho.'),
       A('Cieľ nie je počítať integrály. Cieľ je <b>intuícia</b>: vedieť, čo je amplitúda, čo je pravdepodobnosť, čo robí meranie a kde klasické prirovnania prestávajú platiť.'),
-      A('Ovládanie: <b>WASD</b> pohyb, <b>ťahanie myšou</b> kamera, <b>E</b> vstúpiť/hovoriť, <b>C</b> Kódex symbolov, <b>M</b> mapa, <b>H</b> pomoc. Začni portálom <b>1</b>!'),
+      A('Ovládanie: <b>WASD</b> pohyb, <b>ťahanie myšou</b> kamera, <b>E</b> vstúpiť/hovoriť, <b>C</b> Kódex symbolov, <b>M</b> mapa, <b>H</b> pomoc. Začni portálom <b>0</b> (Sieň symbolov — naučí ťa čítať rovnice) alebo rovno portálom <b>1</b>!'),
       A('Si v kvantovom svete nováčik? Vpravo hore prepni obťažnosť na <b>🫶 Laická</b> — všetko ti vysvetlím bežnými slovami.'),
       Settings.wow && A('A ešte: ostrov je plný <b>klasických omylov</b>. Bojuj s nimi kúzlami <b>1–7</b> (Tab = cieľ, pravý klik = útok), zbieraj skúsenosti a peniaze, nakupuj u <b>Plancka</b> pri fontáne (B = taška). Keď sa so mnou porozprávaš znova, dám ti prvú úlohu.'),
     ], [
@@ -663,7 +685,7 @@ const Game = {
       A('There are 8 portals around the island. Behind each one a mentor is waiting — Euler, Stern, Bloch, Feynman, Dirac, Rabi, Bell and Bohr. They will teach you the <b>language</b>, the <b>symbols</b> and the <b>right pictures</b> of the quantum world.'),
       Settings.dragon && A('Above the island circles <b>Ketvarr</b>, the quantum dragon. Each mentor will teach you one <b>Word of Power</b>. Once you have all eight, climb <b>Dragon’s Peak</b> in the north and defeat him.'),
       A('The goal is not to compute integrals. The goal is <b>intuition</b>: knowing what an amplitude is, what a probability is, what a measurement does and where classical analogies stop working.'),
-      A('Controls: <b>WASD</b> move, <b>mouse drag</b> camera, <b>E</b> enter/talk, <b>C</b> Codex of symbols, <b>M</b> map, <b>H</b> help. Start with portal <b>1</b>!'),
+      A('Controls: <b>WASD</b> move, <b>mouse drag</b> camera, <b>E</b> enter/talk, <b>C</b> Codex of symbols, <b>M</b> map, <b>H</b> help. Start with portal <b>0</b> (the Hall of Symbols — it teaches you to read the equations) or go straight to portal <b>1</b>!'),
       A('New to the quantum world? Switch the difficulty (top right) to <b>🫶 Layman</b> — I will explain everything in everyday words.'),
       Settings.wow && A('One more thing: the island is full of <b>classical misconceptions</b>. Fight them with spells <b>1–7</b> (Tab = target, right-click = attack), gather experience and money, shop at <b>Planck’s</b> by the fountain (B = bags). Talk to me again and I will give you your first quest.'),
     ], [
@@ -673,7 +695,7 @@ const Game = {
       A('Довкола острова — 8 порталів. За кожним чекає наставник — Ейлер, Штерн, Блох, Фейнман, Дірак, Рабі, Белл і Бор. Вони навчать тебе <b>мови</b>, <b>символів</b> і <b>правильних образів</b> квантового світу.'),
       Settings.dragon && A('Над островом кружляє <b>Кетварр</b>, квантовий дракон. Кожен наставник навчить тебе одного <b>слова сили</b>. Коли матимеш усі вісім, піднімися на <b>Драконів пік</b> на півночі й перемож його.'),
       A('Мета — не обчислювати інтеграли. Мета — <b>інтуїція</b>: знати, що таке амплітуда, що таке ймовірність, що робить вимірювання і де класичні порівняння перестають працювати.'),
-      A('Керування: <b>WASD</b> рух, <b>тягни мишею</b> — камера, <b>E</b> увійти/говорити, <b>C</b> Кодекс символів, <b>M</b> мапа, <b>H</b> довідка. Почни з порталу <b>1</b>!'),
+      A('Керування: <b>WASD</b> рух, <b>тягни мишею</b> — камера, <b>E</b> увійти/говорити, <b>C</b> Кодекс символів, <b>M</b> мапа, <b>H</b> довідка. Почни з порталу <b>0</b> (Зала символів — навчить читати рівняння) або одразу з порталу <b>1</b>!'),
       A('Ти новачок у квантовому світі? Перемкни складність (праворуч угорі) на <b>🫶 Для новачків</b> — я все поясню звичайними словами.'),
       Settings.wow && A('І ще одне: острів повний <b>класичних хибних уявлень</b>. Борися з ними закляттями <b>1–7</b> (Tab = ціль, правий клік = атака), збирай досвід і гроші, купуй у <b>Планка</b> біля фонтана (B = сумки). Поговори зі мною ще раз — і я дам тобі перше завдання.'),
     ]) : [A(this.nextQuestText() + tr('. Nezabudni: <i>amplitúdy interferujú, pravdepodobnosti sa len merajú.</i>', '. Don’t forget: <i>amplitudes interfere, probabilities are only measured.</i>', '. Не забувай: <i>амплітуди інтерферують, імовірності лише вимірюються.</i>'))]).filter(Boolean)
@@ -688,7 +710,7 @@ const Game = {
   mapPortalAt(x, y) {
     const ml = this.mapLayout;
     if (!ml) return null;
-    return Hub.portals.find((pt) => { const [px, py] = ml.P(pt.p); return Math.hypot(px - x, py - y) < ml.s * 3.2; }) || null;
+    return [...Hub.portals, Hub.portal0].find((pt) => { const [px, py] = ml.P(pt.p); return Math.hypot(px - x, py - y) < ml.s * 3.2; }) || null;
   },
   // klik na portál v mape = okamžitý presun do odomknutého levelu
   mapClick(x, y) {
@@ -696,7 +718,7 @@ const Game = {
     if (!pt) return;
     const L = pt.L;
     if (!this.isUnlocked(L.num)) { UI.toast(tr(`🔒 Najprv dokonči level ${L.num - 1}.`, `🔒 Complete level ${L.num - 1} first.`, `🔒 Спершу пройди рівень ${L.num - 1}.`)); return; }
-    if (this.scene === this.levels[L.num - 1]) { this.toggleMap(false); return; }
+    if (this.scene === this.levelOf(L.num)) { this.toggleMap(false); return; }
     if (this.scene !== Hub && !confirm(tr(`Presunúť sa do levelu ${L.num}: ${L.title}? Postup v aktuálnom leveli (${this.scene.num} · ${this.scene.title}) sa neuloží.`,
       `Teleport to level ${L.num}: ${L.title}? Progress in the current level (${this.scene.num} · ${this.scene.title}) will not be saved.`, `Перенестися до рівня ${L.num}: ${L.title}? Поступ у поточному рівні (${this.scene.num} · ${this.scene.title}) не буде збережено.`))) return;
     this.toggleMap(false);
@@ -717,12 +739,12 @@ const Game = {
     if (WW) { g.strokeStyle = '#8a6c45'; g.lineWidth = s * 2; g.beginPath(); g.arc(cx, cy, 20 * s, 0, 7); g.stroke(); }
     g.fillStyle = '#26402c'; for (const pn of Hub.pines) { const [x, y] = P(pn.p); g.beginPath(); g.arc(x, y, s * 0.9, 0, 7); g.fill(); }
     g.font = `${Math.max(11, s * 1.6)}px ${N || WW ? 'Cinzel, Georgia, serif' : 'system-ui'}`; g.textAlign = 'center';
-    for (const pt of Hub.portals) {
+    for (const pt of [...Hub.portals, Hub.portal0]) {
       const [x, y] = P(pt.p), open = this.isUnlocked(pt.L.num), st = this.progress.stars[pt.L.num];
       g.fillStyle = open ? `rgb(${pt.L.color.map((c) => c * 255).join(',')})` : '#555';
       g.beginPath(); g.arc(x, y, s * 1.8, 0, 7); g.fill();
       if (pt === hover && open) { g.strokeStyle = '#fff'; g.lineWidth = 2; g.beginPath(); g.arc(x, y, s * 2.4, 0, 7); g.stroke(); }
-      if (this.scene === this.levels[pt.L.num - 1]) { g.strokeStyle = '#5ff'; g.lineWidth = 3; g.beginPath(); g.arc(x, y, s * 2.4, 0, 7); g.stroke(); }
+      if (this.scene === this.levelOf(pt.L.num)) { g.strokeStyle = '#5ff'; g.lineWidth = 3; g.beginPath(); g.arc(x, y, s * 2.4, 0, 7); g.stroke(); }
       g.fillStyle = '#fff';
       g.fillText(`${pt.L.num} ${pt.L.title}`, x, y - s * 2.6);
       g.fillText(open ? (st !== undefined && st > 0 ? '★'.repeat(st) : pt.L.mentor) : '🔒', x, y + s * 3.6);

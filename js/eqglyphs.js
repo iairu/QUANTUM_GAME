@@ -9,6 +9,19 @@
 const EqG = {
   // ---------- kreslenie ----------
   // písmeno glyfu: tmavý obrys pod písmom, aby sa dalo čítať aj na piktograme
+  // všetky písmená glyfov stoja na spoločnej účarí y = 30.5 (z 40) — CSS ju zarovná s účarím okolitého textu
+  BASE: 30.5,
+  // skutočná šírka písma (rovnaké písmo ako v SVG), uložená do medzipamäte → glyf je presne taký široký ako jeho písmeno
+  lw(t, fs = 30) {
+    const k = fs + t;
+    this._w = this._w || {};
+    if (this._w[k] == null) {
+      const c = (this._cx = this._cx || document.createElement('canvas').getContext('2d'));
+      c.font = `700 ${fs}px "Cambria Math", "STIX Two Math", Georgia, serif`;
+      this._w[k] = c.measureText(t).width;
+    }
+    return this._w[k];
+  },
   L(t, x = 20, y = 30.5, fs = 30) {
     return `<text x="${x}" y="${y}" font-size="${fs}" text-anchor="middle" class="glt">${t}</text>`;
   },
@@ -61,15 +74,17 @@ const EqG = {
   box(letter) {
     const pic = this.OPIC[letter] ?? this.OPIC.U, fs = letter.length > 1 ? 19 : 24;
     return '<path d="M2 12h32v25H2z" class="gl-boxf"/><path d="M2 12l7-7h32l-7 7zM34 12l7-7v25l-7 7z" class="gl-boxs"/>'
-      + `<g transform="translate(-3 1)">${pic}</g>` + this.L(letter, 12, 32, fs);
+      + `<g transform="translate(-3 1)">${pic}</g>` + this.L(letter, 12, this.BASE, fs);
   },
   // ket ⟩: zvislá čiara a hrot dopredu (stav, odpoveď); bra ⟨: zrkadlovo (otázka). Šírka podľa obsahu.
   ket(c, bra) {
-    const w = 40 + Math.max(0, [...c].length - 1) * 11, mid = w / 2;
-    const frame = bra ? `<path d="M10 4L3 20l7 16M${w - 4} 4v32" class="gl-ic"/>` : `<path d="M4 4v32M${w - 10} 4l7 16-7 16" class="gl-ic"/>`;
+    const fs = [...c].length > 2 ? 16 : 27, inner = Math.max(12, this.lw(c, fs) + 3);
+    const w = bra ? inner + 18 : inner + 18, mid = bra ? 11 + inner / 2 : 6 + inner / 2; // zvislá čiara 2 j., hrot 9 j.
+
+    const frame = bra ? `<path d="M9 4L2 20l7 16M${w - 3} 4v32" class="gl-ic"/>` : `<path d="M3 4v32M${w - 9} 4l7 16-7 16" class="gl-ic"/>`;
     const hint = c === '0' ? `<path d="M${mid - 4} 9l4-5 4 5" class="gl-ic gl-thin"/>` : c === '1' ? `<path d="M${mid - 4} 31l4 5 4-5" class="gl-ic gl-thin"/>`
       : c === '+' ? `<path d="M${mid + 7} 13l4 3-4 3" class="gl-ic gl-thin"/>` : c === '−' ? `<path d="M${mid - 7} 13l-4 3 4 3" class="gl-ic gl-thin"/>` : '';
-    return { w, svg: frame + hint + this.L(c, mid, 29.5, [...c].length > 2 ? 16 : 27) };
+    return { w, svg: frame + hint + this.L(c, mid, this.BASE, fs) };
   },
 
   // ---------- slovník: kľúč → [kategória (farba), piktogram, názov, slovná pomôcka] ----------
@@ -78,8 +93,8 @@ const EqG = {
     if (this.D) return this.D;
     const t = tr;
     this.D = {
-      'α': ['a', 'up', t('alfa — amplitúda |0⟩', 'alpha — amplitude of |0⟩', 'альфа — амплітуда |0⟩'), t('<b>Alfa ukazuje hore</b> — k |0⟩, severnému pólu. Stojí vyššie v rovnici.', '<b>Alpha points Above</b> — to |0⟩, the north pole. It sits higher in the equation.', '<b>Альфа вказує вгору</b> — до |0⟩, північного полюса. Стоїть вище в рівнянні.')],
-      'β': ['b', 'down', t('beta — amplitúda |1⟩', 'beta — amplitude of |1⟩', 'бета — амплітуда |1⟩'), t('<b>Beta mieri dole</b> — k |1⟩, južnému pólu. Stojí nižšie v rovnici.', '<b>Beta goes Below</b> — to |1⟩, the south pole. It sits lower in the equation.', '<b>Бета дивиться вниз</b> — до |1⟩, південного полюса. Стоїть нижче в рівнянні.')],
+      'α': ['a', 'up', t('alfa — amplitúda |0⟩', 'alpha — amplitude of |0⟩', 'альфа — амплітуда |0⟩'), t('<b>Alfa ukazuje hore</b> — k |0⟩, severnému pólu.', '<b>Alpha points Above</b> — to |0⟩, the north pole.', '<b>Альфа вказує вгору</b> — до |0⟩, північного полюса.')],
+      'β': ['b', 'down', t('beta — amplitúda |1⟩', 'beta — amplitude of |1⟩', 'бета — амплітуда |1⟩'), t('<b>Beta mieri dole</b> — k |1⟩, južnému pólu.', '<b>Beta goes Below</b> — to |1⟩, the south pole.', '<b>Бета дивиться вниз</b> — до |1⟩, південного полюса.')],
       'ψ': ['ket', 'ball', t('psí — stav', 'psi — the state', 'псі — стан'), t('<b>Psí si ty</b>: šípka v guli, recept na všetky odpovede.', '<b>Psi is you</b>: an arrow in the ball, a recipe for every answer.', '<b>Псі — це ти</b>: стрілка в кулі, рецепт усіх відповідей.')],
       'Ψ': ['ket', 'ball', t('veľké psí — stav celku', 'capital psi — state of the whole', 'велике псі — стан цілого'), t('<b>Veľké Psí = celý systém</b> (viac qubitov naraz).', '<b>Big Psi = the whole system</b> (several qubits at once).', '<b>Велике Псі = уся система</b> (кілька кубітів разом).')],
       'θ': ['th', 'tilt', t('théta — sklon od pólu', 'theta — tilt from the pole', 'тета — нахил від полюса'), t('<b>Théta = naklonenie od vrcholu</b>: 0 hore pri |0⟩, π dole pri |1⟩. Určuje P(0), P(1).', '<b>Theta = Tilt from the Top</b>: 0 at |0⟩, π at |1⟩. It sets P(0), P(1).', '<b>Тета = нахил від верхівки</b>: 0 угорі при |0⟩, π унизу при |1⟩. Задає P(0), P(1).')],
@@ -134,19 +149,25 @@ const EqG = {
     let body, w = 40;
     if (D && D[0] === 'op') { w = 44; body = this.box(letter); }
     else if (key.startsWith('ket') || key === 'bra') ({ w, svg: body } = this.ket(letter, key === 'bra'));
-    else if (key === 'exp') { w = 44; body = `<g class="gi">${this.ICON.clock}</g>` + this.L('e', 13, 35, 26) + `<text x="29" y="17" font-size="${letter.length > 3 ? 11 : 15}" text-anchor="middle" class="glt">${letter}</text>`; }
-    else if (key === 'sq') { body = this.ICON.frame + this.L(letter, 18, 30, 26) + '<text x="33" y="15" font-size="13" text-anchor="middle" class="glt">2</text>'; }
-    else if (key === 'cos' || key === 'sin' || key === 'det') { w = 54; body = `<g transform="translate(7 0)">${this.ICON[D[1]]}</g>` + this.L(key, 27, 28, 20); }
-    else body = `<g class="gi">${D && D[1] ? this.ICON[D[1]] : ''}</g>` + this.L(letter, 20, 30.5, [...letter].length > 1 ? 20 : 30);
-    return `<svg viewBox="0 0 ${w} 40" style="width:${(w / 40 * 1.45).toFixed(2)}em" aria-hidden="true">${body}</svg>`;
+    else if (key === 'exp') { w = 44; body = `<g class="gi">${this.ICON.clock}</g>` + this.L('e', 13, this.BASE, 26) + `<text x="29" y="13" font-size="${letter.length > 3 ? 11 : 15}" text-anchor="middle" class="glt">${letter}</text>`; }
+    else if (key === 'sq') { body = this.ICON.frame + this.L(letter, 18, this.BASE, 26) + '<text x="33" y="15" font-size="13" text-anchor="middle" class="glt">2</text>'; }
+    else if (key === 'cos' || key === 'sin' || key === 'det') { w = Math.ceil(this.lw(key, 20) + 4); body = `<g transform="translate(${(w - 40) / 2} 0)">${this.ICON[D[1]]}</g>` + this.L(key, w / 2, this.BASE, 20); }
+    else {
+      // jedno písmeno: šírka glyfu = šírka písmena (piktogram smie presahovať) → žiadna prázdna medzera po stranách
+      const cw = Math.max(10, Math.ceil(this.lw(letter, [...letter].length > 1 ? 20 : 30) + 2));
+      // piktogram sa zmenší na šírku písmena (+ malý presah), aby nezasahoval do susedných symbolov
+      const sc = Math.min(1, Math.max(0.5, (cw + 4) / 32)).toFixed(3);
+      body = `<g class="gi"><g transform="translate(20 20) scale(${sc}) translate(-20 -20)">${D && D[1] ? this.ICON[D[1]] : ''}</g></g>` + this.L(letter, 20, this.BASE, [...letter].length > 1 ? 20 : 30);
+      return `<svg viewBox="${20 - cw / 2} 0 ${cw} 40" style="aspect-ratio:${cw}/40" aria-hidden="true">${body}</svg>`;
+    }
+    return `<svg viewBox="0 0 ${w} 40" style="aspect-ratio:${w}/40" aria-hidden="true">${body}</svg>`;
   },
   esc: (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'),
   html(key, letter, extraCls = '') {
     const D = this.dict()[key] || this.dict().U, cat = key === 'sq' ? (letter === 'α' ? 'a' : letter === 'β' ? 'b' : 'P') : key === 'exp' && /γ/.test(letter) ? 'g' : D[0];
     const svg = this.svg(key, letter);
     const tip = `<div class="gtip"><span class="gly big g-${cat}">${svg}</span><div><b>${D[2]}</b><br>${D[3]}</div></div>`;
-    const pos = key === 'α' || key === 'ket0' ? ' up' : key === 'β' || key === 'ket1' ? ' dn' : '';
-    return `<span class="gly g-${cat}${pos}${extraCls}" data-g="${key}" data-tip="${this.esc(tip)}">${svg}</span>`;
+    return `<span class="gly g-${cat}${extraCls}" data-g="${key}" data-tip="${this.esc(tip)}">${svg}</span>`;
   },
 
   // ---------- text → glyfy (rovnice na javisku aj symboly v dialógoch) ----------
@@ -159,7 +180,7 @@ const EqG = {
       if (seg.startsWith('<')) { if (/^<svg/i.test(seg)) depth++; else if (/^<\/svg/i.test(seg)) depth--; return seg; }
       if (depth > 0 || !seg) return seg;
       // ⟨a|ψ⟩: bra a ket zdieľajú zvislú čiaru — rozdelia sa na dva glyfy (otázka · odpoveď)
-      seg = seg.replace(/⟨([^⟨|\s]{1,4})\|([^|⟩\s]{1,4})⟩/g, (m, a, b) => mark(this.html('bra', a)) + mark(this.html(b === '0' ? 'ket0' : b === '1' ? 'ket1' : 'ket', b)));
+      seg = seg.replace(/⟨([^⟨|\s]{1,4})\|([^|⟩\s]{1,4})⟩/g, (m, a, b) => mark(this.html('bra', a)) + mark(this.html(b === '0' ? 'ket0' : b === '1' ? 'ket1' : 'ket', b).split('M3 4v32').join('')));
       const RE = math
         ? /(\|[^|⟩\s]{1,4}⟩)|(⟨[^⟨|\s]{1,4}\|)|\|([αβ])\|²|(H̃|[ĤÂ])|(?<![\p{L}])(cos|sin|det)(?![\p{L}])|([αβθφγψΨρσΔΩωħπ∂Σ⊗])|(P)(?=\()|(A)(?=[₁₂])|(?<![\p{L}\p{N}])([HXYZSTUInrtp])(?![\p{L}\p{N}])|(?<![\p{L}])(i)(?![\p{L}])/gu
         : /(\|[^|⟩\s]{1,4}⟩)|(⟨[^⟨|\s]{1,4}\|)|\|([αβ])\|²|(H̃|[ĤÂ])|(?<![\p{L}])(cos|sin|det)(?![\p{L}])|([αβθφγψΨρσΔΩωħπ∂Σ⊗])|(P)(?=\()|(A)(?=[₁₂])|(?<![\p{L}\p{N}])([HXYZSTU])(?![\p{L}\p{N}])|(?<=[\d·−+(])(i)(?![\p{L}])/gu;
@@ -197,8 +218,13 @@ const EqG = {
   // sú vo vnútri vzorca priehľadné; hranice čipu sa posunú tak, aby značky zostali správne vnorené (čip sa nikdy neroztrhne).
   INLINE_TAG: /^<\/?(b|i|em|strong|sup|sub|small|span)\b/i,
   wrapInline(html) {
-    const ATOM = String.raw`\|[^|⟩\s<]{1,5}⟩|⟨[^⟨|\s<]{1,4}\||[αβθφγψΨρσΔΩωħπ∂Σ⊗]|(?<![A-Za-zÀ-ĦĨ-žА-яІіЇїЄєҐґ])(?:cos|sin|Re|Im|Tr|det|(?![aouvAOUV](?![₀-₉]))[A-Za-z])(?![A-Za-zÀ-ĦĨ-žА-яІіЇїЄєҐґ])`; // slovenské „a, v, o, u“ nie sú premenné
-    const RUN = new RegExp(String.raw`(?:${ATOM}|[\uE002=+−\-·×/()²³½¼¾√≈≥≤→⇒∼*'′|0-9.,₀-₉  ])+`, 'gu');
+    const LT = 'A-Za-zÀ-ĦĨ-žА-яІіЇїЄєҐґ'; // písmená slov (grécke nie — tie sú vždy symboly)
+    // atómy: ⟨Z⟩ / ⟨a|b⟩, kety, bra, grécke písmená (aj s prilepeným indexom: δij, σA, ΩR), funkcie, samostatné písmená
+    // a dvojpísmenové premenné (Sz, Rz, cn), ak za nimi hneď nasleduje matematika — slovenské „a, v, o, u“ nie sú premenné,
+    // ani predložky „z, s, k“ pred ketom či zátvorkou („z |00⟩“, „z [x, p]“)
+    const ATOM = String.raw`⟨[^⟨⟩\s<]{1,7}⟩|\|[^|⟩\s<]{1,5}⟩|⟨[^⟨|\s<]{1,4}\||[\u0391-\u03A9\u03B1-\u03C9ϑϕϵħ∂Σ⊗∇ℂ](?:[A-Za-z]{1,2}(?![${LT}]))?`
+      + String.raw`|(?<![${LT}])(?![zsk][\s\u00a0]+[[(⟨|])(?:cos|sin|tan|exp|Re|Im|Tr|det|[A-Z][A-Za-z](?=\s?[(=⟩|₀-₉0-9×·/≥≤≈→⇒*+−)^])|[a-z]{2}(?=[=(])|(?![aouvAOUV](?![₀-₉]))[A-Za-z])(?![${LT}])`;
+    const RUN = new RegExp(String.raw`(?:${ATOM}|[\uE002=+−\-·×/()²³½¼¾√≈≥≤→⇒∼≠≡↔⇔∝±%°⁺⁻⁰¹⁴-⁹†^{}\[\]⟨⟩∞*'′_|0-9.,₀-₉  ])+`, 'gu');
     const atomRe = new RegExp(ATOM + String.raw`|\uE002`, 'u');
     // bloky rovníc a výrazy sa vyfarbia celé naraz (aby e<sup>…</sup> a pod. zostali pohromade); čipy sa v nich nehľadajú
     html = String(html).replace(/(<div[^>]*class="[^"]*\b(?:eqb|expr)\b[^"]*"[^>]*>)([\s\S]*?)(<\/div>)/g, (m, o, inner, c) => o + this.colorMath(inner) + c);
@@ -233,23 +259,30 @@ const EqG = {
       }
       return -1;
     };
+    // znamienko na začiatku vzorca (−1 = e^{iπ}) zostane, ak sa ho priamo drží číslo alebo symbol
+    const sign = (a, b) => /[−+±-]/.test(F[a]) && a + 1 < b && !/[\s ,.=≈→⇒≥≤∼≠≡↔⇔∝+·×/−-]/.test(F[a + 1]);
     const trim = (a, b) => {
       let prev;
       do {
         prev = a + ':' + b;
-        while (a < b && /[\s ,.=≈→⇒≥≤∼+·×/−-]/.test(F[a])) a++;
-        while (b > a && /[\s ,.=≈→⇒≥≤∼+·×/−-]/.test(F[b - 1])) b--;
-        while (a < b && F[a] === ')') a++;
-        while (b > a && F[b - 1] === '(') b--;
-        const core = F.slice(a, b), open = (core.match(/\(/g) || []).length, close = (core.match(/\)/g) || []).length;
-        if (close > open && F[b - 1] === ')') b--;
-        if (open > close && F[a] === '(') a++;
+        while (a < b && /[\s ,.=≈→⇒≥≤∼≠≡↔⇔∝+·×/−-]/.test(F[a]) && !sign(a, b)) a++;
+        while (b > a && /[\s ,.=≈→⇒≥≤∼≠≡↔⇔∝+·×/−-]/.test(F[b - 1])) b--;
+        // zátvorky (), [], {} musia byť v čipe spárované: nespárovaná na okraji odpadne, vo vnútri čip pri nej skončí (začne za ňou)
+        const st = [];
+        let cut = -1;
+        for (let i = a; i < b && cut < 0; i++) {
+          const o = '([{'.indexOf(F[i]), c = ')]}'.indexOf(F[i]);
+          if (o >= 0) st.push([i, o]);
+          else if (c >= 0) { if (st.length && st[st.length - 1][1] === c) st.pop(); else cut = i; }
+        }
+        if (cut >= 0) { if (cut === b - 1) b--; else a = cut + 1; }
+        else if (st.length) { if (st[0][0] === a) a++; else b = st[0][0]; }
       } while (prev !== a + ':' + b);
       return [a, b];
     };
     const ins = []; // [pozícia vo F, '\u0006' začiatok | '\u0007' koniec]
-    F.replace(RUN, (run, at) => {
-      let [a, b] = trim(at, at + run.length), prev;
+    const chip = (at, end) => {
+      let [a, b] = trim(at, end), prev;
       do {
         prev = a + ':' + b;
         // vnorenie: nespárovaná zatváracia značka → ak jej otváracia tesne predchádza, čip ju zahrnie, inak začne za ňou
@@ -269,8 +302,14 @@ const EqG = {
         if (F[a] !== '' || F[b - 1] !== '') { const t = trim(a, b); if (F[a] !== '') a = t[0]; if (F[b - 1] !== '') b = t[1]; }
       } while (prev !== a + ':' + b && a < b);
       const core = F.slice(a, b).replace(//g, '');
-      if (a >= b || core.replace(/\s/g, '').length < 3 || !/[=≈→⇒≥≤∼]/.test(core) || !atomRe.test(core)) return run;
+      if (a >= b || core.replace(/\s/g, '').length < 3 || !/[=≈→⇒≥≤∼≠≡↔⇔∝]/.test(core) || !atomRe.test(core)) return;
       ins.push([a, '\u0006'], [b - 1, '\u0007']);
+    };
+    // koniec vety („… osi y. Y|0⟩ = …“) beh rozdelí — čip nikdy neprekročí bodku s medzerou (desatinná bodka medzeru nemá)
+    F.replace(RUN, (run, at) => {
+      let from = 0;
+      for (const m of run.matchAll(/\.[\s\u00a0\uE000]+/gu)) { chip(at + from, at + m.index + 1); from = m.index + m[0].length; }
+      chip(at + from, at + run.length);
       return run;
     });
     // vloženie značiek čipu (od konca): do textu na posun, k značke pred/za ňu

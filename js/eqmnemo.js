@@ -34,10 +34,10 @@ const MNEMO_RULES = [
     tr('Ket ⟩ má hrot dopredu (stav, odpoveď), bra ⟨ je jeho zrkadlo (otázka), operátor je 3D krabička s obrázkom toho, čo robí, pravdepodobnosť je stĺp.',
       'A ket ⟩ points forward (a state, an answer), a bra ⟨ is its mirror (a question), an operator is a 3D box showing what it does, a probability is a pillar.',
       'Кет ⟩ має вістря вперед (стан, відповідь), бра ⟨ — його дзеркало (питання), оператор — 3D-коробка з малюнком того, що він робить, імовірність — стовп.')],
-  [() => EqG.html('ket0', '0') + EqG.html('ket1', '1'), tr('Poloha = HORE / DOLE', 'Position = UP / DOWN', 'Положення = ВГОРІ / ВНИЗУ'),
-    tr('Všetko, čo patrí k |0⟩ (α, |0⟩), sedí v riadku vyššie; čo patrí k |1⟩ (β, |1⟩), nižšie — ako póly Blochovej gule.',
-      'Everything that belongs to |0⟩ (α, |0⟩) sits higher in the line; what belongs to |1⟩ (β, |1⟩) sits lower — like the poles of the Bloch ball.',
-      'Усе, що належить до |0⟩ (α, |0⟩), стоїть у рядку вище; що належить до |1⟩ (β, |1⟩), — нижче, як полюси кулі Блоха.')],
+  [() => EqG.html('ket0', '0') + EqG.html('ket1', '1'), tr('Šípka = HORE / DOLE', 'Arrow = UP / DOWN', 'Стрілка = ВГОРУ / ВНИЗ'),
+    tr('Všetko, čo patrí k |0⟩ (α, |0⟩), má šípku či čiarku hore; čo patrí k |1⟩ (β, |1⟩), dole — ako póly Blochovej gule. Písmená pritom stoja na rovnakej účarí ako text.',
+      'Everything that belongs to |0⟩ (α, |0⟩) carries an arrow or tick pointing up; what belongs to |1⟩ (β, |1⟩) points down — like the poles of the Bloch ball. The letters themselves stay on the same baseline as the text.',
+      'Усе, що належить до |0⟩ (α, |0⟩), має стрілку чи риску вгору; що належить до |1⟩ (β, |1⟩), — униз, як полюси кулі Блоха. Самі літери стоять на тій самій лінії, що й текст.')],
   ['<span class="mn mn-a" style="font-size:1.4em">α</span><span class="mn mn-a" style="font-size:.7em;opacity:.6">α</span>', tr('Veľkosť = KOĽKO', 'Size = HOW MUCH', 'Розмір = СКІЛЬКИ'),
     tr('Na javisku symbol amplitúdy rastie s jej veľkosťou |α|. Keď je amplitúda nulová, scvrkne sa a zbledne.',
       'On the stage an amplitude’s symbol grows with its magnitude |α|. When the amplitude is zero, it shrinks and fades.',
@@ -248,6 +248,10 @@ const EqM = {
     if (!this.stage) return;
     const on = Settings.eq && !document.body.classList.contains('welcoming');
     if (!on) { this.stage.style.display = 'none'; return; }
+    // na ostrove sa rovnica neukazuje — ostáva len 🔑 kľúč mnemotechniky
+    const hub = Game.scene === Hub;
+    this.stage.classList.toggle('keyonly', hub);
+    if (hub) { this.stage.style.display = ''; this.titleEl.innerHTML = '∑ ' + tr('Rovnicová mnemotechnika', 'Equation mnemonics', 'Мнемоніка рівнянь'); this.sig = null; return; }
     const spec = this.build();
     this.stage.style.display = spec ? '' : 'none';
     if (!spec || this.stage.classList.contains('min')) { if (spec) this.titleEl.innerHTML = '∑ ' + spec.title; return; }
