@@ -707,3 +707,66 @@ body.eqmode #eqstage { display: block; }
 #eqstage .eqlegend { width: min(720px, 92vw); position: relative; left: 50%; transform: translateX(-50%); }
 body.eqmode:has(#panel.show) #eqstage { max-width: max(320px, calc(100vw - 830px)); }
 .eqlegend .gd > div > b { display: block; } .eqlegend .gd small b { display: inline; color: var(--gold); }
+
+/* ===== rovnice: väčšie a na vlastnom pozadí („tabuľa rovníc“) — bloky, výrazy, javisko, pohľady aj vzorce vo vetách ===== */
+:root {
+  --eq-grid: rgba(95, 227, 255, 0.07);
+  --eq-bg:
+    linear-gradient(var(--eq-grid) 1px, transparent 1px) 0 0 / 14px 14px,
+    linear-gradient(90deg, var(--eq-grid) 1px, transparent 1px) 0 0 / 14px 14px,
+    radial-gradient(120% 140% at 12% 0%, #1a2b66 0%, #0c1436 52%, #060a1d 100%);
+  --eq-chip: linear-gradient(180deg, rgba(30, 48, 110, 0.95), rgba(10, 16, 44, 0.95));
+  --eq-border: rgba(95, 227, 255, 0.42); --eq-accent: #5fe3ff; --eq-glow: rgba(95, 227, 255, 0.16); --eq-ink: #f3f7ff;
+}
+html[data-theme="nordic"] {
+  --eq-grid: rgba(226, 182, 94, 0.06);
+  --eq-bg:
+    repeating-linear-gradient(135deg, var(--eq-grid) 0 1px, transparent 1px 11px),
+    radial-gradient(120% 140% at 12% 0%, #322c22 0%, #1a1712 55%, #0d0c0a 100%);
+  --eq-chip: linear-gradient(180deg, rgba(58, 50, 36, 0.96), rgba(22, 20, 16, 0.96));
+  --eq-border: rgba(226, 182, 94, 0.5); --eq-accent: #e2b65e; --eq-glow: rgba(226, 182, 94, 0.14); --eq-ink: #f6ecd2;
+}
+html[data-theme="wow"] {
+  --eq-grid: rgba(255, 209, 0, 0.06);
+  --eq-bg:
+    repeating-radial-gradient(circle at 85% 50%, var(--eq-grid) 0 1px, transparent 1px 13px),
+    radial-gradient(120% 140% at 12% 0%, #2f2213 0%, #170f08 55%, #0b0704 100%);
+  --eq-chip: linear-gradient(180deg, rgba(60, 42, 20, 0.96), rgba(22, 15, 8, 0.96));
+  --eq-border: rgba(212, 164, 74, 0.6); --eq-accent: #ffd100; --eq-glow: rgba(255, 209, 0, 0.13); --eq-ink: #fff4d6;
+}
+/* blok rovnice (teória, karty ∑, denník, kvízy) */
+.eq.eqb { position: relative; font-size: 21px; line-height: 1.5; padding: 12px 18px 12px 24px; margin: 10px 0; border-radius: 10px; color: var(--eq-ink);
+  background: var(--eq-bg); border: 1px solid var(--eq-border); border-left: 4px solid var(--eq-accent);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), inset 0 0 28px rgba(0, 0, 0, 0.55), 0 6px 20px var(--eq-glow);
+  text-shadow: 0 0 10px var(--eq-glow), 0 1px 0 rgba(0, 0, 0, 0.6); white-space: normal; overflow-wrap: break-word; text-wrap: balance; }
+.eq.eqb::after { content: "∑"; position: absolute; right: 10px; bottom: -0.25em; font-size: 2.6em; line-height: 1; color: var(--eq-accent); opacity: 0.08; pointer-events: none; }
+#panel .eq.eqb { font-size: 22px; }
+#dialog .eq.eqb { font-size: 24px; }
+html[data-theme="nordic"] .eq.eqb, html[data-theme="nordic"] .info .expr { background: var(--eq-bg); }
+/* výraz v paneli (Diracova knižnica a pod.) */
+.info .expr, #panel .info .expr { font-size: 32px; padding: 12px 16px; min-height: 58px; border-radius: 10px; color: var(--eq-ink);
+  background: var(--eq-bg); border: 1px solid var(--eq-border); border-left: 4px solid var(--eq-accent);
+  box-shadow: inset 0 0 28px rgba(0, 0, 0, 0.55), 0 6px 20px var(--eq-glow); }
+/* vzorec vo vete: čip s vlastným pozadím */
+.eqi { font-family: "Cambria Math", Georgia, serif; font-size: 1.14em; color: var(--eq-ink); white-space: nowrap; padding: 0.06em 0.4em; margin: 0 0.08em;
+  border-radius: 6px; background: var(--eq-chip); border: 1px solid var(--eq-border); box-shadow: 0 0 10px var(--eq-glow);
+  -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+#tip .eqi { color: inherit; background: rgba(0, 0, 0, 0.08); box-shadow: none; }
+.choice .eqi { font-size: 1.08em; }
+/* pohľady 👁: zápis na tabuli */
+#views .vcap { font-size: 18px; line-height: 1.6; margin-top: 6px; padding: 8px 12px; border-radius: 10px; color: var(--eq-ink);
+  background: var(--eq-bg); border: 1px solid var(--eq-border); border-left: 4px solid var(--eq-accent); box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.5); max-height: 240px; }
+#views .vcap .vnote { font-size: 13px; }
+/* javisko rovnice najprv: väčšie tokeny, rovnaká tabuľa */
+#eqstage .eqrows { background: var(--eq-bg); border: 1px solid var(--eq-border); border-left: 4px solid var(--eq-accent);
+  box-shadow: inset 0 0 34px rgba(0, 0, 0, 0.6), 0 18px 40px rgba(0, 0, 0, 0.4), 0 0 26px var(--eq-glow); padding: 12px 20px 14px; }
+#eqstage { max-width: min(780px, calc(100vw - 620px)); }
+body.eqmode:has(#panel.show) #eqstage { max-width: max(380px, calc(100vw - 800px)); }
+.tk { font-size: 25px; }
+.t-k, .t-n { font-size: 21px; }
+.t-m { font-size: 15px; }
+.eqrow + .eqrow .tk { font-size: 20px; }
+.eqrow + .eqrow .t-k, .eqrow + .eqrow .t-n { font-size: 18px; }
+.tk .lb { font-size: 13px; }
+#eqstage .eqh { font-size: 13px; }
+@media (max-width: 1100px) { .tk { font-size: 21px; } .eqrow + .eqrow .tk { font-size: 17px; } }

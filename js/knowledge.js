@@ -5,7 +5,7 @@
 // Farby: α je vždy modrá, β červená — rovnako ako v pohľadoch 👁, aby sa symbol dal spojiť s obrázkom.
 
 const cA = '<i class="ca">α</i>', cB = '<i class="cb">β</i>';
-const EQ = (h) => `<div class="eq">${h}</div>`;
+const EQ = (h) => `<div class="eq eqb">${h}</div>`; // eqb = blok rovnice s vlastným pozadím
 const pick = (pair) => (Array.isArray(pair) ? tr(...pair) : pair);
 
 // každá položka: [slovensky, anglicky, ukrajinsky]; voliteľne views: { krok: 'pohľad' } = tlačidlo „👁 ukáž“

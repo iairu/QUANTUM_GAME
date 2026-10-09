@@ -251,7 +251,7 @@ const UI = {
     }
     if (q.shuffle !== false) order.sort(() => rand() - 0.5);
     for (const i of order) {
-      const b = el('button', 'choice', q.options[i]);
+      const b = el('button', 'choice', mathText(q.options[i])); // vzorce v odpovediach: čip rovnice (a glyfy pri rovniciach najprv)
       b.dataset.ok = i === q.correct ? '1' : '0';
       b.onclick = () => {
         const ok = i === q.correct;
@@ -359,7 +359,13 @@ const UI = {
     if (t) w.dataset.tip = t;
     return w;
   },
-  info(html, cls = '') { return el('div', 'info ' + cls, annotate(html)); },
+  info(html, cls = '') {
+    const d = el('div', 'info ' + cls, annotate(html));
+    // živé hodnoty (panely levelov ich prepisujú cez innerHTML): vzorce dostanú čip rovnice a pri „Rovnice najprv“ glyfy
+    const nat = Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML');
+    Object.defineProperty(d, 'innerHTML', { configurable: true, get() { return nat.get.call(this); }, set(v) { nat.set.call(this, mathText(v)); } });
+    return d;
+  },
 
   // ---------- grafy v paneli ----------
   chart(w = 300, h = 130) {
@@ -614,4 +620,9 @@ const TextMode = {
 function emphasize(text) {
   return String(text).split(/(<[^>]+>)/).map((seg) => (seg.startsWith('<') ? seg
     : seg.replace(/(\|[^|⟩]{1,4}⟩|\d+(?:[.,]\d+)?\s?%?|[A-ZÁ-Ž]{3,}[A-ZÁ-Ž]*)/gu, '<b>$1</b>'))).join('');
+}
+// vzorec bez vysvetliviek pojmov (odpovede v kvízoch): len čip rovnice a pri „Rovnice najprv“ glyfy
+function mathText(html) {
+  html = EqG.wrapInline(html);
+  return Settings.eq ? EqG.glyphify(html) : html;
 }

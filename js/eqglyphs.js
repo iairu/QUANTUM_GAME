@@ -191,6 +191,42 @@ const EqG = {
     return s.replace(/\u0001(\d+)\u0002/g, (m, i) => marks[+i]);
   },
 
+  // ---------- vzorce vo vetách → zvýraznené „čipy“ rovnice (oba typy hry) ----------
+  // beh vzorca = symboly (kety, grécke písmená, samostatné písmená, cos/sin/Re/Im) a matematické znaky;
+  // obalí sa, len ak obsahuje vzťah (=, ≈, →, ⇒, ≥, ≤, ∼) a aspoň jeden symbol
+  wrapInline(html) {
+    const ATOM = String.raw`\|[^|⟩\s<]{1,5}⟩|⟨[^⟨|\s<]{1,4}\||[αβθφγψΨρσΔΩωħπ∂Σ⊗]|(?<![\p{L}])(?:cos|sin|Re|Im|Tr|det|[A-Za-z])(?![\p{L}])`;
+    const RUN = new RegExp(String.raw`(?:${ATOM}|\u0004\d+\u0005|[=+−\-·×/()²³½¼¾√≈≥≤→⇒∼*'′|0-9.,₀-₉ ])+`, 'gu');
+    const atomRe = new RegExp(ATOM + String.raw`|\u0004`, 'u');
+    // krátke horné/dolné indexy (e<sup>iφ</sup>, B<sub>0</sub>) sú súčasťou vzorca — dočasne bez značiek
+    const subs = [];
+    html = String(html).replace(/<(sup|sub)>([^<]{1,14})<\/\1>/g, (m) => `\u0004${subs.push(m) - 1}\u0005`);
+    let inEq = 0, inChip = 0;
+    return html.split(/(<[^>]+>)/).map((seg) => {
+      if (seg.startsWith('<')) {
+        if (/^<div[^>]*class="[^"]*\beqb\b/.test(seg)) inEq = 1; else if (inEq && /^<\/div/.test(seg)) inEq = 0;
+        if (/^<span[^>]*class="[^"]*\beqi\b/.test(seg)) inChip = 1; else if (inChip && /^<span/.test(seg)) inChip++; else if (inChip && /^<\/span/.test(seg)) inChip--;
+        return seg;
+      }
+      if (inEq || inChip || !seg.trim()) return seg;
+      return seg.replace(RUN, (run) => {
+        // okraje: medzery, interpunkcia a nespárované zátvorky ostanú mimo čipu
+        let core = run, prev;
+        do { // opakovane: medzery a interpunkcia, nespárované zátvorky, vzťahový znak bez ľavej/pravej strany
+          prev = core;
+          core = core.replace(/^[\s,.]+/, '').replace(/[\s,.]+$/, '').replace(/^\)+/, '').replace(/\(+$/, '');
+          const open = (core.match(/\(/g) || []).length, close = (core.match(/\)/g) || []).length;
+          if (close > open && core.endsWith(')')) core = core.slice(0, -1);
+          if (open > close && core.startsWith('(')) core = core.slice(1);
+          core = core.replace(/^[=≈→⇒≥≤∼+·×/−-]+/, '').replace(/[=≈→⇒≥≤∼+·×/−-]+$/, '');
+        } while (core !== prev);
+        if (core.length < 5 || !/[=≈→⇒≥≤∼]/.test(core) || !atomRe.test(core)) return run;
+        const i = run.indexOf(core);
+        return `${run.slice(0, i)}<span class="eqi">${core}</span>${run.slice(i + core.length)}`;
+      });
+    }).join('').replace(/\u0004(\d+)\u0005/g, (m, i) => subs[+i]);
+  },
+
   // ---------- zvuková mnemotechnika: tón podľa toho, KTO je symbol ----------
   chime(key) {
     const now = performance.now();
