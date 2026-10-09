@@ -170,8 +170,8 @@ const EqG = {
         if (hat) return mark(this.html(hat, hat));
         if (fn) return mark(this.html(fn, fn));
         if (greek) {
-          if (greek === 'α' && /\($/.test(all.slice(0, off)) && /^[)/]/.test(all.slice(off + 1))) return mark(this.html('ang', 'α')); // R(α), cos(α/2): uhol
-          if (greek === 'γ' && /^\s*(B|\/\s*2|\/2π)/.test(all.slice(off + 1))) return mark(this.html('gyro', 'γ')); // γB₀, γ/2π = gyromagnetický pomer
+          if (greek === 'α' && (all[off + 1] === '\u2060' || (/\($/.test(all.slice(0, off)) && /^[)/]/.test(all.slice(off + 1))))) return mark(this.html('ang', 'α')); // R(α), cos(α/2): uhol
+          if (greek === 'γ' && (all[off + 1] === '\u2061' || /^\s*(B|\/\s*2|\/2π)/.test(all.slice(off + 1)))) return mark(this.html('gyro', 'γ')); // γB₀, γ/2π = gyromagnetický pomer
           return mark(this.html(greek, greek));
         }
         if (P) return mark(this.html('P', 'P'));
@@ -179,7 +179,7 @@ const EqG = {
         if (op) {
           // slovenské predložky „Z“, „S“ na začiatku vety nie sú hradlá
           if (!math && /(^|[.!?:]\s*)$/.test(all.slice(0, off)) && /^\s+\p{Ll}/u.test(all.slice(off + 1))) return m;
-          if (op === 'T' && /(\/|\d\s?)$/.test(all.slice(0, off))) return m; // tesla (MHz/T, 1 T), nie hradlo T
+          if (op === 'T' && (all[off + 1] === '\u2063' || /(\/|\d\s?)$/.test(all.slice(0, off)))) return m; // tesla (MHz/T, 1 T), nie hradlo T
           // v NMR a vo výkladoch (levely 6, 8) je H hamiltonián, inde Hadamardovo hradlo
           if (op === 'H' && Game.scene && [6, 8].includes(Game.scene.num)) return mark(this.html('Ĥ', 'H'));
           return mark(this.html(op, op));
@@ -192,39 +192,156 @@ const EqG = {
   },
 
   // ---------- vzorce vo vetách → zvýraznené „čipy“ rovnice (oba typy hry) ----------
-  // beh vzorca = symboly (kety, grécke písmená, samostatné písmená, cos/sin/Re/Im) a matematické znaky;
-  // obalí sa, len ak obsahuje vzťah (=, ≈, →, ⇒, ≥, ≤, ∼) a aspoň jeden symbol
+  // Beh vzorca = symboly (kety, grécke písmená, samostatné písmená, cos/sin/Re/Im) a matematické znaky; obalí sa,
+  // len ak obsahuje vzťah (=, ≈, →, ⇒, ≥, ≤, ∼) a aspoň jeden symbol. Riadkové značky (<b>, <i>, <sup>, <sub>, <span>)
+  // sú vo vnútri vzorca priehľadné; hranice čipu sa posunú tak, aby značky zostali správne vnorené (čip sa nikdy neroztrhne).
+  INLINE_TAG: /^<\/?(b|i|em|strong|sup|sub|small|span)\b/i,
   wrapInline(html) {
-    const ATOM = String.raw`\|[^|⟩\s<]{1,5}⟩|⟨[^⟨|\s<]{1,4}\||[αβθφγψΨρσΔΩωħπ∂Σ⊗]|(?<![\p{L}])(?:cos|sin|Re|Im|Tr|det|[A-Za-z])(?![\p{L}])`;
-    const RUN = new RegExp(String.raw`(?:${ATOM}|\u0004\d+\u0005|[=+−\-·×/()²³½¼¾√≈≥≤→⇒∼*'′|0-9.,₀-₉ ])+`, 'gu');
-    const atomRe = new RegExp(ATOM + String.raw`|\u0004`, 'u');
-    // krátke horné/dolné indexy (e<sup>iφ</sup>, B<sub>0</sub>) sú súčasťou vzorca — dočasne bez značiek
-    const subs = [];
-    html = String(html).replace(/<(sup|sub)>([^<]{1,14})<\/\1>/g, (m) => `\u0004${subs.push(m) - 1}\u0005`);
-    let inEq = 0, inChip = 0;
+    const ATOM = String.raw`\|[^|⟩\s<]{1,5}⟩|⟨[^⟨|\s<]{1,4}\||[αβθφγψΨρσΔΩωħπ∂Σ⊗]|(?<![A-Za-zÀ-ĦĨ-žА-яІіЇїЄєҐґ])(?:cos|sin|Re|Im|Tr|det|(?![aouvAOUV](?![₀-₉]))[A-Za-z])(?![A-Za-zÀ-ĦĨ-žА-яІіЇїЄєҐґ])`; // slovenské „a, v, o, u“ nie sú premenné
+    const RUN = new RegExp(String.raw`(?:${ATOM}|[\uE002=+−\-·×/()²³½¼¾√≈≥≤→⇒∼*'′|0-9.,₀-₉  ])+`, 'gu');
+    const atomRe = new RegExp(ATOM + String.raw`|\uE002`, 'u');
+    // bloky rovníc a výrazy sa vyfarbia celé naraz (aby e<sup>…</sup> a pod. zostali pohromade); čipy sa v nich nehľadajú
+    html = String(html).replace(/(<div[^>]*class="[^"]*\b(?:eqb|expr)\b[^"]*"[^>]*>)([\s\S]*?)(<\/div>)/g, (m, o, inner, c) => o + this.colorMath(inner) + c);
+    const parts = html.replace(/&nbsp;/g, ' ').split(/(<[^>]+>)/);
+    // plochý text: značka = jeden znak  (priehľadná) alebo  (hranica); každý znak pozná svoj diel a posun
+    let F = '';
+    const own = [], offs = [];
+    let skip = 0, script = 0; // skip: blok rovnice, výraz, čip, glyf (len vyfarbiť); script: vnútri <sup>/<sub> je všetko súčasť vzorca (\uE002)
+    const skipOpen = (t) => /^<div[^>]*class="[^"]*\b(eqb|expr)\b/.test(t) || /^<span[^>]*class="[^"]*\b(eqi|gly)\b/.test(t) || /^<svg/i.test(t);
+    const tagName = (t) => (t.match(/^<\/?([a-z0-9]+)/i) || [])[1]?.toLowerCase();
+    const stack = [];
+    parts.forEach((p, k) => {
+      if (p.startsWith('<')) {
+        const nm = tagName(p), closing = p.startsWith('</'), selfClose = /\/>$/.test(p) || ['br', 'img', 'hr', 'input'].includes(nm);
+        if (nm === 'sup' || nm === 'sub') script += closing ? -1 : 1;
+        if (!closing && !selfClose) { stack.push({ nm, skip: skipOpen(p) }); if (skipOpen(p)) skip++; }
+        else if (closing) { for (let j = stack.length - 1; j >= 0; j--) if (stack[j].nm === nm) { if (stack[j].skip) skip--; stack.length = j; break; } }
+        F += !skip && this.INLINE_TAG.test(p) && !skipOpen(p) ? '' : ''; own.push(k); offs.push(-1);
+        return;
+      }
+      for (let i = 0; i < p.length; i++) { F += skip ? '' : script > 0 && p.length <= 14 ? '\uE002' : p[i]; own.push(k); offs.push(i); }
+    });
+    const PH = /^[\s ]*$/; // len značky a medzery
+    // párová značka k značke na pozícii i (rovnaké meno, s ohľadom na vnorenie); dir = +1 dopredu, −1 dozadu
+    const mate = (i, dir) => {
+      const nm = tagName(parts[own[i]]);
+      let d = 0;
+      for (let j = i + dir; j >= 0 && j < F.length; j += dir) {
+        if (F[j] !== '' || tagName(parts[own[j]]) !== nm) continue;
+        const cl = parts[own[j]].startsWith('</');
+        if (dir > 0 ? !cl : cl) d++; else if (d) d--; else return j;
+      }
+      return -1;
+    };
+    const trim = (a, b) => {
+      let prev;
+      do {
+        prev = a + ':' + b;
+        while (a < b && /[\s ,.=≈→⇒≥≤∼+·×/−-]/.test(F[a])) a++;
+        while (b > a && /[\s ,.=≈→⇒≥≤∼+·×/−-]/.test(F[b - 1])) b--;
+        while (a < b && F[a] === ')') a++;
+        while (b > a && F[b - 1] === '(') b--;
+        const core = F.slice(a, b), open = (core.match(/\(/g) || []).length, close = (core.match(/\)/g) || []).length;
+        if (close > open && F[b - 1] === ')') b--;
+        if (open > close && F[a] === '(') a++;
+      } while (prev !== a + ':' + b);
+      return [a, b];
+    };
+    const ins = []; // [pozícia vo F, '\u0006' začiatok | '\u0007' koniec]
+    F.replace(RUN, (run, at) => {
+      let [a, b] = trim(at, at + run.length), prev;
+      do {
+        prev = a + ':' + b;
+        // vnorenie: nespárovaná zatváracia značka → ak jej otváracia tesne predchádza, čip ju zahrnie, inak začne za ňou
+        for (let i = a; i < b; i++) {
+          if (F[i] !== '' || !parts[own[i]].startsWith('</')) continue;
+          const j = mate(i, -1);
+          if (j >= a) continue;
+          if (j >= 0 && PH.test(F.slice(j + 1, a))) a = j; else a = i + 1;
+        }
+        // nespárovaná otváracia → ak jej zatváracia tesne nasleduje, čip ju zahrnie, inak skončí pred ňou
+        for (let i = b - 1; i >= a; i--) {
+          if (F[i] !== '' || parts[own[i]].startsWith('</')) continue;
+          const j = mate(i, +1);
+          if (j >= 0 && j < b) continue;
+          if (j >= 0 && PH.test(F.slice(b, j))) b = j + 1; else b = i;
+        }
+        if (F[a] !== '' || F[b - 1] !== '') { const t = trim(a, b); if (F[a] !== '') a = t[0]; if (F[b - 1] !== '') b = t[1]; }
+      } while (prev !== a + ':' + b && a < b);
+      const core = F.slice(a, b).replace(//g, '');
+      if (a >= b || core.replace(/\s/g, '').length < 3 || !/[=≈→⇒≥≤∼]/.test(core) || !atomRe.test(core)) return run;
+      ins.push([a, '\u0006'], [b - 1, '\u0007']);
+      return run;
+    });
+    // vloženie značiek čipu (od konca): do textu na posun, k značke pred/za ňu
+    ins.sort((x, y) => y[0] - x[0] || (x[1] === '\u0007' ? -1 : 1));
+    for (const [i, mk] of ins) {
+      const k = own[i];
+      if (offs[i] < 0) parts[k] = mk === '\u0006' ? mk + parts[k] : parts[k] + mk;
+      else { const o = offs[i] + (mk === '\u0006' ? 0 : 1); parts[k] = parts[k].slice(0, o) + mk + parts[k].slice(o); }
+    }
+    const out = parts.join('');
+    return out.replace(/\u0006([\s\S]*?)\u0007/g, (m, inner) => `<span class="eqi">${this.colorMath(inner)}</span>`).replace(/ /g, '&nbsp;');
+  },
+
+  // ---------- každá časť vzorca vlastnou farbou a s rovnakými medzerami ----------
+  // čísla broskyňové · vzťahy (=, →) zlaté s medzerou · operácie (+ − · /) svetlomodré · zátvorky a |…| tlmené
+  // · funkcie (cos, sin, Re …) tyrkysové · premenné biele kurzívou · operátory (H, X …) fialové · P biela · grécke a kety podľa mnemotechniky
+  GREEK: { 'α': 'a', 'β': 'b', 'θ': 'th', 'φ': 'ph', 'γ': 'g', 'ψ': 'ket', 'Ψ': 'ket', 'ρ': 'rho', 'σ': 'ket', 'Δ': 'ph', 'Ω': 'th', 'ω': 'ph', 'ħ': 'k', 'π': 'k', '∂': 'k', 'Σ': 'k', '⊗': 'k', '∇': 'k', 'ℂ': 'k' },
+  colorMath(html) {
+    const TOK = /(\|[^|⟩\s<]{1,5}⟩)|(⟨[^⟨|\s<]{1,4}\|)|(?<![A-Za-zÀ-ĦĨ-žА-яІіЇїЄєҐґ])(cos|sin|tan|exp|log|ln|Re|Im|Tr|det|dim|diag|const|max|min)(?![A-Za-zÀ-ĦĨ-žА-яІіЇїЄєҐґ])|(H̃|[ĤÂ])|([αβθφγψΨρσΔΩωħπ∂Σ⊗∇ℂ])|(\d+(?:[.,]\d+)?(?:\s?%)?|[½¼¾⅓√∞°])|(⇔|⇒|→|≈|≥|≤|∼|≠|=)|([+−\-·×*/])|([()[\]{}|⟨⟩])|(?<![A-Za-zÀ-ĦĨ-žА-яІіЇїЄєҐґ])([A-Za-z])(?![A-Za-zÀ-ĦĨ-žА-яІіЇїЄєҐґ])|(\s+)|([^]+?)/gu;
+    let depth = 0, keep = 0, prevKind = 'start';
+    // fázový faktor e<sup>…</sup> ostane celý (zelený) — pri „Rovnice najprv“ z neho glyphify spraví ručičku hodín
+    const exps = [];
+    html = String(html).replace(/e<sup>[^<]{1,12}<\/sup>/g, (m) => `\uE010${String.fromCharCode(0xE100 + exps.push(m) - 1)}\uE011`);
     return html.split(/(<[^>]+>)/).map((seg) => {
       if (seg.startsWith('<')) {
-        if (/^<div[^>]*class="[^"]*\beqb\b/.test(seg)) inEq = 1; else if (inEq && /^<\/div/.test(seg)) inEq = 0;
-        if (/^<span[^>]*class="[^"]*\beqi\b/.test(seg)) inChip = 1; else if (inChip && /^<span/.test(seg)) inChip++; else if (inChip && /^<\/span/.test(seg)) inChip--;
+        if (/^<svg/i.test(seg)) depth++; else if (depth && /^<\/svg/i.test(seg)) depth--; // písmená glyfov (SVG) sa nefarbia
+        // hodnoty amplitúd (α modrá, β červená, tretia zelená) si farbu KTO nechajú
+        if (/^<(span|i|b)[^>]*class="[^"]*\b(ca|cb|cg)\b/.test(seg)) keep = 1; else if (keep && /^<\//.test(seg)) keep = 0;
         return seg;
       }
-      if (inEq || inChip || !seg.trim()) return seg;
-      return seg.replace(RUN, (run) => {
-        // okraje: medzery, interpunkcia a nespárované zátvorky ostanú mimo čipu
-        let core = run, prev;
-        do { // opakovane: medzery a interpunkcia, nespárované zátvorky, vzťahový znak bez ľavej/pravej strany
-          prev = core;
-          core = core.replace(/^[\s,.]+/, '').replace(/[\s,.]+$/, '').replace(/^\)+/, '').replace(/\(+$/, '');
-          const open = (core.match(/\(/g) || []).length, close = (core.match(/\)/g) || []).length;
-          if (close > open && core.endsWith(')')) core = core.slice(0, -1);
-          if (open > close && core.startsWith('(')) core = core.slice(1);
-          core = core.replace(/^[=≈→⇒≥≤∼+·×/−-]+/, '').replace(/[=≈→⇒≥≤∼+·×/−-]+$/, '');
-        } while (core !== prev);
-        if (core.length < 5 || !/[=≈→⇒≥≤∼]/.test(core) || !atomRe.test(core)) return run;
-        const i = run.indexOf(core);
-        return `${run.slice(0, i)}<span class="eqi">${core}</span>${run.slice(i + core.length)}`;
+      if (depth || keep || !seg) return seg;
+      const toks = [];
+      seg.replace(TOK, (m, ket, bra, fn, hat, gr, num, rel, op, br, v, sp) => {
+        const kind = ket ? 'ket' : bra ? 'bra' : fn ? 'fn' : hat ? 'opr' : gr ? 'gr' : num ? 'num' : rel ? 'rel' : op ? 'op' : br ? 'br' : v ? 'var' : sp ? 'sp' : 'txt';
+        toks.push({ kind, m });
+        return m;
       });
-    }).join('').replace(/\u0004(\d+)\u0005/g, (m, i) => subs[+i]);
+      // kontext pre glyfy (každá časť je vo vlastnom span-e, glyphify už susedov nevidí): neviditeľné značky za symbolom
+      const near = (i, d) => { for (let j = i + d; j >= 0 && j < toks.length; j += d) if (toks[j].kind !== 'sp') return toks[j]; return null; };
+      toks.forEach((t, i) => {
+        const p = near(i, -1), n = near(i, 1);
+        if (t.m === 'α' && p && p.m.startsWith('(') && n && /^[)/]/.test(n.m)) t.m += '\u2060';                   // α ako uhol: R(α), cos(α/2)
+        if (t.m === 'γ' && n && (/^B/.test(n.m) || /^\//.test(n.m))) t.m += '\u2061';                             // γB₀, γ/2π: gyromagnetický pomer
+        if (t.kind === 'var' && t.m === 'T' && p && (p.kind === 'num' || p.m === '/')) { t.m += '\u2063'; t.unit = 1; } // tesla
+      });
+      // interpunkcia sa prilepí k predchádzajúcej časti (čiarka nikdy nezačne riadok)
+      for (let i = toks.length - 1; i > 0; i--) if (toks[i].kind === 'txt' && /^[,.;:]+$/.test(toks[i].m) && !['sp', 'txt'].includes(toks[i - 1].kind)) { toks[i - 1].m += toks[i].m; toks.splice(i, 1); }
+      // medzery okolo vzťahov a operácií dáva CSS → pôvodné medzery pri nich zmiznú
+      return toks.map((t, i) => {
+        const nb = (j) => toks[j] && toks[j].kind;
+        if (t.kind === 'sp') {
+          if (['rel', 'op'].includes(nb(i - 1)) || ['rel', 'op'].includes(nb(i + 1))) return '';
+          return t.m;
+        }
+        let cls;
+        switch (t.kind) {
+          case 'ket': case 'bra': cls = 'm-ket'; break;
+          case 'fn': cls = 'm-fn'; break;
+          case 'opr': cls = 'm-opr'; break;
+          case 'gr': cls = 'm-g mn-' + (t.m.endsWith('\u2060') ? 'th' : this.GREEK[t.m[0]]); break;
+          case 'num': cls = 'm-num'; break;
+          case 'rel': cls = 'm-rel'; break;
+          case 'op': cls = ['start', 'rel', 'op', 'open'].includes(prevKind) && /[−-]/.test(t.m) ? 'm-un' : 'm-op'; break;
+          case 'br': cls = 'm-br'; break;
+          case 'var': cls = t.unit ? 'm-var' : /^[HXYZSTUI]/.test(t.m) ? 'm-opr' : /^P/.test(t.m) ? 'm-prob' : 'm-var'; break;
+          default: cls = null;
+        }
+        prevKind = t.kind === 'br' ? (/[([{⟨]/.test(t.m) ? 'open' : 'close') : t.kind === 'op' && cls === 'm-un' ? 'op' : t.kind;
+        return cls ? `<span class="${cls}">${t.m}</span>` : t.m;
+      }).join('');
+    }).join('').replace(/\uE010([\uE100-\uEFFF])\uE011/g, (m, c) => `<span class="m-exp">${exps[c.charCodeAt(0) - 0xE100]}</span>`);
   },
 
   // ---------- zvuková mnemotechnika: tón podľa toho, KTO je symbol ----------

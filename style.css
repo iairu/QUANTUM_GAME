@@ -748,9 +748,8 @@ html[data-theme="nordic"] .eq.eqb, html[data-theme="nordic"] .info .expr { backg
   background: var(--eq-bg); border: 1px solid var(--eq-border); border-left: 4px solid var(--eq-accent);
   box-shadow: inset 0 0 28px rgba(0, 0, 0, 0.55), 0 6px 20px var(--eq-glow); }
 /* vzorec vo vete: čip s vlastným pozadím */
-.eqi { font-family: "Cambria Math", Georgia, serif; font-size: 1.14em; color: var(--eq-ink); white-space: nowrap; padding: 0.06em 0.4em; margin: 0 0.08em;
-  border-radius: 6px; background: var(--eq-chip); border: 1px solid var(--eq-border); box-shadow: 0 0 10px var(--eq-glow);
-  -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.eqi { display: inline-block; max-width: 100%; vertical-align: middle; font-family: "Cambria Math", Georgia, serif; font-size: 1.14em; line-height: 1.4; color: var(--eq-ink);
+  white-space: normal; padding: 0.12em 0.5em; margin: 0.08em 0.1em; border-radius: 7px; background: var(--eq-chip); border: 1px solid var(--eq-border); box-shadow: 0 0 10px var(--eq-glow); }
 #tip .eqi { color: inherit; background: rgba(0, 0, 0, 0.08); box-shadow: none; }
 .choice .eqi { font-size: 1.08em; }
 /* pohľady 👁: zápis na tabuli */
@@ -770,3 +769,20 @@ body.eqmode:has(#panel.show) #eqstage { max-width: max(380px, calc(100vw - 800px
 .tk .lb { font-size: 13px; }
 #eqstage .eqh { font-size: 13px; }
 @media (max-width: 1100px) { .tk { font-size: 21px; } .eqrow + .eqrow .tk { font-size: 17px; } }
+
+/* každá časť vzorca vlastnou farbou a s rovnakými medzerami (bloky, čipy, výrazy, pohľady, javisko) */
+.m-num, .m-rel, .m-op, .m-un, .m-br, .m-fn, .m-var, .m-opr, .m-prob, .m-ket, .m-g, .m-exp { white-space: nowrap; }
+.m-num { color: #ffb98a; }
+.m-rel { color: #ffd25a; font-weight: 700; margin: 0 0.32em; }
+.m-op { color: #8fd3ff; margin: 0 0.2em; }
+.m-un { color: #8fd3ff; margin-right: 0.04em; }
+.m-br { color: #8c97cc; }
+.m-fn { color: #4fe3c1; margin-right: 0.06em; }
+.m-var { color: #f4f6ff; font-style: italic; }
+.m-opr { color: var(--mn-op); font-weight: 700; }
+.m-prob { color: #ffffff; font-weight: 700; }
+.m-ket { color: var(--mn-ket); }
+.m-g { font-weight: 700; }
+.m-exp { color: var(--mn-ph); }
+sup .m-rel, sub .m-rel { margin: 0 0.15em; } sup .m-op, sub .m-op { margin: 0 0.08em; }
+.eqlegend .rule .demo .m-rel { margin: 0 0.15em; }

@@ -66,6 +66,10 @@ const MNEMO_RULES = [
     tr('Konštanty prírody, funkcie a pevné čísla sú sivé a nikdy sa nehýbu; premenné sa hýbu (fázy sa kolíšu, globálna fáza sa točí).',
       'Constants of nature, functions and fixed numbers are grey and never move; variables do (phases sway, the global phase spins).',
       'Сталі природи, функції й незмінні числа сірі й ніколи не рухаються; змінні рухаються (фази гойдаються, глобальна фаза обертається).')],
+  ['<span class="m-num">2</span><span class="m-rel">=</span><span class="m-fn">cos</span><span class="m-br">(</span><span class="m-var">x</span><span class="m-op">+</span><span class="m-num">1</span><span class="m-br">)</span>', tr('Každá časť = vlastná farba', 'Every part = its own colour', 'Кожна частина = свій колір'),
+    tr('Aj obyčajné časti vzorca majú stálu farbu a rovnaké medzery: čísla broskyňové, vzťahy (=, →, ≈) zlaté s medzerou, operácie (+ − · /) svetlomodré, zátvorky a |…| tlmené, funkcie (cos, sin, Re) tyrkysové, premenné biele kurzívou.',
+      'Even the ordinary parts of a formula have a fixed colour and even spacing: numbers peach, relations (=, →, ≈) gold with space around them, operations (+ − · /) light blue, brackets and |…| muted, functions (cos, sin, Re) teal, variables white italic.',
+      'Навіть звичайні частини формули мають сталий колір і рівні проміжки: числа персикові, відношення (=, →, ≈) золоті з проміжком, дії (+ − · /) світло-сині, дужки й |…| приглушені, функції (cos, sin, Re) бірюзові, змінні білі курсивом.')],
   ['🔊', tr('Zvuk = KTO', 'Sound = WHO', 'Звук = ХТО'),
     tr('Prejdi myšou po symbole: |0⟩ a α zaznejú vysoko, |1⟩ a β nízko, θ klesne, fáza stúpne, operátor cvakne, pravdepodobnosť zazvoní.',
       'Hover over a symbol: |0⟩ and α sound high, |1⟩ and β low, θ falls, a phase rises, an operator clicks, a probability rings.',
@@ -260,7 +264,7 @@ const EqM = {
     spec.rows.forEach((row, ri) => row.forEach((t) => {
       const n = this.nodes[ri + '/' + t.k];
       if (!n) return;
-      if (n._h !== t.h) { n.gl.innerHTML = EqG.glyphify(t.h, true); n._h = t.h; }
+      if (n._h !== t.h) { n.gl.innerHTML = EqG.glyphify(['n', 'k', 'm'].includes(t.t) ? EqG.colorMath(t.h) : t.h, true); n._h = t.h; } // znaky a čísla vlastnými farbami
       const s = t.s == null ? 1 : t.s, scale = t.s == null ? 1 : 0.42 + 0.78 * clamp(s, 0, 1.3);
       n.style.setProperty('--s', scale.toFixed(3));
       n.style.setProperty('--o', (t.fade == null ? (t.s == null ? 1 : 0.35 + 0.65 * clamp(s * 1.4, 0, 1)) : 0.25 + 0.75 * clamp(t.fade, 0, 1)).toFixed(2));

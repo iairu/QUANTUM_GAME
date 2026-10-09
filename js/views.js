@@ -96,7 +96,7 @@ const Views = {
       this.bases(g, 0, h, w, h, st, true); this.rho(g, w, h, w, h, st, true);
       g.strokeStyle = VC.grid; g.beginPath(); g.moveTo(w, 0); g.lineTo(w, H); g.moveTo(0, h); g.lineTo(W, h); g.stroke();
     } else if (this.tab !== 'notation') this[this.tab](g, 0, 0, W, H, st, false);
-    this.cap.innerHTML = this.notation(st, this.tab === 'notation');
+    this.cap.innerHTML = EqG.colorMath(this.notation(st, this.tab === 'notation')); // každá časť zápisu vlastnou farbou
   },
 
   // ---------- pomocné kreslenie ----------
