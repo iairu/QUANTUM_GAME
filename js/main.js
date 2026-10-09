@@ -393,6 +393,11 @@ const Game = {
     UI.init();
     Views.init();
     this.load();
+    if (this.fresh) Welcome.show(() => this.start()); // nový hráč alebo po resete: najprv výber témy a obťažnosti
+    else this.start();
+  },
+  start() {
+    const canvas = $('#gl');
     this.levels = LEVELS.map((L) => new L.cls(L));
     Hub.init();
     Wow.init(); // MMO téma: postava, nepriatelia, lišta kúziel (inak nič)
@@ -675,6 +680,7 @@ const Game = {
   load() {
     try {
       const d = JSON.parse(localStorage.getItem('kvantp-game1') || 'null');
+      this.fresh = !d;
       if (d) this.progress = { stars: d.stars || {}, diff: d.diff || {}, codex: new Set(d.codex || []), scrolls: new Set(d.scrolls || []), introSeen: !!d.introSeen, laymanSeen: !!d.laymanSeen, moved: !!d.moved, allUnlocked: !!d.allUnlocked, session: d.session || null, wow: d.wow || null };
     } catch (e) { /* čistý začiatok */ }
   },
