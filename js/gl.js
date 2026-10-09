@@ -481,12 +481,12 @@ const Bloch = {
         const u = V3.norm(w), up = [0, 1, 0], th = Math.acos(clamp(u[1], -1, 1));
         const h = hor > 1e-3 ? V3.norm([w[0], 0, w[2]]) : [1, 0, 0];
         r.arc(center, up, h, radius * 0.32, th, [1, 0.6, 0.9]);
-        if (lab && th > 0.08) lab(key + 'th', V3.add(center, V3.scale(V3.add(V3.scale(up, Math.cos(th / 2)), V3.scale(h, Math.sin(th / 2))), radius * 0.44)), 'θ', Settings.eq ? 'axis mnl-th' : 'axis',
+        if (lab && th > 0.08) lab(key + 'th', V3.add(center, V3.scale(V3.add(V3.scale(up, Math.cos(th / 2)), V3.scale(h, Math.sin(th / 2))), radius * 0.44)), Settings.eq ? EqG.glyphify('θ') : 'θ', Settings.eq ? 'axis mnl-th' : 'axis',
           tr('θ — uhol od severného pólu |0⟩. Určuje P(0) = cos²(θ/2).', 'θ — angle from the north pole |0⟩. Sets P(0) = cos²(θ/2).', 'θ — кут від північного полюса |0⟩. Визначає P(0) = cos²(θ/2).'));
         if (hor > 0.03) {
           let ph = Math.atan2(vec[1], vec[0]); if (ph < 0) ph += 2 * Math.PI;
           r.arc(center, [1, 0, 0], [0, 0, -1], radius * 0.45, ph, [0.6, 1, 0.7]);
-          if (lab) lab(key + 'ph', V3.add(center, [Math.cos(ph / 2) * radius * 0.57, 0.02, -Math.sin(ph / 2) * radius * 0.57]), 'φ', Settings.eq ? 'axis mnl-ph' : 'axis',
+          if (lab) lab(key + 'ph', V3.add(center, [Math.cos(ph / 2) * radius * 0.57, 0.02, -Math.sin(ph / 2) * radius * 0.57]), Settings.eq ? EqG.glyphify('φ') : 'φ', Settings.eq ? 'axis mnl-ph' : 'axis',
             tr('φ — relatívna fáza: uhol v rovníkovej rovine od osi x.', 'φ — relative phase: angle in the equatorial plane from the x axis.', 'φ — відносна фаза: кут в екваторіальній площині від осі x.'));
         }
       }
@@ -513,14 +513,14 @@ const Bloch = {
     }
     if (lab) {
       const Ls = [[[0, 0, 1], '|0⟩'], [[0, 0, -1], '|1⟩'], [[1, 0, 0], '|+⟩'], [[-1, 0, 0], '|−⟩'], [[0, 1, 0], '|+i⟩'], [[0, -1, 0], '|−i⟩']];
-      for (const [q, t] of Ls) lab(key + t, V3.add(center, V3.scale(qToWorld(q), radius * 1.28)), t, Settings.eq ? 'ket mnl-ket' + (t === '|0⟩' ? ' mnl-a' : t === '|1⟩' ? ' mnl-b' : '') : 'ket');
+      for (const [q, t] of Ls) lab(key + t, V3.add(center, V3.scale(qToWorld(q), radius * 1.28)), Settings.eq ? EqG.glyphify(t) : t, Settings.eq ? 'ket mnl-ket' + (t === '|0⟩' ? ' mnl-a' : t === '|1⟩' ? ' mnl-b' : '') : 'ket');
       if (o.axisNames) for (const [q, t] of [[[1.45, 0, 0], 'x'], [[0, 1.45, 0], 'y'], [[0, 0, 1.45], 'z']])
         lab(key + 'ax' + t, V3.add(center, V3.scale(qToWorld(q), radius)), t, 'axis');
     }
     // rovnice najprv: amplitúdy α, β visia pri póloch |0⟩, |1⟩ — farba = KTO, veľkosť = KOĽKO (|α| = cos θ/2, |β| = sin θ/2)
     if (lab && vec && Settings.eq && L > 0.02) {
       const th = Math.acos(clamp(vec[2] / L, -1, 1)), a = Math.cos(th / 2), b = Math.sin(th / 2), pure = L > 0.99;
-      const tok = (cls, sym, v) => `<span class="mnt ${cls}" style="font-size:${(0.7 + 0.9 * v).toFixed(2)}em;opacity:${(0.35 + 0.65 * v).toFixed(2)}">${sym}${pure ? ' = ' + Fmt.num(v, 2) : ''}</span>`;
+      const tok = (cls, sym, v) => `<span class="mnt ${cls}" style="font-size:${(0.7 + 0.9 * v).toFixed(2)}em;opacity:${(0.35 + 0.65 * v).toFixed(2)}">${EqG.glyphify(sym, true)}${pure ? ' = ' + Fmt.num(v, 2) : ''}</span>`;
       lab(key + 'eqA', V3.add(center, V3.scale(qToWorld([0.42, 0, 1]), radius * 1.18)), tok('a', '|α|', a), 'eqlbl',
         tr('<b>|α|</b> — veľkosť amplitúdy stavu |0⟩ (modrá). Čím bližšie je šípka k severnému pólu, tým je väčšia.', '<b>|α|</b> — the magnitude of the amplitude of |0⟩ (blue). The closer the arrow is to the north pole, the bigger it gets.', '<b>|α|</b> — модуль амплітуди стану |0⟩ (синя). Що ближче стрілка до північного полюса, то вона більша.'));
       lab(key + 'eqB', V3.add(center, V3.scale(qToWorld([0.42, 0, -1]), radius * 1.18)), tok('b', '|β|', b), 'eqlbl',

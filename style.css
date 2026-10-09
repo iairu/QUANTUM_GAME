@@ -653,3 +653,57 @@ body.eqmode #eqstage { display: block; }
 #welcome .wmode .mtext { display: flex; flex-direction: column; gap: 3px; }
 #welcome .wmode[data-v="equations"].on { border-color: var(--mn-op); box-shadow: 0 0 0 1px var(--mn-op), 0 0 22px rgba(185, 140, 255, 0.35); }
 @media (max-width: 900px) { #welcome .wmodes { grid-template-columns: 1fr; } }
+
+/* ∑ rovnicové glyfy: písmeno + piktogram významu + rám druhu, farba kategórie */
+.gly { display: inline-block; vertical-align: -0.5em; line-height: 0; margin: 0 0.04em; color: #e8ecff; }
+.gly svg { height: 1.7em; overflow: visible; }
+.gly.up { vertical-align: -0.28em; } .gly.dn { vertical-align: -0.72em; }
+.g-a { color: var(--mn-a); } .g-b { color: var(--mn-b); } .g-ket { color: var(--mn-ket); } .g-op { color: var(--mn-op); } .g-th { color: var(--mn-th); }
+.g-ph { color: var(--mn-ph); } .g-g { color: var(--mn-g); } .g-P { color: var(--mn-P); } .g-k { color: var(--mn-k); } .g-coh { color: var(--mn-coh); } .g-m { color: var(--mn-m); } .g-c { color: #e8ecff; }
+.gly .glt { fill: currentColor; font-family: "Cambria Math", "STIX Two Math", Georgia, serif; font-weight: 700; stroke: rgba(5, 8, 22, 0.9); stroke-width: 3.6px; paint-order: stroke; stroke-linejoin: round; }
+.gly .gl-ic { fill: none; stroke: currentColor; stroke-width: 2.6px; stroke-linecap: round; stroke-linejoin: round; opacity: 0.48; }
+.gly .gl-thin { stroke-width: 1.6px; }
+.gly .gl-faint { fill: none; stroke: currentColor; stroke-width: 1.4px; opacity: 0.26; }
+.gly .gl-faint.gl-ic { opacity: 0.5; }
+.gly .gl-fill { fill: currentColor; opacity: 0.45; stroke: none; }
+.gly .gl-fill-a { fill: var(--mn-a); opacity: 0.5; } .gly .gl-fill-b { fill: var(--mn-b); opacity: 0.5; }
+.gly .gl-dot { fill: currentColor; opacity: 0.85; }
+.gly .gl-bar { stroke: currentColor; stroke-width: 5px; stroke-linecap: round; opacity: 0.65; fill: none; }
+.gly .gl-boxf { fill: rgba(120, 80, 200, 0.32); stroke: currentColor; stroke-width: 2px; }
+.gly .gl-boxs { fill: rgba(120, 80, 200, 0.16); stroke: currentColor; stroke-width: 1.4px; opacity: 0.8; }
+.gly .gl-pic { fill: none; stroke: currentColor; stroke-width: 2.2px; stroke-linecap: round; stroke-linejoin: round; }
+/* pohyb: premenné sa hýbu, konštanty stoja — globálna fáza sa točí, fázy sa kolíšu, sklon θ kýve */
+.gly .gi { transform-box: view-box; transform-origin: 20px 20px; }
+/* pohyb len na javisku rovnice a pod myšou (v dlhých textoch by desiatky animácií zbytočne zaťažovali grafiku) */
+#eqstage .g-g .gi, .gly.g-g:hover .gi { animation: glspin 7s linear infinite; }
+#eqstage .g-ph .gi, .gly.g-ph:hover .gi { animation: glrock 3.2s ease-in-out infinite; }
+#eqstage .g-th .gi, .gly.g-th:hover .gi { animation: gltilt 3.6s ease-in-out infinite; }
+@keyframes glspin { to { transform: rotate(-360deg); } }
+@keyframes glrock { 50% { transform: rotate(-24deg); } }
+@keyframes gltilt { 50% { transform: rotate(14deg); } }
+.gly:hover svg { filter: drop-shadow(0 0 4px currentColor); }
+@media (prefers-reduced-motion: reduce) { .gly .gi { animation: none !important; } }
+/* bublina glyfu: veľký obrázok + názov + slovná pomôcka */
+.gtip { display: flex; gap: 10px; align-items: center; }
+.gtip > div { flex: 1; }
+.gly.big svg { height: 3.1em; }
+.gtip .gly.big { background: #0d1430; border-radius: 8px; padding: 5px; }
+/* na javisku: glyfy v tokenoch, menšie popisky */
+.tk .gl .gly svg { height: 1.9em; }
+.tk .lb .gly svg { height: 1.45em; }
+.tk .gl .gly { vertical-align: middle; } .tk .gl .gly.up { transform: translateY(-4px); } .tk .gl .gly.dn { transform: translateY(4px); }
+.lbl .gly svg { height: 1.5em; }
+/* 🔑 panel: záložky pravidlá / slovník */
+.eqlegend .ltabs { grid-column: 1 / -1; display: flex; gap: 4px; margin-bottom: 2px; }
+.eqlegend .ltabs button { font-size: 12px; padding: 2px 8px; }
+.eqlegend .ltabs button.on { background: #1d5d7a; border-color: var(--accent); }
+.eqlegend .lpage { grid-column: 1 / -1; display: none; grid-template-columns: 1fr 1fr; gap: 6px 12px; max-height: 52vh; overflow-y: auto; }
+.eqlegend[data-t="rules"] .lpage.rules, .eqlegend[data-t="dict"] .lpage.dict { display: grid; }
+.eqlegend .rule .demo { flex: 0 0 auto; min-width: 64px; }
+.eqlegend .gd { display: flex; gap: 8px; align-items: center; }
+.eqlegend .gd > div > b { font-size: 12.5px; color: var(--text); }
+.eqlegend .gd small { color: var(--muted); line-height: 1.35; font-size: 11.5px; }
+.eqlegend .gd .gly.big svg { height: 2.9em; }
+#eqstage .eqlegend { width: min(720px, 92vw); position: relative; left: 50%; transform: translateX(-50%); }
+body.eqmode:has(#panel.show) #eqstage { max-width: max(320px, calc(100vw - 830px)); }
+.eqlegend .gd > div > b { display: block; } .eqlegend .gd small b { display: inline; color: var(--gold); }

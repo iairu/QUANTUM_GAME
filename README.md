@@ -33,6 +33,14 @@ Volí sa na uvítacej obrazovke aj v nastaveniach (⚙ → 🎮 Typ hry); prepí
 - **Rovnicová mnemotechnika** (🔑 na javisku): *farba = KTO* (α modrá, β červená, kety tyrkysové, θ ružová, φ zelená, globálna fáza zlatá),
   *veľkosť = KOĽKO* (symbol rastie s |amplitúdou|), *otáčanie = FÁZA* (ručička okolo amplitúdy), *krabička = operátor* (pôsobí doprava, ket sa preklopí),
   *|…|² = fáza zamrzne*, *bledne = dekoherencia*, *záblesk a pád = kolaps*, *sivé a nehybné = konštanta*.
+- **Rovnicové glyfy** (`js/eqglyphs.js`): každý symbol rovnice (na javisku, v dialógoch, v paneli teórie aj pri Blochovej guli) sa nahradí vlastnou SVG ikonou,
+  ktorá nesie viac mnemotechník naraz — *obrázok za písmenom = význam* (α šípka hore k |0⟩, β dole k |1⟩, θ sklon od vrcholu, φ otáčka po rovníku,
+  π pol otáčky, i štvrť otáčky, ħ kvantový schodík, ρ tabuľka 2 × 2, e<sup>iφ</sup> ručička hodín, ∂/∂t presýpacie hodiny, ⊗ dva krúžky…),
+  *tvar rámu = druh* (ket ⟩ hrot dopredu, bra ⟨ zrkadlovo, operátor 3D krabička s obrázkom činnosti — X šípka hore-dole, Z otočka, H zrkadlo, Ĥ blesk —,
+  pravdepodobnosť stĺp, |…|² rámik), *poloha* (α, |0⟩ vyššie; β, |1⟩ nižšie), *pohyb* (globálna fáza sa točí, fázy sa kolíšu, konštanty stoja),
+  *zvuk* pri prejdení myšou (|0⟩ vysoko, |1⟩ nízko, θ klesá, fáza stúpa, operátor cvakne) a *slovná pomôcka* v bubline („Alfa ukazuje hore“).
+  Význam sa určuje podľa kontextu: γ pri B = gyromagnetický pomer, α v R(α) = uhol, H v NMR = hamiltonián, T za číslom = tesla.
+  Pod 🔑 sú pravidlá aj **slovník všetkých glyfov**.
 
 *Game type: 🖼 Pictures first (the original) or ∑ Equations first — the real equation of the moment lives in 3D above the scene, with equation mnemonics: colour = WHO, size = HOW MUCH, spin = PHASE.*
 
@@ -103,5 +111,5 @@ Každý level končí **jazykovými pascami** (kvíz o správnych formuláciách
 - `js/math.js` vektory, matice, komplexné čísla · `js/quantum.js` simulátor 1 a 2 qubitov
 - `js/gl.js` renderer (shader, procedurálne siete, Blochova sféra) · `js/ui.js` dialógy, kvízy, denník, vysvetlivky
 - `js/wow.js` MMO téma: postava, kúzla, nepriatelia, úlohy, obchodník, taška, korisť, bossovia, rámy jednotiek, minimapa
-- `js/i18n.js` voľba jazyka a `tr()` · `js/settings.js` obťažnosť (`byDiff`) a nastavenia zobrazenia · `js/knowledge.js` teória a rovnice, extra otázky · `js/eqmnemo.js` typ hry „Rovnice najprv“: 3D javisko rovnice a mnemotechnika · `js/scrolls.js` starobylé zvitky · `js/views.js` pohľady 👁 · `js/tips.js` slovník vysvetliviek · `js/content.js` kódex a jazykové pasce · `js/main.js` hub, kamera, hra
+- `js/i18n.js` voľba jazyka a `tr()` · `js/settings.js` obťažnosť (`byDiff`) a nastavenia zobrazenia · `js/knowledge.js` teória a rovnice, extra otázky · `js/eqmnemo.js` typ hry „Rovnice najprv“: 3D javisko rovnice a mnemotechnika · `js/eqglyphs.js` SVG glyfy symbolov · `js/scrolls.js` starobylé zvitky · `js/views.js` pohľady 👁 · `js/tips.js` slovník vysvetliviek · `js/content.js` kódex a jazykové pasce · `js/main.js` hub, kamera, hra
 - `js/levels/*.js` jednotlivé levely, `registry.js` ich poradie

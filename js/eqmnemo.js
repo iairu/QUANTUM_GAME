@@ -20,39 +20,60 @@ const MODE_DESC = {
 };
 
 // mnemotechnické pravidlá: [ukážkový token, nadpis, vysvetlenie]
+// mnemotechnické pravidlá: [ukážka, nadpis, vysvetlenie] — ukážky sú samotné glyfy (EqG)
 const MNEMO_RULES = [
-  ['<span class="mn mn-a">α</span><span class="mn mn-b">β</span><span class="mn mn-ket">|0⟩</span>', tr('Farba = KTO', 'Colour = WHO', 'Колір = ХТО'),
-    tr('α (amplitúda |0⟩) je vždy modrá, β (amplitúda |1⟩) červená, kety tyrkysové, θ ružová, φ zelená, globálna fáza zlatá — rovnako ako šípky, oblúky a stĺpce v 3D.',
-      'α (the amplitude of |0⟩) is always blue, β (the amplitude of |1⟩) red, kets cyan, θ pink, φ green, the global phase gold — the same as the arrows, arcs and bars in 3D.',
-      'α (амплітуда |0⟩) завжди синя, β (амплітуда |1⟩) червона, кети бірюзові, θ рожева, φ зелена, глобальна фаза золота — так само, як стрілки, дуги й стовпчики в 3D.')],
+  [() => EqG.html('α', 'α') + EqG.html('β', 'β') + EqG.html('θ', 'θ') + EqG.html('φ', 'φ'), tr('Farba = KTO', 'Colour = WHO', 'Колір = ХТО'),
+    tr('α (amplitúda |0⟩) je vždy modrá, β (amplitúda |1⟩) červená, kety tyrkysové, θ ružová, φ zelená, globálna fáza zlatá, operátory fialové — rovnako ako šípky, oblúky a stĺpce v 3D.',
+      'α (the amplitude of |0⟩) is always blue, β (the amplitude of |1⟩) red, kets cyan, θ pink, φ green, the global phase gold, operators violet — the same as the arrows, arcs and bars in 3D.',
+      'α (амплітуда |0⟩) завжди синя, β (амплітуда |1⟩) червона, кети бірюзові, θ рожева, φ зелена, глобальна фаза золота, оператори фіолетові — так само, як стрілки, дуги й стовпчики в 3D.')],
+  [() => EqG.html('π', 'π') + EqG.html('i', 'i') + EqG.html('ħ', 'ħ'), tr('Obrázok za písmenom = VÝZNAM', 'Picture behind the letter = MEANING', 'Малюнок за літерою = ЗНАЧЕННЯ'),
+    tr('Každý symbol nesie piktogram toho, čo robí: α šípku hore k |0⟩, θ sklon od vrcholu, φ otáčku po rovníku, π pol otáčky, i štvrť otáčky, ħ kvantový schodík, ρ tabuľku 2 × 2.',
+      'Every symbol carries a pictogram of what it does: α an arrow up to |0⟩, θ a tilt from the top, φ a turn along the equator, π half a turn, i a quarter turn, ħ a quantum step, ρ a 2 × 2 table.',
+      'Кожен символ несе піктограму того, що він робить: α — стрілку вгору до |0⟩, θ — нахил від верхівки, φ — оберт по екватору, π — пів оберту, i — чверть оберту, ħ — квантову сходинку, ρ — таблицю 2 × 2.')],
+  [() => EqG.html('ket', 'ψ') + EqG.html('bra', 'a') + EqG.html('H', 'H') + EqG.html('P', 'P'), tr('Tvar rámu = DRUH', 'Frame shape = KIND', 'Форма рамки = РІД'),
+    tr('Ket ⟩ má hrot dopredu (stav, odpoveď), bra ⟨ je jeho zrkadlo (otázka), operátor je 3D krabička s obrázkom toho, čo robí, pravdepodobnosť je stĺp.',
+      'A ket ⟩ points forward (a state, an answer), a bra ⟨ is its mirror (a question), an operator is a 3D box showing what it does, a probability is a pillar.',
+      'Кет ⟩ має вістря вперед (стан, відповідь), бра ⟨ — його дзеркало (питання), оператор — 3D-коробка з малюнком того, що він робить, імовірність — стовп.')],
+  [() => EqG.html('ket0', '0') + EqG.html('ket1', '1'), tr('Poloha = HORE / DOLE', 'Position = UP / DOWN', 'Положення = ВГОРІ / ВНИЗУ'),
+    tr('Všetko, čo patrí k |0⟩ (α, |0⟩), sedí v riadku vyššie; čo patrí k |1⟩ (β, |1⟩), nižšie — ako póly Blochovej gule.',
+      'Everything that belongs to |0⟩ (α, |0⟩) sits higher in the line; what belongs to |1⟩ (β, |1⟩) sits lower — like the poles of the Bloch ball.',
+      'Усе, що належить до |0⟩ (α, |0⟩), стоїть у рядку вище; що належить до |1⟩ (β, |1⟩), — нижче, як полюси кулі Блоха.')],
   ['<span class="mn mn-a" style="font-size:1.4em">α</span><span class="mn mn-a" style="font-size:.7em;opacity:.6">α</span>', tr('Veľkosť = KOĽKO', 'Size = HOW MUCH', 'Розмір = СКІЛЬКИ'),
-    tr('Symbol amplitúdy rastie s jej veľkosťou |α|. Keď je amplitúda nulová, symbol sa scvrkne a zbledne.',
-      'An amplitude’s symbol grows with its magnitude |α|. When the amplitude is zero, the symbol shrinks and fades.',
-      'Символ амплітуди росте з її модулем |α|. Коли амплітуда нульова, символ зменшується й блякне.')],
+    tr('Na javisku symbol amplitúdy rastie s jej veľkosťou |α|. Keď je amplitúda nulová, scvrkne sa a zbledne.',
+      'On the stage an amplitude’s symbol grows with its magnitude |α|. When the amplitude is zero, it shrinks and fades.',
+      'На сцені символ амплітуди росте з її модулем |α|. Коли амплітуда нульова, він зменшується й блякне.')],
   ['<span class="mn-demo-halo"><i></i></span>', tr('Otáčanie = FÁZA', 'Spin = PHASE', 'Обертання = ФАЗА'),
-    tr('Ručička okolo amplitúdy ukazuje jej fázu (uhol e<sup>iφ</sup>). Globálna fáza otáča celú zátvorku naraz — preto ju nevidno v žiadnej pravdepodobnosti.',
-      'The hand around an amplitude shows its phase (the angle of e<sup>iφ</sup>). The global phase turns the whole bracket at once — which is why no probability can see it.',
-      'Стрілка довкола амплітуди показує її фазу (кут e<sup>iφ</sup>). Глобальна фаза обертає всю дужку разом — тому її не видно в жодній імовірності.')],
-  ['<span class="mn mn-op">H</span><span class="mn mn-ket">|ψ⟩</span>', tr('Krabička = OPERÁTOR', 'Box = OPERATOR', 'Коробка = ОПЕРАТОР'),
-    tr('Operátory a hradlá sú fialové 3D krabičky. Pôsobia doprava: keď sa uplatnia, krabička sa otočí a ket za ňou sa preklopí.',
-      'Operators and gates are violet 3D boxes. They act to the right: when applied, the box spins and the ket after it flips over.',
-      'Оператори й гейти — фіолетові 3D-коробки. Вони діють праворуч: коли застосовуються, коробка обертається, а кет за нею перевертається.')],
-  ['<span class="mn mn-P">|α|²</span>', tr('|…|² = fáza zamrzne', '|…|² = the phase freezes', '|…|² = фаза замерзає'),
-    tr('V pravdepodobnosti |α|² sa ručička zastaví a zošedne: štvorec absolútnej hodnoty fázu zahodí. Ostane biely stĺpec.',
-      'Inside a probability |α|² the hand stops and turns grey: the squared magnitude throws the phase away. A white bar remains.',
-      'В імовірності |α|² стрілка зупиняється й сіріє: квадрат модуля відкидає фазу. Лишається білий стовпчик.')],
-  ['<span class="mn mn-coh">ρ₀₁</span>', tr('Bledne = DEKOHERENCIA', 'Fades = DECOHERENCE', 'Блякне = ДЕКОГЕРЕНЦІЯ'),
-    tr('Koherencie (mimodiagonála ρ) majú farbu svojej fázy. Keď ich prostredie „odmeria“, blednú — a s nimi interferencia.',
-      'Coherences (the off-diagonal of ρ) carry the colour of their phase. When the environment “measures” them they fade — and interference fades with them.',
-      'Когерентності (позадіагональ ρ) мають колір своєї фази. Коли довкілля їх «вимірює», вони блякнуть — а з ними й інтерференція.')],
+    tr('Ručička okolo amplitúdy ukazuje jej skutočnú fázu (uhol e<sup>iφ</sup>). Globálna fáza otáča celú zátvorku naraz — preto ju nevidno v žiadnej pravdepodobnosti.',
+      'The hand around an amplitude shows its real phase (the angle of e<sup>iφ</sup>). The global phase turns the whole bracket at once — which is why no probability can see it.',
+      'Стрілка довкола амплітуди показує її справжню фазу (кут e<sup>iφ</sup>). Глобальна фаза обертає всю дужку разом — тому її не видно в жодній імовірності.')],
+  [() => EqG.html('X', 'X') + EqG.html('ket', 'ψ'), tr('Krabička pôsobí DOPRAVA', 'A box acts to the RIGHT', 'Коробка діє ПРАВОРУЧ'),
+    tr('Keď sa operátor uplatní, krabička sa otočí a ket za ňou sa preklopí. Na prednej stene je obrázok: X šípka hore-dole, Z otočka okolo osi, H zrkadlo z ↔ x, S štvrť, T osmina otáčky, Ĥ blesk energie.',
+      'When an operator is applied, the box spins and the ket after it flips over. Its front face shows a picture: X an up-down arrow, Z a turn about the axis, H the mirror z ↔ x, S a quarter, T an eighth of a turn, Ĥ an energy bolt.',
+      'Коли оператор застосовується, коробка обертається, а кет за нею перевертається. На передній стінці малюнок: X — стрілка вгору-вниз, Z — оберт навколо осі, H — дзеркало z ↔ x, S — чверть, T — восьмушка оберту, Ĥ — блискавка енергії.')],
+  [() => EqG.html('sq', 'α'), tr('|…|² = zarámovať a zmraziť', '|…|² = frame and freeze', '|…|² = оправити й заморозити'),
+    tr('V pravdepodobnosti |α|² sa ručička zastaví a zošedne: štvorec absolútnej hodnoty fázu zahodí. Ostane biely stĺp.',
+      'Inside a probability |α|² the hand stops and turns grey: the squared magnitude throws the phase away. A white pillar remains.',
+      'В імовірності |α|² стрілка зупиняється й сіріє: квадрат модуля відкидає фазу. Лишається білий стовп.')],
+  [() => EqG.html('ρ', 'ρ'), tr('Bledne = DEKOHERENCIA', 'Fades = DECOHERENCE', 'Блякне = ДЕКОГЕРЕНЦІЯ'),
+    tr('Koherencie (mimodiagonála ρ, bodky v tabuľke) majú farbu svojej fázy. Keď ich prostredie „odmeria“, blednú — a s nimi interferencia.',
+      'Coherences (the off-diagonal of ρ, the dots in the table) carry the colour of their phase. When the environment “measures” them they fade — and interference fades with them.',
+      'Когерентності (позадіагональ ρ, точки в таблиці) мають колір своєї фази. Коли довкілля їх «вимірює», вони блякнуть — а з ними й інтерференція.')],
   ['<span class="mn mn-m">⚡</span>', tr('Záblesk a pád = KOLAPS', 'Flash and drop = COLLAPSE', 'Спалах і падіння = КОЛАПС'),
     tr('Pri meraní rovnica blysne; člen, ktorý nepadol, spadne a ostane jeden výsledok.',
       'On a measurement the equation flashes; the term that did not happen drops away and one outcome remains.',
       'Під час вимірювання рівняння спалахує; член, що не випав, падає, і лишається один результат.')],
-  ['<span class="mn mn-k">ħ π 2</span>', tr('Sivé a nehybné = KONŠTANTA', 'Grey and still = CONSTANT', 'Сіре й нерухоме = СТАЛА'),
-    tr('Konštanty prírody a čísla, ktoré sa nemenia, sú sivé a nikdy sa nehýbu — oči hneď vedia, čo je premenná.',
-      'Constants of nature and fixed numbers are grey and never move — your eyes immediately know what is a variable.',
-      'Сталі природи й незмінні числа сірі й ніколи не рухаються — очі одразу бачать, що є змінною.')],
+  [() => EqG.html('ħ', 'ħ') + EqG.html('Σ', 'Σ'), tr('Sivé a nehybné = KONŠTANTA', 'Grey and still = CONSTANT', 'Сіре й нерухоме = СТАЛА'),
+    tr('Konštanty prírody, funkcie a pevné čísla sú sivé a nikdy sa nehýbu; premenné sa hýbu (fázy sa kolíšu, globálna fáza sa točí).',
+      'Constants of nature, functions and fixed numbers are grey and never move; variables do (phases sway, the global phase spins).',
+      'Сталі природи, функції й незмінні числа сірі й ніколи не рухаються; змінні рухаються (фази гойдаються, глобальна фаза обертається).')],
+  ['🔊', tr('Zvuk = KTO', 'Sound = WHO', 'Звук = ХТО'),
+    tr('Prejdi myšou po symbole: |0⟩ a α zaznejú vysoko, |1⟩ a β nízko, θ klesne, fáza stúpne, operátor cvakne, pravdepodobnosť zazvoní.',
+      'Hover over a symbol: |0⟩ and α sound high, |1⟩ and β low, θ falls, a phase rises, an operator clicks, a probability rings.',
+      'Наведи мишу на символ: |0⟩ і α звучать високо, |1⟩ і β — низько, θ спадає, фаза піднімається, оператор клацає, імовірність дзвенить.')],
+  ['💬', tr('Slovná pomôcka', 'Memory phrase', 'Словесна підказка'),
+    tr('Každý glyf má v bubline krátku vetu na zapamätanie: „Alfa ukazuje hore“, „X = preklopenie“, „T = tenučká osmina otáčky“. Všetky sú v slovníku glyfov.',
+      'Every glyph has a short memory phrase in its tooltip: “Alpha points Above”, “X marks the flip”, “T = a Tiny eighth turn”. All of them are in the glyph dictionary.',
+      'Кожен гліф має в підказці коротку фразу для запам’ятовування: «Альфа вказує вгору», «X = переворот», «T = тоненька восьмушка оберту». Усі вони — у словнику гліфів.')],
 ];
 
 const EqM = {
@@ -63,20 +84,7 @@ const EqM = {
   n(k, h) { return { k, t: 'n', h }; },
 
   // ---------- farbenie symbolov v texte (dialógy, panel, HUD) ----------
-  paint(html) {
-    return String(html).split(/(<[^>]+>)/).map((seg) => {
-      if (seg.startsWith('<')) return seg;
-      return seg
-        .replace(/(\|[0-9ψφa±+−i]{1,3}⟩)/g, '\u0001ket\u0002$1\u0003')
-        .replace(/(⟨[ψφa0-9±+−i]{1,3}\|)/g, '\u0001bra\u0002$1\u0003')
-        .replace(/α/g, '\u0001a\u0002α\u0003').replace(/β/g, '\u0001b\u0002β\u0003')
-        .replace(/θ/g, '\u0001th\u0002θ\u0003').replace(/φ(?![⟩|])/g, '\u0001ph\u0002φ\u0003').replace(/γ/g, '\u0001g\u0002γ\u0003')
-        .replace(/ρ/g, '\u0001rho\u0002ρ\u0003').replace(/([ħπ])/g, '\u0001k\u0002$1\u0003')
-        // samostatné písmeno operátora/hradla; nie na začiatku vety (slovenské predložky „Z“, „S“)
-        .replace(/(^|[^\p{L}\p{N}])([ĤÂHXYZSTU])(?![\p{L}\p{N}])/gu, (m, pre, op, i, all) => (/(^|[.!?:]\s*)$/.test(all.slice(0, i + pre.length)) && /^\s+\p{Ll}/u.test(all.slice(i + m.length)) ? m : `${pre}\u0001op\u0002${op}\u0003`))
-        .replace(/\u0001(\w+)\u0002([^\u0003]*)\u0003/g, '<span class="mn mn-$1">$2</span>');
-    }).join('');
-  },
+  paint(html) { return EqG.glyphify(html); },
 
   // ---------- rovnica pre aktuálnu scénu ----------
   build() {
@@ -191,7 +199,7 @@ const EqM = {
       }
       case 8:
         return { noState: true, rows: [[T('i', 'k', 'iħ'), T('d', 'n', '∂'), T('psi', 'ket', '|ψ⟩'), T('dt', 'n', '/∂t'), eq('e', '='), T('H', 'op', 'Ĥ'), T('psi2', 'ket', '|ψ⟩')],
-          [T('P', 'P', 'P(a)'), eq('e2', '='), T('l', 'k', '|'), T('bra', 'bra', '⟨a|'), T('ket', 'ket', 'ψ⟩'), T('r', 'k', '|²'), eq('s', '·'),
+          [T('P', 'P', 'P(a)'), eq('e2', '='), T('l', 'k', '|'), T('bra', 'bra', '⟨a|'), T('ket', 'ket', '|ψ⟩'), T('r', 'k', '|²'), eq('s', '·'),
             T('q', 'n', tr('čo existuje? · čo vieme? · ako sa javí?', 'what exists? · what can we know? · how does it appear?', 'що існує? · що ми знаємо? · як постає?'))]] };
       case 9: {
         if (!S.n) return null;
@@ -211,7 +219,10 @@ const EqM = {
     document.body.appendChild(st);
     this.rowsEl = st.querySelector('.eqrows'); this.sceneEl = st.querySelector('.eqscene'); this.titleEl = st.querySelector('.eqt');
     const leg = st.querySelector('.eqlegend');
-    leg.innerHTML = this.legendHtml();
+    leg.innerHTML = this.keyHtml();
+    leg.dataset.t = 'rules';
+    leg.querySelectorAll('.ltabs button').forEach((b) => { b.onclick = () => { leg.dataset.t = b.dataset.t; leg.querySelectorAll('.ltabs button').forEach((x) => x.classList.toggle('on', x === b)); }; });
+    EqG.initSound();
     st.querySelector('.eqkey').onclick = () => st.classList.toggle('legend');
     st.querySelector('.eqmin').onclick = () => { st.classList.toggle('min'); Settings.view.eqMin = st.classList.contains('min'); Settings.save(); };
     st.classList.toggle('min', !!Settings.view.eqMin);
@@ -221,8 +232,13 @@ const EqM = {
     document.body.classList.toggle('eqmode', Settings.eq);
     this.sig = null;
   },
-  legendHtml() {
-    return MNEMO_RULES.map(([demo, h, d]) => `<div class="rule"><span class="demo">${demo}</span><div><b>${h}</b><small>${d}</small></div></div>`).join('');
+  legendHtml(from = 0, to = MNEMO_RULES.length) {
+    return MNEMO_RULES.slice(from, to).map(([demo, h, d]) => `<div class="rule"><span class="demo">${typeof demo === 'function' ? demo() : demo}</span><div><b>${h}</b><small>${d}</small></div></div>`).join('');
+  },
+  // 🔑 panel: pravidlá a slovník všetkých glyfov
+  keyHtml() {
+    return `<div class="ltabs"><button class="on" data-t="rules">${tr('📏 Pravidlá', '📏 Rules', '📏 Правила')}</button><button data-t="dict">${tr('📖 Slovník glyfov', '📖 Glyph dictionary', '📖 Словник гліфів')}</button></div>`
+      + `<div class="lpage rules">${this.legendHtml()}</div><div class="lpage dict">${EqG.dictionaryHtml()}</div>`;
   },
   update() {
     if (!this.stage) return;
@@ -244,7 +260,7 @@ const EqM = {
     spec.rows.forEach((row, ri) => row.forEach((t) => {
       const n = this.nodes[ri + '/' + t.k];
       if (!n) return;
-      if (n._h !== t.h) { n.gl.innerHTML = t.h; n._h = t.h; }
+      if (n._h !== t.h) { n.gl.innerHTML = EqG.glyphify(t.h, true); n._h = t.h; }
       const s = t.s == null ? 1 : t.s, scale = t.s == null ? 1 : 0.42 + 0.78 * clamp(s, 0, 1.3);
       n.style.setProperty('--s', scale.toFixed(3));
       n.style.setProperty('--o', (t.fade == null ? (t.s == null ? 1 : 0.35 + 0.65 * clamp(s * 1.4, 0, 1)) : 0.25 + 0.75 * clamp(t.fade, 0, 1)).toFixed(2));
@@ -280,7 +296,7 @@ const EqM = {
       const r = el('div', 'eqrow');
       for (const t of row) {
         const n = el('span', 'tk t-' + t.t);
-        n.innerHTML = `<span class="tv"><span class="halo"><i></i></span><span class="gl"></span>${t.bar != null ? '<span class="bar"><i></i></span>' : ''}</span>${t.lb ? `<small class="lb">${t.lb}</small>` : ''}`;
+        n.innerHTML = `<span class="tv"><span class="halo"><i></i></span><span class="gl"></span>${t.bar != null ? '<span class="bar"><i></i></span>' : ''}</span>${t.lb ? `<small class="lb">${EqG.glyphify(t.lb, true)}</small>` : ''}`;
         n.gl = n.querySelector('.gl');
         if (t.col) n.classList.add('col-' + t.col);
         n.dataset.tip = this.tipOf(t.t);
@@ -291,7 +307,7 @@ const EqM = {
     });
   },
   tipOf(t) {
-    const i = { a: 0, b: 0, ket: 0, bra: 0, th: 0, ph: 2, g: 2, op: 3, P: 4, coh: 5, m: 6, k: 7, c: 1 }[t];
+    const i = { a: 0, b: 0, ket: 2, bra: 2, th: 0, ph: 5, g: 5, op: 6, P: 7, coh: 8, m: 9, k: 10, c: 4 }[t];
     if (i == null) return '';
     const [, h, d] = MNEMO_RULES[i];
     return `<b>${h}</b> — ${d}`;
