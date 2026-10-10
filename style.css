@@ -538,6 +538,11 @@ body.welcoming #hud, body.welcoming #topbar, body.welcoming #panel, body.welcomi
 #welcome .d { font-size: 12px; line-height: 1.4; color: var(--muted); margin-top: 3px; }
 #welcome .wthemes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
 #welcome .shot { position: relative; display: block; width: 100%; aspect-ratio: 12 / 5; border-radius: 8px; overflow: hidden; margin-bottom: 6px; background: #0a0f24; }
+#welcome .shot.live { display: flex; align-items: center; justify-content: center; padding: 8px 12px; box-sizing: border-box;
+  background: radial-gradient(ellipse at 50% 40%, #16224a, #0a0f24 75%); }
+#welcome .shot.live .words { font-size: 15px; line-height: 1.45; color: #e8ecff; text-align: center; }
+#welcome .shot.live .words b { color: var(--gold); }
+#welcome .shot.live .eqi { font-size: 14px; white-space: nowrap; max-width: 100%; }
 #welcome .shot img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s; }
 #welcome .wtheme:hover .shot img { transform: scale(1.05); }
 #welcome .ticon { position: absolute; left: 8px; top: 8px; width: 32px; height: 32px; display: grid; place-items: center; border-radius: 50%;

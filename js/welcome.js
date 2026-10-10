@@ -33,6 +33,13 @@ const MODE_TAG = {
   pictures: tr('Intuícia cez obrazy a pokusy', 'Intuition through pictures and experiments', 'Інтуїція через образи й досліди'),
   equations: tr('Skutočná rovnica žije v 3D', 'The real equation comes alive in 3D', 'Справжнє рівняння оживає в 3D'),
 };
+// ukážka typu hry: pár slov bežnou rečou / jedna farebná rovnica (živé HTML, v jazyku hry)
+const MODE_SHOT = {
+  pictures: () => `<span class="words">${tr('Každá odpoveď nesie <b>malú šípku</b>. Čím dlhšia šípka, tým <b>častejšie</b> odpoveď padne.',
+    'Every answer carries a <b>little arrow</b>. The longer the arrow, the <b>more often</b> that answer comes up.',
+    'Кожна відповідь несе <b>маленьку стрілку</b>. Що довша стрілка, то <b>частіше</b> випадає ця відповідь.')}</span>`,
+  equations: () => `<span class="eqi">${EqG.glyphify(EqG.colorMath('|ψ⟩ = α|0⟩ + β|1⟩'), true)}</span>`,
+};
 const THEME_INFO = {
   classic: {
     name: tr('Klasická', 'Classic', 'Класична'), icon: '🔬',
@@ -74,7 +81,7 @@ const Welcome = {
       <h2>${tr('1 · Typ hry', '1 · Game type', '1 · Тип гри')}</h2>
       <div class="wmodes">${MODES.map((m) => `
         <button class="wmode" data-v="${m}">
-          <span class="shot"><img src="assets/mode-${m}.webp" alt="" loading="eager"></span>
+          <span class="shot live ${m}">${MODE_SHOT[m]()}</span>
           <span class="mtext"><b>${MODE_NAME[m]}</b><i>${MODE_TAG[m]}</i><span class="d">${MODE_DESC[m].replace(/^./, (c) => c.toUpperCase())}.</span></span>
         </button>`).join('')}
       </div>
