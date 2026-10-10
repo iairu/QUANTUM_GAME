@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 -6 52 52" width="96" height="96" role="img" aria-label="phi — relative phase">
+<title>phi — relative phase</title>
+<style>.glt{fill:currentColor;font-family:"Cambria Math","STIX Two Math",Georgia,serif;font-weight:700;stroke:rgba(5,8,22,.9);stroke-width:3.6px;paint-order:stroke;stroke-linejoin:round}
+.gl-ic{fill:none;stroke:currentColor;stroke-width:2.6px;stroke-linecap:round;stroke-linejoin:round;opacity:.48}.gl-thin{stroke-width:1.6px}
+.gl-faint{fill:none;stroke:currentColor;stroke-width:1.4px;opacity:.26}.gl-faint.gl-ic{opacity:.5}.gl-fill{fill:currentColor;opacity:.45;stroke:none}
+.gl-fill-a{fill:#4f8cff;opacity:.5}.gl-fill-b{fill:#ff6b7d;opacity:.5}.gl-dot{fill:currentColor;opacity:.85}.gl-bar{stroke:currentColor;stroke-width:5px;stroke-linecap:round;opacity:.65;fill:none}
+.gl-boxf{fill:rgba(120,80,200,.32);stroke:currentColor;stroke-width:2px}.gl-boxs{fill:rgba(120,80,200,.16);stroke:currentColor;stroke-width:1.4px;opacity:.8}
+.gl-pic{fill:none;stroke:currentColor;stroke-width:2.2px;stroke-linecap:round;stroke-linejoin:round}</style>
+<rect x="-6" y="-6" width="52" height="52" rx="7" fill="#0d1430"/>
+<g color="#7dffa0" style="color:#7dffa0"><g class="gi"><g transform="translate(20 20) scale(0.750) translate(-20 -20)"><ellipse cx="20" cy="31" rx="16" ry="5.5" class="gl-faint"/><path d="M6 32a16 5.5 0 0 0 26 2" class="gl-ic"/><path d="M29 36.5l3.5-2.6-4-1.6" class="gl-ic gl-thin"/></g></g><text x="20" y="30.5" font-size="30" text-anchor="middle" class="glt">φ</text></g>
+</svg>

@@ -1,125 +1,241 @@
-# Psíčko v kvantovom svete
+<p align="center">
+  <img src="assets/icon.svg" alt="Little Psi logo" width="128" height="128">
+</p>
 
-3D hra (WebGL2 = OpenGL ES 3.0, bez knižníc) na získanie **intuície** v kvantovom svete podľa prednášok 1–3:
-jazykové vyjadrenia, symboly, správne obrazy a typické omyly — nie výpočty.
+<h1 align="center">Little Psi in the Quantum World</h1>
 
-## Spustenie
-Dvojklik na `index.html` (Chrome, Edge alebo Firefox). Netreba server ani inštaláciu.
-Postup sa ukladá v prehliadači (localStorage).
-Pri prvom spustení (a po resete) sa ukáže uvítanie v dvoch krokoch: **1 · štýl hry, 2 · obťažnosť** → *Ďalej* → **3 · história, 4 · rovnice, 5 · levely** (postupne / odomknúť všetko, predvolene postupne) → *Začať hru*. Predvolené: klasická téma, ľahká obťažnosť, bez zvitkov, jazyk rovníc, postupne; všetko sa dá neskôr zmeniť v ⚙. Pri pokračovaní v rozohranej hre sa na pár sekúnd ukáže aj tlačidlo „🗑 Začať odznova“.
+<p align="center">
+  <i>Psíčko v kvantovom svete · Псічко у квантовому світі</i><br>
+  A 3D browser game for building <b>intuition</b> about quantum mechanics: its language, symbols, the right pictures and the typical misconceptions — not calculations.
+</p>
 
-## Jazyk / Language
-Hra je po slovensky, po anglicky a po ukrajinsky. Bez uloženej voľby sa jazyk určí podľa prehliadača: čeština a slovenčina → SK, ukrajinčina, ruština a bieloruština (ktorýkoľvek z jazykov prehliadača) → UA, všetky ostatné → EN.
-Prepínač **SK / EN / UA** je vpravo hore aj na uvítacej obrazovke (zmena znovu načíta stránku, postup zostane uložený).
-**Dialógy** (repliky, kvízy, jazykové pasce, karty „po ľudsky“, teória, zvitky, úlohy) sú v `lang/sk.csv`, `lang/en.csv`, `lang/uk.csv` — stĺpce `key,text`, text v úvodzovkách (`""` = úvodzovka). V kóde ich načíta `DL('kľúč', hodnoty…)` (`js/i18n.js`); chýbajúci preklad nahradí anglický.
-- **Vzorce sú v dvojitých hranatých zátvorkách** `[[…]]` — podľa nich hra vie, kam dať pozadie rovnice: `[[P = |α|²]]` vo vete = čip, `[[…]]` na samostatnom riadku = blok rovnice. Matice sa píšu `[0, 1; 1, 0]`, aby sa nepliedli so zátvorkami.
-- `{0}`, `{1}` … sú hodnoty, ktoré doplní hra (počty, percentá, mená) — v preklade môžu byť na inom mieste.
-- Po úprave CSV spusti `node tools/build-lang.js`: vygeneruje `lang/*.js` (pri spustení z disku prehliadač CSV načítať nedovolí) a skontroluje zátvorky `[[ ]]` a `{n}`. Na serveri (http/https) hra číta CSV priamo.
-- Ostatné texty rozhrania (tlačidlá, HUD, vysvetlivky, Kódex) ostávajú v kóde ako `tr('slovensky', 'English', 'українською')`.
+<p align="center">
+  <a href="https://github.com/iairu/QUANTUM_GAME/releases"><img alt="Release" src="https://img.shields.io/github/v/release/iairu/QUANTUM_GAME?include_prereleases&label=release&color=5fe3ff"></a>
+  <img alt="Status: beta" src="https://img.shields.io/badge/status-beta-orange">
+  <a href="https://github.com/iairu/QUANTUM_GAME/commits"><img alt="Last commit" src="https://img.shields.io/github/last-commit/iairu/QUANTUM_GAME?color=b98cff"></a>
+  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-green"></a>
+  <img alt="WebGL2, no libraries" src="https://img.shields.io/badge/WebGL2-no%20libraries-4f8cff">
+  <img alt="Languages: SK, EN, UA" src="https://img.shields.io/badge/languages-SK%20%7C%20EN%20%7C%20UA-ffd25a">
+  <img alt="No install" src="https://img.shields.io/badge/install-none%20(double--click%20index.html)-7dffa0">
+</p>
 
-*The game is in Slovak, English and Ukrainian. Without a saved choice, Czech and Slovak browsers get SK, browsers with Ukrainian, Russian or Belarusian among their languages get UA, everyone else EN. Switch with the SK / EN / UA selector in the top-right corner or on the welcome screen.*
+> [!IMPORTANT]
+> **The lectures are your primary learning resource.** This game is only a supplement and is likely to contain errors — please verify everything you learn in it against the lecture materials.
 
-## Ostrov
-- Všetky portály stoja v jednom kruhu okolo stredu, rovnomerne a v poradí čísel (portál 1 na severe; s drakom je na severe Dračí štít, portál 9). Portál 0 je len v type „Jazyk rovníc“.
-- V strede ostrova čaká sprievodkyňa **Iskra** (✨ iskierka svetla) — zámerne nevyzerá ako symbol amplitúdy ani globálnej fázy.
+<p align="center">
+  <img src="docs/screenshots/island-classic.webp" alt="Hilbert Island in the Classic style" width="49%">
+  <img src="docs/screenshots/level3-equation.webp" alt="Bloch Observatory with the live equation (Equation Language)" width="49%">
+  <img src="docs/screenshots/level0-hall.webp" alt="Portal 0 — the Hall of Symbols" width="49%">
+  <img src="docs/screenshots/level1-dialogue.webp" alt="Complex Harbour: a dialogue with marked equations" width="49%">
+</p>
 
-## Témy
-- V nastaveniach (⚙ → 🎨 Téma) sa volí **téma** hry; zmena znovu načíta hru, postup ostáva.
-  - *⚔ MMO (World of Warcraft)* — hrá sa ako MMO, obsah ostáva rovnaký (nižšie); aj 9. level s drakom.
-  - *Klasická* (predvolená v novej hre) — pôvodný modrý Hilbertov ostrov, 8 levelov.
-  - *🐉 Severská (Skyrim)* — zasnežený ostrov, severské farby a písmo, detailné textúry a 9. level s drakom (nižšie).
-- Hudba a zvukové efekty sú v oboch témach rovnaké.
-- Každá téma má vlastný kurzor (šípka + varianta nad klikateľným; v MMO téme aj meč nad omylmi a bublina nad postavami). Počas otáčania kamery kurzor zmizne.
+## Contents
+- [Play](#play)
+- [Screenshots](#screenshots)
+- [What the game teaches](#what-the-game-teaches)
+- [Choices on the welcome screen](#choices-on-the-welcome-screen)
+- [Equation glyphs](#equation-glyphs)
+- [Levels](#levels)
+- [Controls](#controls)
+- [Languages and dialogue files](#languages-and-dialogue-files)
+- [Project structure](#project-structure)
+- [License](#license)
+- [Changelog](#changelog)
 
-## Typ hry: 🖼 Prevažne ľudský jazyk / ∑ Jazyk rovníc (experimentálny)
-Volí sa na uvítacej obrazovke aj v nastaveniach (⚙ → 🎮 Typ hry); prepína sa za behu, bez znovunačítania.
-- **🖼 Prevažne ľudský jazyk** — pôvodná hra: najprv obraz a intuícia (ručičky, Blochova guľa, pokusy), rovnice len v paneli 📐.
-- **∑ Jazyk rovníc (experimentálny)** — navyše **portál 0 — Sieň symbolov**: 17 podstavcov, na každom jeden symbol ako 3D pokus (α, β, kety, bra, θ, φ, γ, e<sup>iφ</sup> a i, operátory, P, |α|², ρ, ħ/π/Σ/∂/⊗, meranie a kolaps, σ/r/n, ω/Ω/Δ, p/t/A); rozhovory a otázky vysvetľujú len fyzikálny význam symbolov, nie pravidlá kľúča. Po každom otázka, po každej kapitole opakovanie, na konci veľká skúška. Ďalej: skutočná rovnica, ktorá práve platí, je v paneli hore na obrazovke (na ostrove sa neukazuje) a jej hodnoty sa menia s hrou:
-  |α|², interferencia |A₁ + A₂|², SG P(↑) = ½(1 + r·n), hradlo G|ψ⟩ počas rotácie,
-  dekoherencia ρ₀₁ → (1 − p)e<sup>−iφ</sup>ρ₀₁, Diracov výraz a jeho typ, H̃ = (ħ/2)(ΔZ + Ω<sub>R</sub>X), dva qubity a determinant previazanosti,
-  Schrödingerova rovnica, P(zásah) = ½(1 + r·n) v boji s drakom. Pred každou úlohou karta „∑ Rovnica najprv“, teória je vždy otvorená,
-  symboly v textoch sú vo farbách mnemotechniky a pri póloch Blochovej gule visia |α|, |β|.
-- **Rovnicová mnemotechnika** (🔑 vpravo hore, kláves K): *farba = KTO* (α modrá, β červená, kety tyrkysové, θ ružová, φ zelená, globálna fáza zlatá),
-  *veľkosť = KOĽKO* (symbol rastie s |amplitúdou|), *otáčanie = FÁZA* (ručička okolo amplitúdy), *krabička = operátor* (pôsobí doprava, ket sa preklopí),
-  *|…|² = fáza zamrzne*, *bledne = dekoherencia*, *záblesk a pád = kolaps*, *sivé a nehybné = konštanta*.
-- **Rovnicové glyfy** (`js/eqglyphs.js`): každý symbol rovnice (na javisku, v dialógoch, v paneli teórie aj pri Blochovej guli) sa nahradí vlastnou SVG ikonou,
-  ktorá nesie viac mnemotechník naraz — *obrázok za písmenom = význam* (α šípka hore k |0⟩, β dole k |1⟩, θ sklon od vrcholu, φ otáčka po rovníku,
-  π pol otáčky, i štvrť otáčky, ħ kvantový schodík, ρ tabuľka 2 × 2, e<sup>iφ</sup> ručička hodín, ∂/∂t presýpacie hodiny, ⊗ dva krúžky…),
-  *tvar rámu = druh* (ket ⟩ hrot dopredu, bra ⟨ zrkadlovo, operátor 3D krabička s obrázkom činnosti — X šípka hore-dole, Z otočka, H zrkadlo, Ĥ blesk —,
-  pravdepodobnosť stĺp, |…|² rámik), *poloha* (α, |0⟩ vyššie; β, |1⟩ nižšie), *pohyb* (globálna fáza sa točí, fázy sa kolíšu, konštanty stoja),
-  *zvuk* pri prejdení myšou (|0⟩ vysoko, |1⟩ nízko, θ klesá, fáza stúpa, operátor cvakne) a *slovná pomôcka* v bubline („Alfa ukazuje hore“).
-  Význam sa určuje podľa kontextu: γ pri B = gyromagnetický pomer, α v R(α) = uhol, H v NMR = hamiltonián, T za číslom = tesla.
-  Pod 🔑 sú pravidlá aj **slovník všetkých glyfov**.
+## Play
+Double-click `index.html` (Chrome, Edge or Firefox). No server, build or install is needed — WebGL2 (OpenGL ES 3.0) with no libraries.
+Progress, settings, the Codex and the Journal are saved in the browser (`localStorage`), so after a reload the game continues exactly where you left off; for a few seconds a **🗑 Start over** button is offered as well.
 
-*Game type: 🖼 Mainly Human Language (the original) or ∑ Equation Language (Experimental) — the real equation of the moment is shown at the top of the screen, its symbols drawn as glyphs with tooltips.*
+On the first start (and after a reset) a two-step welcome screen appears:
 
-## MMO téma (⚔ World of Warcraft)
-Dialógy, kvízy, levely, Kódex, Denník aj tlačidlá ostávajú rovnaké — mení sa spôsob hry (`js/wow.js`).
-- **Postava:** Psíčko je kvantový mág s úrovňou (1–20), zdravím a *koherenciou* (manou), palicou a rúchom; mimo boja sa obnovuje. Medzerník = skok.
-- **Lišta kúziel** (dole v strede, klávesy 1 … =): 1 Fázový šíp (zosielanie 1,6 s), 2 Pauliho preklopenie X, 3 Hadamard H, 4 Bornova čepeľ (meranie), 5 korekcia chýb (liečenie), 6 dekoherenčná vlna, 7 tunelovanie, 8/9 elixíry, 0 automatický útok, − jazdecká Blochova guľa, = návrat k Iskre. Globálny cooldown, cooldowny, cast bar, kúzla sa odomykajú s úrovňou.
-- **Kvantový súboj:** každý nepriateľ má štít = qubit. Bornova čepeľ zasiahne s **P(|1⟩) = (1 − z)/2** (inak štít skolabuje na |0⟩), X ho preklopí, H pošle na rovník, dekoherenčná vlna zmrští Blochov vektor, relaxácia T₁ ho ťahá späť na |0⟩. Rám cieľa ukazuje P(|1⟩).
-- **Nepriatelia = klasické omyly** (skryté premenné, biliardové elektróny, atómy-planetky, nadsvetelné signály, mačky mŕtve-aj-živé, kultisti vedomia); vysvetlivka každého vyvracia omyl. Sú **neutrálni** (žlté menovky): zaútočia až vtedy, keď ich napadneš. Slabé bližšie k stredu, silnejšie na okraji ostrova; stred a podstavce portálov sú bezpečné. Tab / klik = cieľ, pravý klik = útok, menovky so zdravím, plávajúce čísla, smrť → „Uvoľniť ducha“.
-- **Úlohy:** mentori majú nad hlavou „!“ (ďalší level), sprievodkyňa Iskra zadáva 6 úloh na omyly („!“ / „?“), sledovanie úloh pod minimapou.
-- **Obchodník Max Planck** pri fontáne: elixíry, výstroj (Intelekt, Výdrž), jazdecká Blochova guľa; predaj haraburdia. **Taška (B)** so 16 miestami a výstrojou; peniaze v zlatých/strieborných/medených.
-- **Levely sú dungeony:** portály sú víry v kamenných oblúkoch s odporúčanou úrovňou. Boss levelu (napr. *Sčítač pravdepodobností*) stráca zdravie s každým krokom a správnou odpoveďou, nesprávna odpoveď je jeho úder. Po porážke padá korisť podľa hviezdičiek (★ zelená, ★★ modrá, ★★★ fialová), peniaze a skúsenosti. Drak Ketvarr je nájazd.
-- Minimapa, nápis zóny, ukazovateľ skúseností, informačný kanál koristi, chybové hlásenia; slnečná lúka s cestami, listnaté stromy (pred kamerou sa spriehľadnia), fontána.
+1. **Gameplay style** and **Difficulty** → *Next ▸*
+2. **History**, **Equations** and **Levels** → *◂ Back* / *▶ Start the game*
 
-## Finále v severskej a MMO téme: drak Ketvarr (level 9)
-- Nad Hilbertovým ostrovom krúži kvantový drak **Ketvarr**. Každý z 8 levelov naučí jedno *slovo moci*; s ôsmimi sa otvorí **Dračí štít** (portál 9 na severe, mentor Erwin Schrödinger).
-- **Ťahová bitka** v 3 kolách: drakov štít je qubit (Blochova guľa), úder čepeľou je **meranie** pozdĺž zraniteľného miesta *n* — zásah s P = (1 + r·n)/2 a kolaps štítu. Hráč vykríkne jedno slovo (hradlá X, H, Z, S; od 2. kola impulz RABI-RA s uhlom θ, v 3. kole aj s osou φ), drak urobí **vopred ohlásený ťah** (rotácia okolo z, úder krídlom X, rev oblohy Y, hmla dekoherencie, presun srdca) a chrlí oheň.
-- **Metrika:** draka zraní len úder s P(zásah) ≥ prah (ľahká/laická 80 %, normálna 90 %, ťažká 95 %). Tlačidlá ukazujú P(zásah) v ďalšom ťahu už aj s drakovým ťahom; po zranení drak štít prekuje. Na záver 3 otázky o tom, *prečo* si vyhral.
-- Severský vzhľad: procedurálne textúry v shaderi (tundra so snehom, kameň, drevo, ihličie, dračie šupiny), borovice, menhiry, hory, sneženie, súmračná obloha s polárnou žiarou, písmo Cinzel.
+Everything can be changed later in the settings (⚙).
 
-## Zvuk a grafika
-- **Hudba** (`js/audio.js`): generatívna, bez zvukových súborov — tichý bordún D + A, pomalé akordy v d mol (≈ 9 s na akord), riedka harfa v pentatonike s ozvenou, vzdialený roh a vietor. Bez bicích a náhlych zmien, aby pomáhala sústredeniu. Spustí sa pri prvom kliknutí alebo klávese (pravidlo prehliadačov).
-- **Zvukové efekty**: tlačidlá, dialógy, listovanie, zvitky, mapa, denník, kódex, toasty, správna/nesprávna odpoveď, portál, dokončenie levelu a súboj s drakom (výkrik, čepeľ, oheň, rev).
-- **🔊 / N** stlmí všetko; hlasitosť hudby a efektov je v nastaveniach (⚙).
-- **Textúry** (len severská téma, nastavenia → 🖼): *automaticky* (vysoké len na výkonnejších počítačoch — aspoň 8 jadier a 8 GB, nie softvérové/mobilné GPU), *pôvodné*, alebo *vysoké rozlíšenie* (viac oktáv šumu, reliéf normál bez UV, lišajník, trblietanie snehu).
-
-## Obťažnosť, nastavenia, ukladanie
-- **Obťažnosť** (rozbaľovací zoznam vpravo hore, dá sa meniť kedykoľvek):
-  - *🫶 Laická* — mechanika ako ľahká, ale všetko bežnými slovami: pred každou úlohou kartička „po ľudsky“, odborné slová s prekladom v zátvorke, jednoduché vysvetlivky, úvod sprievodkyne o kvantových počítačoch (`js/layman.js`).
-  - *Ľahká* (predvolená v novej hre) — väčšie tolerancie, menej meraní, nápovedy, v kvízoch o jednu nesprávnu možnosť menej, väčšie písmo a zlaté kľúčové slová v texte.
-  - *Normálna* — pôvodná hra; v paneli zbalený box „📐 Teória a rovnice“ s jadrom levelu.
-  - *Ťažká* — viac poznatkov: rozbalená teória s rovnicami ku každej úlohe, 2 extra otázky s rovnicami na level, husté texty bez analógií; presnosť, náhodné ciele, bez nápovied, extra hádanky v leveli 3, prísnejšie hviezdičky.
-- **📜 História — historické zvitky** (samostatné nastavenie, pri ľubovoľnej obťažnosti; na uvítacej obrazovke a v ⚙ ako 3. voľba „História“ po štýle hry a obťažnosti; predvolene vypnuté): pred krokmi levelov sa rozvinie zvitok s históriou objavov (roky, autori, ich rozhovory a slávne výroky; zbierka v Kódexe → „📜 Zvitky“) a na konci každého levelu je otázka z histórie. Uložená hra s bývalou obťažnosťou „Prastará“ sa načíta ako Ťažká so zapnutými zvitkami.
-- **👁 Pohľady** (V, kedykoľvek, v každej obťažnosti): ten istý stav ako hodinové ručičky amplitúd, Blochove rezy zboku a zhora, pravdepodobnosti v bázach Z/X/Y, mapa matice ρ (plocha = veľkosť, farba = fáza) a farebný zápis; α je všade modrá, β červená. Tlačidlo „👁 Ukáž to obrázkom“ v teórii otvorí pohľad k rovnici.
-- **⚙ Nastavenia** (O): vizualizácie (mriežka sféry, projekcie ⟨X⟩⟨Y⟩⟨Z⟩, uhly θ/φ, stĺpce P(0)/P(1), stopa, grafy) a geometria zobrazenia (zorný uhol, veľkosť popiskov, priehľadnosť sféry, automatické otáčanie).
-- Geometrické ovládanie v leveloch: voľné uhly magnetov (L2), geometrické laboratórium — ľubovoľný stav, rotácia R<sub>n</sub>(α), meranie pozdĺž osi m (L3), fázový posun φ (L4), sila poľa B₀ (L6).
-- **Stav hry sa ukladá priebežne** do localStorage: postup, Kódex, Denník, rozohraný level aj s krokom, poloha na ostrove, jazyk, obťažnosť, nastavenia. Po znovunačítaní hra pokračuje tam, kde skončila.
-- **Pomoc (H)** → *Odomknúť všetky levely* / *Reset hry* (zmaže postup, ponechá jazyk a nastavenia).
-
-## Ovládanie
-| kláves | akcia |
+## Screenshots
+| | |
 |---|---|
-| WASD / šípky | pohyb po ostrove (Shift = rýchlejšie) |
-| ťahanie myšou, koliesko | kamera |
-| E | vstúpiť do portálu / hovoriť |
-| Enter, medzerník | ďalej v dialógu |
-| ← / Backspace | späť v dialógu |
-| L | Denník — všetky rozhovory, rovnice úloh (∑, v oboch typoch hry) a vysvetlenia (prečítať / prehrať znova); rovnice sú aj v Kódexe (C) → „∑ Rovnice“ |
-| K | 🔑 kľúč — slovník glyfov, potom pravidlá mnemotechniky (typ „Jazyk rovníc“; počas rozhovoru nedostupný, aby sa dialóg sústredil na fyziku) |
-| C | Kódex symbolov, osobností a pojmov |
-| M | mapa · H pomoc · O nastavenia · V pohľady · Esc zavrieť okná |
-| F9 | odomknúť všetky levely (režim učiteľa) — aj tlačidlom na konci okna Pomoc (H) |
+| ![Welcome screen](docs/screenshots/welcome.webp) | ![Glyph dictionary under the 🔑 key](docs/screenshots/glyph-key.webp) |
+| **Welcome screen** — gameplay style, difficulty, history, equations, levels | **🔑 Key** — glyph dictionary first, mnemonic rules second |
+| ![Nordic style](docs/screenshots/island-nordic.webp) | ![MMO style](docs/screenshots/island-wow.webp) |
+| **Nordic style** — snowy island and the dragon's peak | **MMO style** — spells, quests, a vendor and dungeons |
+| ![MMO level](docs/screenshots/mmo-level.webp) | ![Hall of Symbols](docs/screenshots/level0-hall.webp) |
+| **MMO dungeon** — the level boss loses health with every step and correct answer | **Hall of Symbols** — 17 animated 3D exhibits of the equation symbols |
 
-Prejdením myšou nad čímkoľvek (tlačidlo, symbol, 3D objekt, podčiarknutý pojem v texte) sa zobrazí krátka vysvetlivka.
+## What the game teaches
+You play **Little Psi**, the quantum state ψ — not a little ball with a position, but a *rule for predictions*. Your guide **Spark** (✨ a spark of light, deliberately unlike any amplitude symbol) waits in the middle of **Hilbert Island**. All portals stand in one ring around the centre; behind each one a mentor teaches one topic of lectures 1–3 through small experiments, dialogues and quizzes. Every level ends with **language traps** — a quiz about correct wording, because many mistakes in quantum physics are made with words, not with calculations.
 
-## Levely
-1. **Komplexný prístav** (Euler) — amplitúda ako ručička, fáza, i² = −1, interferencia
-2. **Sternova–Gerlachova pec** — dve stopy, ±ħ/2, postupné merania Z → X → Z, predpoveď cos²(θ/2)
-3. **Blochovo observatórium** (Bloch) — hradlá X, Y, Z, H, S, T ako rotácie, relatívna vs. globálna fáza, meranie
-4. **Chrám interferencie** (Feynman) — H·H vs. H·meranie·H, matica hustoty ρ, koherencie, dekoherencia
-5. **Diracova knižnica** (Dirac) — gramatika bra-ket: stav, otázka, číslo, operátor, pravdepodobnosť
-6. **Rabiho rezonátor** (Rabi, Zeeman) — NMR, precesia, rotujúci rámec, π/π-2 impulzy, rezonancia, T₂, ansámbel
-7. **Bellov most** (Bell, Einstein) — Bellov stav, redukované stavy, nemožnosť signalizácie, CHSH hra
-8. **Sieň výkladov** (Bohr, Kant, Wittgenstein, Stodola, Bohm, Heisenberg, Noether) — kolaps, komplementarita, interpretácie
+- Amplitudes are clock hands; probability is the squared length; the phase only matters when amplitudes meet (interference).
+- Measurement asks a question in a chosen basis; the global phase is unobservable, the relative phase is not.
+- Gates are rotations of the Bloch ball; mixtures live inside it; decoherence erases the off-diagonal of ρ.
+- Bra-ket grammar, NMR and Rabi oscillations, entanglement and the CHSH game, and the interpretations of quantum mechanics.
 
-Každý level končí **jazykovými pascami** (kvíz o správnych formuláciách); hviezdičky podľa počtu chýb.
+Correct answers **snap into place**: once an input is accepted (an arrow on its target, a π pulse, the optimal CHSH angles…), the slider and the 3D picture glide exactly onto the correct value.
 
-## Štruktúra kódu
-- `js/math.js` vektory, matice, komplexné čísla · `js/quantum.js` simulátor 1 a 2 qubitov
-- `js/gl.js` renderer (shader, procedurálne siete, Blochova sféra) · `js/ui.js` dialógy, kvízy, denník, vysvetlivky
-- `js/wow.js` MMO téma: postava, kúzla, nepriatelia, úlohy, obchodník, taška, korisť, bossovia, rámy jednotiek, minimapa
-- `js/i18n.js` voľba jazyka, `tr()` a `DL()` (dialógy z `lang/*.csv`; `tools/build-lang.js` z nich generuje `lang/*.js`) · `js/settings.js` obťažnosť (`byDiff`) a nastavenia zobrazenia · `js/knowledge.js` teória a rovnice, extra otázky · `js/eqmnemo.js` typ hry „Jazyk rovníc“: 3D javisko rovnice a mnemotechnika · `js/eqglyphs.js` SVG glyfy symbolov · `js/scrolls.js` starobylé zvitky · `js/views.js` pohľady 👁 · `js/tips.js` slovník vysvetliviek · `js/content.js` kódex a jazykové pasce · `js/main.js` hub, kamera, hra
-- `js/levels/*.js` jednotlivé levely, `registry.js` ich poradie
+## Choices on the welcome screen
+### 1 · Gameplay style
+| Style | |
+|---|---|
+| **Classic** (default) | the original blue grid island with 8 portals — nothing distracts from the physics, runs on weaker computers |
+| **🐉 Nordic** | a snowy island with pines and standing stones, Nordic lettering and detailed procedural textures; every mentor teaches a *Word of Power* and level 9 is a turn-based battle with the quantum dragon **Ketvarr** |
+| **⚔ MMO** | plays like an online RPG: a quantum mage with levels, a spell bar (X and H gates, the Born blade = measurement…), *classical misconceptions* as neutral enemies whose shields are qubits, quests, a vendor (Max Planck), bags and loot; levels are dungeons with bosses, and the dragon is a raid |
+
+### 2 · Difficulty
+Can be changed at any time from the selector in the top-right corner — the open dialogue, quiz and task text update immediately.
+
+- **🫶 Layman** — everything in everyday words: an "in plain words" card before every task, technical words translated in brackets, simple tooltips.
+- **Easy** (default) — wider tolerances, fewer trials, hints, one wrong option fewer in quizzes.
+- **Normal** — the original game.
+- **Hard** — theory and equations at every step, extra equation questions, dense texts without analogies, random targets, no hints, stricter stars.
+
+### 3 · History
+**📜 Historic scrolls** (off by default): before level steps a scroll unrolls with the history of the discoveries — years, authors, their conversations and famous words — and every level ends with one history question. Collected scrolls stay in the Codex.
+
+### 4 · Equations
+- **🖼 Mainly Human Language** — the picture and intuition come first (hands, the Bloch ball, experiments); equations live in the 📐 theory panel and the Journal.
+- **∑ Equation Language (Experimental)** (default) — the real equation that holds right now is shown at the top of the screen and changes as you play; every task starts with its "∑ Equation first" card; all symbols are drawn as glyphs (below); adds **portal 0 — the Hall of Symbols** (17 pedestals, each symbol as a small 3D experiment, with a question after each one, a review after each chapter and a final exam).
+
+### 5 · Levels
+**Step by step** (default — the next portal opens after the previous level) or **Unlock everything** (all portals open right away, e.g. for teachers or revision). Unlocking and resetting are also available at the bottom of the help (H) and settings (⚙) panels.
+
+## Equation glyphs
+In the Equation Language every symbol becomes an SVG glyph that carries its meaning: **colour = who** it is, a **pictogram behind the letter = what it does**, and the **frame shape = what kind** of object it is. Hover a glyph for its name, a memory phrase and the pictogram on its own; the 🔑 key (top right, key **K**) holds the full glyph dictionary and the mnemonic rules. The files below are exported from the game (`docs/glyphs/`).
+
+<p>
+  <img src="docs/glyphs/alpha.svg" alt="α — amplitude of |0⟩" height="64">
+  <img src="docs/glyphs/beta.svg" alt="β — amplitude of |1⟩" height="64">
+  <img src="docs/glyphs/psi.svg" alt="|ψ⟩ — a state" height="64">
+  <img src="docs/glyphs/ket0.svg" alt="|0⟩ — north pole" height="64">
+  <img src="docs/glyphs/ket1.svg" alt="|1⟩ — south pole" height="64">
+  <img src="docs/glyphs/bra.svg" alt="⟨a| — a question" height="64">
+  <img src="docs/glyphs/theta.svg" alt="θ — tilt from the pole" height="64">
+  <img src="docs/glyphs/phi.svg" alt="φ — relative phase" height="64">
+  <img src="docs/glyphs/gamma.svg" alt="γ — global phase" height="64">
+  <img src="docs/glyphs/phase-factor.svg" alt="e^{iφ} — phase factor" height="64">
+  <img src="docs/glyphs/hadamard.svg" alt="H — Hadamard gate" height="64">
+  <img src="docs/glyphs/pauli-x.svg" alt="X — the X gate" height="64">
+  <img src="docs/glyphs/probability.svg" alt="P — probability" height="64">
+  <img src="docs/glyphs/born.svg" alt="|α|² — squared magnitude" height="64">
+  <img src="docs/glyphs/rho.svg" alt="ρ — density matrix" height="64">
+  <img src="docs/glyphs/hbar.svg" alt="ħ — reduced Planck constant" height="64">
+</p>
+
+| Glyph | Meaning | Memory phrase |
+|---|---|---|
+| α, β | amplitudes of \|0⟩ (blue) and \|1⟩ (red) | *Alpha points Above, Beta goes Below* |
+| \|ψ⟩, \|0⟩, \|1⟩ | kets — states; the frame ⟩ points forward | the tick shows the pole |
+| ⟨a\| | bra — a question; the mirrored frame | ⟨a\|ψ⟩ is one number |
+| θ, φ, γ | tilt (pink), relative phase (green), global phase (gold) | *Tilt from the Top, the Fan's turn, the Gold Gear* |
+| H, X, … | operators — 3D boxes acting to the right | *X marks the flip, H = Halfway swap* |
+| P, \|α\|² | probability — a white pillar; the frame freezes the phase | *frame it and freeze it* |
+
+## Levels
+| # | Level | Mentor | Topic |
+|---|---|---|---|
+| 0 | Hall of Symbols *(Equation Language only)* | Spark | what every symbol in the equations means |
+| 1 | Complex Harbour | Leonhard Euler | amplitude as a clock hand, phase, i² = −1, interference |
+| 2 | Stern–Gerlach Furnace | Otto Stern & Walther Gerlach | two spots, ±ħ/2, sequential measurements Z → X → Z, cos²(θ/2) |
+| 3 | Bloch Observatory | Felix Bloch | gates X, Y, Z, H, S, T as rotations, relative vs. global phase, measurement, geometry lab |
+| 4 | Temple of Interference | Richard Feynman | H·H vs. H·measurement·H, density matrix ρ, coherences, decoherence |
+| 5 | Dirac's Library | Paul Dirac | bra-ket grammar: state, question, number, operator, probability |
+| 6 | Rabi's Resonator (NMR) | I. I. Rabi | precession, rotating frame, π and π/2 pulses, resonance, T₂ |
+| 7 | Bell's Bridge | John Bell | Bell state, reduced states, no-signalling, the CHSH game |
+| 8 | Hall of Interpretations | Niels Bohr (+ Kant, Wittgenstein, Stodola, Bohm, Heisenberg, Noether) | collapse, complementarity, interpretations |
+| 9 | Dragon's Peak *(Nordic and MMO styles)* | Erwin Schrödinger | turn-based battle: the dragon's ward is a qubit, a strike is a measurement with P = ½(1 + r·n) |
+
+Stars depend on the number of mistakes. New Codex cards (symbols, people, concepts, scrolls and every task's **∑ equation**) unlock as you play.
+
+## Controls
+| Key | Action |
+|---|---|
+| WASD / arrows | move around the island (Shift = faster) |
+| mouse drag, wheel | camera |
+| E | enter a portal / talk |
+| Enter, Space · ← / Backspace | next / back in a dialogue |
+| L | Journal — every conversation, task equation (∑) and quiz explanation; read or replay |
+| C | Codex — symbols, people, concepts, scrolls, equations |
+| K | 🔑 key — glyph dictionary and mnemonic rules (Equation Language; unavailable during conversations) |
+| V | 👁 views — the same state as clock hands, Bloch cuts, bases and the ρ matrix |
+| M · H · O · Esc | map (click a portal to travel) · help · settings · close windows |
+| 1 – = | spells (MMO style) · B bags · Tab target · Space jump |
+| F9 | unlock all levels |
+
+Hover anything (button, symbol, 3D object, underlined term) for a short explanation. Controls that do nothing at the moment (e.g. spells or panel buttons while a dialogue is open) are shown greyed out.
+
+## Languages and dialogue files
+The game is in **Slovak, English and Ukrainian**. Without a saved choice, Czech and Slovak browsers get SK, browsers with Ukrainian, Russian or Belarusian among their languages get UA, and everyone else EN. Switch with the selector in the top-right corner or on the welcome screen.
+
+All dialogue text — conversations, quizzes, language traps, "in plain words" cards, theory, scrolls and quests — lives in `lang/sk.csv`, `lang/en.csv` and `lang/uk.csv` (columns `key,text`; a missing translation falls back to English). The code reads them with `DL('key', values…)`.
+
+- **Equations are written in double square brackets** — this tells the game where to draw the equation background: `[[P = |α|²]]` inside a sentence becomes an inline chip, `[[…]]` on a line of its own becomes an equation block. Matrices are written `[0, 1; 1, 0]` so they don't clash with the brackets.
+- `{0}`, `{1}` … are values filled in by the game (counts, percentages, names); a translation may move them.
+- After editing a CSV run `node tools/build-lang.js`. It regenerates `lang/*.js` (browsers refuse to read CSV files when the game is opened from disk) and checks the `[[ ]]` brackets and `{n}` placeholders. When served over http(s) the game reads the CSV files directly.
+- Interface strings (buttons, HUD, tooltips, Codex) stay in the code as `tr('slovensky', 'English', 'українською')`.
+
+## Project structure
+| Path | Contents |
+|---|---|
+| `index.html`, `style.css` | page, help, themes, welcome screen |
+| `js/main.js` | game loop, island (hub), portals, base `Level` class, saving |
+| `js/levels/*.js` | levels 0–9; `registry.js` sets their order |
+| `js/ui.js` | dialogues, quizzes, Journal, Codex, settings, tooltips |
+| `js/gl.js` · `js/math.js` · `js/quantum.js` | WebGL2 renderer and procedural meshes · vectors, matrices, complex numbers · 1- and 2-qubit simulator |
+| `js/eqglyphs.js` · `js/eqmnemo.js` | SVG equation glyphs and `[[…]]` rendering · live equation and the 🔑 key |
+| `js/i18n.js` · `lang/` · `tools/build-lang.js` | language choice, `tr()` and `DL()` · dialogue CSV files · CSV → JS generator and checker |
+| `js/knowledge.js` · `js/content.js` · `js/scrolls.js` · `js/layman.js` | theory and equations · Codex and language traps · historic scrolls · layman cards and glossary |
+| `js/views.js` · `js/tips.js` · `js/audio.js` · `js/wow.js` · `js/welcome.js` · `js/settings.js` | 👁 views · tooltips · generative music and sound effects · MMO style · welcome screen · settings |
+| `assets/` · `docs/` | icons, theme pictures · README screenshots and exported glyph SVGs |
+
+## License
+[MIT](LICENSE) © 2026 Ondrej Špánik
+
+## Changelog
+Built from the commit history (newest first).
+
+### 2026-10-10
+- [`732fa4f`](https://github.com/iairu/QUANTUM_GAME/commit/732fa4f) Easy is the default difficulty and Equation Language the default game type; task equations in the Codex; fixed the selection border of the game-type cards; temporary "Start over" button when continuing a game
+- [`ef294fa`](https://github.com/iairu/QUANTUM_GAME/commit/ef294fa) Unlock all levels and Reset game at the bottom of the settings as well
+- [`039a4b7`](https://github.com/iairu/QUANTUM_GAME/commit/039a4b7) Welcome-screen notice: the lectures are the primary learning resource
+- [`8abfe1c`](https://github.com/iairu/QUANTUM_GAME/commit/8abfe1c) Task equations in the Journal in both game types; two-slide welcome screen with an "Unlock everything" choice
+- [`422fc9a`](https://github.com/iairu/QUANTUM_GAME/commit/422fc9a) Updates
+- [`93b1c02`](https://github.com/iairu/QUANTUM_GAME/commit/93b1c02) History (historic scrolls) separate from difficulty; welcome screen update
+- [`a099a7f`](https://github.com/iairu/QUANTUM_GAME/commit/a099a7f) Improvements
+- [`c40f099`](https://github.com/iairu/QUANTUM_GAME/commit/c40f099) Correct inputs snap into the exact state
+- [`c81f684`](https://github.com/iairu/QUANTUM_GAME/commit/c81f684) Updated welcome-screen visuals for the game type
+- [`bc51d08`](https://github.com/iairu/QUANTUM_GAME/commit/bc51d08) Renamed the game types; dialogue adjustments
+- [`4868b79`](https://github.com/iairu/QUANTUM_GAME/commit/4868b79) Adjusted the glyph and key approach
+- [`9795bdb`](https://github.com/iairu/QUANTUM_GAME/commit/9795bdb) Better key location; disabled buttons are shown as such during dialogues
+- [`41a41cd`](https://github.com/iairu/QUANTUM_GAME/commit/41a41cd) Glyph tooltips show the pictogram separately
+- [`cd46e7e`](https://github.com/iairu/QUANTUM_GAME/commit/cd46e7e) Dialogue moved to CSV translation files with generated JS
+
+### 2026-10-09
+- [`6da6dc7`](https://github.com/iairu/QUANTUM_GAME/commit/6da6dc7) Improvements to the mnemonic version
+- [`835ad3b`](https://github.com/iairu/QUANTUM_GAME/commit/835ad3b) Improved equation backgrounds and colours
+- [`aca7afd`](https://github.com/iairu/QUANTUM_GAME/commit/aca7afd) Bigger equation display with mnemonics
+- [`cfa7fa5`](https://github.com/iairu/QUANTUM_GAME/commit/cfa7fa5) More equation mnemonics
+- [`b0bb51b`](https://github.com/iairu/QUANTUM_GAME/commit/b0bb51b) Live equations
+- [`f0ce1d6`](https://github.com/iairu/QUANTUM_GAME/commit/f0ce1d6) Ukrainian translation
+- [`f557568`](https://github.com/iairu/QUANTUM_GAME/commit/f557568) Welcome setup wizard
+
+### 2026-10-08
+- [`dc72d04`](https://github.com/iairu/QUANTUM_GAME/commit/dc72d04) Fast-changing numbers are easier to read
+- [`3e9b5e6`](https://github.com/iairu/QUANTUM_GAME/commit/3e9b5e6) Larger panel text
+- [`7f18729`](https://github.com/iairu/QUANTUM_GAME/commit/7f18729) "Ask Google AI" button in dialogues
+- [`fccb2c0`](https://github.com/iairu/QUANTUM_GAME/commit/fccb2c0) Removed dialogue keys
+- [`bb20ed8`](https://github.com/iairu/QUANTUM_GAME/commit/bb20ed8) Custom cursor, hidden while rotating the camera
+- [`75a8efb`](https://github.com/iairu/QUANTUM_GAME/commit/75a8efb) MMO-style gameplay
+- [`8848080`](https://github.com/iairu/QUANTUM_GAME/commit/8848080) Music volume off is truly silent (reverb routed through the volume); quieter 15 % default
+- [`2d3f005`](https://github.com/iairu/QUANTUM_GAME/commit/2d3f005) Theme selector: Classic (8 levels) and Nordic (Skyrim look + dragon level 9); music and sound effects in both
+- [`c756187`](https://github.com/iairu/QUANTUM_GAME/commit/c756187) Music, sound effects, better textures depending on computer performance
+- [`b67baed`](https://github.com/iairu/QUANTUM_GAME/commit/b67baed) Nordic (Skyrim-style) look
+- [`d3ddc94`](https://github.com/iairu/QUANTUM_GAME/commit/d3ddc94) Teleport mid-dialogue; Layman as the default difficulty
+- [`cfe7805`](https://github.com/iairu/QUANTUM_GAME/commit/cfe7805) Hotfix: labels per difficulty
+- [`88a22be`](https://github.com/iairu/QUANTUM_GAME/commit/88a22be) Layman version added to the difficulty selector
+- [`4387991`](https://github.com/iairu/QUANTUM_GAME/commit/4387991) WASD hint and teleport through the map
+- [`d535264`](https://github.com/iairu/QUANTUM_GAME/commit/d535264) Banner, favicon and metadata
+- [`425fe1c`](https://github.com/iairu/QUANTUM_GAME/commit/425fe1c) Update
+- [`55bc677`](https://github.com/iairu/QUANTUM_GAME/commit/55bc677) Difficulty updates; "ancient" difficulty with scrolls of knowledge
+- [`2b968b3`](https://github.com/iairu/QUANTUM_GAME/commit/2b968b3) Difficulties, localStorage save, reset button
+- [`830d16e`](https://github.com/iairu/QUANTUM_GAME/commit/830d16e) Slovak and English (i18n); unlock the whole game from the help section
+- [`4c941e1`](https://github.com/iairu/QUANTUM_GAME/commit/4c941e1) v1: lectures 1–3 as a game world
