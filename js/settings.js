@@ -7,9 +7,9 @@ const DIFFS = ['layman', 'easy', 'normal', 'hard'];
 // a MMO (predvolená: hrá sa ako World of Warcraft — kúzla, nepriatelia, úlohy, obchodník, korisť; aj drak)
 const THEMES = ['classic', 'nordic', 'wow'];
 const Settings = {
-  diff: 'layman', // nová hra začína laickou obťažnosťou
+  diff: 'easy', // nová hra začína ľahkou obťažnosťou
   theme: 'classic', // prvá voľba na uvítacej obrazovke
-  mode: 'pictures', // typ hry: 'pictures' (obrazy najprv) alebo 'equations' (rovnice najprv, rovnicová mnemotechnika)
+  mode: 'equations', // predvolený je jazyk rovníc; typ hry: 'pictures' (obrazy najprv) alebo 'equations' (rovnice najprv, rovnicová mnemotechnika)
   get eq() { return this.mode === 'equations'; },
   get nordic() { return this.theme === 'nordic'; },
   get wow() { return this.theme === 'wow'; },

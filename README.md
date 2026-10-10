@@ -6,7 +6,7 @@ jazykové vyjadrenia, symboly, správne obrazy a typické omyly — nie výpočt
 ## Spustenie
 Dvojklik na `index.html` (Chrome, Edge alebo Firefox). Netreba server ani inštaláciu.
 Postup sa ukladá v prehliadači (localStorage).
-Pri prvom spustení (a po resete) sa ukáže uvítanie v dvoch krokoch: **1 · štýl hry, 2 · obťažnosť** → *Ďalej* → **3 · história, 4 · rovnice, 5 · levely** (postupne / odomknúť všetko, predvolene postupne) → *Začať hru*. Predvolená je vždy prvá voľba; všetko sa dá neskôr zmeniť v ⚙.
+Pri prvom spustení (a po resete) sa ukáže uvítanie v dvoch krokoch: **1 · štýl hry, 2 · obťažnosť** → *Ďalej* → **3 · história, 4 · rovnice, 5 · levely** (postupne / odomknúť všetko, predvolene postupne) → *Začať hru*. Predvolené: klasická téma, ľahká obťažnosť, bez zvitkov, jazyk rovníc, postupne; všetko sa dá neskôr zmeniť v ⚙. Pri pokračovaní v rozohranej hre sa na pár sekúnd ukáže aj tlačidlo „🗑 Začať odznova“.
 
 ## Jazyk / Language
 Hra je po slovensky, po anglicky a po ukrajinsky. Bez uloženej voľby sa jazyk určí podľa prehliadača: čeština a slovenčina → SK, ukrajinčina, ruština a bieloruština (ktorýkoľvek z jazykov prehliadača) → UA, všetky ostatné → EN.
@@ -78,8 +78,8 @@ Dialógy, kvízy, levely, Kódex, Denník aj tlačidlá ostávajú rovnaké — 
 
 ## Obťažnosť, nastavenia, ukladanie
 - **Obťažnosť** (rozbaľovací zoznam vpravo hore, dá sa meniť kedykoľvek):
-  - *🫶 Laická* (predvolená v novej hre) — mechanika ako ľahká, ale všetko bežnými slovami: pred každou úlohou kartička „po ľudsky“, odborné slová s prekladom v zátvorke, jednoduché vysvetlivky, úvod sprievodkyne o kvantových počítačoch (`js/layman.js`).
-  - *Ľahká* — väčšie tolerancie, menej meraní, nápovedy, v kvízoch o jednu nesprávnu možnosť menej, väčšie písmo a zlaté kľúčové slová v texte.
+  - *🫶 Laická* — mechanika ako ľahká, ale všetko bežnými slovami: pred každou úlohou kartička „po ľudsky“, odborné slová s prekladom v zátvorke, jednoduché vysvetlivky, úvod sprievodkyne o kvantových počítačoch (`js/layman.js`).
+  - *Ľahká* (predvolená v novej hre) — väčšie tolerancie, menej meraní, nápovedy, v kvízoch o jednu nesprávnu možnosť menej, väčšie písmo a zlaté kľúčové slová v texte.
   - *Normálna* — pôvodná hra; v paneli zbalený box „📐 Teória a rovnice“ s jadrom levelu.
   - *Ťažká* — viac poznatkov: rozbalená teória s rovnicami ku každej úlohe, 2 extra otázky s rovnicami na level, husté texty bez analógií; presnosť, náhodné ciele, bez nápovied, extra hádanky v leveli 3, prísnejšie hviezdičky.
 - **📜 História — historické zvitky** (samostatné nastavenie, pri ľubovoľnej obťažnosti; na uvítacej obrazovke a v ⚙ ako 3. voľba „História“ po štýle hry a obťažnosti; predvolene vypnuté): pred krokmi levelov sa rozvinie zvitok s históriou objavov (roky, autori, ich rozhovory a slávne výroky; zbierka v Kódexe → „📜 Zvitky“) a na konci každého levelu je otázka z histórie. Uložená hra s bývalou obťažnosťou „Prastará“ sa načíta ako Ťažká so zapnutými zvitkami.
@@ -97,7 +97,7 @@ Dialógy, kvízy, levely, Kódex, Denník aj tlačidlá ostávajú rovnaké — 
 | E | vstúpiť do portálu / hovoriť |
 | Enter, medzerník | ďalej v dialógu |
 | ← / Backspace | späť v dialógu |
-| L | Denník — všetky rozhovory, rovnice úloh (∑, v oboch typoch hry) a vysvetlenia (prečítať / prehrať znova) |
+| L | Denník — všetky rozhovory, rovnice úloh (∑, v oboch typoch hry) a vysvetlenia (prečítať / prehrať znova); rovnice sú aj v Kódexe (C) → „∑ Rovnice“ |
 | K | 🔑 kľúč — slovník glyfov, potom pravidlá mnemotechniky (typ „Jazyk rovníc“; počas rozhovoru nedostupný, aby sa dialóg sústredil na fyziku) |
 | C | Kódex symbolov, osobností a pojmov |
 | M | mapa · H pomoc · O nastavenia · V pohľady · Esc zavrieť okná |

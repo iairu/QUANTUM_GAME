@@ -64,12 +64,12 @@ const THEME_INFO = {
 const Welcome = {
   show(done) {
     this.done = done;
-    // predvolená je v každej sekcii prvá voľba: klasická téma, laická obťažnosť, bez zvitkov, prevažne ľudský jazyk
+    // predvolené: klasická téma, ľahká obťažnosť, bez zvitkov, jazyk rovníc
     // (po zmene jazyka na uvítacej obrazovke ostanú voľby hráča)
     let keep = false;
     try { keep = sessionStorage.getItem('kvantp-welcome-keep') === '1'; sessionStorage.removeItem('kvantp-welcome-keep'); } catch (e) { /* bez úložiska */ }
     if (keep) { this.theme = Settings.theme; this.diff = Settings.diff; this.scrolls = Settings.scrolls; this.mode = Settings.mode; }
-    else { this.theme = THEMES[0]; this.diff = DIFFS[0]; this.scrolls = false; this.mode = MODES[0]; }
+    else { this.theme = THEMES[0]; this.diff = 'easy'; this.scrolls = false; this.mode = 'equations'; }
     this.unlock = false; // „odomknúť všetko“ je predvolene vypnuté
     let slide = 0;
     try { slide = keep ? +(sessionStorage.getItem('kvantp-welcome-slide') || 0) : 0; this.unlock = keep && sessionStorage.getItem('kvantp-welcome-unlock') === '1'; } catch (e) { /* bez úložiska */ }

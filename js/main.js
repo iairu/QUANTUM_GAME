@@ -56,7 +56,7 @@ class Level {
     const pre = [];
     // denník: rovnica úlohy sa zapíše v oboch typoch hry
     const eqHtml = EqM.eqFor(this.num, name);
-    if (eqHtml && !this.seenScrolls.has('eqlog:' + name)) { this.seenScrolls.add('eqlog:' + name); UI.record({ kind: 'eq', html: eqHtml }); }
+    if (eqHtml && !this.seenScrolls.has('eqlog:' + name)) { this.seenScrolls.add('eqlog:' + name); UI.record({ kind: 'eq', html: eqHtml }); Game.progress.eqs.add(this.num + ':' + name); } // aj do Kódexu → ∑ Rovnice
     // rovnice najprv: pred krokom jeho rovnica vo farbách mnemotechniky
     if (Settings.eq && !Game.progress.eqIntroSeen) pre.push(...Game.eqIntroLines()); // mnemotechnika sa ešte nepredstavila (prepnuté počas rozhovoru)
     if (Settings.eq && !this.seenScrolls.has('eq:' + name)) {
@@ -437,7 +437,7 @@ const LEVEL_TIPS = tr({
 // ------------------------------------------------------------------
 const Game = {
   keys: {},
-  progress: { stars: {}, diff: {}, codex: new Set(), scrolls: new Set(), introSeen: false, laymanSeen: false, allUnlocked: false, session: null, moved: false },
+  progress: { stars: {}, diff: {}, codex: new Set(), scrolls: new Set(), eqs: new Set(), introSeen: false, laymanSeen: false, allUnlocked: false, session: null, moved: false },
   init() {
     const canvas = $('#gl');
     try { this.r = new Renderer(canvas); }
@@ -621,10 +621,14 @@ const Game = {
     if (!ss) return;
     if ((ss.scene === 'L0' && Settings.eq) || (ss.scene > 0 && ss.scene <= this.levels.length && this.isUnlocked(ss.scene))) {
       this.enterLevel(ss.scene === 'L0' ? 0 : ss.scene, ss);
-      UI.toast(tr('↩ Pokračuješ tam, kde si skončil(a).', '↩ Continuing where you left off.', '↩ Продовжуєш там, де зупинився(-лася).'));
     } else if (Array.isArray(ss.p)) {
       Hub.player.p = ss.p; Hub.player.heading = ss.h || 0; Hub.cam.yaw = ss.yaw || 0;
-    }
+    } else return;
+    // pokračovanie v rozohranej hre: na pár sekúnd aj tlačidlo „Začať odznova“ (s potvrdením)
+    const t = UI.toast(tr('↩ Pokračuješ tam, kde si skončil(a). ', '↩ Continuing where you left off. ', '↩ Продовжуєш там, де зупинився(-лася). ')
+      + `<button class="treset">${tr('🗑 Začať odznova', '🗑 Start over', '🗑 Почати спочатку')}</button>`, 9000);
+    t.classList.add('withbtn');
+    t.querySelector('.treset').onclick = () => UI.resetAsk();
   },
   // odomkne všetky levely bez toho, aby ich označilo za dokončené (režim učiteľa / skákanie medzi levelmi)
   unlockAll() {
@@ -755,13 +759,13 @@ const Game = {
   save() {
     if (this.resetting || !this.levels) return;
     this.progress.session = this.snapshot();
-    try { localStorage.setItem('kvantp-game1', JSON.stringify({ ...this.progress, codex: [...this.progress.codex], scrolls: [...this.progress.scrolls] })); } catch (e) { /* bez ukladania */ }
+    try { localStorage.setItem('kvantp-game1', JSON.stringify({ ...this.progress, codex: [...this.progress.codex], scrolls: [...this.progress.scrolls], eqs: [...this.progress.eqs] })); } catch (e) { /* bez ukladania */ }
   },
   load() {
     try {
       const d = JSON.parse(localStorage.getItem('kvantp-game1') || 'null');
       this.fresh = !d;
-      if (d) this.progress = { stars: d.stars || {}, diff: Object.fromEntries(Object.entries(d.diff || {}).map(([k, v]) => [k, v === 'ancient' ? 'hard' : v])), codex: new Set(d.codex || []), scrolls: new Set(d.scrolls || []), introSeen: !!d.introSeen, eqIntroSeen: !!d.eqIntroSeen, laymanSeen: !!d.laymanSeen, moved: !!d.moved, allUnlocked: !!d.allUnlocked, session: d.session || null, wow: d.wow || null };
+      if (d) this.progress = { stars: d.stars || {}, diff: Object.fromEntries(Object.entries(d.diff || {}).map(([k, v]) => [k, v === 'ancient' ? 'hard' : v])), codex: new Set(d.codex || []), scrolls: new Set(d.scrolls || []), eqs: new Set(d.eqs || []), introSeen: !!d.introSeen, eqIntroSeen: !!d.eqIntroSeen, laymanSeen: !!d.laymanSeen, moved: !!d.moved, allUnlocked: !!d.allUnlocked, session: d.session || null, wow: d.wow || null };
     } catch (e) { /* čistý začiatok */ }
   },
 };

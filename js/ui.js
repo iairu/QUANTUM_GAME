@@ -135,6 +135,7 @@ const UI = {
     $('#toasts').appendChild(t);
     setTimeout(() => t.classList.add('out'), ms);
     setTimeout(() => t.remove(), ms + 600);
+    return t;
   },
 
   // ---------- denník ----------
@@ -575,10 +576,11 @@ const UI = {
     const list = $('#codex .list'), got = Game.progress.codex;
     list.innerHTML = '';
     const tabs = $('#codex .tabs'); tabs.innerHTML = '';
-    for (const [k, n] of [['all', tr('Všetko', 'All', 'Усе')], ['symbol', tr('🔣 Symboly', '🔣 Symbols', '🔣 Символи')], ['osobnost', tr('👤 Osobnosti', '👤 People', '👤 Особистості')], ['pojem', tr('💡 Pojmy', '💡 Concepts', '💡 Поняття')], ['scroll', tr('📜 Zvitky', '📜 Scrolls', '📜 Сувої')]]) {
+    for (const [k, n] of [['all', tr('Všetko', 'All', 'Усе')], ['symbol', tr('🔣 Symboly', '🔣 Symbols', '🔣 Символи')], ['osobnost', tr('👤 Osobnosti', '👤 People', '👤 Особистості')], ['pojem', tr('💡 Pojmy', '💡 Concepts', '💡 Поняття')], ['scroll', tr('📜 Zvitky', '📜 Scrolls', '📜 Сувої')], ['eq', tr('∑ Rovnice', '∑ Equations', '∑ Рівняння')]]) {
       const b = el('button', filter === k ? 'on' : '', n); b.onclick = () => this.renderCodex(k); tabs.appendChild(b);
     }
     if (filter === 'scroll') return this.renderScrolls(list);
+    if (filter === 'eq') return this.renderEquations(list);
     const entries = CODEX.filter((e) => filter === 'all' || e.type === filter);
     $('#codex .count').textContent = `${got.size} / ${CODEX.length} ${tr('odomknutých', 'unlocked', 'відкрито')}`;
     for (const e of entries) {
@@ -589,6 +591,23 @@ const UI = {
           + `<div class="src">${tr('Level', 'Level', 'Рівень')} ${e.level}</div>`
         : `<div class="sym">?</div><div class="nm">${tr('zamknuté', 'locked', 'закрито')}</div><div class="ds">${tr(`Odomkneš v leveli ${e.level}.`, `Unlocked in level ${e.level}.`, `Відкриється в рівні ${e.level}.`)}</div>`;
       if (!have) card.dataset.tip = tr(`Dokonči level ${e.level} (${LEVELS[e.level - 1].title}).`, `Complete level ${e.level} (${LEVELS[e.level - 1].title}).`, `Пройди рівень ${e.level} (${LEVELS[e.level - 1].title}).`);
+      list.appendChild(card);
+    }
+  },
+  // ∑ rovnice úloh všetkých levelov (odomknú sa, keď hráč úlohu začne) — v oboch typoch hry
+  renderEquations(list) {
+    const got = Game.progress.eqs, all = [];
+    for (const L of LEVELS) {
+      const lv = Game.levels[L.num - 1];
+      lv.steps.forEach((st, k) => { const html = EqM.eqFor(L.num, st.name); if (html) all.push({ L, step: st.name, k, html }); });
+    }
+    $('#codex .count').textContent = `${all.filter((e) => got.has(e.L.num + ':' + e.step)).length} / ${all.length} ${tr('rovníc · odomknú sa, keď začneš úlohu', 'equations · they unlock when you start the task', 'рівнянь · відкриваються, коли починаєш завдання')}`;
+    for (const e of all) {
+      const have = got.has(e.L.num + ':' + e.step), card = el('div', 'card eqcard2 ' + (have ? '' : 'locked'));
+      const title = e.step === 'intro' ? tr('Jadro levelu', 'Core of the level', 'Ядро рівня') : tr(`Úloha ${e.k}`, `Task ${e.k}`, `Завдання ${e.k}`);
+      card.innerHTML = have
+        ? `<div class="sym">∑</div><div class="nm">${e.L.num} · ${e.L.title} — ${title}</div><div class="ds">${annotate(e.html, false, true)}</div>`
+        : `<div class="sym">∑ ?</div><div class="nm">${tr('zamknuté', 'locked', 'закрито')}</div><div class="ds">${tr(`Level ${e.L.num} · ${title}.`, `Level ${e.L.num} · ${title}.`, `Рівень ${e.L.num} · ${title}.`)}</div>`;
       list.appendChild(card);
     }
   },
