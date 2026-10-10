@@ -4,22 +4,22 @@
 
 const BLOCH_PUZZLES = [
   { from: '0', to: '1', gates: ['X'], max: 1, title: tr('Preklop |0⟩ na |1⟩', 'Flip |0⟩ to |1⟩', 'Переверни |0⟩ на |1⟩'), grant: ['bloch', 'sphere', 'XYZ'],
-    msg: L('l3.BLOCH_PUZZLES.1') },
+    msg: DL('l3.BLOCH_PUZZLES.1') },
   { from: '0', to: '+', gates: ['X', 'Z', 'H'], max: 1, title: tr('Dostaň sa z pólu na rovník do |+⟩', 'Get from the pole to the equator, to |+⟩', 'Дістанься з полюса на екватор, до |+⟩'), grant: ['H'],
-    msg: L('l3.BLOCH_PUZZLES.2') },
+    msg: DL('l3.BLOCH_PUZZLES.2') },
   { from: '+', to: '-', gates: ['Z', 'S', 'T'], max: 1, title: tr('Zmeň |+⟩ na |−⟩', 'Change |+⟩ into |−⟩', 'Зміни |+⟩ на |−⟩'), grant: ['relph', 'ST'],
-    msg: L('l3.BLOCH_PUZZLES.3') },
+    msg: DL('l3.BLOCH_PUZZLES.3') },
   { from: '0', to: '+i', gates: ['H', 'S', 'X', 'Z'], max: 2, title: tr('Dostaň sa do |+i⟩ (os y)', 'Get to |+i⟩ (the y axis)', 'Дістанься до |+i⟩ (вісь y)'), grant: ['thetaphi'],
-    msg: L('l3.BLOCH_PUZZLES.4') },
+    msg: DL('l3.BLOCH_PUZZLES.4') },
   { from: '0', to: '1', gates: ['H', 'Z'], max: 3, title: tr('Preklop |0⟩ na |1⟩ — ale bez X!', 'Flip |0⟩ to |1⟩ — but without X!', 'Переверни |0⟩ на |1⟩ — але без X!'), grant: ['unitary'],
-    msg: L('l3.BLOCH_PUZZLES.5') },
+    msg: DL('l3.BLOCH_PUZZLES.5') },
   { from: '0', to: '1', gates: ['Y'], max: 1, title: tr('Preklop |0⟩ na |1⟩ hradlom Y', 'Flip |0⟩ to |1⟩ with the Y gate', 'Переверни |0⟩ на |1⟩ гейтом Y'), grant: ['globalph'],
-    msg: L('l3.BLOCH_PUZZLES.6') },
+    msg: DL('l3.BLOCH_PUZZLES.6') },
   // len na ťažkej obťažnosti
   { from: '0', to: '-i', gates: ['H', 'S', 'Z', 'X'], max: 3, hard: true, title: tr('Dostaň sa do |−i⟩ (os −y)', 'Get to |−i⟩ (the −y axis)', 'Дістанься до |−i⟩ (вісь −y)'), grant: [],
-    msg: L('l3.BLOCH_PUZZLES.7') },
+    msg: DL('l3.BLOCH_PUZZLES.7') },
   { from: '+', to: '+i', gates: ['T'], max: 2, hard: true, title: tr('Otoč |+⟩ na |+i⟩ len hradlom T', 'Turn |+⟩ into |+i⟩ using only T', 'Перетвори |+⟩ на |+i⟩ лише гейтом T'), grant: [],
-    msg: L('l3.BLOCH_PUZZLES.8') },
+    msg: DL('l3.BLOCH_PUZZLES.8') },
 ];
 
 class L3Bloch extends Level {
@@ -34,10 +34,10 @@ class L3Bloch extends Level {
   intro() {
     this.quest(tr('Vypočuj si Felixa Blocha', 'Listen to Felix Bloch', 'Послухай Фелікса Блоха'), { easy: tr('💬 Bloch', '💬 Bloch', '💬 Блох'), hard: tr('Bloch: θ, φ, rotácie', 'Bloch: θ, φ, rotations', 'Блох: θ, φ, повороти') });
     this.say([
-      L('l3.intro.1.0'),
-      L('l3.intro.1.1'),
-      L('l3.intro.1.2'),
-      L('l3.intro.1.3', this.puzzleList().length),
+      DL('l3.intro.1.0'),
+      DL('l3.intro.1.1'),
+      DL('l3.intro.1.2'),
+      DL('l3.intro.1.3', this.puzzleList().length),
     ], () => this.next());
   }
 
@@ -93,8 +93,8 @@ class L3Bloch extends Level {
       this.grant(P.grant);
       this.say([`✅ ${P.msg}`], () => {
         if (this.pi === 2) {
-          this.ask({ q: L('l3.onAnimDone.1.q'), options: [L('l3.onAnimDone.1.options.0'), L('l3.onAnimDone.1.options.1'), L('l3.onAnimDone.1.options.2')], correct: 0,
-            why: L('l3.onAnimDone.1.why') }, () => this.advance());
+          this.ask({ q: DL('l3.onAnimDone.1.q'), options: [DL('l3.onAnimDone.1.options.0'), DL('l3.onAnimDone.1.options.1'), DL('l3.onAnimDone.1.options.2')], correct: 0,
+            why: DL('l3.onAnimDone.1.why') }, () => this.advance());
         } else this.advance();
       });
     } else if (this.moves >= this.maxMoves) UI.toast(tr('Ešte to nie je ono. Klikni ↺ Znova a skús iné poradie.', 'Not quite yet. Click ↺ Again and try a different order.', 'Ще не зовсім. Натисни ↺ Знову і спробуй інший порядок.'));
@@ -126,8 +126,8 @@ class L3Bloch extends Level {
       hard: tr('|+⟩ → M<sub>Z</sub> ×1, ×100 · porovnaj s |+i⟩', '|+⟩ → M<sub>Z</sub> ×1, ×100 · compare with |+i⟩', '|+⟩ → M<sub>Z</sub> ×1, ×100 · порівняй із |+i⟩'),
     });
     this.say([
-      L('l3.measure.1.0'),
-      L('l3.measure.1.1'),
+      DL('l3.measure.1.0'),
+      DL('l3.measure.1.1'),
     ]);
     this.readout = UI.info('');
     UI.panelSet(tr('Meranie v Z-báze', 'Measurement in the Z basis', 'Вимірювання в базисі Z'), [
@@ -155,8 +155,8 @@ class L3Bloch extends Level {
   checkMeasure() {
     if (!(this.f.m1 && this.f.m100) || this.f.mdone) return;
     this.f.mdone = true;
-    this.ask({ q: L('l3.checkMeasure.1.q'), options: [L('l3.checkMeasure.1.options.0'), L('l3.checkMeasure.1.options.1'), L('l3.checkMeasure.1.options.2')], correct: 0,
-      why: L('l3.checkMeasure.1.why') }, () => this.next());
+    this.ask({ q: DL('l3.checkMeasure.1.q'), options: [DL('l3.checkMeasure.1.options.0'), DL('l3.checkMeasure.1.options.1'), DL('l3.checkMeasure.1.options.2')], correct: 0,
+      why: DL('l3.checkMeasure.1.why') }, () => this.next());
   }
 
   // ---------- geometrické laboratórium (voľné skúmanie) ----------
@@ -170,7 +170,7 @@ class L3Bloch extends Level {
       easy: tr('🧪 Laboratórium: stav · rotácia · meranie', '🧪 Lab: state · rotation · measurement', '🧪 Лабораторія: стан · поворот · вимірювання'),
       hard: '|ψ(θ,φ)⟩ → R<sub>n</sub>(α) → M<sub>m</sub>: P(+m) = (1 + r·m)/2',
     });
-    this.say([L('l3.lab.1')]);
+    this.say([DL('l3.lab.1')]);
     const L = this.L, deg = (v) => v + '°';
     this.labInfo = UI.info(''); this.labChart = UI.chart(300, 110); this.readout = UI.info('');
     const det = (title, nodes, open) => { const d = el('details'); d.open = !!open; d.appendChild(el('summary', null, title)); nodes.forEach((x) => d.appendChild(x)); return d; };

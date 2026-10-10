@@ -59,13 +59,13 @@ function DLG_LOAD(lang, csv) { if (!DLG[lang]) DLG[lang] = parseCsv(csv); }
     document.write(`<script src="lang/${l}.js"><\/script>`);
   }
 })();
-// L('kľúč', hodnota0, hodnota1 …) → text dialógu v aktuálnom jazyku (chýbajúci preklad nahradí anglický)
-function L(key, ...args) {
+// DL('kľúč', hodnota0, hodnota1 …) → text dialógu v aktuálnom jazyku (chýbajúci preklad nahradí anglický)
+function DL(key, ...args) {
   const s = (DLG[LANG] && DLG[LANG].get(key)) ?? (DLG.en && DLG.en.get(key));
   if (s == null) { console.warn('Chýba text dialógu:', key); return key; }
   return args.length ? s.replace(/\{(\d+)\}/g, (m, k) => (args[k] ?? m)) : s;
 }
-L.has = (key) => !!((DLG[LANG] && DLG[LANG].has(key)) || (DLG.en && DLG.en.has(key)));
+DL.has = (key) => !!((DLG[LANG] && DLG[LANG].has(key)) || (DLG.en && DLG.en.has(key)));
 
 function setLang(lang) {
   if (!LANGS.includes(lang) || lang === LANG) return;

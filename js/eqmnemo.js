@@ -7,8 +7,8 @@
 
 const MODES = ['pictures', 'equations'];
 const MODE_NAME = {
-  pictures: tr('🖼 Odporúčaná · obrazy najprv', '🖼 Recommended · pictures first', '🖼 Рекомендована · спершу образи'),
-  equations: tr('∑ Experimentálna · symboly najprv', '∑ Experimental · symbols first', '∑ Експериментальна · спершу символи'),
+  pictures: tr('🖼 Prevažne ľudský jazyk', '🖼 Mainly Human Language', '🖼 Переважно людська мова'),
+  equations: tr('∑ Jazyk rovníc (experimentálny)', '∑ Equation Language (Experimental)', '∑ Мова рівнянь (експериментальна)'),
 };
 const MODE_DESC = {
   pictures: tr('pôvodná hra: najprv obraz a intuícia (ručičky, Blochova guľa, pokusy), rovnice len v paneli teórie',
@@ -222,7 +222,7 @@ const EqM = {
       + '<div class="eqscene"><div class="eqrows"></div></div>';
     document.body.appendChild(st);
     this.rowsEl = st.querySelector('.eqrows'); this.sceneEl = st.querySelector('.eqscene'); this.titleEl = st.querySelector('.eqt');
-    // 🔑 kľúč mnemotechniky: tlačidlo vpravo hore (len v type „Experimentálna“) — dostupné vždy, aj na ostrove a počas dialógu
+    // 🔑 kľúč mnemotechniky: tlačidlo vpravo hore (len v type „Jazyk rovníc“) — dostupné vždy, aj na ostrove a počas dialógu
     const leg = this.keyEl = el('div', 'eqlegend'); leg.id = 'eqkey';
     leg.innerHTML = this.keyHtml();
     leg.dataset.t = 'dict';

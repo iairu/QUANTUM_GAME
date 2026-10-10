@@ -17,9 +17,9 @@ class L2Stern extends Level {
   intro() {
     this.quest(tr('Vypočuj si Sterna a Gerlacha', 'Listen to Stern and Gerlach', 'Послухай Штерна та Ґерлаха'), { easy: tr('💬 Stern & Gerlach', '💬 Stern & Gerlach', '💬 Штерн і Ґерлах'), hard: tr('SG: Ag, nehomogénne B, ±ħ/2', 'SG: Ag, inhomogeneous B, ±ħ/2', 'ШҐ: Ag, неоднорідне B, ±ħ/2') });
     this.say([
-      { who: L('l2.intro.1.0.who'), face: '🧲', text: L('l2.intro.1.0.text') },
-      { who: L('l2.intro.1.1.who'), face: '🧲', text: L('l2.intro.1.1.text') },
-      { who: L('l2.intro.1.2.who'), face: '🧲', text: L('l2.intro.1.2.text') },
+      { who: DL('l2.intro.1.0.who'), face: '🧲', text: DL('l2.intro.1.0.text') },
+      { who: DL('l2.intro.1.1.who'), face: '🧲', text: DL('l2.intro.1.1.text') },
+      { who: DL('l2.intro.1.2.who'), face: '🧲', text: DL('l2.intro.1.2.text') },
     ], () => this.next());
   }
 
@@ -31,12 +31,12 @@ class L2Stern extends Level {
       const need = byDiff(30, 50, 80);
       if (this.f.s1 || this.seen.q < need || this.seen.c < need) return;
       this.f.s1 = true;
-      this.ask({ q: L('l2.twoSpots.1.q'), options: [L('l2.twoSpots.1.options.0'), L('l2.twoSpots.1.options.1'), L('l2.twoSpots.1.options.2')], correct: 0,
-        why: L('l2.twoSpots.1.why') }, () => {
+      this.ask({ q: DL('l2.twoSpots.1.q'), options: [DL('l2.twoSpots.1.options.0'), DL('l2.twoSpots.1.options.1'), DL('l2.twoSpots.1.options.2')], correct: 0,
+        why: DL('l2.twoSpots.1.why') }, () => {
         this.grant(['stern', 'gerlach', 'Sz', 'hbar', 'spinhalf']);
         this.say([
-          { who: L('l2.twoSpots.2.0.who'), face: '🧲', text: L('l2.twoSpots.2.0.text') },
-          { who: L('l2.twoSpots.2.1.who'), face: '🧲', text: L('l2.twoSpots.2.1.text') },
+          { who: DL('l2.twoSpots.2.0.who'), face: '🧲', text: DL('l2.twoSpots.2.0.text') },
+          { who: DL('l2.twoSpots.2.1.who'), face: '🧲', text: DL('l2.twoSpots.2.1.text') },
         ], () => this.next());
       });
     };
@@ -49,8 +49,8 @@ class L2Stern extends Level {
     const n = byDiff(25, 40, 60);
     this.quest(tr(`Vyskúšaj zostavu A (Z+ → Z) a zostavu B (Z+ → X+ → Z). Pri každej musí na tienidlo dopadnúť aspoň ${n} atómov (filtre časť pohltia).`, `Try setup A (Z+ → Z) and setup B (Z+ → X+ → Z). For each, at least ${n} atoms must reach the screen (filters absorb some).`, `Спробуй схему A (Z+ → Z) і схему B (Z+ → X+ → Z). Для кожної на екран має потрапити щонайменше ${n} атомів (фільтри частину поглинуть).`), { easy: tr(`🧲 Zostava A · Zostava B · ${n} atómov`, `🧲 Setup A · Setup B · ${n} atoms`, `🧲 Схема A · Схема B · ${n} атомів`), hard: `A: Z+ → Z · B: Z+ → X+ → Z · N ≥ ${n}` });
     this.say([
-      { who: L('l2.sequences.1.0.who'), face: '🧲', text: L('l2.sequences.1.0.text') },
-      { who: L('l2.sequences.1.1.who'), face: '🧲', text: L('l2.sequences.1.1.text') },
+      { who: DL('l2.sequences.1.0.who'), face: '🧲', text: DL('l2.sequences.1.0.text') },
+      { who: DL('l2.sequences.1.1.who'), face: '🧲', text: DL('l2.sequences.1.1.text') },
     ]);
     this.check = () => {
       const sig = this.sig(), tot = this.cnt.up + this.cnt.down, need = byDiff(25, 40, 60);
@@ -58,8 +58,8 @@ class L2Stern extends Level {
       if (sig === 'z+|x+|z' && tot >= need && !this.f.B) { this.f.B = true; UI.toast(tr(`✅ Zostava B: hore ${Fmt.pct(this.cnt.up / tot)} — znova 50/50!`, `✅ Setup B: up ${Fmt.pct(this.cnt.up / tot)} — 50/50 again!`, `✅ Схема B: угору ${Fmt.pct(this.cnt.up / tot)} — знову 50/50!`)); }
       if (this.f.A && this.f.B && !this.f.s2) {
         this.f.s2 = true;
-        setTimeout(() => this.ask({ q: L('l2.sequences.2.q'), options: [L('l2.sequences.2.options.0'), L('l2.sequences.2.options.1'), L('l2.sequences.2.options.2')], correct: 0,
-          why: L('l2.sequences.2.why') }, () => {
+        setTimeout(() => this.ask({ q: DL('l2.sequences.2.q'), options: [DL('l2.sequences.2.options.0'), DL('l2.sequences.2.options.1'), DL('l2.sequences.2.options.2')], correct: 0,
+          why: DL('l2.sequences.2.why') }, () => {
           this.grant(['basisq', 'ket0']);
           this.next();
         }), 600);
@@ -76,9 +76,9 @@ class L2Stern extends Level {
     this.quest(tr(`Predpovedz výsledok a over ho: druhý magnet je otočený o ${a}°.`, `Predict the result and test it: the second magnet is rotated by ${a}°.`, `Передбач результат і перевір його: другий магніт повернуто на ${a}°.`), { easy: tr(`🤔 Tipni: magnet ${a}°`, `🤔 Guess: magnet ${a}°`, `🤔 Вгадай: магніт ${a}°`), hard: `P(+ | +z, ${a}°) = ?` });
     const pc = (x) => Fmt.pct(x), opts = [p, 1 - p, 0.5, 1].map((x) => tr(`približne ${pc(x)}`, `about ${pc(x)}`, `приблизно ${pc(x)}`));
     this.ask({
-      q: L('l2.predict.1', a),
+      q: DL('l2.predict.1', a),
       options: opts, correct: 0,
-      why: L('l2.predict.2', a, pc(p)),
+      why: DL('l2.predict.2', a, pc(p)),
     }, () => {
       this.hideTheory = false; this.updStats();
       const need = byDiff(60, 100, 200);
@@ -87,7 +87,7 @@ class L2Stern extends Level {
         const tot = this.cnt.up + this.cnt.down;
         if (this.sig() === `z+|${a}°` && tot >= byDiff(60, 100, 200) && !this.f.s3) {
           this.f.s3 = true;
-          this.say([{ who: L('l2.predict.3'), face: '🧲', text: L('l2.predict.4', Fmt.pct(this.cnt.up / tot), pc(p)) }], () => this.next());
+          this.say([{ who: DL('l2.predict.3'), face: '🧲', text: DL('l2.predict.4', Fmt.pct(this.cnt.up / tot), pc(p)) }], () => this.next());
         }
       };
     });

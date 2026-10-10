@@ -16,10 +16,10 @@ class L1Complex extends Level {
   intro() {
     this.quest(tr('Vypočuj si Eulera', 'Listen to Euler', 'Послухай Ейлера'), { easy: tr('💬 Euler', '💬 Euler', '💬 Ейлер'), hard: tr('Euler: α = |α|e<sup>iφ</sup>, P = |α|²', 'Euler: α = |α|e<sup>iφ</sup>, P = |α|²', 'Ейлер: α = |α|e<sup>iφ</sup>, P = |α|²') });
     this.say([
-      L('l1.intro.1'),
-      L('l1.intro.2'),
-      L('l1.intro.3'),
-      L('l1.intro.4'),
+      DL('l1.intro.1'),
+      DL('l1.intro.2'),
+      DL('l1.intro.3'),
+      DL('l1.intro.4'),
     ], () => this.next());
   }
 
@@ -44,8 +44,8 @@ class L1Complex extends Level {
       if (!this.done1 && dist < byDiff(0.12, 0.06, 0.03)) {
         this.done1 = true;
         this.grant(['euler', 'eiphi', 'amp']);
-        this.say([L('l1.upd.1')], () =>
-          this.ask({ q: L('l1.upd.2.q'), options: [L('l1.upd.2.options.0'), L('l1.upd.2.options.1'), L('l1.upd.2.options.2')], correct: 0, why: L('l1.upd.2.why') }, () => this.next()));
+        this.say([DL('l1.upd.1')], () =>
+          this.ask({ q: DL('l1.upd.2.q'), options: [DL('l1.upd.2.options.0'), DL('l1.upd.2.options.1'), DL('l1.upd.2.options.2')], correct: 0, why: DL('l1.upd.2.why') }, () => this.next()));
       }
     };
     UI.panelSet(tr('Ručička amplitúdy α', 'Amplitude hand α', 'Стрілка амплітуди α'), [
@@ -70,9 +70,9 @@ class L1Complex extends Level {
         this.done2 = true;
         setTimeout(() => {
           this.grant(['i']);
-          this.say([L('l1.press.1.0', this.presses, this.presses === 2 ? 'stlačenia' : 'stlačení'),
-            L('l1.press.1.1')], () =>
-            this.ask({ q: L('l1.press.2.q'), options: [L('l1.press.2.options.0'), L('l1.press.2.options.1'), L('l1.press.2.options.2')], correct: 0, why: L('l1.press.2.why') }, () => this.next()));
+          this.say([DL('l1.press.1.0', this.presses, this.presses === 2 ? 'stlačenia' : 'stlačení'),
+            DL('l1.press.1.1')], () =>
+            this.ask({ q: DL('l1.press.2.q'), options: [DL('l1.press.2.options.0'), DL('l1.press.2.options.1'), DL('l1.press.2.options.2')], correct: 0, why: DL('l1.press.2.why') }, () => this.next()));
         }, 700);
       }
     };
@@ -88,9 +88,9 @@ class L1Complex extends Level {
     this.mode = 'int'; this.ph2 = 0; this.gotZero = false; this.gotMax = false;
     this.quest(tr('Dve cesty k tomu istému výsledku. Nájdi fázu, pri ktorej sa amplitúdy úplne VYRUŠIA (P = 0), aj fázu, pri ktorej je P maximálne.', 'Two paths to the same outcome. Find the phase at which the amplitudes fully CANCEL (P = 0), and the phase at which P is maximal.', 'Два шляхи до того самого результату. Знайди фазу, за якої амплітуди повністю ГАСЯТЬСЯ (P = 0), і фазу, за якої P максимальна.'), { easy: tr('🔍 P = 0 · potom P = 1', '🔍 P = 0 · then P = 1', '🔍 P = 0 · потім P = 1'), hard: '|½ + ½e<sup>iφ</sup>|² → 0, 1 · φ = ?' });
     this.say([
-      L('l1.interference.1'),
-      L('l1.interference.2'),
-      L('l1.interference.3'),
+      DL('l1.interference.1'),
+      DL('l1.interference.2'),
+      DL('l1.interference.3'),
     ]);
     const info = UI.info(''), chart = UI.chart();
     this.visited = [];
@@ -118,8 +118,8 @@ class L1Complex extends Level {
         this.done3 = true;
         setTimeout(() => {
           this.grant(['interf', 'abs2', 'ReIm', 'conj']);
-          this.say([L('l1.upd.3'),
-            L('l1.upd.4')], () => this.next());
+          this.say([DL('l1.upd.3'),
+            DL('l1.upd.4')], () => this.next());
         }, 500);
       }
       return Fmt.angle(v);

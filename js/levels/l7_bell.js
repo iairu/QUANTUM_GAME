@@ -16,9 +16,9 @@ class L7Bell extends Level {
   intro() {
     this.quest(tr('Vypočuj si Bella a Einsteina', 'Listen to Bell and Einstein', 'Послухай Белла та Ейнштейна'), { easy: tr('💬 Bell & Einstein', '💬 Bell & Einstein', '💬 Белл & Ейнштейн'), hard: tr('EPR 1935 vs. Bell 1964', 'EPR 1935 vs. Bell 1964', 'ЕПР 1935 проти Белла 1964') });
     this.say([
-      L('l7.intro.1.0'),
-      { ...this.E, text: L('l7.intro.1.1.text') },
-      L('l7.intro.1.2'),
+      DL('l7.intro.1.0'),
+      { ...this.E, text: DL('l7.intro.1.1.text') },
+      DL('l7.intro.1.2'),
     ], () => this.next());
   }
 
@@ -43,8 +43,8 @@ class L7Bell extends Level {
     if (this.stepIdx === 1 && !this.flags.b && C.abs2(this.psi.reduce((s, c, i) => C.add(s, C.mul(C.conj(this.bell()[i]), c)), C.of(0))) > 0.999) {
       this.flags.b = true;
       this.grant(['cnot', 'phiplus', 'entangle']);
-      this.say([L('l7.after.1.0'),
-        L('l7.after.1.1')], () => this.next());
+      this.say([DL('l7.after.1.0'),
+        DL('l7.after.1.1')], () => this.next());
     }
   }
 
@@ -74,9 +74,9 @@ class L7Bell extends Level {
       this.flags.ns = true;
       this.grant(['nosignal', 'einstein']);
       setTimeout(() => this.say([
-        { ...this.E, text: L('l7.measurePairs.1.0.text') },
-        L('l7.measurePairs.1.1'),
-        L('l7.measurePairs.1.2'),
+        { ...this.E, text: DL('l7.measurePairs.1.0.text') },
+        DL('l7.measurePairs.1.1'),
+        DL('l7.measurePairs.1.2'),
       ], () => this.next()), 300);
     }
   }
@@ -85,10 +85,10 @@ class L7Bell extends Level {
     this.showAxes = true;
     this.quest(tr('CHSH hra: nastav uhly meraní tak, aby tím vyhral viac ako 80 % kôl (klasicky najviac 75 %).', 'CHSH game: set the measurement angles so that the team wins more than 80 % of rounds (classically at most 75 %).', 'Гра CHSH: налаштуй кути вимірювань так, щоб команда вигравала понад 80 % раундів (класично щонайбільше 75 %).'), { easy: tr(`🎲 vyhraj > ${Fmt.pct(byDiff(0.78, 0.8, 0.83))}`, `🎲 win > ${Fmt.pct(byDiff(0.78, 0.8, 0.83))}`, `🎲 виграй > ${Fmt.pct(byDiff(0.78, 0.8, 0.83))}`), hard: `a⊕b = x·y · P<sub>win</sub> > ${Fmt.pct(byDiff(0.78, 0.8, 0.83))} · ${tr('klasicky', 'classical', 'класично')} ≤ 75 % · cos²(π/8) ≈ 85 %` });
     this.say([
-      L('l7.chsh.1.0'),
-      L('l7.chsh.1.1'),
-      { ...this.E, text: L('l7.chsh.1.2.text') },
-      L('l7.chsh.1.3'),
+      DL('l7.chsh.1.0'),
+      DL('l7.chsh.1.1'),
+      { ...this.E, text: DL('l7.chsh.1.2.text') },
+      DL('l7.chsh.1.3'),
     ], () => {
       this.read = UI.info('');
       this.chart = UI.chart(300, 130); this.pairWin = null;
@@ -117,9 +117,9 @@ class L7Bell extends Level {
     if (p > byDiff(0.78, 0.8, 0.83) && !this.flags.chsh) {
       this.flags.chsh = true;
       this.grant(['bell', 'chsh']);
-      this.say([L('l7.play.1.0', Fmt.pct(p)),
-        { ...this.E, text: L('l7.play.1.1.text') },
-        L('l7.play.1.2')], () => this.next());
+      this.say([DL('l7.play.1.0', Fmt.pct(p)),
+        { ...this.E, text: DL('l7.play.1.1.text') },
+        DL('l7.play.1.2')], () => this.next());
     }
   }
   // výhra pre každú dvojicu (x, y): teória (|Φ⁺⟩, osi v rovine xz) P(rovnaké) = cos²((a − b)/2) a namerané

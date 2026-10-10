@@ -3,29 +3,29 @@
 
 const PHILOSOPHERS = [
   { id: 'kant', name: 'Immanuel Kant', face: '📜', col: [0.8, 0.7, 0.5],
-    lines: [L('l8.kant.lines.0'),
-      L('l8.kant.lines.1')],
-    q: { q: L('l8.kant.q.q'), options: [L('l8.kant.q.options.0'), L('l8.kant.q.options.1'), L('l8.kant.q.options.2')], correct: 0, why: L('l8.kant.q.why') } },
+    lines: [DL('l8.kant.lines.0'),
+      DL('l8.kant.lines.1')],
+    q: { q: DL('l8.kant.q.q'), options: [DL('l8.kant.q.options.0'), DL('l8.kant.q.options.1'), DL('l8.kant.q.options.2')], correct: 0, why: DL('l8.kant.q.why') } },
   { id: 'wittg', name: 'Ludwig Wittgenstein', face: '🗣', col: [0.6, 0.6, 0.8],
-    lines: [L('l8.wittg.lines.0'),
-      L('l8.wittg.lines.1')],
-    q: { q: L('l8.wittg.q.q'), options: [L('l8.wittg.q.options.0'), L('l8.wittg.q.options.1'), L('l8.wittg.q.options.2')], correct: 0, why: L('l8.wittg.q.why') } },
+    lines: [DL('l8.wittg.lines.0'),
+      DL('l8.wittg.lines.1')],
+    q: { q: DL('l8.wittg.q.q'), options: [DL('l8.wittg.q.options.0'), DL('l8.wittg.q.options.1'), DL('l8.wittg.q.options.2')], correct: 0, why: DL('l8.wittg.q.why') } },
   { id: 'stodola', name: 'Aurel Stodola', face: '⚙️', col: [0.5, 0.75, 0.6],
-    lines: [L('l8.stodola.lines.0'),
-      L('l8.stodola.lines.1')],
-    q: { q: L('l8.stodola.q.q'), options: [L('l8.stodola.q.options.0'), L('l8.stodola.q.options.1'), L('l8.stodola.q.options.2')], correct: 0, why: L('l8.stodola.q.why') } },
+    lines: [DL('l8.stodola.lines.0'),
+      DL('l8.stodola.lines.1')],
+    q: { q: DL('l8.stodola.q.q'), options: [DL('l8.stodola.q.options.0'), DL('l8.stodola.q.options.1'), DL('l8.stodola.q.options.2')], correct: 0, why: DL('l8.stodola.q.why') } },
   { id: 'bohm', name: 'David Bohm', face: '🌊', col: [0.4, 0.6, 0.9],
-    lines: [L('l8.bohm.lines.0'),
-      L('l8.bohm.lines.1')],
-    q: { q: L('l8.bohm.q.q'), options: [L('l8.bohm.q.options.0'), L('l8.bohm.q.options.1'), L('l8.bohm.q.options.2')], correct: 0, why: L('l8.bohm.q.why') } },
+    lines: [DL('l8.bohm.lines.0'),
+      DL('l8.bohm.lines.1')],
+    q: { q: DL('l8.bohm.q.q'), options: [DL('l8.bohm.q.options.0'), DL('l8.bohm.q.options.1'), DL('l8.bohm.q.options.2')], correct: 0, why: DL('l8.bohm.q.why') } },
   { id: 'heis', name: 'Werner Heisenberg', face: '🎼', col: [0.85, 0.55, 0.45],
-    lines: [L('l8.heis.lines.0'),
-      L('l8.heis.lines.1')],
-    q: { q: L('l8.heis.q.q'), options: [L('l8.heis.q.options.0'), L('l8.heis.q.options.1'), L('l8.heis.q.options.2')], correct: 0, why: L('l8.heis.q.why') } },
+    lines: [DL('l8.heis.lines.0'),
+      DL('l8.heis.lines.1')],
+    q: { q: DL('l8.heis.q.q'), options: [DL('l8.heis.q.options.0'), DL('l8.heis.q.options.1'), DL('l8.heis.q.options.2')], correct: 0, why: DL('l8.heis.q.why') } },
   { id: 'noether', name: 'Emmy Noether', face: '♾', col: [0.75, 0.5, 0.85],
-    lines: [L('l8.noether.lines.0'),
-      L('l8.noether.lines.1')],
-    q: { q: L('l8.noether.q.q'), options: [L('l8.noether.q.options.0'), L('l8.noether.q.options.1'), L('l8.noether.q.options.2')], correct: 0, why: L('l8.noether.q.why') } },
+    lines: [DL('l8.noether.lines.0'),
+      DL('l8.noether.lines.1')],
+    q: { q: DL('l8.noether.q.q'), options: [DL('l8.noether.q.options.0'), DL('l8.noether.q.options.1'), DL('l8.noether.q.options.2')], correct: 0, why: DL('l8.noether.q.why') } },
 ];
 const PHILOSOPHERS_EN = { // mená mysliteľov (repliky a otázky sú v lang/*.csv)
 
@@ -52,10 +52,10 @@ class L8Philo extends Level {
   intro() {
     this.quest(tr('Vypočuj si Bohra', 'Listen to Bohr', 'Послухай Бора'), { easy: tr('💬 Bohr', '💬 Bohr', '💬 Бор'), hard: tr('Bohr: komplementarita', 'Bohr: complementarity', 'Бор: доповнювальність') });
     this.say([
-      L('l8.intro.1.0'),
-      L('l8.intro.1.1'),
-      L('l8.intro.1.2'),
-      L('l8.intro.1.3'),
+      DL('l8.intro.1.0'),
+      DL('l8.intro.1.1'),
+      DL('l8.intro.1.2'),
+      DL('l8.intro.1.3'),
     ], () => this.next());
   }
 
@@ -87,17 +87,17 @@ class L8Philo extends Level {
     UI.panelHide();
     this.quest(tr('Záverečná úloha Bohra: tri roviny otázok a štyri otázky ku každému pojmu', 'Bohr’s final task: three levels of questions and four questions for every concept', 'Підсумкове завдання Бора: три рівні питань і чотири питання до кожного поняття'), { easy: tr('🗂 zatrieď otázky', '🗂 sort the questions', '🗂 розсортуй питання'), hard: tr('ontológia / epistemológia / fenomenológia · 4 otázky', 'ontology / epistemology / phenomenology · 4 questions', 'онтологія / епістемологія / феноменологія · 4 питання') });
     this.say([
-      L('l8.sorting.1.0'),
-      L('l8.sorting.1.1'),
+      DL('l8.sorting.1.0'),
+      DL('l8.sorting.1.1'),
     ], () => UI.quizSeries([
-      { who: L('l8.sorting.2.0.who'), face: '☯', q: L('l8.sorting.2.0.q'), options: [L('l8.sorting.2.0.options.0'), L('l8.sorting.2.0.options.1'), L('l8.sorting.2.0.options.2')], correct: 0, why: L('l8.sorting.2.0.why') },
-      { who: L('l8.sorting.2.1.who'), face: '☯', q: L('l8.sorting.2.1.q'), options: [L('l8.sorting.2.1.options.0'), L('l8.sorting.2.1.options.1'), L('l8.sorting.2.1.options.2')], correct: 0, why: L('l8.sorting.2.1.why') },
-      { who: L('l8.sorting.2.2.who'), face: '☯', q: L('l8.sorting.2.2.q'), options: [L('l8.sorting.2.2.options.0'), L('l8.sorting.2.2.options.1'), L('l8.sorting.2.2.options.2')], correct: 0, why: L('l8.sorting.2.2.why') },
-      { who: L('l8.sorting.2.3.who'), face: '☯', q: L('l8.sorting.2.3.q'), options: [L('l8.sorting.2.3.options.0'), L('l8.sorting.2.3.options.1'), L('l8.sorting.2.3.options.2'), L('l8.sorting.2.3.options.3')], correct: 0, why: L('l8.sorting.2.3.why') },
+      { who: DL('l8.sorting.2.0.who'), face: '☯', q: DL('l8.sorting.2.0.q'), options: [DL('l8.sorting.2.0.options.0'), DL('l8.sorting.2.0.options.1'), DL('l8.sorting.2.0.options.2')], correct: 0, why: DL('l8.sorting.2.0.why') },
+      { who: DL('l8.sorting.2.1.who'), face: '☯', q: DL('l8.sorting.2.1.q'), options: [DL('l8.sorting.2.1.options.0'), DL('l8.sorting.2.1.options.1'), DL('l8.sorting.2.1.options.2')], correct: 0, why: DL('l8.sorting.2.1.why') },
+      { who: DL('l8.sorting.2.2.who'), face: '☯', q: DL('l8.sorting.2.2.q'), options: [DL('l8.sorting.2.2.options.0'), DL('l8.sorting.2.2.options.1'), DL('l8.sorting.2.2.options.2')], correct: 0, why: DL('l8.sorting.2.2.why') },
+      { who: DL('l8.sorting.2.3.who'), face: '☯', q: DL('l8.sorting.2.3.q'), options: [DL('l8.sorting.2.3.options.0'), DL('l8.sorting.2.3.options.1'), DL('l8.sorting.2.3.options.2'), DL('l8.sorting.2.3.options.3')], correct: 0, why: DL('l8.sorting.2.3.why') },
     ], (m) => {
       this.mistakes += m;
       this.grant(['bohr', 'collapse', 'onto', 'four']);
-      this.say([L('l8.sorting.3')], () => this.next());
+      this.say([DL('l8.sorting.3')], () => this.next());
     }));
   }
 

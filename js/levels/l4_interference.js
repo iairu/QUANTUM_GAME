@@ -32,17 +32,17 @@ class L4Interference extends Level {
   intro() {
     this.quest(tr('Vypočuj si Feynmana', 'Listen to Feynman', 'Послухай Фейнмана'), { easy: tr('💬 Feynman', '💬 Feynman', '💬 Фейнман'), hard: tr('Feynman: H·H, ρ, koherencia', 'Feynman: H·H, ρ, coherence', 'Фейнман: H·H, ρ, когерентність') });
     this.say([
-      L('l4.intro.1.0'),
-      L('l4.intro.1.1'),
-      L('l4.intro.1.2'),
-      L('l4.intro.1.3'),
+      DL('l4.intro.1.0'),
+      DL('l4.intro.1.1'),
+      DL('l4.intro.1.2'),
+      DL('l4.intro.1.3'),
     ], () => this.next());
   }
 
   pure() {
     this.mode = 'none'; this.resetHist();
-    this.ask({ q: L('l4.pure.1.q'), options: [L('l4.pure.1.options.0'), L('l4.pure.1.options.1'), L('l4.pure.1.options.2')], correct: 0,
-      why: L('l4.pure.1.why') }, () => {
+    this.ask({ q: DL('l4.pure.1.q'), options: [DL('l4.pure.1.options.0'), DL('l4.pure.1.options.1'), DL('l4.pure.1.options.2')], correct: 0,
+      why: DL('l4.pure.1.why') }, () => {
       const n = byDiff(30, 50, 100);
       this.quest(tr(`Pošli aspoň ${n} qubitov cez H → H (stred chrámu prázdny). Sleduj stĺpce ρ!`, `Send at least ${n} qubits through H → H (temple centre empty). Watch the ρ bars!`, `Надішли щонайменше ${n} кубітів крізь H → H (центр храму порожній). Стеж за стовпчиками ρ!`), {
         easy: tr(`📤 ${n} qubitov · H → H`, `📤 ${n} qubits · H → H`, `📤 ${n} кубітів · H → H`), hard: `|0⟩ → H → H → M<sub>Z</sub> · N ≥ ${n} · ρ₀₁ ?` });
@@ -52,8 +52,8 @@ class L4Interference extends Level {
 
   withMeasure() {
     this.mode = 'meas'; this.resetHist();
-    this.ask({ q: L('l4.withMeasure.1.q'), options: [L('l4.withMeasure.1.options.0'), L('l4.withMeasure.1.options.1'), L('l4.withMeasure.1.options.2')], correct: 0,
-      why: L('l4.withMeasure.1.why') }, () => {
+    this.ask({ q: DL('l4.withMeasure.1.q'), options: [DL('l4.withMeasure.1.options.0'), DL('l4.withMeasure.1.options.1'), DL('l4.withMeasure.1.options.2')], correct: 0,
+      why: DL('l4.withMeasure.1.why') }, () => {
       const n = byDiff(30, 50, 100);
       this.quest(tr(`Pošli aspoň ${n} qubitov s meraním v strede. Pozri, čo sa stane s mimodiagonálnymi stĺpcami ρ.`, `Send at least ${n} qubits with the measurement in the centre. See what happens to the off-diagonal ρ bars.`, `Надішли щонайменше ${n} кубітів із вимірюванням у центрі. Подивися, що станеться з позадіагональними стовпчиками ρ.`), {
         easy: tr(`📤 ${n} qubitov · 👁 meranie v strede`, `📤 ${n} qubits · 👁 measurement in the middle`, `📤 ${n} кубітів · 👁 вимірювання посередині`), hard: `H → M<sub>Z</sub>(${tr('zabudnuté', 'forgotten', 'забуте')}) → H · N ≥ ${n} · ρ₀₁ → 0` });
@@ -66,9 +66,9 @@ class L4Interference extends Level {
     this.target = byDiff(0.75, 0.75, [0.6, 0.65, 0.7, 0.8, 0.85, 0.9][Math.floor(rand() * 6)]);
     const T = Fmt.pct(this.target), n = byDiff(30, 50, 100);
     this.say([
-      L('l4.deco.1.0'),
-      L('l4.deco.1.1', T, n),
-      L('l4.deco.1.2'),
+      DL('l4.deco.1.0'),
+      DL('l4.deco.1.1', T, n),
+      DL('l4.deco.1.2'),
     ], () => {
       this.quest(tr(`Nastav dekoherenciu p (a fázu φ) tak, aby P(0) = ${T}, a pošli aspoň ${n} qubitov.`, `Set the decoherence p (and the phase φ) so that P(0) = ${T}, and send at least ${n} qubits.`, `Встанови декогеренцію p (і фазу φ) так, щоб P(0) = ${T}, і надішли щонайменше ${n} кубітів.`), {
         easy: tr(`🌫 p → P(0) = ${T} · 📤 ${n}`, `🌫 p → P(0) = ${T} · 📤 ${n}`, `🌫 p → P(0) = ${T} · 📤 ${n}`),
@@ -125,18 +125,18 @@ class L4Interference extends Level {
     if (this.stepIdx === 1 && !this.f.a) {
       this.f.a = true;
       this.grant(['feynman', 'coh']);
-      this.say([L('l4.check.1')], () => this.next());
+      this.say([DL('l4.check.1')], () => this.next());
     } else if (this.stepIdx === 2 && !this.f.b) {
       this.f.b = true;
       this.grant(['rho', 'mix', 'supmix']);
-      this.say([L('l4.check.2.0'),
-        L('l4.check.2.1')], () => this.next());
+      this.say([DL('l4.check.2.0'),
+        DL('l4.check.2.1')], () => this.next());
     } else if (this.stepIdx === 3 && !this.f.c && this.mode === 'deco' && Math.abs(this.P0() - this.target) < byDiff(0.06, 0.03, 0.015)) {
       this.f.c = true;
       this.grant(['deco', 'dagger']);
-      this.say([L('l4.check.3.0', Fmt.num(this.p, 2), Fmt.pct(1 - this.p), Fmt.pct(this.P0())),
-        L('l4.check.3.1'),
-        L('l4.check.3.2')], () => this.next());
+      this.say([DL('l4.check.3.0', Fmt.num(this.p, 2), Fmt.pct(1 - this.p), Fmt.pct(this.P0())),
+        DL('l4.check.3.1'),
+        DL('l4.check.3.2')], () => this.next());
     }
   }
 

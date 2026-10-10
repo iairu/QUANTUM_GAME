@@ -110,9 +110,9 @@ const SHOUTS = {
 };
 
 const DRAGON_TRAPS = [
-  { q: L('l9.DRAGON_TRAPS.1.0.q'), options: [L('l9.DRAGON_TRAPS.1.0.options.0'), L('l9.DRAGON_TRAPS.1.0.options.1'), L('l9.DRAGON_TRAPS.1.0.options.2')], correct: 0, why: L('l9.DRAGON_TRAPS.1.0.why') },
-  { q: L('l9.DRAGON_TRAPS.1.1.q'), options: [L('l9.DRAGON_TRAPS.1.1.options.0'), L('l9.DRAGON_TRAPS.1.1.options.1'), L('l9.DRAGON_TRAPS.1.1.options.2')], correct: 0, why: L('l9.DRAGON_TRAPS.1.1.why') },
-  { q: L('l9.DRAGON_TRAPS.1.2.q'), options: [L('l9.DRAGON_TRAPS.1.2.options.0'), L('l9.DRAGON_TRAPS.1.2.options.1'), L('l9.DRAGON_TRAPS.1.2.options.2')], correct: 0, why: L('l9.DRAGON_TRAPS.1.2.why') },
+  { q: DL('l9.DRAGON_TRAPS.1.0.q'), options: [DL('l9.DRAGON_TRAPS.1.0.options.0'), DL('l9.DRAGON_TRAPS.1.0.options.1'), DL('l9.DRAGON_TRAPS.1.0.options.2')], correct: 0, why: DL('l9.DRAGON_TRAPS.1.0.why') },
+  { q: DL('l9.DRAGON_TRAPS.1.1.q'), options: [DL('l9.DRAGON_TRAPS.1.1.options.0'), DL('l9.DRAGON_TRAPS.1.1.options.1'), DL('l9.DRAGON_TRAPS.1.1.options.2')], correct: 0, why: DL('l9.DRAGON_TRAPS.1.1.why') },
+  { q: DL('l9.DRAGON_TRAPS.1.2.q'), options: [DL('l9.DRAGON_TRAPS.1.2.options.0'), DL('l9.DRAGON_TRAPS.1.2.options.1'), DL('l9.DRAGON_TRAPS.1.2.options.2')], correct: 0, why: DL('l9.DRAGON_TRAPS.1.2.why') },
 ];
 
 class L9Dragon extends Level {
@@ -132,11 +132,11 @@ class L9Dragon extends Level {
   intro() {
     this.quest(tr('Vypočuj si Schrödingera', 'Listen to Schrödinger', 'Послухай Шредінгера'), { easy: tr('💬 Schrödinger', '💬 Schrödinger', '💬 Шредінгер'), hard: tr('Súboj: štít = qubit, úder = meranie', 'Battle: ward = qubit, strike = measurement', 'Битва: захист = кубіт, удар = вимірювання') });
     this.say([
-      L('l9.intro.1.0'),
-      L('l9.intro.1.1'),
-      L('l9.intro.1.2'),
-      L('l9.intro.1.3'),
-      L('l9.intro.1.4', Fmt.pct(this.thr)),
+      DL('l9.intro.1.0'),
+      DL('l9.intro.1.1'),
+      DL('l9.intro.1.2'),
+      DL('l9.intro.1.3'),
+      DL('l9.intro.1.4', Fmt.pct(this.thr)),
     ], () => this.next());
   }
 
@@ -159,14 +159,14 @@ class L9Dragon extends Level {
     ][k];
     this.quest(qs[0], { easy: qs[1], hard: `P(${tr('hit', 'hit', 'влуч.')}) = (1 + r·n)/2 ≥ ${Fmt.pct(this.thr)} · HP ${this.dhp}` });
     const lines = [
-      [L('l9.lines.1.0.0'),
-        L('l9.lines.1.0.1')],
-      [L('l9.lines.1.1.0'),
-        L('l9.lines.1.1.1')],
-      [L('l9.lines.1.2.0'),
-        L('l9.lines.1.2.1')],
+      [DL('l9.lines.1.0.0'),
+        DL('l9.lines.1.0.1')],
+      [DL('l9.lines.1.1.0'),
+        DL('l9.lines.1.1.1')],
+      [DL('l9.lines.1.2.0'),
+        DL('l9.lines.1.2.1')],
     ][k];
-    this.say(lines.map((t) => (t.startsWith('🐉') ? { who: L('l9.startPhase.1'), face: '🐉', text: t.replace(/^🐉 <b>Ketvarr:<\/b> /, '') } : t.replace(/^Schrödinger: /, ''))), () => this.buildPanel());
+    this.say(lines.map((t) => (t.startsWith('🐉') ? { who: DL('l9.startPhase.1'), face: '🐉', text: t.replace(/^🐉 <b>Ketvarr:<\/b> /, '') } : t.replace(/^Schrödinger: /, ''))), () => this.buildPanel());
   }
 
   pickMove() {
@@ -284,32 +284,32 @@ class L9Dragon extends Level {
     UI.panelHide(); this.anim = null; Sound.sfx('roar');
     const k = this.phase;
     const msg = [
-      [L('l9.msg.1.0.0'), L('l9.msg.1.0.1')],
-      [L('l9.msg.1.1.0'), L('l9.msg.1.1.1')],
-      [L('l9.msg.1.2.0'), L('l9.msg.1.2.1')],
+      [DL('l9.msg.1.0.0'), DL('l9.msg.1.0.1')],
+      [DL('l9.msg.1.1.0'), DL('l9.msg.1.1.1')],
+      [DL('l9.msg.1.2.0'), DL('l9.msg.1.2.1')],
     ][k];
-    this.say([{ who: L('l9.phaseWon.1'), face: '🐉', text: msg[0] }, msg[1]], () => this.next());
+    this.say([{ who: DL('l9.phaseWon.1'), face: '🐉', text: msg[0] }, msg[1]], () => this.next());
   }
 
   defeated() {
     UI.panelHide(); this.mistakes += 2;
-    this.say([{ who: L('l9.defeated.1'), face: '🐉', text: L('l9.defeated.2') },
-      L('l9.defeated.3')],
+    this.say([{ who: DL('l9.defeated.1'), face: '🐉', text: DL('l9.defeated.2') },
+      DL('l9.defeated.3')],
     () => this.startPhase(this.phase));
   }
 
   finale() {
     UI.panelHide();
     this.quest(tr('Posledná skúška slov moci', 'The last test of the Words of Power', 'Останнє випробування слів сили'), { easy: tr('📝 Skúška', '📝 Exam', '📝 Іспит'), hard: tr('3 otázky o súboji', '3 questions about the battle', '3 питання про битву') });
-    this.say([L('l9.finale.1')], () => {
+    this.say([DL('l9.finale.1')], () => {
       UI.quizSeries([...DRAGON_TRAPS, ...ancientTraps(this.num)].map((q) => ({ who: this.mentor, face: this.face, ...q })), (m) => {
         this.mistakes += m;
         const k = this.mistakes, stars = byDiff(k <= 2 ? 3 : k <= 5 ? 2 : 1, k <= 1 ? 3 : k <= 3 ? 2 : 1, k === 0 ? 3 : k <= 2 ? 2 : 1);
         Game.completeLevel(this.num, stars);
         const rating = '★'.repeat(stars) + '☆'.repeat(3 - stars);
         this.say([
-          { who: L('l9.finale.2'), face: '🐉', text: L('l9.finale.3') },
-          L('l9.finale.4', rating, this.mistakes),
+          { who: DL('l9.finale.2'), face: '🐉', text: DL('l9.finale.3') },
+          DL('l9.finale.4', rating, this.mistakes),
         ], () => Game.backToHub());
       });
     });

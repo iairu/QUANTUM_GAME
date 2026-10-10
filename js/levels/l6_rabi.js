@@ -16,10 +16,10 @@ class L6Rabi extends Level {
   intro() {
     this.quest(tr('Vypočuj si Rabiho', 'Listen to Rabi', 'Послухай Рабі'), { easy: tr('💬 Rabi & Zeeman', '💬 Rabi & Zeeman', '💬 Рабі & Zeeman'), hard: tr('NMR: B₀ → 2 hladiny, RF → rotácie', 'NMR: B₀ → 2 levels, RF → rotations', 'ЯМР: B₀ → 2 рівні, РЧ → повороти') });
     this.say([
-      L('l6.intro.1.0'),
-      { who: L('l6.intro.1.1.who'), face: '🧪', text: L('l6.intro.1.1.text') },
-      L('l6.intro.1.2'),
-      L('l6.intro.1.3'),
+      DL('l6.intro.1.0'),
+      { who: DL('l6.intro.1.1.who'), face: '🧪', text: DL('l6.intro.1.1.text') },
+      DL('l6.intro.1.2'),
+      DL('l6.intro.1.3'),
     ], () => this.next());
   }
 
@@ -56,10 +56,10 @@ class L6Rabi extends Level {
     this.onFrame = () => {
       if (this.labTime < 4 || this.flags.p) return;
       this.flags.p = true;
-      this.ask({ q: L('l6.precession.1.q'), options: [L('l6.precession.1.options.0'), L('l6.precession.1.options.1'), L('l6.precession.1.options.2')], correct: 0,
-        why: L('l6.precession.1.why') }, () => {
+      this.ask({ q: DL('l6.precession.1.q'), options: [DL('l6.precession.1.options.0'), DL('l6.precession.1.options.1'), DL('l6.precession.1.options.2')], correct: 0,
+        why: DL('l6.precession.1.why') }, () => {
         this.grant(['zeeman', 'B0', 'precess', 'rotframe']);
-        this.say([L('l6.precession.2')], () => this.next());
+        this.say([DL('l6.precession.2')], () => this.next());
       });
     };
   }
@@ -72,8 +72,8 @@ class L6Rabi extends Level {
       if (this.r[2] < -byDiff(0.9, 0.96, 0.99) && !this.flags.pi) {
         this.flags.pi = true;
         this.grant(['rabi', 'OmegaR', 'rabiosc']);
-        this.say([L('l6.piPulse.1.0'),
-          L('l6.piPulse.1.1')], () => this.next());
+        this.say([DL('l6.piPulse.1.0'),
+          DL('l6.piPulse.1.1')], () => this.next());
       }
     };
   }
@@ -84,7 +84,7 @@ class L6Rabi extends Level {
     this.check = () => {
       if (Math.abs(this.r[2]) < byDiff(0.12, 0.06, 0.03) && !this.flags.half) {
         this.flags.half = true;
-        this.say([L('l6.halfPulse.1')], () => this.next());
+        this.say([DL('l6.halfPulse.1')], () => this.next());
       }
     };
   }
@@ -93,11 +93,11 @@ class L6Rabi extends Level {
     this.d0 = (rand() < 0.5 ? -1 : 1) * byDiff(0.8 + Math.round(rand() * 6) / 10, 0.8 + Math.round(rand() * 6) / 10, 0.6 + Math.round(rand() * 20) * 0.05);
     this.f = 0; this.area = Math.PI;
     this.quest(tr('Rádio je rozladené! Nájdi rezonančnú frekvenciu tak, aby π-impulz opäť preklopil spin (P(|1⟩) > 97 %).', 'The radio is detuned! Find the resonance frequency so that a π pulse flips the spin again (P(|1⟩) > 97 %).', 'Радіо розстроєне! Знайди резонансну частоту, щоб π-імпульс знову перевертав спін (P(|1⟩) > 97 %).'), { easy: tr('📻 nájdi rezonanciu · π-impulz', '📻 find the resonance · π pulse', '📻 знайди резонанс · π-імпульс'), hard: `Δ → 0 · π · P(|1⟩) > ${Fmt.pct(byDiff(0.94, 0.97, 0.99))} · Ω<sub>eff</sub> = √(Ω²+Δ²)` });
-    this.say([L('l6.tuning.1')], () => this.buildPanel({ area: true, tune: true }));
+    this.say([DL('l6.tuning.1')], () => this.buildPanel({ area: true, tune: true }));
     this.check = () => {
       if (this.r[2] < -byDiff(0.88, 0.94, 0.98) && !this.flags.tune) {
         this.flags.tune = true;
-        this.say([L('l6.tuning.2')], () => this.next());
+        this.say([DL('l6.tuning.2')], () => this.next());
       }
     };
   }
@@ -105,7 +105,7 @@ class L6Rabi extends Level {
   t2() {
     this.useT2 = true; this.f = this.d0; this.area = Math.PI / 2;
     this.quest(tr('Dekoherencia T₂: urob π/2-impulz a čakaj, kým sa Blochov vektor nezmrští pod 30 % dĺžky.', 'Decoherence T₂: apply a π/2 pulse and wait until the Bloch vector shrinks below 30 % of its length.', 'Декогеренція T₂: застосуй π/2-імпульс і чекай, доки вектор Блоха зменшиться до менш ніж 30 % своєї довжини.'), { easy: tr('⏳ π/2 · čakaj (T₂)', '⏳ π/2 · wait (T₂)', '⏳ π/2 · чекай (T₂)'), hard: `π/2 → |r<sub>⊥</sub>| ∝ e<sup>−t/T₂</sup> < ${Fmt.num(0.3, 1)} · T₂ ≈ ${Fmt.num(2.5, 1)} s` });
-    this.say([L('l6.t2.1')], () => this.buildPanel({ area: true, t2: true }));
+    this.say([DL('l6.t2.1')], () => this.buildPanel({ area: true, t2: true }));
     this.check = () => {};
     this.watch = true;
   }
@@ -129,8 +129,8 @@ class L6Rabi extends Level {
     if (this.watch && this.stepIdx === 5 && !this.pulse && V3.len(this.r) < 0.3 && Math.abs(this.r[2]) < 0.2 && !this.flags.t2) {
       this.flags.t2 = true; this.watch = false;
       this.grant(['T2', 'ensemble']);
-      this.say([L('l6.update.1.0'),
-        L('l6.update.1.1')], () => this.next());
+      this.say([DL('l6.update.1.0'),
+        DL('l6.update.1.1')], () => this.next());
     }
     // graf
     const disp = this.disp();

@@ -76,15 +76,15 @@ class Level {
   finale() {
     UI.panelHide();
     const nq = TRAPS[this.num].length + hardTraps(this.num).length + ancientTraps(this.num).length;
-    this.quest(L('main.finale.1'), { easy: L('main.finale.2'), hard: L('main.finale.3', nq) });
-    this.say([L('main.finale.4')], () => {
+    this.quest(DL('main.finale.1'), { easy: DL('main.finale.2'), hard: DL('main.finale.3', nq) });
+    this.say([DL('main.finale.4')], () => {
       const traps = [...TRAPS[this.num], ...hardTraps(this.num), ...ancientTraps(this.num)];
       UI.quizSeries(traps.map((q) => ({ who: this.mentor, face: this.face, ...q })), (m) => {
         this.mistakes += m;
         const k = this.mistakes, stars = byDiff(k <= 1 ? 3 : k <= 3 ? 2 : 1, k === 0 ? 3 : k <= 2 ? 2 : 1, k === 0 ? 3 : k <= 1 ? 2 : 1);
         Game.completeLevel(this.num, stars);
         const rating = '★'.repeat(stars) + '☆'.repeat(3 - stars);
-        this.say([L('main.finale.5', rating, this.mistakes, DIFF_NAME[Settings.diff])], () => Game.backToHub());
+        this.say([DL('main.finale.5', rating, this.mistakes, DIFF_NAME[Settings.diff])], () => Game.backToHub());
       });
     });
   }
@@ -116,10 +116,9 @@ const Hub = {
   player: { p: [0, 0, 6], heading: Math.PI, phase: 0 },
   cam: new OrbitCam([0, 1, 0], 9, 0, 0.38, 4, 22),
   portals: [],
-  crystals: [],
   init() {
     // všetky portály stoja v jednom kruhu okolo stredu, rovnomerne a v poradí čísel. Sieň symbolov (0) je len v type hry
-    // „Experimentálna“ (rovnice); drakov portál (9), ak je, stojí na severe pod Dračím štítom, inak je na severe portál 1.
+    // „Jazyk rovníc“ (rovnice); drakov portál (9), ak je, stojí na severe pod Dračím štítom, inak je na severe portál 1.
     const ring = [...(Settings.eq ? [LEVEL0] : []), ...LEVELS], n = ring.length, boss = ring.some((L) => L.boss);
     const all = ring.map((L, k) => {
       const a = -Math.PI / 2 + ((boss ? k + 1 : k - (Settings.eq ? 1 : 0)) / n) * Math.PI * 2, p = [Math.cos(a) * 20, 0, Math.sin(a) * 20];
@@ -142,11 +141,6 @@ const Hub = {
       const a = rnd() * Math.PI * 2, rad = 7 + rnd() * 26, p = [Math.cos(a) * rad, 0, Math.sin(a) * rad];
       if (free(p, 4.5)) this.rocks.push({ p, s: [0.6 + rnd() * 1.4, 0.4 + rnd() * 0.9, 0.6 + rnd() * 1.2], rot: rnd() * 6 });
     }
-    const syms = ['ψ', 'ħ', '⟨φ|ψ⟩', '⊗', 'ρ', 'Σ', 'e<sup>iφ</sup>', '|0⟩', '|1⟩', '†', 'Ĥ', '|Φ⁺⟩'];
-    this.crystals = syms.map((s, i) => {
-      const a = (i / syms.length) * Math.PI * 2 + 0.26, r = i % 2 ? 11 : 30;
-      return { s, p: [Math.cos(a) * r, 2.2 + (i % 3) * 0.6, Math.sin(a) * r], k: i };
-    });
   },
   all() { return this.portal0 ? [...this.portals, this.portal0] : this.portals; },
   enter(fromLevel) {
@@ -275,13 +269,6 @@ const Hub = {
       UI.label('portal' + L.num, V3.add(c, [0, 2.9, 0]), `<b>${L.num} · ${L.title}</b>${st}<br><small>${open ? L.face + ' ' + L.mentor : tr('🔒 zamknuté', '🔒 locked', '🔒 закрито')}</small>`, 'portal' + (open ? '' : ' locked'));
     }
     this.drawPortal0(r, t);
-    // plávajúce kryštály so symbolmi
-    for (const c of this.crystals) {
-      const p = V3.add(c.p, [0, Math.sin(t * 0.8 + c.k) * 0.3, 0]);
-      r.draw('box', M4.mul(M4.trs(p, t * 0.5 + c.k, 0.55), M4.trs([0, 0, 0], 0, [1, 1.6, 1])), N ? [0.72, 0.55, 1] : [0.5, 0.8, 1], { emissive: N ? 0.35 : 0.3, alpha: 0.75 }); // v severskej téme duševné kamene
-      UI.label('cr' + c.k, V3.add(p, [0, 1.2, 0]), c.s, 'sym', CRYSTAL_TIPS[c.s]);
-      UI.hot(p, CRYSTAL_TIPS[c.s], 30);
-    }
     // drak Ketvarr (severská téma): krúži nad ostrovom, po porážke sedí na Dračom štíte
     if (!Settings.dragon) { /* klasická téma: bez draka a snehu */ } else if (Game.progress.stars[9] === undefined) {
       const w = t * 0.11, dp = [Math.cos(w) * 46, 27 + Math.sin(t * 0.5) * 3, Math.sin(w) * 46];
@@ -423,23 +410,6 @@ const LEVEL_TIPS = tr({
   8: 'Мова й реальність: Бор, Кант, Вітгенштейн, Стодола, Бом, колапс.',
   9: '🐉 Фінальна битва з драконом Кетварром: покрокова, захист = кубіт, удар = вимірювання, цілься на P(влучання) ≥ порогу.',
 });
-const CRYSTAL_TIPS = tr({
-  'ψ': 'ψ — kvantový stav (vlnová funkcia).', 'ħ': 'ħ = h/2π — redukovaná Planckova konštanta.',
-  '⟨φ|ψ⟩': '⟨φ|ψ⟩ — bra-ket: komplexné číslo (amplitúda prekrytia).', '⊗': '⊗ — tenzorový súčin: skladá systémy.',
-  'ρ': 'ρ — matica hustoty.', 'Σ': 'Σ — suma (napr. rozvoj stavu do bázy).', 'e<sup>iφ</sup>': 'e^{iφ} — fázový faktor, bod na jednotkovej kružnici.',
-  '†': '† — dýka, hermitovské združenie.', '|Φ⁺⟩': '|Φ⁺⟩ — Bellov (maximálne previazaný) stav.',
-}, {
-  'ψ': 'ψ — a quantum state (wave function).', 'ħ': 'ħ = h/2π — the reduced Planck constant.',
-  '⟨φ|ψ⟩': '⟨φ|ψ⟩ — bra-ket: a complex number (overlap amplitude).', '⊗': '⊗ — tensor product: combines systems.',
-  'ρ': 'ρ — the density matrix.', 'Σ': 'Σ — a sum (e.g. expanding a state in a basis).', 'e<sup>iφ</sup>': 'e^{iφ} — phase factor, a point on the unit circle.',
-  '†': '† — dagger, Hermitian conjugate.', '|Φ⁺⟩': '|Φ⁺⟩ — a Bell (maximally entangled) state.',
-}, {
-  'ψ': 'ψ — квантовий стан (хвильова функція).', 'ħ': 'ħ = h/2π — зведена стала Планка.',
-  '⟨φ|ψ⟩': '⟨φ|ψ⟩ — бра-кет: комплексне число (амплітуда перекриття).', '⊗': '⊗ — тензорний добуток: поєднує системи.',
-  'ρ': 'ρ — матриця густини.', 'Σ': 'Σ — сума (напр. розклад стану в базисі).', 'e<sup>iφ</sup>': 'e^{iφ} — фазовий множник, точка на одиничному колі.',
-  '†': '† — «кинджал», ермітове спряження.', '|Φ⁺⟩': '|Φ⁺⟩ — стан Белла (максимально сплутаний).',
-});
-Object.assign(CRYSTAL_TIPS, { '|0⟩': TIPS['|0⟩'], '|1⟩': TIPS['|1⟩'], 'Ĥ': TIPS['Ĥ'] });
 
 // ------------------------------------------------------------------
 // Hra
@@ -595,7 +565,7 @@ const Game = {
     Settings.mode = m; Settings.save();
     EqM.apply();
     UI.labelsClear();
-    Hub.init(); // portál 0 (Sieň symbolov) je len v type „Experimentálna“ — kruh portálov sa preusporiada
+    Hub.init(); // portál 0 (Sieň symbolov) je len v type „Jazyk rovníc“ — kruh portálov sa preusporiada
     if (this.scene && this.scene.num === 0 && !Settings.eq) this.backToHub();
     if (this.scene && this.scene !== Hub) { this.scene.request(); UI.refreshTheory(); } else UI.setHud(tr('Hilbertov ostrov', 'Hilbert Island', 'Острів Гільберта'), this.nextQuestText());
     UI.refreshDialog && UI.refreshDialog();
@@ -608,9 +578,9 @@ const Game = {
     this.progress.eqIntroSeen = true; this.save();
     const A = (text, raw) => ({ who: tr('Iskra (sprievodkyňa)', 'Spark (your guide)', 'Іскра (твоя провідниця)'), face: '✨', text, raw });
     return [
-      A(L('main.eqIntroLines.1')),
-      A(L('main.eqIntroLines.2')),
-      A(L('main.eqIntroLines.3')),
+      A(DL('main.eqIntroLines.1')),
+      A(DL('main.eqIntroLines.2')),
+      A(DL('main.eqIntroLines.3')),
     ];
   },
   // zmaže postup (nastavenia a jazyk ponechá) a začne odznova
@@ -689,17 +659,17 @@ const Game = {
     this.save();
     if (Settings.wow && !first && Wow.guideQuest(A)) return; // MMO: úlohy od Iskry
     UI.say((first ? [
-      A(L('main.guideTalk.1.0')),
-      A(L('main.guideTalk.1.1')),
-      A(L('main.guideTalk.1.2')),
-      A(L('main.guideTalk.1.3')),
-      Settings.dragon && A(L('main.guideTalk.1.4')),
-      A(L('main.guideTalk.1.5')),
-      A(L('main.guideTalk.1.6')),
-      Settings.eq && A(L('main.guideTalk.1.7')),
-      A(L('main.guideTalk.1.8')),
-      Settings.wow && A(L('main.guideTalk.1.9')),
-    ] : [A(this.nextQuestText() + L('main.guideTalk.2'))]).filter(Boolean)
+      A(DL('main.guideTalk.1.0')),
+      A(DL('main.guideTalk.1.1')),
+      A(DL('main.guideTalk.1.2')),
+      A(DL('main.guideTalk.1.3')),
+      Settings.dragon && A(DL('main.guideTalk.1.4')),
+      A(DL('main.guideTalk.1.5')),
+      A(DL('main.guideTalk.1.6')),
+      Settings.eq && A(DL('main.guideTalk.1.7')),
+      A(DL('main.guideTalk.1.8')),
+      Settings.wow && A(DL('main.guideTalk.1.9')),
+    ] : [A(this.nextQuestText() + DL('main.guideTalk.2'))]).filter(Boolean)
       .concat(first && Settings.eq && !this.progress.eqIntroSeen ? this.eqIntroLines() : []));
   },
   toggleMap(force) {

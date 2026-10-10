@@ -6,8 +6,8 @@
 
 const G0 = (k, l = k) => EqG.html(k, l);
 // texty z lang/*.csv podľa predpony kľúča: repliky <k>.0, <k>.1 …; otázka <k>.q, možnosti <k>.o.0 … (prvá je správna), <k>.why
-const LN = (k) => { const out = []; for (let i = 0; L.has(`${k}.${i}`); i++) out.push(L(`${k}.${i}`)); return out; };
-const LQ = (k) => { const options = []; for (let i = 0; L.has(`${k}.o.${i}`); i++) options.push(L(`${k}.o.${i}`)); return { q: L(`${k}.q`), options, correct: 0, why: L(`${k}.why`) }; };
+const LN = (k) => { const out = []; for (let i = 0; DL.has(`${k}.${i}`); i++) out.push(DL(`${k}.${i}`)); return out; };
+const LQ = (k) => { const options = []; for (let i = 0; DL.has(`${k}.o.${i}`); i++) options.push(DL(`${k}.o.${i}`)); return { q: DL(`${k}.q`), options, correct: 0, why: DL(`${k}.why`) }; };
 // farby mnemotechniky (style.css: --mn-* a .m-*) v RGB 0..1 — 3D model má vždy farbu svojho symbolu v rovnici
 const MC = {
   a: [0.31, 0.55, 1], b: [1, 0.42, 0.49], ket: [0.37, 0.89, 1], op: [0.73, 0.55, 1], th: [1, 0.6, 0.9], ph: [0.49, 1, 0.63],
@@ -386,13 +386,13 @@ const EXHIBITS0 = [
   ];
 
 // záverečná skúška: otázky naprieč všetkými exponátmi
-const FINAL0 = () => { const out = []; for (let i = 1; L.has(`l0.final.${i}.q`); i++) out.push(LQ(`l0.final.${i}`)); return out; };
+const FINAL0 = () => { const out = []; for (let i = 1; DL.has(`l0.final.${i}.q`); i++) out.push(LQ(`l0.final.${i}`)); return out; };
 
 const CHAPTERS0 = {
-  1: () => L('l0.chapter.1'),
-  2: () => L('l0.chapter.2'),
-  3: () => L('l0.chapter.3'),
-  4: () => L('l0.chapter.4'),
+  1: () => DL('l0.chapter.1'),
+  2: () => DL('l0.chapter.2'),
+  3: () => DL('l0.chapter.3'),
+  4: () => DL('l0.chapter.4'),
 };
 
 class L0Symbols extends Level {
@@ -424,9 +424,9 @@ class L0Symbols extends Level {
   intro() {
     this.quest(tr('Vypočuj si Iskru', 'Listen to Spark', 'Послухай Іскру'), { easy: tr('💬 Iskra', '💬 Spark', '💬 Іскра') });
     this.say([
-      L('l0.intro.0'),
-      L('l0.intro.1', this.ex.length),
-      L('l0.intro.2'),
+      DL('l0.intro.0'),
+      DL('l0.intro.1', this.ex.length),
+      DL('l0.intro.2'),
     ], () => this.next());
   }
   ch1() { this.chapter(1); }
@@ -454,7 +454,7 @@ class L0Symbols extends Level {
     this.focus = -1; this.camT = 0;
     UI.panelHide();
     this.quest(tr(`Opakovanie kapitoly ${ch}`, `Chapter ${ch} review`, `Повторення розділу ${ch}`), { easy: tr('📝 Opakovanie', '📝 Review', '📝 Повторення') });
-    this.say([L('l0.review', ch, list.length)], () =>
+    this.say([DL('l0.review', ch, list.length)], () =>
       UI.quizSeries(shuffle0(list.map((e) => this.q(e.q2()))), (m) => { this.mistakes += m; this.next(); }));
   }
   q(x) { return { who: this.mentor, face: this.face, ...x }; }
@@ -477,14 +477,14 @@ class L0Symbols extends Level {
     const pool = shuffle0(EXHIBITS0.flatMap((e) => [e.q1, e.q2])).slice(0, 6).map((f) => f());
     const list = shuffle0([...FINAL0(), ...pool]).map((x) => this.q(x));
     this.quest(tr('Veľká skúška symbolov', 'The big symbol exam', 'Великий іспит символів'), { easy: tr('📝 Skúška', '📝 Exam', '📝 Іспит'), hard: tr(`${list.length} otázok naprieč všetkými podstavcami`, `${list.length} questions across all pedestals`, `${list.length} питань з усіх постаментів`) });
-    this.say([L('l0.finale.intro', list.length)], () =>
+    this.say([DL('l0.finale.intro', list.length)], () =>
       UI.quizSeries(list, (m) => {
         this.mistakes += m;
         const total = list.length + this.ex.length * 2, k = this.mistakes / total;
         const stars = byDiff(k <= 0.1 ? 3 : k <= 0.25 ? 2 : 1, k <= 0.05 ? 3 : k <= 0.15 ? 2 : 1, k === 0 ? 3 : k <= 0.08 ? 2 : 1);
         Game.completeLevel(0, stars);
         const rating = '★'.repeat(stars) + '☆'.repeat(3 - stars);
-        this.say([L('l0.finale.done', rating, this.mistakes, total)], () => Game.backToHub());
+        this.say([DL('l0.finale.done', rating, this.mistakes, total)], () => Game.backToHub());
       }));
   }
 

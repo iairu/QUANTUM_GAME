@@ -56,19 +56,19 @@ function diracType(tokens, squared) {
 
 const DIRAC_TASKS = [
   { title: tr('AMPLITÚDU, že stav ψ „nájdeme“ ako stav a', 'the AMPLITUDE that the state ψ is “found” as the state a', 'АМПЛІТУДУ того, що стан ψ «буде знайдено» як стан a'), want: 'num', exact: ['⟨a|', '|ψ⟩'], sq: false, grant: ['dirac', 'ket', 'bra', 'braket'],
-    msg: L('l5.DIRAC_TASKS.1') },
+    msg: DL('l5.DIRAC_TASKS.1') },
   { title: tr('PRAVDEPODOBNOSŤ výsledku a pri meraní stavu ψ', 'the PROBABILITY of outcome a when measuring the state ψ', 'ІМОВІРНІСТЬ результату a під час вимірювання стану ψ'), want: 'prob', exact: ['⟨a|', '|ψ⟩'], sq: true, grant: [],
-    msg: L('l5.DIRAC_TASKS.2') },
+    msg: DL('l5.DIRAC_TASKS.2') },
   { title: tr('PROJEKTOR na stav ψ (= matica hustoty čistého stavu)', 'the PROJECTOR onto the state ψ (= density matrix of a pure state)', 'ПРОЄКТОР на стан ψ (= матриця густини чистого стану)'), want: 'op', exact: ['|ψ⟩', '⟨ψ|'], sq: false, grant: ['ketbra'],
-    msg: L('l5.DIRAC_TASKS.3') },
+    msg: DL('l5.DIRAC_TASKS.3') },
   { title: tr('STREDNÚ HODNOTU veličiny Â v stave ψ', 'the EXPECTATION VALUE of the observable Â in the state ψ', 'СЕРЕДНЄ ЗНАЧЕННЯ спостережуваної Â у стані ψ'), want: 'num', exact: ['⟨ψ|', 'Â', '|ψ⟩'], sq: false, grant: ['hat', 'expect'],
-    msg: L('l5.DIRAC_TASKS.4') },
+    msg: DL('l5.DIRAC_TASKS.4') },
   { title: tr('nový STAV, ktorý vznikne pôsobením Hamiltoniánu Ĥ na ψ', 'the new STATE obtained by applying the Hamiltonian Ĥ to ψ', 'новий СТАН, отриманий дією гамільтоніана Ĥ на ψ'), want: 'ket', exact: ['Ĥ', '|ψ⟩'], sq: false, grant: [],
-    msg: L('l5.DIRAC_TASKS.5') },
+    msg: DL('l5.DIRAC_TASKS.5') },
   { title: tr('MATICOVÝ ELEMENT operátora Â medzi φ (vľavo) a ψ (vpravo)', 'the MATRIX ELEMENT of the operator Â between φ (left) and ψ (right)', 'МАТРИЧНИЙ ЕЛЕМЕНТ оператора Â між φ (ліворуч) і ψ (праворуч)'), want: 'num', exact: ['⟨φ|', 'Â', '|ψ⟩'], sq: false, grant: [],
-    msg: L('l5.DIRAC_TASKS.6') },
+    msg: DL('l5.DIRAC_TASKS.6') },
   { title: tr('ZLOŽENÝ STAV dvoch systémov: ψ (systém A) a φ (systém B)', 'the COMPOSITE STATE of two systems: ψ (system A) and φ (system B)', 'СКЛАДЕНИЙ СТАН двох систем: ψ (система A) і φ (система B)'), want: 'ket2', exact: ['|ψ⟩', '⊗', '|φ⟩'], sq: false, grant: ['tensor', 'kron'],
-    msg: L('l5.DIRAC_TASKS.7') },
+    msg: DL('l5.DIRAC_TASKS.7') },
 ];
 
 const LEGEND_TIPS = tr({
@@ -96,12 +96,12 @@ class L5Dirac extends Level {
   intro() {
     this.quest(tr('Vypočuj si Diraca', 'Listen to Dirac', 'Послухай Дірака'), { easy: tr('💬 Dirac', '💬 Dirac', '💬 Дірак'), hard: tr('bra-ket: typy výrazov', 'bra-ket: expression types', 'бра-кет: типи виразів') });
     this.say([
-      L('l5.intro.1.0'),
-      { who: L('l5.intro.1.1.who'), face: '📚', text: L('l5.intro.1.1.text') },
-      { who: L('l5.intro.1.2.who'), face: '📚', text: L('l5.intro.1.2.text') },
-      { who: L('l5.intro.1.3.who'), face: '📚', text: L('l5.intro.1.3.text') },
-      { who: L('l5.intro.1.4.who'), face: '📚', text: L('l5.intro.1.4.text') },
-      L('l5.intro.1.5'),
+      DL('l5.intro.1.0'),
+      { who: DL('l5.intro.1.1.who'), face: '📚', text: DL('l5.intro.1.1.text') },
+      { who: DL('l5.intro.1.2.who'), face: '📚', text: DL('l5.intro.1.2.text') },
+      { who: DL('l5.intro.1.3.who'), face: '📚', text: DL('l5.intro.1.3.text') },
+      { who: DL('l5.intro.1.4.who'), face: '📚', text: DL('l5.intro.1.4.text') },
+      DL('l5.intro.1.5'),
     ], () => this.next());
   }
 
@@ -135,9 +135,9 @@ class L5Dirac extends Level {
     const ok = this.res.type === T.want && this.squared === T.sq && got.join() === T.exact.join();
     if (ok) {
       this.grant(T.grant);
-      this.say([{ who: L('l5.verify.1'), face: '📚', text: '✅ ' + T.msg }], () => {
+      this.say([{ who: DL('l5.verify.1'), face: '📚', text: '✅ ' + T.msg }], () => {
         if (this.ti === 2) {
-          this.ask({ q: L('l5.verify.2.q'), options: [L('l5.verify.2.options.0'), L('l5.verify.2.options.1'), L('l5.verify.2.options.2')], correct: 0, why: L('l5.verify.2.why') }, () => this.after());
+          this.ask({ q: DL('l5.verify.2.q'), options: [DL('l5.verify.2.options.0'), DL('l5.verify.2.options.1'), DL('l5.verify.2.options.2')], correct: 0, why: DL('l5.verify.2.why') }, () => this.after());
         } else this.after();
       });
     } else if (Settings.hard) this.mistakes++; // ťažká: každé zlé overenie je chyba
@@ -149,7 +149,7 @@ class L5Dirac extends Level {
   }
   after() {
     if (this.ti + 1 < DIRAC_TASKS.length) this.loadTask(this.ti + 1);
-    else this.say([L('l5.after.1.0'), { who: L('l5.after.1.1.who'), face: '📚', text: L('l5.after.1.1.text') }], () => this.next());
+    else this.say([DL('l5.after.1.0'), { who: DL('l5.after.1.1.who'), face: '📚', text: DL('l5.after.1.1.text') }], () => this.next());
   }
 
   update(dt) { this.t += dt; this.spin += dt; }

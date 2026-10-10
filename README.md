@@ -10,7 +10,7 @@ Postup sa ukladá v prehliadači (localStorage).
 ## Jazyk / Language
 Hra je po slovensky, po anglicky a po ukrajinsky. Bez uloženej voľby sa jazyk určí podľa prehliadača: čeština a slovenčina → SK, ukrajinčina, ruština a bieloruština (ktorýkoľvek z jazykov prehliadača) → UA, všetky ostatné → EN.
 Prepínač **SK / EN / UA** je vpravo hore aj na uvítacej obrazovke (zmena znovu načíta stránku, postup zostane uložený).
-**Dialógy** (repliky, kvízy, jazykové pasce, karty „po ľudsky“, teória, zvitky, úlohy) sú v `lang/sk.csv`, `lang/en.csv`, `lang/uk.csv` — stĺpce `key,text`, text v úvodzovkách (`""` = úvodzovka). V kóde ich načíta `L('kľúč', hodnoty…)` (`js/i18n.js`); chýbajúci preklad nahradí anglický.
+**Dialógy** (repliky, kvízy, jazykové pasce, karty „po ľudsky“, teória, zvitky, úlohy) sú v `lang/sk.csv`, `lang/en.csv`, `lang/uk.csv` — stĺpce `key,text`, text v úvodzovkách (`""` = úvodzovka). V kóde ich načíta `DL('kľúč', hodnoty…)` (`js/i18n.js`); chýbajúci preklad nahradí anglický.
 - **Vzorce sú v dvojitých hranatých zátvorkách** `[[…]]` — podľa nich hra vie, kam dať pozadie rovnice: `[[P = |α|²]]` vo vete = čip, `[[…]]` na samostatnom riadku = blok rovnice. Matice sa píšu `[0, 1; 1, 0]`, aby sa nepliedli so zátvorkami.
 - `{0}`, `{1}` … sú hodnoty, ktoré doplní hra (počty, percentá, mená) — v preklade môžu byť na inom mieste.
 - Po úprave CSV spusti `node tools/build-lang.js`: vygeneruje `lang/*.js` (pri spustení z disku prehliadač CSV načítať nedovolí) a skontroluje zátvorky `[[ ]]` a `{n}`. Na serveri (http/https) hra číta CSV priamo.
@@ -19,7 +19,7 @@ Prepínač **SK / EN / UA** je vpravo hore aj na uvítacej obrazovke (zmena znov
 *The game is in Slovak, English and Ukrainian. Without a saved choice, Czech and Slovak browsers get SK, browsers with Ukrainian, Russian or Belarusian among their languages get UA, everyone else EN. Switch with the SK / EN / UA selector in the top-right corner or on the welcome screen.*
 
 ## Ostrov
-- Všetky portály stoja v jednom kruhu okolo stredu, rovnomerne a v poradí čísel (portál 1 na severe; s drakom je na severe Dračí štít, portál 9). Portál 0 je len v type „Experimentálna“.
+- Všetky portály stoja v jednom kruhu okolo stredu, rovnomerne a v poradí čísel (portál 1 na severe; s drakom je na severe Dračí štít, portál 9). Portál 0 je len v type „Jazyk rovníc“.
 - V strede ostrova čaká sprievodkyňa **Iskra** (✨ iskierka svetla) — zámerne nevyzerá ako symbol amplitúdy ani globálnej fázy.
 
 ## Témy
@@ -30,10 +30,10 @@ Prepínač **SK / EN / UA** je vpravo hore aj na uvítacej obrazovke (zmena znov
 - Hudba a zvukové efekty sú v oboch témach rovnaké.
 - Každá téma má vlastný kurzor (šípka + varianta nad klikateľným; v MMO téme aj meč nad omylmi a bublina nad postavami). Počas otáčania kamery kurzor zmizne.
 
-## Typ hry: 🖼 Odporúčaná · obrazy najprv / ∑ Experimentálna · symboly najprv
+## Typ hry: 🖼 Prevažne ľudský jazyk / ∑ Jazyk rovníc (experimentálny)
 Volí sa na uvítacej obrazovke aj v nastaveniach (⚙ → 🎮 Typ hry); prepína sa za behu, bez znovunačítania.
-- **🖼 Odporúčaná · obrazy najprv** — pôvodná hra: najprv obraz a intuícia (ručičky, Blochova guľa, pokusy), rovnice len v paneli 📐.
-- **∑ Experimentálna · symboly najprv** — navyše **portál 0 — Sieň symbolov**: 17 podstavcov, na každom jeden symbol ako 3D pokus (α, β, kety, bra, θ, φ, γ, e<sup>iφ</sup> a i, operátory, P, |α|², ρ, ħ/π/Σ/∂/⊗, meranie a kolaps, σ/r/n, ω/Ω/Δ, p/t/A); rozhovory a otázky vysvetľujú len fyzikálny význam symbolov, nie pravidlá kľúča. Po každom otázka, po každej kapitole opakovanie, na konci veľká skúška. Ďalej: skutočná rovnica, ktorá práve platí, sa vznáša v 3D nad scénou (nakláňa sa s kamerou) a jej hodnoty sa menia s hrou:
+- **🖼 Prevažne ľudský jazyk** — pôvodná hra: najprv obraz a intuícia (ručičky, Blochova guľa, pokusy), rovnice len v paneli 📐.
+- **∑ Jazyk rovníc (experimentálny)** — navyše **portál 0 — Sieň symbolov**: 17 podstavcov, na každom jeden symbol ako 3D pokus (α, β, kety, bra, θ, φ, γ, e<sup>iφ</sup> a i, operátory, P, |α|², ρ, ħ/π/Σ/∂/⊗, meranie a kolaps, σ/r/n, ω/Ω/Δ, p/t/A); rozhovory a otázky vysvetľujú len fyzikálny význam symbolov, nie pravidlá kľúča. Po každom otázka, po každej kapitole opakovanie, na konci veľká skúška. Ďalej: skutočná rovnica, ktorá práve platí, sa vznáša v 3D nad scénou (nakláňa sa s kamerou) a jej hodnoty sa menia s hrou:
   ostrov e<sup>iγ</sup>(α|0⟩ + β|1⟩) s točiacou sa globálnou fázou, |α|², interferencia |A₁ + A₂|², SG P(↑) = ½(1 + r·n), hradlo G|ψ⟩ počas rotácie,
   dekoherencia ρ₀₁ → (1 − p)e<sup>−iφ</sup>ρ₀₁, Diracov výraz a jeho typ, H̃ = (ħ/2)(ΔZ + Ω<sub>R</sub>X), dva qubity a determinant previazanosti,
   Schrödingerova rovnica, P(zásah) = ½(1 + r·n) v boji s drakom. Pred každou úlohou karta „∑ Rovnica najprv“, teória je vždy otvorená,
@@ -97,7 +97,7 @@ Dialógy, kvízy, levely, Kódex, Denník aj tlačidlá ostávajú rovnaké — 
 | Enter, medzerník | ďalej v dialógu |
 | ← / Backspace | späť v dialógu |
 | L | Denník — všetky rozhovory a vysvetlenia (prečítať / prehrať znova) |
-| K | 🔑 kľúč — slovník glyfov, potom pravidlá mnemotechniky (typ „Experimentálna“; počas rozhovoru nedostupný, aby sa dialóg sústredil na fyziku) |
+| K | 🔑 kľúč — slovník glyfov, potom pravidlá mnemotechniky (typ „Jazyk rovníc“; počas rozhovoru nedostupný, aby sa dialóg sústredil na fyziku) |
 | C | Kódex symbolov, osobností a pojmov |
 | M | mapa · H pomoc · O nastavenia · V pohľady · Esc zavrieť okná |
 | F9 | odomknúť všetky levely (režim učiteľa) — aj tlačidlom na konci okna Pomoc (H) |
@@ -120,5 +120,5 @@ Každý level končí **jazykovými pascami** (kvíz o správnych formuláciách
 - `js/math.js` vektory, matice, komplexné čísla · `js/quantum.js` simulátor 1 a 2 qubitov
 - `js/gl.js` renderer (shader, procedurálne siete, Blochova sféra) · `js/ui.js` dialógy, kvízy, denník, vysvetlivky
 - `js/wow.js` MMO téma: postava, kúzla, nepriatelia, úlohy, obchodník, taška, korisť, bossovia, rámy jednotiek, minimapa
-- `js/i18n.js` voľba jazyka, `tr()` a `L()` (dialógy z `lang/*.csv`; `tools/build-lang.js` z nich generuje `lang/*.js`) · `js/settings.js` obťažnosť (`byDiff`) a nastavenia zobrazenia · `js/knowledge.js` teória a rovnice, extra otázky · `js/eqmnemo.js` typ hry „Rovnice najprv“: 3D javisko rovnice a mnemotechnika · `js/eqglyphs.js` SVG glyfy symbolov · `js/scrolls.js` starobylé zvitky · `js/views.js` pohľady 👁 · `js/tips.js` slovník vysvetliviek · `js/content.js` kódex a jazykové pasce · `js/main.js` hub, kamera, hra
+- `js/i18n.js` voľba jazyka, `tr()` a `DL()` (dialógy z `lang/*.csv`; `tools/build-lang.js` z nich generuje `lang/*.js`) · `js/settings.js` obťažnosť (`byDiff`) a nastavenia zobrazenia · `js/knowledge.js` teória a rovnice, extra otázky · `js/eqmnemo.js` typ hry „Jazyk rovníc“: 3D javisko rovnice a mnemotechnika · `js/eqglyphs.js` SVG glyfy symbolov · `js/scrolls.js` starobylé zvitky · `js/views.js` pohľady 👁 · `js/tips.js` slovník vysvetliviek · `js/content.js` kódex a jazykové pasce · `js/main.js` hub, kamera, hra
 - `js/levels/*.js` jednotlivé levely, `registry.js` ich poradie
