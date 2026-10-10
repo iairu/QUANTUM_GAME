@@ -362,6 +362,7 @@ const Wow = {
   spellState(sp) { // dôvod, prečo sa kúzlo nedá použiť (alebo null)
     const s = this.S;
     if (sp.item) return this.count(sp.item) ? null : 'none';
+    if (UI.busy) return 'busy'; // otvorený dialóg/kvíz: kúzlo nič neurobí
     if (sp.lvl > s.lvl) return 'lvl';
     if (sp.needMount && !s.mount) return 'lvl';
     if (!this.inHub() && sp.id !== 'hearth') return 'inst';
@@ -373,6 +374,7 @@ const Wow = {
     if (this.dead) return this.err(tr('Si mŕtvy(a).', 'You are dead.', 'Ти мертвий(-а).'));
     if (sp.item) return this.useItem(sp.item);
     const s = this.S, st = this.spellState(sp);
+    if (st === 'busy') return;
     if (st === 'lvl') return this.err(sp.needMount ? tr('Najprv si kúp Blochovu guľu u Plancka.', 'Buy the Bloch Sphere from Planck first.', 'Спершу купи сферу Блоха в Планка.') : tr(`Toto kúzlo sa naučíš na úrovni ${sp.lvl}.`, `You learn this spell at level ${sp.lvl}.`, `Це закляття ти вивчиш на рівні ${sp.lvl}.`));
     if (st === 'inst') return this.err(tr('Tu sa bojuje vedomosťami — kúzla fungujú na ostrove.', 'Here you fight with knowledge — spells work on the island.', 'Тут ти б’єшся знаннями — закляття діють на острові.'));
     if (sp.id === 'shoot') {

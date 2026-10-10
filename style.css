@@ -367,7 +367,10 @@ html[data-theme="wow"] .lbl.player { font-size: 18px; }
 .abtn .cnt { position: absolute; right: 3px; bottom: 1px; font: 700 11px system-ui; color: #fff; text-shadow: 0 1px 1px #000; }
 .abtn .cdw { position: absolute; inset: 0; pointer-events: none; }
 .abtn .cdt { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font: 700 17px system-ui; color: #ffd100; text-shadow: 0 0 3px #000; pointer-events: none; }
-.abtn.lvl .ic, .abtn.none .ic, .abtn.inst .ic { filter: grayscale(1) brightness(0.5); }
+.abtn.lvl .ic, .abtn.none .ic, .abtn.inst .ic, .abtn.busy .ic { filter: grayscale(1) brightness(0.5); }
+/* počas dialógu: neaktívne tlačidlá (klik nič neurobí) */
+.abtn.busy { opacity: 0.45; cursor: var(--cur, default); }
+body.dlg-open #panel button.gated { opacity: 0.35; cursor: var(--cur, default); }
 .abtn.lvl::after { content: "🔒"; position: absolute; left: 2px; bottom: 0; font-size: 11px; }
 .abtn.oom { box-shadow: inset 0 0 0 46px rgba(30, 60, 200, 0.45); }
 .abtn.range .kb { color: #ff3030; }
@@ -583,9 +586,6 @@ body.eqmode #eqstage { display: block; }
   background: radial-gradient(ellipse at 50% 20%, rgba(28, 40, 92, 0.93), rgba(9, 13, 32, 0.9) 75%); backdrop-filter: blur(3px); border-radius: 16px; padding: 8px 16px 12px;
   border: 1px solid rgba(140, 170, 255, 0.18); box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35); }
 #eqstage.min .eqscene, #eqstage.min .eqlegend { display: none; }
-/* ostrov: bez rovnice, len hlavička s 🔑 kľúčom */
-#eqstage.keyonly .eqscene, #eqstage.keyonly .eqmin { display: none; }
-#eqstage.keyonly.legend .eqlegend { display: grid; }
 #eqstage.flash .eqrows { animation: eqflash .5s ease-out; }
 @keyframes eqflash { 0% { box-shadow: 0 0 0 2px #fff, 0 0 40px #fff8; } 100% { box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35); } }
 .eqrow { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px 8px; transform-style: preserve-3d; margin: 6px 0; }
@@ -812,3 +812,16 @@ sup .m-rel, sub .m-rel { margin: 0 0.15em; } sup .m-op, sub .m-op { margin: 0 0.
 .eqlegend.l0cards .gd .gly.big svg { --gh: 3.2em; }
 .l0big { font-size: 34px; text-align: center; line-height: 1.5; }
 .l0big .gly svg { --gh: 1.7em; }
+
+/* 🔑 kľúč mnemotechniky vpravo hore (typ „Experimentálna“) */
+#btn-key { display: none; }
+body.eqmode #btn-key { display: inline-block; }
+#btn-key.on { background: #1d5d7a; border-color: var(--accent); }
+#eqkey { display: none; position: fixed; right: 14px; top: 58px; width: min(760px, calc(100vw - 28px)); max-height: calc(100vh - 80px); overflow-y: auto; z-index: 11; /* nad dialógom */
+  background: #0b1026f7; box-shadow: 0 10px 40px #000c; font-size: 14px; }
+html[data-theme="wow"] #eqkey { background: linear-gradient(rgba(14, 12, 24, 0.98), rgba(8, 8, 16, 0.98)); border: 2px solid #8a7240; }
+html[data-theme="nordic"] #eqkey { background: linear-gradient(rgba(18, 17, 15, 0.98), rgba(10, 10, 9, 0.98)); }
+#eqkey.show { display: grid; }
+body:not(.eqmode) #eqkey { display: none !important; }
+#eqkey .rule b { font-size: 14.5px; } #eqkey .rule small, #eqkey .gd small { font-size: 13px; } #eqkey .gd > div > b { font-size: 14px; }
+#eqkey .lpage { max-height: none; overflow: visible; }

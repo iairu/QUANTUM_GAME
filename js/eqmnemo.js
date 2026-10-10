@@ -218,22 +218,34 @@ const EqM = {
   // ---------- 3D javisko ----------
   init() {
     const st = this.stage = el('div'); st.id = 'eqstage';
-    st.innerHTML = `<div class="eqh"><b class="eqt"></b><button class="eqkey" data-tip="${tr('Kľúč rovnicovej mnemotechniky', 'Key to the equation mnemonics', 'Ключ мнемоніки рівнянь')}">🔑</button><button class="eqmin">▾</button></div>`
-      + '<div class="eqscene"><div class="eqrows"></div></div><div class="eqlegend"></div>';
+    st.innerHTML = `<div class="eqh"><b class="eqt"></b><button class="eqmin">▾</button></div>`
+      + '<div class="eqscene"><div class="eqrows"></div></div>';
     document.body.appendChild(st);
     this.rowsEl = st.querySelector('.eqrows'); this.sceneEl = st.querySelector('.eqscene'); this.titleEl = st.querySelector('.eqt');
-    const leg = st.querySelector('.eqlegend');
+    // 🔑 kľúč mnemotechniky: tlačidlo vpravo hore (len v type „Experimentálna“) — dostupné vždy, aj na ostrove a počas dialógu
+    const leg = this.keyEl = el('div', 'eqlegend'); leg.id = 'eqkey';
     leg.innerHTML = this.keyHtml();
     leg.dataset.t = 'rules';
     leg.querySelectorAll('.ltabs button').forEach((b) => { b.onclick = () => { leg.dataset.t = b.dataset.t; leg.querySelectorAll('.ltabs button').forEach((x) => x.classList.toggle('on', x === b)); }; });
+    document.body.appendChild(leg);
+    const kb = $('#btn-key');
+    kb.textContent = '🔑';
+    kb.dataset.tip = tr('Kľúč rovnicovej mnemotechniky: pravidlá a slovník glyfov (K)', 'Key to the equation mnemonics: rules and glyph dictionary (K)', 'Ключ мнемоніки рівнянь: правила та словник гліфів (K)');
+    kb.onclick = () => this.toggleKey();
     EqG.initSound();
-    st.querySelector('.eqkey').onclick = () => st.classList.toggle('legend');
     st.querySelector('.eqmin').onclick = () => { st.classList.toggle('min'); Settings.view.eqMin = st.classList.contains('min'); Settings.save(); };
     st.classList.toggle('min', !!Settings.view.eqMin);
     this.apply();
   },
+  toggleKey(force) {
+    const on = Settings.eq && (force ?? !this.keyEl.classList.contains('show'));
+    if (on !== this.keyEl.classList.contains('show')) Sound.sfx(on ? 'map' : 'close');
+    this.keyEl.classList.toggle('show', on);
+    $('#btn-key').classList.toggle('on', on);
+  },
   apply() {
     document.body.classList.toggle('eqmode', Settings.eq);
+    if (!Settings.eq && this.keyEl) this.toggleKey(false);
     this.sig = null;
   },
   legendHtml(from = 0, to = MNEMO_RULES.length) {
@@ -248,10 +260,8 @@ const EqM = {
     if (!this.stage) return;
     const on = Settings.eq && !document.body.classList.contains('welcoming');
     if (!on) { this.stage.style.display = 'none'; return; }
-    // na ostrove sa rovnica neukazuje — ostáva len 🔑 kľúč mnemotechniky
-    const hub = Game.scene === Hub;
-    this.stage.classList.toggle('keyonly', hub);
-    if (hub) { this.stage.style.display = ''; this.titleEl.innerHTML = '∑ ' + tr('Rovnicová mnemotechnika', 'Equation mnemonics', 'Мнемоніка рівнянь'); this.sig = null; return; }
+    // na ostrove sa rovnica neukazuje (🔑 kľúč je vpravo hore)
+    if (Game.scene === Hub) { this.stage.style.display = 'none'; this.sig = null; return; }
     const spec = this.build();
     this.stage.style.display = spec ? '' : 'none';
     if (!spec || this.stage.classList.contains('min')) { if (spec) this.titleEl.innerHTML = '∑ ' + spec.title; return; }

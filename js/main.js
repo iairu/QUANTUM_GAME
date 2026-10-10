@@ -485,6 +485,9 @@ const Game = {
     this.r.shiftX += (pw - this.r.shiftX) * Math.min(1, dt * 6);
     Views.update();
     EqM.update();
+    // ovládanie, ktoré práve nič neurobí, je zošedené: počas dialógu tlačidlá panelu a kúzla, na ostrove tlačidlo „Ostrov“
+    document.body.classList.toggle('dlg-open', UI.busy);
+    UI.hubBtn.disabled = this.scene === Hub;
     UI.labelsBegin();
     this.scene.draw(this.r);
     UI.labelsEnd();
@@ -494,12 +497,13 @@ const Game = {
   bindInput(canvas) {
     window.addEventListener('keydown', (e) => {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
-      if (e.code === 'Escape') UI.toggleSettings(false);
+      if (e.code === 'Escape') { UI.toggleSettings(false); EqM.toggleKey(false); }
       if (e.code === 'Tab') e.preventDefault(); // Tab = ďalší cieľ (MMO), nie presun fokusu
       this.keys[e.code] = true;
       if ((e.code === 'Enter' || e.code === 'Space') && UI.busy && UI._next) { e.preventDefault(); UI._next(); return; }
       if ((e.code === 'ArrowLeft' || e.code === 'Backspace') && UI.busy && UI._prev) { e.preventDefault(); UI._prev(); return; }
       if (e.code === 'KeyL') { UI.toggleLog(); return; }
+      if (e.code === 'KeyK' && Settings.eq) { EqM.toggleKey(); return; } // 🔑 kľúč mnemotechniky aj počas dialógu
       if (e.code === 'KeyV') { Views.toggle(); return; } // pohľady aj počas dialógu
       if (e.code === 'KeyN') { Sound.toggleMute(); return; }
       if (e.code === 'KeyM') { this.toggleMap(); return; } // mapa (a teleport) aj počas dialógu

@@ -38,7 +38,7 @@ Volí sa na uvítacej obrazovke aj v nastaveniach (⚙ → 🎮 Typ hry); prepí
   dekoherencia ρ₀₁ → (1 − p)e<sup>−iφ</sup>ρ₀₁, Diracov výraz a jeho typ, H̃ = (ħ/2)(ΔZ + Ω<sub>R</sub>X), dva qubity a determinant previazanosti,
   Schrödingerova rovnica, P(zásah) = ½(1 + r·n) v boji s drakom. Pred každou úlohou karta „∑ Rovnica najprv“, teória je vždy otvorená,
   symboly v textoch sú vo farbách mnemotechniky a pri póloch Blochovej gule visia |α|, |β|.
-- **Rovnicová mnemotechnika** (🔑 na javisku): *farba = KTO* (α modrá, β červená, kety tyrkysové, θ ružová, φ zelená, globálna fáza zlatá),
+- **Rovnicová mnemotechnika** (🔑 vpravo hore, kláves K): *farba = KTO* (α modrá, β červená, kety tyrkysové, θ ružová, φ zelená, globálna fáza zlatá),
   *veľkosť = KOĽKO* (symbol rastie s |amplitúdou|), *otáčanie = FÁZA* (ručička okolo amplitúdy), *krabička = operátor* (pôsobí doprava, ket sa preklopí),
   *|…|² = fáza zamrzne*, *bledne = dekoherencia*, *záblesk a pád = kolaps*, *sivé a nehybné = konštanta*.
 - **Rovnicové glyfy** (`js/eqglyphs.js`): každý symbol rovnice (na javisku, v dialógoch, v paneli teórie aj pri Blochovej guli) sa nahradí vlastnou SVG ikonou,
@@ -97,6 +97,7 @@ Dialógy, kvízy, levely, Kódex, Denník aj tlačidlá ostávajú rovnaké — 
 | Enter, medzerník | ďalej v dialógu |
 | ← / Backspace | späť v dialógu |
 | L | Denník — všetky rozhovory a vysvetlenia (prečítať / prehrať znova) |
+| K | 🔑 kľúč rovnicovej mnemotechniky (typ „Experimentálna“), aj počas dialógu |
 | C | Kódex symbolov, osobností a pojmov |
 | M | mapa · H pomoc · O nastavenia · V pohľady · Esc zavrieť okná |
 | F9 | odomknúť všetky levely (režim učiteľa) — aj tlačidlom na konci okna Pomoc (H) |

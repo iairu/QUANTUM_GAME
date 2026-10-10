@@ -56,6 +56,7 @@ const UI = {
     $('#btn-help').onclick = () => this.toggleHelp();
     $('#btn-sound').onclick = () => Sound.toggleMute();
     $('#btn-hub').onclick = () => Game.backToHub();
+    this.hubBtn = $('#btn-hub');
     $('#btn-log').onclick = () => this.toggleLog();
     $('#codex .close').onclick = () => this.toggleCodex(false);
     $('#help .close').onclick = () => this.toggleHelp(false);
@@ -340,7 +341,7 @@ const UI = {
   },
   panelHide() { this.panel.classList.remove('show'); this.panel.innerHTML = ''; },
   button(html, onclick, cls = '', tip) {
-    const b = el('button', cls, html);
+    const b = el('button', (cls ? cls + ' ' : '') + 'gated', html); // gated: počas dialógu nič neurobí (CSS ho zošedí)
     b.onclick = (e) => { if (!this.busy) onclick(e); };
     const t = tip ?? tipFor(html);
     if (t) b.dataset.tip = t;
