@@ -4,23 +4,22 @@
 
 const BLOCH_PUZZLES = [
   { from: '0', to: '1', gates: ['X'], max: 1, title: tr('Preklop |0⟩ na |1⟩', 'Flip |0⟩ to |1⟩', 'Переверни |0⟩ на |1⟩'), grant: ['bloch', 'sphere', 'XYZ'],
-    msg: tr('<b>X</b> = rotácia o 180° okolo osi x. Z severného pólu na južný: kvantové NOT, „preklopenie bitu“. Všimni si: |0⟩ a |1⟩ sú v Hilbertovom priestore <b>kolmé</b>, ale na Blochovej sfére <b>protiľahlé</b>.', '<b>X</b> = a 180° rotation about the x axis. From the north pole to the south: quantum NOT, a “bit flip”. Notice: |0⟩ and |1⟩ are <b>perpendicular</b> in Hilbert space but <b>antipodal</b> on the Bloch sphere.', '<b>X</b> = поворот на 180° навколо осі x. З північного полюса на південний: квантове НЕ, «переворот біта». Зверни увагу: |0⟩ і |1⟩ <b>перпендикулярні</b> в гільбертовому просторі, але <b>протилежні</b> на сфері Блоха.') },
+    msg: L('l3.BLOCH_PUZZLES.1') },
   { from: '0', to: '+', gates: ['X', 'Z', 'H'], max: 1, title: tr('Dostaň sa z pólu na rovník do |+⟩', 'Get from the pole to the equator, to |+⟩', 'Дістанься з полюса на екватор, до |+⟩'), grant: ['H'],
-    msg: tr('<b>H</b> otáča okolo osi medzi x a z → vymieňa osi z ↔ x. Pozor na jazyk: H „vytvorí superpozíciu“ len z pohľadu Z-bázy. Na |+⟩ by ju naopak „zrušilo“.', '<b>H</b> rotates about the axis between x and z → swaps the axes z ↔ x. Mind the language: H “creates a superposition” only from the point of view of the Z basis. Applied to |+⟩ it would “undo” one instead.', '<b>H</b> обертає навколо осі між x і z → міняє місцями осі z ↔ x. Обережно з мовою: H «створює суперпозицію» лише з погляду базису Z. Застосований до |+⟩, він би її навпаки «скасував».') },
+    msg: L('l3.BLOCH_PUZZLES.2') },
   { from: '+', to: '-', gates: ['Z', 'S', 'T'], max: 1, title: tr('Zmeň |+⟩ na |−⟩', 'Change |+⟩ into |−⟩', 'Зміни |+⟩ на |−⟩'), grant: ['relph', 'ST'],
-    msg: tr('Pozri na P(0) a P(1): <b>nezmenili sa</b> (stále ½ a ½)! Z zmenil iba <b>relatívnu fázu</b> o π. V Z-báze nerozlíšiteľné, v X-báze úplne odlišné stavy.', 'Look at P(0) and P(1): <b>they didn’t change</b> (still ½ and ½)! Z changed only the <b>relative phase</b> by π. Indistinguishable in the Z basis, completely different states in the X basis.', 'Поглянь на P(0) і P(1): <b>вони не змінилися</b> (досі ½ і ½)! Z змінив лише <b>відносну фазу</b> на π. Нерозрізненні в базисі Z, зовсім різні стани в базисі X.') },
+    msg: L('l3.BLOCH_PUZZLES.3') },
   { from: '0', to: '+i', gates: ['H', 'S', 'X', 'Z'], max: 2, title: tr('Dostaň sa do |+i⟩ (os y)', 'Get to |+i⟩ (the y axis)', 'Дістанься до |+i⟩ (вісь y)'), grant: ['thetaphi'],
-    msg: tr('H ťa zložilo na rovník (θ = π/2), S otočilo fázu o π/2 (φ = π/2). Dva uhly θ a φ stačia na opis každého čistého qubitu.', 'H brought you down to the equator (θ = π/2), S turned the phase by π/2 (φ = π/2). Two angles θ and φ are enough to describe any pure qubit.', 'H опустив тебе на екватор (θ = π/2), S повернув фазу на π/2 (φ = π/2). Двох кутів θ і φ досить, щоб описати будь-який чистий кубіт.') },
+    msg: L('l3.BLOCH_PUZZLES.4') },
   { from: '0', to: '1', gates: ['H', 'Z'], max: 3, title: tr('Preklop |0⟩ na |1⟩ — ale bez X!', 'Flip |0⟩ to |1⟩ — but without X!', 'Переверни |0⟩ на |1⟩ — але без X!'), grant: ['unitary'],
-    msg: tr('H·Z·H = X. Rôzne postupnosti rotácií môžu dať tú istú výslednú rotáciu. Každé hradlo je <b>unitárne</b> = rotácia, ktorá zachováva dĺžku šípky.', 'H·Z·H = X. Different sequences of rotations can give the same overall rotation. Every gate is <b>unitary</b> = a rotation that preserves the length of the arrow.', 'H·Z·H = X. Різні послідовності поворотів можуть дати той самий загальний поворот. Кожен гейт <b>унітарний</b> = поворот, що зберігає довжину стрілки.') },
+    msg: L('l3.BLOCH_PUZZLES.5') },
   { from: '0', to: '1', gates: ['Y'], max: 1, title: tr('Preklop |0⟩ na |1⟩ hradlom Y', 'Flip |0⟩ to |1⟩ with the Y gate', 'Переверни |0⟩ на |1⟩ гейтом Y'), grant: ['globalph'],
-    msg: tr('Pozri na zápis: Y|0⟩ = <b>i|1⟩</b>. Faktor i je <b>globálna fáza</b> — rovnaký pre celý stav, nedá sa zmerať. Preto píšeme <b>i|1⟩ ∼ |1⟩</b> („rovné až na globálnu fázu“). Šípka na sfére je tá istá!', 'Look at the notation: Y|0⟩ = <b>i|1⟩</b>. The factor i is a <b>global phase</b> — the same for the whole state, impossible to measure. That’s why we write <b>i|1⟩ ∼ |1⟩</b> (“equal up to a global phase”). The arrow on the sphere is the same!', 'Поглянь на запис: Y|0⟩ = <b>i|1⟩</b>. Множник i — це <b>глобальна фаза</b>: однакова для всього стану, виміряти її неможливо. Тому пишемо <b>i|1⟩ ∼ |1⟩</b> («рівні з точністю до глобальної фази»). Стрілка на сфері та сама!') },
+    msg: L('l3.BLOCH_PUZZLES.6') },
   // len na ťažkej obťažnosti
   { from: '0', to: '-i', gates: ['H', 'S', 'Z', 'X'], max: 3, hard: true, title: tr('Dostaň sa do |−i⟩ (os −y)', 'Get to |−i⟩ (the −y axis)', 'Дістанься до |−i⟩ (вісь −y)'), grant: [],
-    msg: tr('Napr. H → |+⟩, S → |+i⟩, Z → |−i⟩ (alebo H, Z, S). Relatívna fáza φ = 3π/2 — teda −i. Rôzne cesty po sfére, rovnaký cieľ.',
-      'E.g. H → |+⟩, S → |+i⟩, Z → |−i⟩ (or H, Z, S). Relative phase φ = 3π/2 — that is −i. Different paths over the sphere, the same target.', 'Напр. H → |+⟩, S → |+i⟩, Z → |−i⟩ (або H, Z, S). Відносна фаза φ = 3π/2 — це −i. Різні шляхи сферою, та сама ціль.') },
+    msg: L('l3.BLOCH_PUZZLES.7') },
   { from: '+', to: '+i', gates: ['T'], max: 2, hard: true, title: tr('Otoč |+⟩ na |+i⟩ len hradlom T', 'Turn |+⟩ into |+i⟩ using only T', 'Перетвори |+⟩ на |+i⟩ лише гейтом T'), grant: [],
-    msg: tr('T·T = S: dve rotácie o 45° okolo z dajú 90°. Fázové hradlá tvoria rebrík: T² = S, S² = Z.', 'T·T = S: two 45° rotations about z make 90°. The phase gates form a ladder: T² = S, S² = Z.', 'T·T = S: два повороти на 45° навколо z дають 90°. Фазові гейти утворюють драбину: T² = S, S² = Z.') },
+    msg: L('l3.BLOCH_PUZZLES.8') },
 ];
 
 class L3Bloch extends Level {
@@ -34,22 +33,12 @@ class L3Bloch extends Level {
 
   intro() {
     this.quest(tr('Vypočuj si Felixa Blocha', 'Listen to Felix Bloch', 'Послухай Фелікса Блоха'), { easy: tr('💬 Bloch', '💬 Bloch', '💬 Блох'), hard: tr('Bloch: θ, φ, rotácie', 'Bloch: θ, φ, rotations', 'Блох: θ, φ, повороти') });
-    this.say(tr([
-      'Grüezi! Som Felix Bloch. Vďaka NMR som ukázal, že stav spinu sa dá kresliť ako <b>šípka v guli</b>. Dnes ju voláme <b>Blochova sféra</b>.',
-      'Prirovnanie: Blochova sféra je <b>zemeguľa stavov</b>. Severný pól = |0⟩, južný = |1⟩, rovník = rovnomerné superpozície. <b>Zemepisná šírka</b> (uhol θ) určuje pravdepodobnosti merania v Z-báze, <b>zemepisná dĺžka</b> (φ) je relatívna fáza.',
-      'Ale pozor: toto <b>nie je</b> mapa laboratória a šípka nie je os rotujúcej guľôčky! Je to obraz amplitúd α a β.',
-      `Hradlá sú <b>otočenia</b> tejto gule. Vyrieš ${this.puzzleList().length} hádaniek: dostaň šípku (červená) na zlatý cieľ s obmedzenými hradlami. Guľou môžeš otáčať myšou.`,
-    ], [
-      'Grüezi! I am Felix Bloch. Thanks to NMR I showed that the state of a spin can be drawn as an <b>arrow in a ball</b>. Today we call it the <b>Bloch sphere</b>.',
-      'An analogy: the Bloch sphere is a <b>globe of states</b>. North pole = |0⟩, south = |1⟩, the equator = equal superpositions. <b>Latitude</b> (the angle θ) sets the measurement probabilities in the Z basis, <b>longitude</b> (φ) is the relative phase.',
-      'But careful: this is <b>not</b> a map of the laboratory, and the arrow is not the axis of a spinning ball! It is a picture of the amplitudes α and β.',
-      `Gates are <b>rotations</b> of this ball. Solve ${this.puzzleList().length} puzzles: bring the (red) arrow onto the golden target with a limited set of gates. You can rotate the ball with the mouse.`,
-    ], [
-      'Grüezi! Я Фелікс Блох. Завдяки ЯМР я показав, що стан спіну можна намалювати як <b>стрілку в кулі</b>. Сьогодні її називають <b>сферою Блоха</b>.',
-      'Аналогія: сфера Блоха — це <b>глобус станів</b>. Північний полюс = |0⟩, південний = |1⟩, екватор = рівноважні суперпозиції. <b>Широта</b> (кут θ) задає ймовірності вимірювання в базисі Z, <b>довгота</b> (φ) — відносна фаза.',
-      'Але обережно: це <b>не</b> мапа лабораторії, і стрілка — не вісь кульки, що обертається! Це зображення амплітуд α і β.',
-      `Гейти — це <b>повороти</b> цієї кулі. Розв’яжи ${this.puzzleList().length} головоломок: доведи (червону) стрілку до золотої цілі обмеженим набором гейтів. Кулю можна обертати мишею.`,
-    ]), () => this.next());
+    this.say([
+      L('l3.intro.1.0'),
+      L('l3.intro.1.1'),
+      L('l3.intro.1.2'),
+      L('l3.intro.1.3', this.puzzleList().length),
+    ], () => this.next());
   }
 
   puzzles() { this.plist = this.puzzleList(); this.loadPuzzle(Math.min(this.sub.pi || 0, this.plist.length - 1)); }
@@ -104,10 +93,8 @@ class L3Bloch extends Level {
       this.grant(P.grant);
       this.say([`✅ ${P.msg}`], () => {
         if (this.pi === 2) {
-          this.ask(tr({ q: 'Stavy |+⟩ a |−⟩ majú rovnaké P(0) = P(1) = ½. Sú to rovnaké stavy?', options: ['Nie — líšia sa relatívnou fázou a meranie v X-báze ich rozlíši naisto', 'Áno — rovnaké pravdepodobnosti = rovnaký stav', 'Áno, líšia sa len globálnou fázou'], correct: 0,
-            why: 'Rovnaké štatistiky v jednej báze ešte neznamenajú rovnaký stav. Sú dokonca ortogonálne!' }, { q: 'The states |+⟩ and |−⟩ have the same P(0) = P(1) = ½. Are they the same state?', options: ['No — they differ by a relative phase, and a measurement in the X basis tells them apart with certainty', 'Yes — same probabilities = same state', 'Yes, they differ only by a global phase'], correct: 0,
-            why: 'Equal statistics in one basis do not mean the same state. They are even orthogonal!' }, { q: 'Стани |+⟩ і |−⟩ мають однакові P(0) = P(1) = ½. Це той самий стан?', options: ['Ні — вони відрізняються відносною фазою, і вимірювання в базисі X напевно їх розрізнить', 'Так — однакові ймовірності = той самий стан', 'Так, вони відрізняються лише глобальною фазою'], correct: 0,
-            why: 'Однакова статистика в одному базисі не означає того самого стану. Вони навіть ортогональні!' }), () => this.advance());
+          this.ask({ q: L('l3.onAnimDone.1.q'), options: [L('l3.onAnimDone.1.options.0'), L('l3.onAnimDone.1.options.1'), L('l3.onAnimDone.1.options.2')], correct: 0,
+            why: L('l3.onAnimDone.1.why') }, () => this.advance());
         } else this.advance();
       });
     } else if (this.moves >= this.maxMoves) UI.toast(tr('Ešte to nie je ono. Klikni ↺ Znova a skús iné poradie.', 'Not quite yet. Click ↺ Again and try a different order.', 'Ще не зовсім. Натисни ↺ Знову і спробуй інший порядок.'));
@@ -138,16 +125,10 @@ class L3Bloch extends Level {
       easy: tr('📏 Meraj |+⟩: 1× a 100×', '📏 Measure |+⟩: 1× and 100×', '📏 Виміряй |+⟩: 1× і 100×'),
       hard: tr('|+⟩ → M<sub>Z</sub> ×1, ×100 · porovnaj s |+i⟩', '|+⟩ → M<sub>Z</sub> ×1, ×100 · compare with |+i⟩', '|+⟩ → M<sub>Z</sub> ×1, ×100 · порівняй із |+i⟩'),
     });
-    this.say(tr([
-      'Posledná lekcia: <b>meranie</b>. Šípka obsahuje veľa informácie (θ aj φ). Koľko z nej dostaneš jedným meraním?',
-      'Klikni <b>Meraj 1×</b> na stav |+⟩. Potom <b>Meraj 100 kópií</b> — tie isté prípravy, nezávislé merania.',
-    ], [
-      'The last lesson: <b>measurement</b>. The arrow holds a lot of information (both θ and φ). How much of it do you get from one measurement?',
-      'Click <b>Measure 1×</b> on the state |+⟩. Then <b>Measure 100 copies</b> — the same preparations, independent measurements.',
-    ], [
-      'Останній урок: <b>вимірювання</b>. Стрілка несе багато інформації (і θ, і φ). Скільки з неї ти отримаєш з одного вимірювання?',
-      'Натисни <b>Виміряти 1×</b> на стані |+⟩. Потім <b>Виміряти 100 копій</b> — однакові приготування, незалежні вимірювання.',
-    ]));
+    this.say([
+      L('l3.measure.1.0'),
+      L('l3.measure.1.1'),
+    ]);
     this.readout = UI.info('');
     UI.panelSet(tr('Meranie v Z-báze', 'Measurement in the Z basis', 'Вимірювання в базисі Z'), [
       UI.row(UI.button(tr('Priprav |+⟩', 'Prepare |+⟩', 'Приготувати |+⟩'), () => { this.psi = Q.named('+'); this.updReadout(); }), UI.button(tr('Priprav |+i⟩', 'Prepare |+i⟩', 'Приготувати |+i⟩'), () => { this.psi = Q.named('+i'); this.updReadout(); })),
@@ -174,10 +155,8 @@ class L3Bloch extends Level {
   checkMeasure() {
     if (!(this.f.m1 && this.f.m100) || this.f.mdone) return;
     this.f.mdone = true;
-    this.ask(tr({ q: 'Čo nám dalo JEDNO meranie qubitu?', options: ['jeden bit (0 alebo 1) a stav sa zmenil na |0⟩ alebo |1⟩', 'hodnoty α a β', 'uhly θ a φ'], correct: 0,
-      why: 'Jedno meranie = jeden bit. Pravdepodobnosti zistíš až zo <b>štatistiky mnohých rovnako pripravených kópií</b>. A fázu φ len meraním v inej báze. (Skús: |+⟩ a |+i⟩ dajú v Z-báze rovnakú štatistiku!)' }, { q: 'What did ONE measurement of the qubit give us?', options: ['one bit (0 or 1), and the state changed to |0⟩ or |1⟩', 'the values of α and β', 'the angles θ and φ'], correct: 0,
-      why: 'One measurement = one bit. You learn the probabilities only from the <b>statistics of many identically prepared copies</b>. And the phase φ only by measuring in another basis. (Try it: |+⟩ and |+i⟩ give the same statistics in the Z basis!)' }, { q: 'Що нам дало ОДНЕ вимірювання кубіта?', options: ['один біт (0 або 1), а стан змінився на |0⟩ або |1⟩', 'значення α і β', 'кути θ і φ'], correct: 0,
-      why: 'Одне вимірювання = один біт. Імовірності дізнаєшся лише зі <b>статистики багатьох однаково приготованих копій</b>. А фазу φ — лише вимірюванням в іншому базисі. (Спробуй: |+⟩ і |+i⟩ дають у базисі Z однакову статистику!)' }), () => this.next());
+    this.ask({ q: L('l3.checkMeasure.1.q'), options: [L('l3.checkMeasure.1.options.0'), L('l3.checkMeasure.1.options.1'), L('l3.checkMeasure.1.options.2')], correct: 0,
+      why: L('l3.checkMeasure.1.why') }, () => this.next());
   }
 
   // ---------- geometrické laboratórium (voľné skúmanie) ----------
@@ -191,8 +170,7 @@ class L3Bloch extends Level {
       easy: tr('🧪 Laboratórium: stav · rotácia · meranie', '🧪 Lab: state · rotation · measurement', '🧪 Лабораторія: стан · поворот · вимірювання'),
       hard: '|ψ(θ,φ)⟩ → R<sub>n</sub>(α) → M<sub>m</sub>: P(+m) = (1 + r·m)/2',
     });
-    this.say([tr('Na záver voľné laboratórium. Každý čistý stav je bod (θ, φ), každé hradlo je rotácia R<sub>n</sub>(α) okolo nejakej osi n a každé meranie je otázka „je stav v smere m?“ — <b>P(+m) = (1 + r·m)/2</b>.',
-      'Finally, a free lab. Every pure state is a point (θ, φ), every gate is a rotation R<sub>n</sub>(α) about some axis n, and every measurement is the question “is the state along m?” — <b>P(+m) = (1 + r·m)/2</b>.', 'Наостанок — вільна лабораторія. Кожен чистий стан — точка (θ, φ), кожен гейт — поворот R<sub>n</sub>(α) навколо якоїсь осі n, а кожне вимірювання — питання «чи напрямлений стан уздовж m?» — <b>P(+m) = (1 + r·m)/2</b>.')]);
+    this.say([L('l3.lab.1')]);
     const L = this.L, deg = (v) => v + '°';
     this.labInfo = UI.info(''); this.labChart = UI.chart(300, 110); this.readout = UI.info('');
     const det = (title, nodes, open) => { const d = el('details'); d.open = !!open; d.appendChild(el('summary', null, title)); nodes.forEach((x) => d.appendChild(x)); return d; };

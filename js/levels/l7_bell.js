@@ -15,19 +15,11 @@ class L7Bell extends Level {
 
   intro() {
     this.quest(tr('Vypočuj si Bella a Einsteina', 'Listen to Bell and Einstein', 'Послухай Белла та Ейнштейна'), { easy: tr('💬 Bell & Einstein', '💬 Bell & Einstein', '💬 Белл & Ейнштейн'), hard: tr('EPR 1935 vs. Bell 1964', 'EPR 1935 vs. Bell 1964', 'ЕПР 1935 проти Белла 1964') });
-    this.say(tr([
-      'Dobrý deň, som John Bell z CERN. Vitaj na <b>moste previazanosti</b>. Vľavo stojí <b>Alica</b> so svojím qubitom, vpravo <b>Bob</b>.',
-      { ...this.E, text: 'A ja som Einstein. Roku 1935 sme s Podolským a Rosenom tvrdili, že kvantová mechanika je <b>neúplná</b>. Ak niečo na diaľku predpoviem s istotou, musí to byť „prvok reality“ vopred! Žiadne <i>spukhafte Fernwirkung</i> — strašidelné pôsobenie na diaľku.' },
-      'V roku 1964 som ukázal, ako sa dá tento spor <b>rozhodnúť experimentom</b>. Najprv však musíš vyrobiť previazaný pár.',
-    ], [
-      'Good day, I am John Bell from CERN. Welcome to the <b>bridge of entanglement</b>. On the left stands <b>Alice</b> with her qubit, on the right <b>Bob</b>.',
-      { ...this.E, text: 'And I am Einstein. In 1935, with Podolsky and Rosen, we argued that quantum mechanics is <b>incomplete</b>. If I can predict something at a distance with certainty, it must be an “element of reality” beforehand! No <i>spukhafte Fernwirkung</i> — spooky action at a distance.' },
-      'In 1964 I showed how this dispute can be <b>settled by experiment</b>. But first you have to make an entangled pair.',
-    ], [
-      'Добрий день, я Джон Белл із CERN. Ласкаво просимо на <b>міст сплутаності</b>. Ліворуч стоїть <b>Аліса</b> зі своїм кубітом, праворуч — <b>Боб</b>.',
-      { ...this.E, text: 'А я Ейнштейн. 1935 року ми з Подольським і Розеном доводили, що квантова механіка <b>неповна</b>. Якщо я можу напевно передбачити щось на відстані, то це мусить бути «елементом реальності» ще заздалегідь! Жодної <i>spukhafte Fernwirkung</i> — моторошної дії на відстані.' },
-      '1964 року я показав, як цю суперечку можна <b>розв’язати експериментом</b>. Але спершу треба створити сплутану пару.',
-    ]), () => this.next());
+    this.say([
+      L('l7.intro.1.0'),
+      { ...this.E, text: L('l7.intro.1.1.text') },
+      L('l7.intro.1.2'),
+    ], () => this.next());
   }
 
   build() {
@@ -51,12 +43,8 @@ class L7Bell extends Level {
     if (this.stepIdx === 1 && !this.flags.b && C.abs2(this.psi.reduce((s, c, i) => C.add(s, C.mul(C.conj(this.bell()[i]), c)), C.of(0))) > 0.999) {
       this.flags.b = true;
       this.grant(['cnot', 'phiplus', 'entangle']);
-      this.say(tr(['Výborne! Teraz sa pozri na Blochove sféry: <b>obe šípky zmizli do stredu</b>.',
-        'Celok |Φ⁺⟩ je čistý stav, ale <b>každý qubit sám o sebe nemá vlastný stav</b> — je maximálne zmiešaný. Informácia nie je „v Alici“ ani „v Bobovi“, je v <b>koreláciách</b>. To je previazanosť: celok je viac než súčet častí.'], [
-        'Excellent! Now look at the Bloch spheres: <b>both arrows vanished into the centre</b>.',
-        'The whole |Φ⁺⟩ is a pure state, but <b>neither qubit on its own has a state of its own</b> — each is maximally mixed. The information is neither “in Alice” nor “in Bob”, it is in the <b>correlations</b>. That is entanglement: the whole is more than the sum of its parts.'], [
-        'Чудово! А тепер поглянь на сфери Блоха: <b>обидві стрілки зникли в центрі</b>.',
-        'Ціле |Φ⁺⟩ — чистий стан, але <b>жоден кубіт окремо не має власного стану</b> — кожен максимально змішаний. Інформація не «в Алісі» й не «в Бобі», вона в <b>кореляціях</b>. Це і є сплутаність: ціле більше за суму частин.']), () => this.next());
+      this.say([L('l7.after.1.0'),
+        L('l7.after.1.1')], () => this.next());
     }
   }
 
@@ -85,41 +73,23 @@ class L7Bell extends Level {
     if (this.flags.zz && this.flags.xz && !this.flags.ns) {
       this.flags.ns = true;
       this.grant(['nosignal', 'einstein']);
-      setTimeout(() => this.say(tr([
-        { ...this.E, text: 'Pri Z–Z sú výsledky <b>vždy rovnaké</b>! Hovoril som to: hodnoty museli byť určené vopred, ako dve rukavice v dvoch krabiciach.' },
-        'Možno. Ale všimni si Boba: nech Alica meria Z alebo X, Bob vidí <b>stále 50 : 50</b>. Alica mu takto <b>nemôže poslať správu</b> — korelácie uvidia až po porovnaní výsledkov obyčajným (klasickým, pomalším) kanálom.',
-        'A o rukaviciach rozhodne hra. Poďme na to!',
-      ], [
-        { ...this.E, text: 'With Z–Z the outcomes are <b>always the same</b>! I told you: the values must have been fixed in advance, like two gloves in two boxes.' },
-        'Perhaps. But look at Bob: whether Alice measures Z or X, Bob sees <b>50 : 50 every time</b>. This way Alice <b>cannot send him a message</b> — they see the correlations only after comparing results over an ordinary (classical, slower) channel.',
-        'And a game will decide about the gloves. Let’s go!',
-      ], [
-        { ...this.E, text: 'При Z–Z результати <b>завжди однакові</b>! Я ж казав: значення мусили бути визначені наперед, як дві рукавички у двох коробках.' },
-        'Можливо. Але поглянь на Боба: хоч Аліса вимірює Z, хоч X, Боб щоразу бачить <b>50 : 50</b>. Так Аліса <b>не може надіслати йому повідомлення</b> — кореляції вони побачать лише після порівняння результатів звичайним (класичним, повільнішим) каналом.',
-        'А про рукавички вирішить гра. Уперед!',
-      ]), () => this.next()), 300);
+      setTimeout(() => this.say([
+        { ...this.E, text: L('l7.measurePairs.1.0.text') },
+        L('l7.measurePairs.1.1'),
+        L('l7.measurePairs.1.2'),
+      ], () => this.next()), 300);
     }
   }
 
   chsh() {
     this.showAxes = true;
     this.quest(tr('CHSH hra: nastav uhly meraní tak, aby tím vyhral viac ako 80 % kôl (klasicky najviac 75 %).', 'CHSH game: set the measurement angles so that the team wins more than 80 % of rounds (classically at most 75 %).', 'Гра CHSH: налаштуй кути вимірювань так, щоб команда вигравала понад 80 % раундів (класично щонайбільше 75 %).'), { easy: tr(`🎲 vyhraj > ${Fmt.pct(byDiff(0.78, 0.8, 0.83))}`, `🎲 win > ${Fmt.pct(byDiff(0.78, 0.8, 0.83))}`, `🎲 виграй > ${Fmt.pct(byDiff(0.78, 0.8, 0.83))}`), hard: `a⊕b = x·y · P<sub>win</sub> > ${Fmt.pct(byDiff(0.78, 0.8, 0.83))} · ${tr('klasicky', 'classical', 'класично')} ≤ 75 % · cos²(π/8) ≈ 85 %` });
-    this.say(tr([
-      'Pravidlá <b>CHSH hry</b>: rozhodca pošle Alici náhodný bit x a Bobovi náhodný bit y. Bez komunikácie odpovedia bitmi a, b.',
-      'Vyhrávajú, ak <b>a ⊕ b = x · y</b>: teda majú odpovedať <b>rovnako</b>, okrem prípadu x = y = 1, keď majú odpovedať <b>rôzne</b>.',
-      { ...this.E, text: 'Ak majú „rukavice“ — vopred dohodnuté odpovede (lokálne skryté premenné) — nikdy neprekročia <b>75 %</b>. To je Bellova nerovnosť.' },
-      'S previazaným párom si Alica podľa x vyberie uhol merania a₀ alebo a₁, Bob podľa y uhol b₀ alebo b₁. Skús nájsť uhly, ktoré prekonajú 75 %!',
-    ], [
-      'The rules of the <b>CHSH game</b>: the referee sends Alice a random bit x and Bob a random bit y. Without communicating, they answer with bits a, b.',
-      'They win if <b>a ⊕ b = x · y</b>: so they should answer <b>the same</b>, except when x = y = 1, when they should answer <b>differently</b>.',
-      { ...this.E, text: 'If they have “gloves” — answers agreed in advance (local hidden variables) — they never exceed <b>75 %</b>. That is Bell’s inequality.' },
-      'With an entangled pair, Alice picks the measurement angle a₀ or a₁ depending on x, and Bob picks b₀ or b₁ depending on y. Try to find angles that beat 75 %!',
-    ], [
-      'Правила <b>гри CHSH</b>: суддя надсилає Алісі випадковий біт x, а Бобові випадковий біт y. Не спілкуючись, вони відповідають бітами a, b.',
-      'Вони виграють, якщо <b>a ⊕ b = x · y</b>: тобто мають відповісти <b>однаково</b>, крім випадку x = y = 1, коли мають відповісти <b>по-різному</b>.',
-      { ...this.E, text: 'Якщо в них «рукавички» — відповіді, домовлені заздалегідь (локальні приховані змінні), — вони ніколи не перевищать <b>75 %</b>. Це нерівність Белла.' },
-      'Зі сплутаною парою Аліса вибирає кут вимірювання a₀ або a₁ залежно від x, а Боб — b₀ або b₁ залежно від y. Спробуй знайти кути, що поб’ють 75 %!',
-    ]), () => {
+    this.say([
+      L('l7.chsh.1.0'),
+      L('l7.chsh.1.1'),
+      { ...this.E, text: L('l7.chsh.1.2.text') },
+      L('l7.chsh.1.3'),
+    ], () => {
       this.read = UI.info('');
       this.chart = UI.chart(300, 130); this.pairWin = null;
       const sl = (k, label) => UI.slider(label, -90, 180, byDiff(15, 7.5, 7.5), this.ang[k], (v) => { this.ang[k] = v; this.drawChsh(); return v + '°'; });
@@ -147,15 +117,9 @@ class L7Bell extends Level {
     if (p > byDiff(0.78, 0.8, 0.83) && !this.flags.chsh) {
       this.flags.chsh = true;
       this.grant(['bell', 'chsh']);
-      this.say(tr([`${Fmt.pct(p)}! Teoretické maximum je cos²(π/8) ≈ <b>85 %</b>. Toto <b>žiadne rukavice nedokážu</b>.`,
-        { ...this.E, text: 'Hmm... Takže buď sa vzdám lokálnosti, alebo predstavy, že hodnoty existujú pred meraním.' },
-        'Presne. <b>Bohm</b> volí nelokálnosť (pilotná vlna), operačný prístup (Bohr) opúšťa predexistujúce hodnoty. A pozor: <b>správu</b> ste si stále neposlali. Za experimentálne overenie dostali Aspect, Clauser a Zeilinger Nobelovu cenu 2022.'], [
-        `${Fmt.pct(p)}! The theoretical maximum is cos²(π/8) ≈ <b>85 %</b>. <b>No gloves can do this</b>.`,
-        { ...this.E, text: 'Hmm... So either I give up locality, or the idea that values exist before the measurement.' },
-        'Exactly. <b>Bohm</b> chooses non-locality (the pilot wave), the operational approach (Bohr) gives up pre-existing values. And note: you still haven’t sent each other a <b>message</b>. Aspect, Clauser and Zeilinger received the 2022 Nobel Prize for the experimental confirmation.'], [
-        `${Fmt.pct(p)}! Теоретичний максимум — cos²(π/8) ≈ <b>85 %</b>. <b>Жодні рукавички цього не зможуть</b>.`,
-        { ...this.E, text: 'Гм... Отже, або я відмовляюся від локальності, або від ідеї, що значення існують до вимірювання.' },
-        'Саме так. <b>Бом</b> обирає нелокальність (хвиля-пілот), операційний підхід (Бор) відмовляється від наперед існуючих значень. І зверни увагу: ви досі не надіслали одне одному жодного <b>повідомлення</b>. Аспе, Клаузер і Цайлінгер отримали Нобелівську премію 2022 року за експериментальне підтвердження.']), () => this.next());
+      this.say([L('l7.play.1.0', Fmt.pct(p)),
+        { ...this.E, text: L('l7.play.1.1.text') },
+        L('l7.play.1.2')], () => this.next());
     }
   }
   // výhra pre každú dvojicu (x, y): teória (|Φ⁺⟩, osi v rovine xz) P(rovnaké) = cos²((a − b)/2) a namerané

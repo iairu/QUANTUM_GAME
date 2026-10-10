@@ -16,19 +16,11 @@ class L2Stern extends Level {
 
   intro() {
     this.quest(tr('Vypočuj si Sterna a Gerlacha', 'Listen to Stern and Gerlach', 'Послухай Штерна та Ґерлаха'), { easy: tr('💬 Stern & Gerlach', '💬 Stern & Gerlach', '💬 Штерн і Ґерлах'), hard: tr('SG: Ag, nehomogénne B, ±ħ/2', 'SG: Ag, inhomogeneous B, ±ħ/2', 'ШҐ: Ag, неоднорідне B, ±ħ/2') });
-    this.say(tr([
-      { who: 'Otto Stern', face: '🧲', text: 'Vitaj vo Frankfurte, rok 1922! Z tejto <b>pece</b> letia atómy striebra. Každý má jeden nepárový elektrón a ten sa správa ako maličký magnet.' },
-      { who: 'Walther Gerlach', face: '🧲', text: 'Zväzok pustíme cez <b>nehomogénne</b> magnetické pole (horný pól je ostrý, dolný plochý). Magnetický moment sa podľa svojej orientácie vychýli hore alebo dole.' },
-      { who: 'Otto Stern', face: '🧲', text: 'Klasická predstava: magnetíky sú natočené náhodne → na tienidle by mal vzniknúť <b>spojitý pás</b>. Poďme to otestovať!' },
-    ], [
-      { who: 'Otto Stern', face: '🧲', text: 'Welcome to Frankfurt, 1922! Silver atoms fly out of this <b>furnace</b>. Each has one unpaired electron, and it behaves like a tiny magnet.' },
-      { who: 'Walther Gerlach', face: '🧲', text: 'We send the beam through an <b>inhomogeneous</b> magnetic field (the top pole is sharp, the bottom one flat). Depending on its orientation, the magnetic moment is deflected up or down.' },
-      { who: 'Otto Stern', face: '🧲', text: 'The classical picture: the little magnets point in random directions → a <b>continuous band</b> should appear on the screen. Let’s test it!' },
-    ], [
-      { who: 'Отто Штерн', face: '🧲', text: 'Ласкаво просимо до Франкфурта, 1922 рік! З цієї <b>печі</b> вилітають атоми срібла. Кожен має один неспарений електрон, і той поводиться як крихітний магніт.' },
-      { who: 'Вальтер Ґерлах', face: '🧲', text: 'Ми пропускаємо пучок крізь <b>неоднорідне</b> магнітне поле (верхній полюс гострий, нижній плаский). Залежно від орієнтації магнітний момент відхиляється вгору або вниз.' },
-      { who: 'Отто Штерн', face: '🧲', text: 'Класична картина: магнітики напрямлені навмання → на екрані має з’явитися <b>суцільна смуга</b>. Перевірмо!' },
-    ]), () => this.next());
+    this.say([
+      { who: L('l2.intro.1.0.who'), face: '🧲', text: L('l2.intro.1.0.text') },
+      { who: L('l2.intro.1.1.who'), face: '🧲', text: L('l2.intro.1.1.text') },
+      { who: L('l2.intro.1.2.who'), face: '🧲', text: L('l2.intro.1.2.text') },
+    ], () => this.next());
   }
 
   // ---------- úloha 1: klasika vs. skutočnosť ----------
@@ -39,21 +31,13 @@ class L2Stern extends Level {
       const need = byDiff(30, 50, 80);
       if (this.f.s1 || this.seen.q < need || this.seen.c < need) return;
       this.f.s1 = true;
-      this.ask(tr({ q: 'Koľko stôp vytvorí skutočný (kvantový) zväzok na tienidle?', options: ['dve oddelené stopy', 'spojitý pás', 'jednu stopu v strede'], correct: 0,
-        why: 'Pri meraní projekcie spinu ½ v zvolenej osi sú len dva výsledky: <b>+ħ/2</b> a <b>−ħ/2</b>.' }, { q: 'How many spots does the real (quantum) beam make on the screen?', options: ['two separate spots', 'a continuous band', 'one spot in the middle'], correct: 0,
-        why: 'Measuring the projection of a spin ½ along a chosen axis has only two outcomes: <b>+ħ/2</b> and <b>−ħ/2</b>.' }, { q: 'Скільки плям утворює на екрані реальний (квантовий) пучок?', options: ['дві окремі плями', 'суцільну смугу', 'одну пляму посередині'], correct: 0,
-        why: 'Вимірювання проєкції спіну ½ уздовж обраної осі має лише два результати: <b>+ħ/2</b> і <b>−ħ/2</b>.' }), () => {
+      this.ask({ q: L('l2.twoSpots.1.q'), options: [L('l2.twoSpots.1.options.0'), L('l2.twoSpots.1.options.1'), L('l2.twoSpots.1.options.2')], correct: 0,
+        why: L('l2.twoSpots.1.why') }, () => {
         this.grant(['stern', 'gerlach', 'Sz', 'hbar', 'spinhalf']);
-        this.say(tr([
-          { who: 'Walther Gerlach', face: '🧲', text: 'Hornú stopu voláme <b>S<sub>z</sub> = +ħ/2</b> (stav <b>|0⟩ ≡ |+z⟩</b>, „spin hore“), dolnú <b>S<sub>z</sub> = −ħ/2</b> (stav <b>|1⟩ ≡ |−z⟩</b>).' },
-          { who: 'Otto Stern', face: '🧲', text: 'Pozor na jazyk! Experiment <b>neukázal, ako sa elektrón točí</b>. Ukázal, aké výsledky dáva presne určené meranie. A „spin ½“ neznamená polovičnú otáčku — je to názov druhu kvantového spinu.' },
-        ], [
-          { who: 'Walther Gerlach', face: '🧲', text: 'We call the upper spot <b>S<sub>z</sub> = +ħ/2</b> (state <b>|0⟩ ≡ |+z⟩</b>, “spin up”), the lower one <b>S<sub>z</sub> = −ħ/2</b> (state <b>|1⟩ ≡ |−z⟩</b>).' },
-          { who: 'Otto Stern', face: '🧲', text: 'Mind the language! The experiment <b>did not show how the electron spins</b>. It showed what outcomes a precisely specified measurement gives. And “spin ½” doesn’t mean half a turn — it is the name of a kind of quantum spin.' },
-        ], [
-          { who: 'Вальтер Ґерлах', face: '🧲', text: 'Верхню пляму називаємо <b>S<sub>z</sub> = +ħ/2</b> (стан <b>|0⟩ ≡ |+z⟩</b>, «спін угору»), нижню — <b>S<sub>z</sub> = −ħ/2</b> (стан <b>|1⟩ ≡ |−z⟩</b>).' },
-          { who: 'Отто Штерн', face: '🧲', text: 'Обережно з мовою! Експеримент <b>не показав, як обертається електрон</b>. Він показав, які результати дає точно задане вимірювання. А «спін ½» не означає пів оберту — це назва різновиду квантового спіну.' },
-        ]), () => this.next());
+        this.say([
+          { who: L('l2.twoSpots.2.0.who'), face: '🧲', text: L('l2.twoSpots.2.0.text') },
+          { who: L('l2.twoSpots.2.1.who'), face: '🧲', text: L('l2.twoSpots.2.1.text') },
+        ], () => this.next());
       });
     };
     this.buildPanel();
@@ -64,26 +48,18 @@ class L2Stern extends Level {
     this.edit = true; this.model = 'q';
     const n = byDiff(25, 40, 60);
     this.quest(tr(`Vyskúšaj zostavu A (Z+ → Z) a zostavu B (Z+ → X+ → Z). Pri každej musí na tienidlo dopadnúť aspoň ${n} atómov (filtre časť pohltia).`, `Try setup A (Z+ → Z) and setup B (Z+ → X+ → Z). For each, at least ${n} atoms must reach the screen (filters absorb some).`, `Спробуй схему A (Z+ → Z) і схему B (Z+ → X+ → Z). Для кожної на екран має потрапити щонайменше ${n} атомів (фільтри частину поглинуть).`), { easy: tr(`🧲 Zostava A · Zostava B · ${n} atómov`, `🧲 Setup A · Setup B · ${n} atoms`, `🧲 Схема A · Схема B · ${n} атомів`), hard: `A: Z+ → Z · B: Z+ → X+ → Z · N ≥ ${n}` });
-    this.say(tr([
-      { who: 'Otto Stern', face: '🧲', text: 'Teraz môžeš zapojiť až <b>tri magnety</b> za sebou, otáčať ich (os z = 0°, os x = 90°) a nastaviť <b>filter</b>, ktorý prepustí len jeden zväzok.' },
-      { who: 'Walther Gerlach', face: '🧲', text: 'Zostava A: prvý magnet Z prepustí len „+“, druhý magnet znova Z. Zostava B: medzi ne vlož magnet X (prepúšťa „+“). Tipni si výsledok skôr, než vystrelíš!' },
-    ], [
-      { who: 'Otto Stern', face: '🧲', text: 'Now you can chain up to <b>three magnets</b>, rotate them (z axis = 0°, x axis = 90°) and set a <b>filter</b> that lets only one beam through.' },
-      { who: 'Walther Gerlach', face: '🧲', text: 'Setup A: the first Z magnet lets only “+” through, the second magnet measures Z again. Setup B: put an X magnet (passing “+”) between them. Guess the result before you fire!' },
-    ], [
-      { who: 'Отто Штерн', face: '🧲', text: 'Тепер можеш з’єднати до <b>трьох магнітів</b>, повертати їх (вісь z = 0°, вісь x = 90°) і встановити <b>фільтр</b>, що пропускає лише один пучок.' },
-      { who: 'Вальтер Ґерлах', face: '🧲', text: 'Схема A: перший магніт Z пропускає лише «+», другий магніт знову вимірює Z. Схема B: встав між ними магніт X (що пропускає «+»). Вгадай результат, перш ніж стріляти!' },
-    ]));
+    this.say([
+      { who: L('l2.sequences.1.0.who'), face: '🧲', text: L('l2.sequences.1.0.text') },
+      { who: L('l2.sequences.1.1.who'), face: '🧲', text: L('l2.sequences.1.1.text') },
+    ]);
     this.check = () => {
       const sig = this.sig(), tot = this.cnt.up + this.cnt.down, need = byDiff(25, 40, 60);
       if (sig === 'z+|z' && tot >= need && !this.f.A) { this.f.A = true; UI.toast(tr(`✅ Zostava A: hore ${Fmt.pct(this.cnt.up / tot)} — atóm si „pamätá“ výsledok Z.`, `✅ Setup A: up ${Fmt.pct(this.cnt.up / tot)} — the atom “remembers” the Z result.`, `✅ Схема A: угору ${Fmt.pct(this.cnt.up / tot)} — атом «пам’ятає» результат Z.`)); }
       if (sig === 'z+|x+|z' && tot >= need && !this.f.B) { this.f.B = true; UI.toast(tr(`✅ Zostava B: hore ${Fmt.pct(this.cnt.up / tot)} — znova 50/50!`, `✅ Setup B: up ${Fmt.pct(this.cnt.up / tot)} — 50/50 again!`, `✅ Схема B: угору ${Fmt.pct(this.cnt.up / tot)} — знову 50/50!`)); }
       if (this.f.A && this.f.B && !this.f.s2) {
         this.f.s2 = true;
-        setTimeout(() => this.ask(tr({ q: 'Prečo zostava B (Z+ → X+ → Z) dáva na konci opäť 50 : 50?', options: ['Meranie v osi x pripravilo nový stav |+x⟩; v ňom je výsledok v osi z neistý.', 'Magnet X pokazil atómy.', 'Atómy mali skryté hodnoty pre všetky osi a magnet X ich premiešal.'], correct: 0,
-          why: 'Istota v jednej báze neznamená istotu v inej. <b>Meracia báza je súčasťou otázky.</b> Spin nie je šípka s vopred určenými hodnotami pre x, y aj z naraz.' }, { q: 'Why does setup B (Z+ → X+ → Z) give 50 : 50 again at the end?', options: ['The x measurement prepared a new state |+x⟩; in it the z outcome is uncertain.', 'The X magnet damaged the atoms.', 'The atoms had hidden values for all axes and the X magnet shuffled them.'], correct: 0,
-          why: 'Certainty in one basis does not mean certainty in another. <b>The measurement basis is part of the question.</b> Spin is not an arrow with predetermined values for x, y and z all at once.' }, { q: 'Чому схема B (Z+ → X+ → Z) наприкінці знову дає 50 : 50?', options: ['Вимірювання x приготувало новий стан |+x⟩; у ньому результат z невизначений.', 'Магніт X пошкодив атоми.', 'Атоми мали приховані значення для всіх осей, а магніт X їх перемішав.'], correct: 0,
-          why: 'Визначеність в одному базисі не означає визначеності в іншому. <b>Базис вимірювання — частина питання.</b> Спін — не стрілка з наперед визначеними значеннями для x, y і z одночасно.' }), () => {
+        setTimeout(() => this.ask({ q: L('l2.sequences.2.q'), options: [L('l2.sequences.2.options.0'), L('l2.sequences.2.options.1'), L('l2.sequences.2.options.2')], correct: 0,
+          why: L('l2.sequences.2.why') }, () => {
           this.grant(['basisq', 'ket0']);
           this.next();
         }), 600);
@@ -100,10 +76,9 @@ class L2Stern extends Level {
     this.quest(tr(`Predpovedz výsledok a over ho: druhý magnet je otočený o ${a}°.`, `Predict the result and test it: the second magnet is rotated by ${a}°.`, `Передбач результат і перевір його: другий магніт повернуто на ${a}°.`), { easy: tr(`🤔 Tipni: magnet ${a}°`, `🤔 Guess: magnet ${a}°`, `🤔 Вгадай: магніт ${a}°`), hard: `P(+ | +z, ${a}°) = ?` });
     const pc = (x) => Fmt.pct(x), opts = [p, 1 - p, 0.5, 1].map((x) => tr(`približne ${pc(x)}`, `about ${pc(x)}`, `приблизно ${pc(x)}`));
     this.ask({
-      q: tr(`Atómy prešli filtrom „+z“. Druhý magnet je otočený o ${a}° od osi z. Aký podiel pôjde do jeho hornej stopy?`, `The atoms passed a “+z” filter. The second magnet is rotated ${a}° from the z axis. What fraction goes to its upper spot?`, `Атоми пройшли фільтр «+z». Другий магніт повернуто на ${a}° від осі z. Яка частка піде в його верхню пляму?`),
+      q: L('l2.predict.1', a),
       options: opts, correct: 0,
-      why: tr(`Pravdepodobnosť je cos²(${a}°/2) = ${pc(p)}. Na Blochovej sfére: (1 + cos ${a}°)/2. Čím menší uhol medzi osami, tým istejší výsledok.`,
-        `The probability is cos²(${a}°/2) = ${pc(p)}. On the Bloch sphere: (1 + cos ${a}°)/2. The smaller the angle between the axes, the more certain the outcome.`, `Імовірність дорівнює cos²(${a}°/2) = ${pc(p)}. На сфері Блоха: (1 + cos ${a}°)/2. Що менший кут між осями, то певніший результат.`),
+      why: L('l2.predict.2', a, pc(p)),
     }, () => {
       this.hideTheory = false; this.updStats();
       const need = byDiff(60, 100, 200);
@@ -112,7 +87,7 @@ class L2Stern extends Level {
         const tot = this.cnt.up + this.cnt.down;
         if (this.sig() === `z+|${a}°` && tot >= byDiff(60, 100, 200) && !this.f.s3) {
           this.f.s3 = true;
-          this.say([{ who: tr('Otto Stern', 'Otto Stern', 'Отто Штерн'), face: '🧲', text: tr(`Namerali sme ${Fmt.pct(this.cnt.up / tot)} hore (teória ${pc(p)}). Jedno meranie dá vždy len +ħ/2 alebo −ħ/2, ale <b>štatistika mnohých opakovaní</b> prezradí pravdepodobnosť. Presne tak sa v laboratóriu overuje Bornovo pravidlo.`, `We measured ${Fmt.pct(this.cnt.up / tot)} up (theory ${pc(p)}). A single measurement always gives just +ħ/2 or −ħ/2, but the <b>statistics of many repetitions</b> reveal the probability. That is exactly how the Born rule is tested in the lab.`, `Ми виміряли ${Fmt.pct(this.cnt.up / tot)} угору (теорія ${pc(p)}). Одне вимірювання завжди дає лише +ħ/2 або −ħ/2, але <b>статистика багатьох повторень</b> розкриває ймовірність. Саме так у лабораторії перевіряють правило Борна.`) }], () => this.next());
+          this.say([{ who: L('l2.predict.3'), face: '🧲', text: L('l2.predict.4', Fmt.pct(this.cnt.up / tot), pc(p)) }], () => this.next());
         }
       };
     });

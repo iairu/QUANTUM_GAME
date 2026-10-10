@@ -168,7 +168,7 @@ const UI = {
       if (en.kind === 'say') {
         const first = en.lines[0];
         box.appendChild(el('summary', null, `💬 <b>${first.who || ''}</b>: ${first.text.replace(/<[^>]+>/g, '').slice(0, 90)}…`));
-        for (const l of en.lines) box.appendChild(el('div', 'line', `<span class="who">${l.face || ''} ${l.who || ''}</span> ${annotate(l.text)}`));
+        for (const l of en.lines) box.appendChild(el('div', 'line', `<span class="who">${l.face || ''} ${l.who || ''}</span> ${annotate(l.text, false, true)}`));
         const rb = el('button', null, tr('▶ Prehrať znova', '▶ Replay', '▶ Відтворити знову'));
         rb.onclick = () => {
           if (this.busy) { this.toast(tr('Najprv dokonči aktuálny dialóg — text si však môžeš prečítať tu.', 'Finish the current dialogue first — but you can read the text here.', 'Спершу заверши поточний діалог — але текст можна прочитати тут.')); return; }
@@ -178,9 +178,9 @@ const UI = {
         box.appendChild(rb);
       } else {
         box.appendChild(el('summary', null, `${en.ok ? '✅' : '❌'} <b>${tr('Otázka', 'Question', 'Питання')}:</b> ${en.q.replace(/<[^>]+>/g, '').slice(0, 90)}`));
-        box.appendChild(el('div', 'line', annotate(en.q)));
+        box.appendChild(el('div', 'line', annotate(en.q, false, true)));
         box.appendChild(el('div', 'line good', '✔ ' + en.answer));
-        if (en.why) box.appendChild(el('div', 'line', annotate(en.why)));
+        if (en.why) box.appendChild(el('div', 'line', annotate(en.why, false, true)));
       }
       if (idx === 0) box.open = true;
       list.appendChild(box);
@@ -202,7 +202,7 @@ const UI = {
       Sound.sfx(l.cls === 'scroll' ? 'scroll' : !opened ? 'dialog' : 'page'); opened = true;
       this.dialog.innerHTML = '';
       this.dialog.appendChild(el('div', 'who', (l.face || '💬') + ' ' + (l.who || '') + (opts.replay ? ` <small>(${tr('opakovanie', 'replay', 'повтор')})</small>` : '')));
-      this.dialog.appendChild(el('div', 'txt', l.raw ? l.text : TextMode.render(l.text)));
+      this.dialog.appendChild(el('div', 'txt', l.raw ? EqG.markEq(l.text) : TextMode.render(l.text)));
       this.dialog.className = 'show ' + Settings.diff + (Settings.layman ? ' easy' : '') + (Settings.hard ? ' hard' : '') + (l.cls ? ' ' + l.cls : '');
       const nav = el('div', 'nav');
       const back = el('button', null, tr('◂ Späť', '◂ Back', '◂ Назад'));
@@ -241,7 +241,7 @@ const UI = {
     this.dialog.innerHTML = '';
     Sound.sfx('dialog');
     this.dialog.appendChild(el('div', 'who', (q.face || '❓') + ' ' + (q.who || tr('Otázka', 'Question', 'Питання'))));
-    this.dialog.appendChild(el('div', 'txt', annotate(q.q, true)));
+    this.dialog.appendChild(el('div', 'txt', annotate(q.q, true, true)));
     const box = el('div', 'choices');
     let order = q.options.map((_, i) => i);
     if (Settings.easy && order.length > 2) { // ľahká a laická: o jednu nesprávnu možnosť menej
@@ -251,7 +251,7 @@ const UI = {
     }
     if (q.shuffle !== false) order.sort(() => rand() - 0.5);
     for (const i of order) {
-      const b = el('button', 'choice', mathText(q.options[i])); // vzorce v odpovediach: čip rovnice (a glyfy pri rovniciach najprv)
+      const b = el('button', 'choice', mathText(q.options[i], true)); // vzorce v odpovediach: čip rovnice (a glyfy pri rovniciach najprv)
       b.dataset.ok = i === q.correct ? '1' : '0';
       b.onclick = () => {
         const ok = i === q.correct;
@@ -261,7 +261,7 @@ const UI = {
         [...box.children].forEach((c) => (c.disabled = true));
         b.classList.add(ok ? 'good' : 'bad');
         if (!ok) box.children[order.indexOf(q.correct)].classList.add('good');
-        const fb = el('div', 'why ' + (ok ? 'ok' : 'no'), (ok ? tr('✅ Správne. ', '✅ Correct. ', '✅ Правильно. ') : tr('❌ Nie celkom. ', '❌ Not quite. ', '❌ Не зовсім. ')) + annotate(q.why || '', true));
+        const fb = el('div', 'why ' + (ok ? 'ok' : 'no'), (ok ? tr('✅ Správne. ', '✅ Correct. ', '✅ Правильно. ') : tr('❌ Nie celkom. ', '❌ Not quite. ', '❌ Не зовсім. ')) + annotate(q.why || '', true, true));
         this.dialog.appendChild(fb);
         const c = el('button', 'primary', tr('Pokračovať ▸', 'Continue ▸', 'Продовжити ▸'));
         c.onclick = () => { this.dialog.classList.remove('show'); this.busy = false; this._next = null; cb && cb(ok); };
@@ -327,7 +327,7 @@ const UI = {
     d.appendChild(el('summary', null, tr('📐 Teória a rovnice', '📐 Theory and equations', '📐 Теорія та рівняння')));
     for (const p of parts) {
       d.appendChild(el('h4', null, p.h));
-      d.appendChild(el('div', 'th', annotate(p.html)));
+      d.appendChild(el('div', 'th', annotate(p.html, false, true)));
       if (p.view) d.appendChild(this.button(tr('👁 Ukáž to obrázkom', '👁 Show it as a picture', '👁 Показати як картинку'), () => Views.open(p.view), '', tr('Otvorí pohľad, v ktorom túto rovnicu vidno.', 'Opens the view in which this equation can be seen.', 'Відкриє погляд, у якому видно це рівняння.')));
     }
     this.panel.appendChild(d);
@@ -612,8 +612,8 @@ const TextMode = {
     return out.length ? out : [lines[lines.length - 1]];
   },
   render(html) {
-    if (Settings.layman) return annotate(html, true); // laická: žargón s prekladom
-    return annotate(html);
+    if (Settings.layman) return annotate(html, true, true); // laická: žargón s prekladom
+    return annotate(html, false, true);
   },
 };
 // zvýrazní čísla, stavy a slová písané veľkými písmenami (pre ľahkú obťažnosť v úlohách)
@@ -622,7 +622,7 @@ function emphasize(text) {
     : seg.replace(/(\|[^|⟩]{1,4}⟩|\d+(?:[.,]\d+)?\s?%?|[A-ZÁ-Ž]{3,}[A-ZÁ-Ž]*)/gu, '<b>$1</b>'))).join('');
 }
 // vzorec bez vysvetliviek pojmov (odpovede v kvízoch): len čip rovnice a pri „Rovnice najprv“ glyfy
-function mathText(html) {
-  html = EqG.wrapInline(html);
+function mathText(html, explicit = false) {
+  html = EqG.wrapInline(html, explicit);
   return Settings.eq ? EqG.glyphify(html) : html;
 }

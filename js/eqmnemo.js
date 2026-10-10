@@ -7,16 +7,16 @@
 
 const MODES = ['pictures', 'equations'];
 const MODE_NAME = {
-  pictures: tr('🖼 Obrazy najprv', '🖼 Pictures first', '🖼 Спершу образи'),
-  equations: tr('∑ Rovnice najprv', '∑ Equations first', '∑ Спершу рівняння'),
+  pictures: tr('🖼 Odporúčaná · obrazy najprv', '🖼 Recommended · pictures first', '🖼 Рекомендована · спершу образи'),
+  equations: tr('∑ Experimentálna · symboly najprv', '∑ Experimental · symbols first', '∑ Експериментальна · спершу символи'),
 };
 const MODE_DESC = {
   pictures: tr('pôvodná hra: najprv obraz a intuícia (ručičky, Blochova guľa, pokusy), rovnice len v paneli teórie',
     'the original game: the picture and intuition come first (hands, the Bloch ball, experiments); equations only in the theory panel',
     'оригінальна гра: спершу образ та інтуїція (стрілки, куля Блоха, досліди), рівняння — лише в панелі теорії'),
-  equations: tr('skutočná rovnica žije v 3D nad scénou a mení sa s hrou; rovnicová mnemotechnika: farba = KTO, veľkosť = KOĽKO, otáčanie = FÁZA; pred každou úlohou jej rovnica',
-    'the real equation lives in 3D above the scene and changes with the game; equation mnemonics: colour = WHO, size = HOW MUCH, spin = PHASE; every task starts with its equation',
-    'справжнє рівняння живе в 3D над сценою й змінюється разом із грою; мнемоніка рівнянь: колір = ХТО, розмір = СКІЛЬКИ, обертання = ФАЗА; кожне завдання починається з рівняння'),
+  equations: tr('navyše portál 0 — Sieň symbolov; skutočná rovnica žije v 3D nad scénou a mení sa s hrou; rovnicová mnemotechnika: farba = KTO, veľkosť = KOĽKO, otáčanie = FÁZA; pred každou úlohou jej rovnica',
+    'adds portal 0 — the Hall of Symbols; the real equation lives in 3D above the scene and changes with the game; equation mnemonics: colour = WHO, size = HOW MUCH, spin = PHASE; every task starts with its equation',
+    'додає портал 0 — Залу символів; справжнє рівняння живе в 3D над сценою й змінюється разом із грою; мнемоніка рівнянь: колір = ХТО, розмір = СКІЛЬКИ, обертання = ФАЗА; кожне завдання починається з рівняння'),
 };
 
 // mnemotechnické pravidlá: [ukážkový token, nadpis, vysvetlenie]

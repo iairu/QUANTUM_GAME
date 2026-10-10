@@ -16,10 +16,10 @@ class L1Complex extends Level {
   intro() {
     this.quest(tr('Vypočuj si Eulera', 'Listen to Euler', 'Послухай Ейлера'), { easy: tr('💬 Euler', '💬 Euler', '💬 Ейлер'), hard: tr('Euler: α = |α|e<sup>iφ</sup>, P = |α|²', 'Euler: α = |α|e<sup>iφ</sup>, P = |α|²', 'Ейлер: α = |α|e<sup>iφ</sup>, P = |α|²') });
     this.say([
-      tr('Vitaj v <b>Komplexnom prístave</b>! Ja som Leonhard Euler. Zaviedol som písmenká <b>e</b> a <b>i</b> — a v kvantovej mechanike ich uvidíš na každom kroku.', 'Welcome to the <b>Complex Harbour</b>! I am Leonhard Euler. I introduced the letters <b>e</b> and <b>i</b> — and in quantum mechanics you will see them at every step.', 'Ласкаво просимо до <b>Комплексної гавані</b>! Я Леонард Ейлер. Я запровадив літери <b>e</b> та <b>i</b> — і в квантовій механіці ти бачитимеш їх на кожному кроці.'),
-      tr('Prirovnanie: <b>amplitúda je ako ručička na hodinách</b>. Má <b>dĺžku</b> (veľkosť) a <b>uhol</b> (fázu). V kvantovom svete každý možný výsledok nesie takúto ručičku.', 'An analogy: <b>an amplitude is like the hand of a clock</b>. It has a <b>length</b> (magnitude) and an <b>angle</b> (phase). In the quantum world every possible outcome carries such a hand.', 'Аналогія: <b>амплітуда — як стрілка годинника</b>. Вона має <b>довжину</b> (модуль) і <b>кут</b> (фазу). У квантовому світі кожен можливий результат несе таку стрілку.'),
-      tr('Pravdepodobnosť je <b>štvorec dĺžky</b> ručičky: |α|². Uhol jej je ukradnutý! Prečo teda fáza vôbec existuje? To zistíš v treťej úlohe. 😉', 'The probability is the <b>square of the length</b> of the hand: |α|². It doesn’t care about the angle at all! So why does phase exist? You’ll find out in the third task. 😉', 'Імовірність — це <b>квадрат довжини</b> стрілки: |α|². Кут її зовсім не цікавить! То навіщо існує фаза? Дізнаєшся в третьому завданні. 😉'),
-      tr('Pod tebou je <b>komplexná rovina</b>: vodorovne <b>Re</b> (reálna časť), zvislo <b>Im</b> (imaginárna časť). Kruh je jednotková kružnica.', 'Beneath you is the <b>complex plane</b>: horizontally <b>Re</b> (real part), vertically <b>Im</b> (imaginary part). The circle is the unit circle.', 'Під тобою — <b>комплексна площина</b>: горизонтально <b>Re</b> (дійсна частина), вертикально <b>Im</b> (уявна частина). Коло — одиничне коло.'),
+      L('l1.intro.1'),
+      L('l1.intro.2'),
+      L('l1.intro.3'),
+      L('l1.intro.4'),
     ], () => this.next());
   }
 
@@ -44,8 +44,8 @@ class L1Complex extends Level {
       if (!this.done1 && dist < byDiff(0.12, 0.06, 0.03)) {
         this.done1 = true;
         this.grant(['euler', 'eiphi', 'amp']);
-        this.say([tr('Presne! Všimni si: kým si menil iba <b>fázu</b>, stĺpec pravdepodobnosti sa nepohol. Menil sa len pri zmene <b>veľkosti</b>.', 'Exactly! Notice: while you changed only the <b>phase</b>, the probability bar didn’t move. It changed only when you changed the <b>magnitude</b>.', 'Саме так! Зверни увагу: поки ти змінював(-ла) лише <b>фазу</b>, стовпчик імовірності не рухався. Він змінився, тільки коли ти змінив(-ла) <b>модуль</b>.')], () =>
-          this.ask(tr({ q: 'Dve amplitúdy: 0,7 a 0,7·e<sup>iπ/2</sup> (= 0,7i). Majú rovnakú pravdepodobnosť?', options: ['Áno, obe 0,49', 'Nie, druhá má −0,49', 'Nie, druhá má 0,7'], correct: 0, why: '|0,7i|² = 0,7i · (−0,7i) = 0,49. Fáza sa v |α|² stratí.' }, { q: 'Two amplitudes: 0.7 and 0.7·e<sup>iπ/2</sup> (= 0.7i). Do they have the same probability?', options: ['Yes, both 0.49', 'No, the second has −0.49', 'No, the second has 0.7'], correct: 0, why: '|0.7i|² = 0.7i · (−0.7i) = 0.49. The phase is lost in |α|².' }, { q: 'Дві амплітуди: 0,7 і 0,7·e<sup>iπ/2</sup> (= 0,7i). Чи мають вони однакову ймовірність?', options: ['Так, обидві 0,49', 'Ні, друга має −0,49', 'Ні, друга має 0,7'], correct: 0, why: '|0,7i|² = 0,7i · (−0,7i) = 0,49. Фаза в |α|² губиться.' }), () => this.next()));
+        this.say([L('l1.upd.1')], () =>
+          this.ask({ q: L('l1.upd.2.q'), options: [L('l1.upd.2.options.0'), L('l1.upd.2.options.1'), L('l1.upd.2.options.2')], correct: 0, why: L('l1.upd.2.why') }, () => this.next()));
       }
     };
     UI.panelSet(tr('Ručička amplitúdy α', 'Amplitude hand α', 'Стрілка амплітуди α'), [
@@ -70,12 +70,9 @@ class L1Complex extends Level {
         this.done2 = true;
         setTimeout(() => {
           this.grant(['i']);
-          this.say(tr([`Hotovo za ${this.presses} ${this.presses === 2 ? 'stlačenia' : 'stlačení'}. <b>Násobenie i = otočenie o 90°</b>. Dve otočenia = 180°, teda <b>i · i = i² = −1</b>. Žiadna mágia, len geometria!`,
-            'A ešte: e<sup>iπ</sup> = −1. Fáza π (otočenie o 180°) je presne to <b>znamienko mínus</b>, ktoré odlišuje stavy |+⟩ a |−⟩. Stretneš ich v Blochovom observatóriu.'],
-            [`Done in ${this.presses} presses. <b>Multiplying by i = rotating by 90°</b>. Two rotations = 180°, so <b>i · i = i² = −1</b>. No magic, just geometry!`,
-            'And one more thing: e<sup>iπ</sup> = −1. The phase π (a 180° rotation) is exactly the <b>minus sign</b> that distinguishes the states |+⟩ and |−⟩. You will meet them in the Bloch Observatory.'], [`Готово за ${this.presses} натискань. <b>Множення на i = поворот на 90°</b>. Два повороти = 180°, тому <b>i · i = i² = −1</b>. Жодної магії, лише геометрія!`,
-            'І ще одне: e<sup>iπ</sup> = −1. Фаза π (поворот на 180°) — це саме той <b>знак мінус</b>, що відрізняє стани |+⟩ і |−⟩. Ти зустрінеш їх в Обсерваторії Блоха.']), () =>
-            this.ask(tr({ q: 'Koľkokrát treba vynásobiť číslo 1 číslom i, aby sme sa dostali do −i?', options: ['3-krát (270°)', '1-krát', '4-krát'], correct: 0, why: '1 → i → −1 → −i. Štyri stlačenia by nás vrátili späť na 1.' }, { q: 'How many times must we multiply the number 1 by i to get to −i?', options: ['3 times (270°)', 'once', '4 times'], correct: 0, why: '1 → i → −1 → −i. Four presses would bring us back to 1.' }, { q: 'Скільки разів треба помножити число 1 на i, щоб дістатися до −i?', options: ['3 рази (270°)', 'один раз', '4 рази'], correct: 0, why: '1 → i → −1 → −i. Чотири натискання повернули б нас до 1.' }), () => this.next()));
+          this.say([L('l1.press.1.0', this.presses, this.presses === 2 ? 'stlačenia' : 'stlačení'),
+            L('l1.press.1.1')], () =>
+            this.ask({ q: L('l1.press.2.q'), options: [L('l1.press.2.options.0'), L('l1.press.2.options.1'), L('l1.press.2.options.2')], correct: 0, why: L('l1.press.2.why') }, () => this.next()));
         }, 700);
       }
     };
@@ -91,9 +88,9 @@ class L1Complex extends Level {
     this.mode = 'int'; this.ph2 = 0; this.gotZero = false; this.gotMax = false;
     this.quest(tr('Dve cesty k tomu istému výsledku. Nájdi fázu, pri ktorej sa amplitúdy úplne VYRUŠIA (P = 0), aj fázu, pri ktorej je P maximálne.', 'Two paths to the same outcome. Find the phase at which the amplitudes fully CANCEL (P = 0), and the phase at which P is maximal.', 'Два шляхи до того самого результату. Знайди фазу, за якої амплітуди повністю ГАСЯТЬСЯ (P = 0), і фазу, за якої P максимальна.'), { easy: tr('🔍 P = 0 · potom P = 1', '🔍 P = 0 · then P = 1', '🔍 P = 0 · потім P = 1'), hard: '|½ + ½e<sup>iφ</sup>|² → 0, 1 · φ = ?' });
     this.say([
-      tr('Teraz to najdôležitejšie. Do toho istého výsledku vedú <b>dve cesty</b>, každá má svoju amplitúdu A₁ a A₂ (dĺžka 0,5).', 'Now the most important part. <b>Two paths</b> lead to the same outcome, each with its own amplitude A₁ and A₂ (length 0.5).', 'Тепер найважливіше. <b>Два шляхи</b> ведуть до того самого результату, кожен зі своєю амплітудою A₁ і A₂ (довжина 0,5).'),
-      tr('Kvantové pravidlo: <b>najprv sčítaj ručičky (amplitúdy), až potom umocni</b>: P = |A₁ + A₂|². Klasické pravidlo pre vylučujúce sa alternatívy by sčítalo pravdepodobnosti: |A₁|² + |A₂|² = 0,5 vždy.', 'The quantum rule: <b>first add the hands (amplitudes), only then square</b>: P = |A₁ + A₂|². The classical rule for mutually exclusive alternatives would add probabilities: |A₁|² + |A₂|² = 0.5 always.', 'Квантове правило: <b>спершу додай стрілки (амплітуди), лише потім підноси до квадрата</b>: P = |A₁ + A₂|². Класичне правило для взаємовиключних альтернатив додавало б імовірності: |A₁|² + |A₂|² = 0,5 завжди.'),
-      tr('Prirovnanie: dvaja ľudia tlačia hojdačku. Ak tlačia <b>v rytme</b>, hojdačka letí vysoko. Ak <b>proti sebe</b>, nepohne sa. Tu ide o rytmus — teda <b>relatívnu fázu</b>.', 'An analogy: two people push a swing. If they push <b>in rhythm</b>, the swing flies high. If they push <b>against each other</b>, it doesn’t move. What matters is the rhythm — the <b>relative phase</b>.', 'Аналогія: двоє людей розгойдують гойдалку. Якщо штовхають <b>у ритм</b>, гойдалка злітає високо. Якщо штовхають <b>одне проти одного</b>, вона не рухається. Важить ритм — <b>відносна фаза</b>.'),
+      L('l1.interference.1'),
+      L('l1.interference.2'),
+      L('l1.interference.3'),
     ]);
     const info = UI.info(''), chart = UI.chart();
     this.visited = [];
@@ -121,8 +118,8 @@ class L1Complex extends Level {
         this.done3 = true;
         setTimeout(() => {
           this.grant(['interf', 'abs2', 'ReIm', 'conj']);
-          this.say([tr('Výborne! Pri fáze π je P = 0, hoci každá cesta sama by dala ¼. <b>Toto je jadro kvantovej mechaniky</b>: fáza je neviditeľná v jednej amplitúde, ale rozhoduje, keď sa amplitúdy stretnú.', 'Excellent! At phase π, P = 0, even though each path alone would give ¼. <b>This is the core of quantum mechanics</b>: the phase is invisible in a single amplitude, but it decides when amplitudes meet.', 'Чудово! За фази π маємо P = 0, хоча кожен шлях окремо дав би ¼. <b>Це суть квантової механіки</b>: в окремій амплітуді фазу не видно, але вона вирішує, коли амплітуди зустрічаються.'),
-            tr('Kvantové algoritmy robia presne toto: usporiadajú fázy tak, aby sa zlé odpovede vyrušili a dobré zosilnili.', 'Quantum algorithms do exactly this: they arrange the phases so that wrong answers cancel and right ones are reinforced.', 'Квантові алгоритми роблять саме це: вони влаштовують фази так, щоб неправильні відповіді гасилися, а правильні підсилювалися.')], () => this.next());
+          this.say([L('l1.upd.3'),
+            L('l1.upd.4')], () => this.next());
         }, 500);
       }
       return Fmt.angle(v);

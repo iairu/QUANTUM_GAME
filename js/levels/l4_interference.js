@@ -31,30 +31,18 @@ class L4Interference extends Level {
 
   intro() {
     this.quest(tr('Vypočuj si Feynmana', 'Listen to Feynman', 'Послухай Фейнмана'), { easy: tr('💬 Feynman', '💬 Feynman', '💬 Фейнман'), hard: tr('Feynman: H·H, ρ, koherencia', 'Feynman: H·H, ρ, coherence', 'Фейнман: H·H, ρ, когерентність') });
-    this.say(tr([
-      'Hej! Som Dick Feynman. Raz som povedal, že dvojštrbinový pokus obsahuje <b>jediné tajomstvo</b> kvantovej mechaniky. Tu je jeho qubitová verzia.',
-      'Koľaj: qubit začne v |0⟩, prejde bránou <b>H</b>, stredom chrámu a druhou bránou <b>H</b>. Na konci ho detektor zmeria: 0 alebo 1.',
-      'Prirovnanie: k pokladu vedú <b>dve cesty</b>. Kým nikto nevie, ktorou si šiel, ich amplitúdy sa môžu sčítať aj vyrušiť. Keď to niekto <b>zistí</b> (zmeria), interferencia zmizne — ostanú len obyčajné pravdepodobnosti.',
-      'Vzadu vidíš <b>maticu hustoty ρ</b> (ró) ako stĺpce: dva na diagonále = pravdepodobnosti (populácie), dva mimo diagonály = <b>koherencie</b>, „pamäť fázy“.',
-    ], [
-      'Hey! I’m Dick Feynman. I once said the double-slit experiment contains <b>the only mystery</b> of quantum mechanics. Here is its qubit version.',
-      'The track: the qubit starts in |0⟩, passes through gate <b>H</b>, the centre of the temple and a second gate <b>H</b>. At the end a detector measures it: 0 or 1.',
-      'An analogy: <b>two paths</b> lead to the treasure. As long as nobody knows which one you took, their amplitudes can add up or cancel. Once someone <b>finds out</b> (measures), the interference disappears — only ordinary probabilities remain.',
-      'At the back you see the <b>density matrix ρ</b> (rho) as bars: the two on the diagonal = probabilities (populations), the two off the diagonal = <b>coherences</b>, the “memory of the phase”.',
-    ], [
-      'Привіт! Я Дік Фейнман. Колись я сказав, що досвід із двома щілинами містить <b>єдину таємницю</b> квантової механіки. Ось його кубітова версія.',
-      'Доріжка: кубіт стартує в |0⟩, проходить гейтом <b>H</b>, центром храму й другим гейтом <b>H</b>. Наприкінці детектор його вимірює: 0 або 1.',
-      'Аналогія: до скарбу ведуть <b>два шляхи</b>. Поки ніхто не знає, яким ти пішов(-ла), їхні амплітуди можуть додаватися або гаситися. Щойно хтось <b>дізнається</b> (виміряє), інтерференція зникає — лишаються звичайні ймовірності.',
-      'Позаду видно <b>матрицю густини ρ</b> (ро) у вигляді стовпчиків: два на діагоналі = ймовірності (заселеності), два поза діагоналлю = <b>когерентності</b>, «пам’ять фази».',
-    ]), () => this.next());
+    this.say([
+      L('l4.intro.1.0'),
+      L('l4.intro.1.1'),
+      L('l4.intro.1.2'),
+      L('l4.intro.1.3'),
+    ], () => this.next());
   }
 
   pure() {
     this.mode = 'none'; this.resetHist();
-    this.ask(tr({ q: 'Qubit |0⟩ → H → H → meranie. Čo nameriaš?', options: ['vždy 0', '50 % : 50 %', 'vždy 1'], correct: 0,
-      why: 'H·H = I. Príspevky k |1⟩ sa deštruktívne vyrušia, k |0⟩ konštruktívne sčítajú.' }, { q: 'Qubit |0⟩ → H → H → measurement. What do you measure?', options: ['always 0', '50 % : 50 %', 'always 1'], correct: 0,
-      why: 'H·H = I. The contributions to |1⟩ cancel destructively, those to |0⟩ add up constructively.' }, { q: 'Кубіт |0⟩ → H → H → вимірювання. Що ти виміряєш?', options: ['завжди 0', '50 % : 50 %', 'завжди 1'], correct: 0,
-      why: 'H·H = I. Внески до |1⟩ гасяться деструктивно, внески до |0⟩ додаються конструктивно.' }), () => {
+    this.ask({ q: L('l4.pure.1.q'), options: [L('l4.pure.1.options.0'), L('l4.pure.1.options.1'), L('l4.pure.1.options.2')], correct: 0,
+      why: L('l4.pure.1.why') }, () => {
       const n = byDiff(30, 50, 100);
       this.quest(tr(`Pošli aspoň ${n} qubitov cez H → H (stred chrámu prázdny). Sleduj stĺpce ρ!`, `Send at least ${n} qubits through H → H (temple centre empty). Watch the ρ bars!`, `Надішли щонайменше ${n} кубітів крізь H → H (центр храму порожній). Стеж за стовпчиками ρ!`), {
         easy: tr(`📤 ${n} qubitov · H → H`, `📤 ${n} qubits · H → H`, `📤 ${n} кубітів · H → H`), hard: `|0⟩ → H → H → M<sub>Z</sub> · N ≥ ${n} · ρ₀₁ ?` });
@@ -64,10 +52,8 @@ class L4Interference extends Level {
 
   withMeasure() {
     this.mode = 'meas'; this.resetHist();
-    this.ask(tr({ q: 'Teraz do stredu vložíme meranie v Z-báze a jeho výsledok ZABUDNEME. Čo nameriaš na konci?', options: ['50 % : 50 %', 'vždy 0', 'vždy 1'], correct: 0,
-      why: 'Meranie zničí koherenciu (mimodiagonálne prvky ρ). Zostane zmes ½|0⟩⟨0| + ½|1⟩⟨1| = I/2 — a tú druhé H nezmení.' }, { q: 'Now we put a Z-basis measurement in the centre and FORGET its result. What do you measure at the end?', options: ['50 % : 50 %', 'always 0', 'always 1'], correct: 0,
-      why: 'The measurement destroys the coherence (off-diagonal elements of ρ). What remains is the mixture ½|0⟩⟨0| + ½|1⟩⟨1| = I/2 — and the second H doesn’t change it.' }, { q: 'Тепер ставимо в центр вимірювання в базисі Z і ЗАБУВАЄМО його результат. Що ти виміряєш наприкінці?', options: ['50 % : 50 %', 'завжди 0', 'завжди 1'], correct: 0,
-      why: 'Вимірювання руйнує когерентність (позадіагональні елементи ρ). Лишається суміш ½|0⟩⟨0| + ½|1⟩⟨1| = I/2 — і другий H її не змінює.' }), () => {
+    this.ask({ q: L('l4.withMeasure.1.q'), options: [L('l4.withMeasure.1.options.0'), L('l4.withMeasure.1.options.1'), L('l4.withMeasure.1.options.2')], correct: 0,
+      why: L('l4.withMeasure.1.why') }, () => {
       const n = byDiff(30, 50, 100);
       this.quest(tr(`Pošli aspoň ${n} qubitov s meraním v strede. Pozri, čo sa stane s mimodiagonálnymi stĺpcami ρ.`, `Send at least ${n} qubits with the measurement in the centre. See what happens to the off-diagonal ρ bars.`, `Надішли щонайменше ${n} кубітів із вимірюванням у центрі. Подивися, що станеться з позадіагональними стовпчиками ρ.`), {
         easy: tr(`📤 ${n} qubitov · 👁 meranie v strede`, `📤 ${n} qubits · 👁 measurement in the middle`, `📤 ${n} кубітів · 👁 вимірювання посередині`), hard: `H → M<sub>Z</sub>(${tr('zabudnuté', 'forgotten', 'забуте')}) → H · N ≥ ${n} · ρ₀₁ → 0` });
@@ -79,19 +65,11 @@ class L4Interference extends Level {
     this.mode = 'deco'; this.p = 0; this.phi = 0; this.resetHist();
     this.target = byDiff(0.75, 0.75, [0.6, 0.65, 0.7, 0.8, 0.85, 0.9][Math.floor(rand() * 6)]);
     const T = Fmt.pct(this.target), n = byDiff(30, 50, 100);
-    this.say(tr([
-      'Meranie je extrémny prípad. V skutočnom čipe qubit pomaly „uniká“ do prostredia: <b>dekoherencia</b>. Prostredie akoby čiastočne odmeralo fázu.',
-      `Posuvníkom nastav silu dekoherencie <b>p</b> (0 = nič, 1 = úplné meranie). Úloha: nájdi p, pri ktorom bude P(0) = <b>${T}</b>, a pošli aspoň ${n} qubitov.`,
-      'Nový je aj <b>fázový posun φ</b> v strede chrámu (rotácia okolo osi z). Mení, či sa cesty stretnú „v rytme“ — interferenčné prúžky: P(0) = (1 + (1 − p)·cos φ)/2.',
-    ], [
-      'A measurement is the extreme case. In a real chip the qubit slowly “leaks” into the environment: <b>decoherence</b>. It is as if the environment partly measured the phase.',
-      `Use the slider to set the decoherence strength <b>p</b> (0 = nothing, 1 = a full measurement). Task: find p for which P(0) = <b>${T}</b>, and send at least ${n} qubits.`,
-      'Also new: a <b>phase shifter φ</b> in the centre of the temple (a rotation about the z axis). It decides whether the paths meet “in rhythm” — interference fringes: P(0) = (1 + (1 − p)·cos φ)/2.',
-    ], [
-      'Вимірювання — крайній випадок. У реальному чипі кубіт поволі «витікає» в довкілля: <b>декогеренція</b>. Наче довкілля частково виміряло фазу.',
-      `Повзунком встанови силу декогеренції <b>p</b> (0 = нічого, 1 = повне вимірювання). Завдання: знайди p, за якого P(0) = <b>${T}</b>, і надішли щонайменше ${n} кубітів.`,
-      'Нове також: <b>фазозсувач φ</b> у центрі храму (поворот навколо осі z). Він вирішує, чи шляхи зустрінуться «в ритм» — інтерференційні смуги: P(0) = (1 + (1 − p)·cos φ)/2.',
-    ]), () => {
+    this.say([
+      L('l4.deco.1.0'),
+      L('l4.deco.1.1', T, n),
+      L('l4.deco.1.2'),
+    ], () => {
       this.quest(tr(`Nastav dekoherenciu p (a fázu φ) tak, aby P(0) = ${T}, a pošli aspoň ${n} qubitov.`, `Set the decoherence p (and the phase φ) so that P(0) = ${T}, and send at least ${n} qubits.`, `Встанови декогеренцію p (і фазу φ) так, щоб P(0) = ${T}, і надішли щонайменше ${n} кубітів.`), {
         easy: tr(`🌫 p → P(0) = ${T} · 📤 ${n}`, `🌫 p → P(0) = ${T} · 📤 ${n}`, `🌫 p → P(0) = ${T} · 📤 ${n}`),
         hard: `P(0) = (1 + (1−p)cos φ)/2 = ${T} ± ${Fmt.pct(byDiff(0.06, 0.03, 0.015))} · N ≥ ${n}`,
@@ -147,28 +125,18 @@ class L4Interference extends Level {
     if (this.stepIdx === 1 && !this.f.a) {
       this.f.a = true;
       this.grant(['feynman', 'coh']);
-      this.say([tr('Vidíš? Stále 0. Pozri na ρ cestou: po prvom H sú <b>všetky štyri stĺpce rovnako vysoké</b> — mimodiagonálne koherencie nesú informáciu o fáze a druhé H ich premení na istotu.', 'See? Always 0. Look at ρ along the way: after the first H <b>all four bars are equally tall</b> — the off-diagonal coherences carry the phase information, and the second H turns it into certainty.', 'Бачиш? Завжди 0. Поглянь на ρ дорогою: після першого H <b>усі чотири стовпчики однаково високі</b> — позадіагональні когерентності несуть інформацію про фазу, а другий H перетворює її на певність.')], () => this.next());
+      this.say([L('l4.check.1')], () => this.next());
     } else if (this.stepIdx === 2 && !this.f.b) {
       this.f.b = true;
       this.grant(['rho', 'mix', 'supmix']);
-      this.say(tr(['Po meraní mimodiagonálne stĺpce <b>zmizli</b>. Diagonála je rovnaká ako pri superpozícii (½, ½), preto ich <b>meranie v Z-báze nerozlíši</b>. Rozdiel sa ukáže až pri ďalšej operácii.',
-        'Na Blochovej sfére: šípka sa stiahla do <b>stredu</b> (maximálne zmiešaný stav I/2). Druhé H otáča guľu, ale bod v strede sa otáčaním nepohne.'], [
-        'After the measurement the off-diagonal bars <b>vanished</b>. The diagonal is the same as for the superposition (½, ½), so a <b>measurement in the Z basis cannot tell them apart</b>. The difference shows only in the next operation.',
-        'On the Bloch sphere: the arrow shrank to the <b>centre</b> (the maximally mixed state I/2). The second H rotates the ball, but a point at the centre does not move under rotation.'], [
-        'Після вимірювання позадіагональні стовпчики <b>зникли</b>. Діагональ та сама, що й у суперпозиції (½, ½), тож <b>вимірювання в базисі Z не може їх розрізнити</b>. Різниця проявиться лише в наступній операції.',
-        'На сфері Блоха: стрілка зменшилася до <b>центру</b> (максимально змішаний стан I/2). Другий H обертає кулю, але точка в центрі під час обертання не рухається.']), () => this.next());
+      this.say([L('l4.check.2.0'),
+        L('l4.check.2.1')], () => this.next());
     } else if (this.stepIdx === 3 && !this.f.c && this.mode === 'deco' && Math.abs(this.P0() - this.target) < byDiff(0.06, 0.03, 0.015)) {
       this.f.c = true;
       this.grant(['deco', 'dagger']);
-      this.say(tr([`Presne: p = ${Fmt.num(this.p, 2)} zmršťuje koherencie na ${Fmt.pct(1 - this.p)} a P(0) = (1 + (1 − p)·cos φ)/2 = ${Fmt.pct(this.P0())}. Šípka je kratšia než 1 → <b>zmiešaný stav</b> vnútri gule.`,
-        'Matematicky druhé hradlo pôsobí na maticu hustoty ako <b>HρH†</b> (dýka † = hermitovské združenie). Pre zmes I/2 dostaneš opäť I/2 — nič nezmení.',
-        'Poučenie pre kvantové počítače: <b>koherencia je palivo</b> interferencie. Kto ju stratí, stratí výhodu.'], [
-        `Exactly: p = ${Fmt.num(this.p, 2)} shrinks the coherences to ${Fmt.pct(1 - this.p)} and P(0) = (1 + (1 − p)·cos φ)/2 = ${Fmt.pct(this.P0())}. The arrow is shorter than 1 → a <b>mixed state</b> inside the ball.`,
-        'Mathematically, the second gate acts on the density matrix as <b>HρH†</b> (the dagger † = Hermitian conjugate). For the mixture I/2 you get I/2 again — nothing changes.',
-        'The lesson for quantum computers: <b>coherence is the fuel</b> of interference. Lose it and you lose the advantage.'], [
-        `Саме так: p = ${Fmt.num(this.p, 2)} зменшує когерентності до ${Fmt.pct(1 - this.p)} і P(0) = (1 + (1 − p)·cos φ)/2 = ${Fmt.pct(this.P0())}. Стрілка коротша за 1 → <b>змішаний стан</b> усередині кулі.`,
-        'Математично другий гейт діє на матрицю густини як <b>HρH†</b> (кинджал † = ермітове спряження). Для суміші I/2 знову отримаєш I/2 — нічого не змінюється.',
-        'Урок для квантових комп’ютерів: <b>когерентність — це паливо</b> інтерференції. Втратиш її — втратиш і перевагу.']), () => this.next());
+      this.say([L('l4.check.3.0', Fmt.num(this.p, 2), Fmt.pct(1 - this.p), Fmt.pct(this.P0())),
+        L('l4.check.3.1'),
+        L('l4.check.3.2')], () => this.next());
     }
   }
 

@@ -175,14 +175,21 @@ const EqG = {
   glyphify(html, math = false) {
     const marks = [], mark = (h) => `\u0001${marks.push(h) - 1}\u0002`;
     let s = String(html).replace(/e<sup>([^<]{1,10})<\/sup>/g, (m, x) => mark(this.html('exp', x)));
-    let depth = 0;
+    let depth = 0, chip = 0; // chip > 0: vnútri čipu rovnice [[…]] — tam je všetko vzorec (ako math)
     s = s.split(/(<[^>]+>)/).map((seg) => {
-      if (seg.startsWith('<')) { if (/^<svg/i.test(seg)) depth++; else if (/^<\/svg/i.test(seg)) depth--; return seg; }
+      if (seg.startsWith('<')) {
+        if (/^<svg/i.test(seg)) depth++; else if (/^<\/svg/i.test(seg)) depth--;
+        else if (/^<span[^>]*class="[^"]*\beqi\b/.test(seg)) chip = 1;
+        else if (chip && /^<span\b/.test(seg)) chip++;
+        else if (chip && /^<\/span/.test(seg)) chip--;
+        return seg;
+      }
       if (depth > 0 || !seg) return seg;
+      const math2 = math || chip > 0;
       // ⟨a|ψ⟩: bra a ket zdieľajú zvislú čiaru — rozdelia sa na dva glyfy (otázka · odpoveď)
       seg = seg.replace(/⟨([^⟨|\s]{1,4})\|([^|⟩\s]{1,4})⟩/g, (m, a, b) => mark(this.html('bra', a)) + mark(this.html(b === '0' ? 'ket0' : b === '1' ? 'ket1' : 'ket', b).split('M3 4v32').join('')));
-      const RE = math
-        ? /(\|[^|⟩\s]{1,4}⟩)|(⟨[^⟨|\s]{1,4}\|)|\|([αβ])\|²|(H̃|[ĤÂ])|(?<![\p{L}])(cos|sin|det)(?![\p{L}])|([αβθφγψΨρσΔΩωħπ∂Σ⊗])|(P)(?=\()|(A)(?=[₁₂])|(?<![\p{L}\p{N}])([HXYZSTUInrtp])(?![\p{L}\p{N}])|(?<![\p{L}])(i)(?![\p{L}])/gu
+      const RE = math2
+        ? /(\|[^|⟩\s]{1,4}⟩)|(⟨[^⟨|\s]{1,4}\|)|\|([αβ])\|²|(H̃|[ĤÂ])|(?<![\p{L}])(cos|sin|det)(?![\p{L}])|([αβθφγψΨρσΔΩωħπ∂Σ⊗])|(?<![\p{L}\p{N}])(P)(?![\p{L}\p{N}])|(?<![\p{L}\p{N}])(A)(?![\p{L}])|(?<![\p{L}\p{N}])([HXYZSTUInrtp])(?![\p{L}\p{N}])|(?<![\p{L}])(i)(?![\p{L}])/gu
         : /(\|[^|⟩\s]{1,4}⟩)|(⟨[^⟨|\s]{1,4}\|)|\|([αβ])\|²|(H̃|[ĤÂ])|(?<![\p{L}])(cos|sin|det)(?![\p{L}])|([αβθφγψΨρσΔΩωħπ∂Σ⊗])|(P)(?=\()|(A)(?=[₁₂])|(?<![\p{L}\p{N}])([HXYZSTU])(?![\p{L}\p{N}])|(?<=[\d·−+(])(i)(?![\p{L}])/gu;
       return seg.replace(RE, (m, ket, bra, sq, hat, fn, greek, P, A, op, im, off, all) => {
         if (ket) { const c = ket.slice(1, -1); return mark(this.html(c === '0' ? 'ket0' : c === '1' ? 'ket1' : c === '+' || c === '−' ? 'ketpm' : 'ket', c)); }
@@ -199,7 +206,7 @@ const EqG = {
         if (A) return mark(this.html('A', 'A'));
         if (op) {
           // slovenské predložky „Z“, „S“ na začiatku vety nie sú hradlá
-          if (!math && /(^|[.!?:]\s*)$/.test(all.slice(0, off)) && /^\s+\p{Ll}/u.test(all.slice(off + 1))) return m;
+          if (!math2 && /(^|[.!?:]\s*)$/.test(all.slice(0, off)) && /^\s+\p{Ll}/u.test(all.slice(off + 1))) return m;
           if (op === 'T' && (all[off + 1] === '\u2063' || /(\/|\d\s?)$/.test(all.slice(0, off)))) return m; // tesla (MHz/T, 1 T), nie hradlo T
           // v NMR a vo výkladoch (levely 6, 8) je H hamiltonián, inde Hadamardovo hradlo
           if (op === 'H' && Game.scene && [6, 8].includes(Game.scene.num)) return mark(this.html('Ĥ', 'H'));
@@ -217,7 +224,30 @@ const EqG = {
   // len ak obsahuje vzťah (=, ≈, →, ⇒, ≥, ≤, ∼) a aspoň jeden symbol. Riadkové značky (<b>, <i>, <sup>, <sub>, <span>)
   // sú vo vnútri vzorca priehľadné; hranice čipu sa posunú tak, aby značky zostali správne vnorené (čip sa nikdy neroztrhne).
   INLINE_TAG: /^<\/?(b|i|em|strong|sup|sub|small|span)\b/i,
-  wrapInline(html) {
+  // vzorce označené v texte dialógov (lang/*.csv): [[…]] vo vete = čip, [[…]] na samostatnom riadku = blok rovnice
+  markEq(html) {
+    const s = String(html);
+    let out = '', i = 0;
+    while (i < s.length) {
+      const a = s.indexOf('[[', i);
+      if (a < 0) { out += s.slice(i); break; }
+      // koniec: „]]“ mimo vnútorných hranatých zátvoriek ([x, p], [[a; b]] …)
+      let d = 0, b = -1;
+      for (let j = a + 2; j < s.length; j++) {
+        if (s[j] === '[') d++;
+        else if (s[j] === ']') { if (d === 0 && s[j + 1] === ']') { b = j; break; } d = Math.max(0, d - 1); }
+      }
+      if (b < 0) { out += s.slice(i); break; }
+      const inner = s.slice(a + 2, b), before = s.slice(i, a);
+      const block = /(^|\n)[ \t]*$/.test(s.slice(0, a)) && /^[ \t]*(\n|$)/.test(s.slice(b + 2)) && (a > 0 || b + 2 < s.length);
+      out += before + (block ? `<div class="eq eqb">${this.colorMath(inner)}</div>` : `<span class="eqi">${this.colorMath(inner)}</span>`);
+      i = b + 2;
+    }
+    return out.replace(/\n/g, '');
+  },
+  // explicit = text dialógu: pozadie dostanú len vzorce v [[…]]; inak (živé hodnoty v paneloch, HUD) sa vzorce hľadajú samy
+  wrapInline(html, explicit = false) {
+    if (explicit || String(html).includes('[[')) return this.markEq(html);
     const LT = 'A-Za-zÀ-ĦĨ-žА-яІіЇїЄєҐґ'; // písmená slov (grécke nie — tie sú vždy symboly)
     // atómy: ⟨Z⟩ / ⟨a|b⟩, kety, bra, grécke písmená (aj s prilepeným indexom: δij, σA, ΩR), funkcie, samostatné písmená
     // a dvojpísmenové premenné (Sz, Rz, cn), ak za nimi hneď nasleduje matematika — slovenské „a, v, o, u“ nie sú premenné,

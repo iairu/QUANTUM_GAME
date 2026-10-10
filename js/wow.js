@@ -1,7 +1,7 @@
 'use strict';
 // MMO téma — hrá sa ako World of Warcraft, obsah hry ostáva rovnaký.
 // Ostrov je otvorený svet: postava s úrovňou, zdravím a koherenciou (manou), lišta kúziel 1 … =,
-// nepriatelia „klasické omyly“, úlohy od Amplitúdy, obchodník Planck, taška, peniaze, jazdecké zviera.
+// nepriatelia „klasické omyly“, úlohy od Iskry, obchodník Planck, taška, peniaze, jazdecké zviera.
 // Levely sú inštancie (dungeony): boss = omyl, ktorý porážajú vedomosti — splnené kroky a správne odpovede.
 // Mechanika kúziel je kvantová: každý nepriateľ má „štít“ = qubit (Blochov vektor r);
 // Bornova čepeľ (meranie) zasiahne s P(|1⟩) = (1 − z)/2, X ho preklopí, H ho pošle na rovník,
@@ -115,36 +115,30 @@ const SPELLS = [
   { id: 'mount', key: 'Minus', label: '−', icon: '🔮', lvl: 1, cast: 1.5, needMount: true,
     name: tr('Blochova guľa (jazda)', 'Bloch Sphere (mount)', 'Сфера Блоха (верхове)'), text: tr('Nasadni / zosadni. +60 % rýchlosť. Kúpiš u Plancka.', 'Mount / dismount. +60% speed. Sold by Planck.', 'Осідлати / зіскочити. +60% швидкості. Продає Планк.') },
   { id: 'hearth', key: 'Equal', label: '=', icon: '🏠', lvl: 1, cast: 3, cd: 30,
-    name: tr('Návrat k Amplitúde', 'Return to Amplitude', 'Повернення до Амплітуди'), text: tr('Po 3 s ťa prenesie k Amplitúde do stredu ostrova (z levelu späť na ostrov).', 'After 3 s takes you to Amplitude in the middle of the island (from a level back to the island).', 'Через 3 с переносить тебе до Амплітуди в центрі острова (з рівня — назад на острів).') },
+    name: tr('Návrat k Iskre', 'Return to Spark', 'Повернення до Іскри'), text: tr('Po 3 s ťa prenesie k Iskre do stredu ostrova (z levelu späť na ostrov).', 'After 3 s takes you to Spark in the middle of the island (from a level back to the island).', 'Через 3 с переносить тебе до Іскри в центрі острова (з рівня — назад на острів).') },
 ];
 const GCD = 1.2;
 
-// úlohy od Amplitúdy: zneškodni omyly (vždy jedna aktívna)
+// úlohy od Iskry: zneškodni omyly (vždy jedna aktívna)
 const QUESTS = [
   { mob: 'hidden', n: 5, c: 90, items: [['pot_hp', 3]], title: tr('Nič nie je skryté', 'Nothing Is Hidden', 'Нічого не приховано'),
-    offer: tr(['Na lúkach za portálmi sa premávajú <b>Skryté premenné</b>. Šepkajú, že výsledok merania bol daný vopred.', 'Bell dokázal, že žiadne lokálne skryté premenné nevysvetlia kvantové korelácie. Zneškodni ich <b>5</b> — a vráť sa ku mne.'],
-      ['The meadows beyond the portals are crawling with <b>Hidden Variables</b>. They whisper that the outcome was fixed in advance.', 'Bell proved that no local hidden variables can explain quantum correlations. Debunk <b>5</b> of them — and come back to me.'], ['Луки за порталами кишать <b>Прихованими змінними</b>. Вони шепочуть, що результат був визначений наперед.', 'Белл довів, що жодні локальні приховані змінні не пояснять квантових кореляцій. Розвінчай <b>5</b> із них — і повертайся до мене.']),
-    done: tr('Výborne. Pamätaj: kvantové pravdepodobnosti nie sú len naša nevedomosť.', 'Well done. Remember: quantum probabilities are not just our ignorance.', 'Молодець. Пам’ятай: квантові ймовірності — це не просто наше незнання.') },
+    offer: [L('wow.QUESTS.1.0'), L('wow.QUESTS.1.1')],
+    done: L('wow.QUESTS.2') },
   { mob: 'billiard', n: 6, c: 160, items: [['pot_mana', 3]], title: tr('Guľky bez dráhy', 'Balls Without a Path', 'Кулі без траєкторії'),
-    offer: tr(['Biliardové elektróny sa kotúľajú po ostrove, akoby mali presnú dráhu.', 'Medzi meraniami kvantový objekt žiadnu trajektóriu nemá. Rozbi ich <b>6</b>.'],
-      ['Billiard-Ball Electrons roll around the island as if they had a definite path.', 'Between measurements a quantum object has no trajectory. Break <b>6</b> of them.'], ['Більярдні електрони котяться островом так, ніби мають певну траєкторію.', 'Між вимірюваннями квантовий об’єкт не має траєкторії. Розбий <b>6</b> із них.']),
-    done: tr('Dráha je obraz z klasickej fyziky. Ty máš lepší: stav a amplitúdy.', 'A path is a picture from classical physics. You have a better one: the state and its amplitudes.', 'Траєкторія — це образ із класичної фізики. У тебе є кращий: стан та його амплітуди.') },
+    offer: [L('wow.QUESTS.3.0'), L('wow.QUESTS.3.1')],
+    done: L('wow.QUESTS.4') },
   { mob: 'planet', n: 4, c: 260, items: [['pot_hp', 3], ['pot_mana', 2]], title: tr('Pád planetiek', 'The Fall of the Little Planets', 'Падіння планеток'),
-    offer: tr(['Atómy-planetky tvrdia, že elektróny obiehajú jadro ako planéty Slnko.', 'Taký elektrón by žiaril a do jadra by spadol za stotinu miliardtiny sekundy. Zhoď ich <b>4</b>.'],
-      ['The Little-Planet Atoms claim electrons orbit the nucleus like planets around the Sun.', 'Such an electron would radiate and fall into the nucleus within a hundredth of a billionth of a second. Bring down <b>4</b>.'], ['Атоми-планетки стверджують, що електрони обертаються навколо ядра, як планети навколо Сонця.', 'Такий електрон випромінював би й упав на ядро за соту частку мільярдної секунди. Збий <b>4</b>.']),
-    done: tr('Orbitál nie je dráha, ale rozloženie amplitúd. Presne tak.', 'An orbital is not a path but a distribution of amplitudes. Exactly.', 'Орбіталь — не траєкторія, а розподіл амплітуд. Саме так.') },
+    offer: [L('wow.QUESTS.5.0'), L('wow.QUESTS.5.1')],
+    done: L('wow.QUESTS.6') },
   { mob: 'ftl', n: 4, c: 400, items: [['pot_hp', 4]], title: tr('Žiadne správy cez previazanosť', 'No Messages Through Entanglement', 'Жодних повідомлень через сплутаність'),
-    offer: tr(['Nadsvetelné signály lietajú nad mostom a sľubujú správy rýchlejšie ako svetlo.', 'Previazanosť dáva korelácie, nie správy — Bobova štatistika nezávisí od Alicinej voľby. Zachyť <b>4</b>.'],
-      ['Faster-than-Light Signals fly over the bridge, promising messages faster than light.', 'Entanglement gives correlations, not messages — Bob’s statistics don’t depend on Alice’s choice. Intercept <b>4</b>.'], ['Надсвітлові сигнали літають над мостом і обіцяють повідомлення швидше за світло.', 'Сплутаність дає кореляції, а не повідомлення — статистика Боба не залежить від вибору Аліси. Перехопи <b>4</b>.']),
-    done: tr('Nemožnosť signalizácie drží. Relativita si vydýchla.', 'No-signalling holds. Relativity breathes a sigh of relief.', 'Неможливість сигналізації діє. Теорія відносності з полегшенням зітхає.') },
+    offer: [L('wow.QUESTS.7.0'), L('wow.QUESTS.7.1')],
+    done: L('wow.QUESTS.8') },
   { mob: 'cat', n: 4, c: 600, items: [['pot_hp', 4], ['pot_mana', 4]], title: tr('Otvor škatuľu', 'Open the Box', 'Відкрий скриньку'),
-    offer: tr(['Mačky „mŕtve aj živé“ strašia po okraji ostrova.', 'Superpozícia nie je „oboje naraz“ — stav dáva pravdepodobnosti a meranie jeden výsledok. Upokoj <b>4</b>.'],
-      ['“Dead-and-alive” cats haunt the edge of the island.', 'A superposition is not “both at once” — the state gives probabilities, a measurement one outcome. Calm <b>4</b>.'], ['Краєм острова блукають «мертво-живі» коти.', 'Суперпозиція — це не «обидва водночас»: стан дає ймовірності, вимірювання — один результат. Заспокой <b>4</b>.']),
-    done: tr('Schrödinger by bol spokojný. Jeho mačka bola kritika, nie návod.', 'Schrödinger would be pleased. His cat was a critique, not a recipe.', 'Шредінгер був би задоволений. Його кіт був критикою, а не рецептом.') },
+    offer: [L('wow.QUESTS.9.0'), L('wow.QUESTS.9.1')],
+    done: L('wow.QUESTS.10') },
   { mob: 'cultist', n: 5, c: 900, items: [['pot_hp', 5], ['pot_mana', 5]], title: tr('Detektor nepotrebuje dušu', 'A Detector Needs No Soul', 'Детекторові не потрібна душа'),
-    offer: tr(['Kultisti vedomia kážu, že svet skolabuje, až keď sa naň niekto pozrie.', 'Meranie je fyzikálna interakcia; dekoherencia beží aj v prázdnom laboratóriu. Rozožeň <b>5</b>.'],
-      ['The Consciousness Cultists preach that the world collapses only when someone looks.', 'A measurement is a physical interaction; decoherence runs even in an empty lab. Disperse <b>5</b>.'], ['Сектанти свідомості проповідують, що світ колапсує, лише коли хтось дивиться.', 'Вимірювання — фізична взаємодія; декогеренція йде навіть у порожній лабораторії. Розжени <b>5</b>.']),
-    done: tr('Ostrov je čistý od omylov. Si skutočný kvantový mág.', 'The island is clean of misconceptions. You are a true quantum mage.', 'Острів очищено від хибних уявлень. Ти справжній квантовий маг.') },
+    offer: [L('wow.QUESTS.11.0'), L('wow.QUESTS.11.1')],
+    done: L('wow.QUESTS.12') },
 ];
 
 const DIFF_DMG = () => byDiff(0.7, 1, 1.25); // nepriatelia v ľahkej/laickej obťažnosti udierajú slabšie
@@ -231,7 +225,7 @@ const Wow = {
     return d >= 5 ? '#ff2020' : d >= 3 ? '#ff8040' : d >= -2 ? '#ffff00' : d >= -4 ? '#40c040' : '#9d9d9d';
   },
   safe(p) { // stred ostrova a podstavce portálov sú bezpečné (nepriatelia tam nevstúpia)
-    return V3.len([p[0], 0, p[2]]) < 7.5 || Hub.portals.some((pt) => this.dist(pt.p, p) < 5.5);
+    return V3.len([p[0], 0, p[2]]) < 7.5 || Hub.all().some((pt) => this.dist(pt.p, p) < 5.5);
   },
   err(msg) {
     const e = this.ui.err;
@@ -472,7 +466,7 @@ const Wow = {
     if (q && s.q.on && q.mob === m.type && s.q.k < q.n) {
       s.q.k++;
       this.feed(`<span class="qp">${q.title}: ${T.name} ${s.q.k}/${q.n}</span>`);
-      if (s.q.k >= q.n) { Sound.sfx('good'); UI.toast(tr(`✔ Úloha splnená: <b>${q.title}</b> — vráť sa k Amplitúde.`, `✔ Quest complete: <b>${q.title}</b> — return to Amplitude.`, `✔ Завдання виконано: <b>${q.title}</b> — повернися до Амплітуди.`), 3600); }
+      if (s.q.k >= q.n) { Sound.sfx('good'); UI.toast(tr(`✔ Úloha splnená: <b>${q.title}</b> — vráť sa k Iskre.`, `✔ Quest complete: <b>${q.title}</b> — return to Spark.`, `✔ Завдання виконано: <b>${q.title}</b> — повернися до Іскри.`), 3600); }
     }
     Game.save();
   },
@@ -485,7 +479,7 @@ const Wow = {
     if (this.inHub()) this.playerFct(`−${d}`, 'hurt');
     if (this.cast && this.cast.sp.id === 'hearth') { this.cast = null; this.err(tr('Prerušené.', 'Interrupted.', 'Перервано.')); }
     if (s.hp <= 0) {
-      if (!this.inHub()) { s.hp = Math.round(this.maxHp * 0.5); UI.toast(tr('💀 Padol(a) si — Amplitúda ťa oživila. Chyby sa počítajú do hviezdičiek.', '💀 You fell — Amplitude revived you. Mistakes count towards the stars.', '💀 Ти впав(-ла) — Амплітуда тебе оживила. Помилки враховуються в зірках.'), 3200); return; }
+      if (!this.inHub()) { s.hp = Math.round(this.maxHp * 0.5); UI.toast(tr('💀 Padol(a) si — Iskra ťa oživila. Chyby sa počítajú do hviezdičiek.', '💀 You fell — Spark revived you. Mistakes count towards the stars.', '💀 Ти впав(-ла) — Іскра тебе оживила. Помилки враховуються в зірках.'), 3200); return; }
       this.die();
     }
   },
@@ -654,7 +648,7 @@ const Wow = {
     host.appendChild(d); setTimeout(() => d.remove(), 1300);
   },
 
-  // ---------- úlohy (Amplitúda) ----------
+  // ---------- úlohy (Iskra) ----------
   questMark() { // '!' = nová úloha, '?' = splnená, '…' = rozpracovaná
     const s = this.S, q = QUESTS[s.q.i];
     if (!q || !Game.progress.introSeen) return '';
@@ -990,7 +984,7 @@ const Wow = {
     q('#wow-vendor .x').onclick = () => this.closeVendor();
     q('#wow-loot .x').onclick = () => this.ui.loot.classList.remove('show');
     q('#wow-death h2').textContent = tr('Zomrel(a) si', 'You died', 'Ти загинув(-ла)');
-    q('#wow-death p').textContent = tr('Klasické omyly ťa premohli. Duch sa vráti k Amplitúde v strede ostrova.', 'The classical misconceptions overwhelmed you. Your spirit returns to Amplitude in the middle of the island.', 'Класичні хибні уявлення тебе здолали. Твій дух повертається до Амплітуди в центрі острова.');
+    q('#wow-death p').textContent = tr('Klasické omyly ťa premohli. Duch sa vráti k Iskre v strede ostrova.', 'The classical misconceptions overwhelmed you. Your spirit returns to Spark in the middle of the island.', 'Класичні хибні уявлення тебе здолали. Твій дух повертається до Іскри в центрі острова.');
     q('#wow-death button').textContent = tr('Uvoľniť ducha', 'Release Spirit', 'Звільнити дух');
     q('#wow-death button').onclick = () => this.release();
     q('#wow-mini canvas').onclick = () => Game.toggleMap(true);
@@ -1079,7 +1073,7 @@ const Wow = {
       const nl = LEVELS.find((Lv) => Game.progress.stars[Lv.num] === undefined);
       if (nl) tr2 += `<div class="qt">${tr('Ďalší level', 'Next level', 'Наступний рівень')}</div><div class="qo">• ${nl.num} · ${nl.title}${Game.isUnlocked(nl.num) ? '' : ' 🔒'}</div>`;
       if (q && s.q.on) tr2 += `<div class="qt">${q.title}</div><div class="qo${s.q.k >= q.n ? ' done' : ''}">• ${MOB_TYPES[q.mob].name}: ${Math.min(s.q.k, q.n)}/${q.n}${s.q.k >= q.n ? ' ✔' : ''}</div>`;
-      else if (q && Game.progress.introSeen) tr2 += `<div class="qo muted">${tr('Amplitúda má pre teba úlohu (!)', 'Amplitude has a quest for you (!)', 'Амплітуда має для тебе завдання (!)')}</div>`;
+      else if (q && Game.progress.introSeen) tr2 += `<div class="qo muted">${tr('Iskra má pre teba úlohu (!)', 'Spark has a quest for you (!)', 'Іскра має для тебе завдання (!)')}</div>`;
     }
     if (this.ui.track._h !== tr2) { this.ui.track.innerHTML = tr2; this.ui.track._h = tr2; }
     this.ui.track.classList.toggle('show', !!tr2);
@@ -1102,7 +1096,7 @@ const Wow = {
     g.strokeStyle = '#8a6c45'; g.lineWidth = 2 * sc; g.beginPath(); g.arc(cx, cy, 20 * sc, 0, 7); g.stroke();
     g.fillStyle = '#9b958a'; g.beginPath(); g.arc(cx, cy, 4 * sc, 0, 7); g.fill();
     g.fillStyle = '#2e5a24'; for (const pn of Hub.pines) { const [x, y] = P(pn.p); g.beginPath(); g.arc(x, y, 1.1 * sc, 0, 7); g.fill(); }
-    for (const pt of Hub.portals) {
+    for (const pt of Hub.all()) {
       const [x, y] = P(pt.p), open = Game.isUnlocked(pt.L.num);
       g.fillStyle = open ? `rgb(${pt.L.color.map((c) => c * 255).join(',')})` : '#555'; g.beginPath(); g.arc(x, y, 2.2 * sc, 0, 7); g.fill();
       g.fillStyle = '#fff'; g.font = `bold ${Math.round(3 * sc)}px sans-serif`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(pt.L.num, x, y);

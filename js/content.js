@@ -88,48 +88,48 @@ const CODEX = [
 // Jazykové pasce: na konci každého levelu (správne formulácie vs. časté omyly)
 const TRAPS_SK = {
   1: [
-    { q: 'Amplitúda α = 0,6i. Aká je pravdepodobnosť príslušného výsledku?', options: ['0,36', '−0,36', '0,6'], correct: 0, why: '|α|² = α·α* = 0,6i · (−0,6i) = 0,36. Pravdepodobnosť nikdy nie je záporná.' },
-    { q: 'Čo znamená násobenie amplitúdy faktorom e<sup>iφ</sup>?', options: ['otočenie „ručičky“ v komplexnej rovine o uhol φ', 'zväčšenie pravdepodobnosti', 'fyzikálne roztočenie častice'], correct: 0, why: 'Veľkosť (a teda |α|²) sa nemení, mení sa len fáza.' },
-    { q: 'Ktorá veta je správna?', options: ['Interferujú amplitúdy, až potom počítame pravdepodobnosť.', 'Interferujú pravdepodobnosti.', 'Interferencia je čisto kvantový jav, klasické vlny ju nemajú.'], correct: 0, why: 'Klasické vlny interferujú tiež — kvantovo však interferujú amplitúdy pravdepodobnosti.' },
+    { q: L('traps.1.0.q'), options: [L('traps.1.0.options.0'), L('traps.1.0.options.1'), L('traps.1.0.options.2')], correct: 0, why: L('traps.1.0.why') },
+    { q: L('traps.1.1.q'), options: [L('traps.1.1.options.0'), L('traps.1.1.options.1'), L('traps.1.1.options.2')], correct: 0, why: L('traps.1.1.why') },
+    { q: L('traps.1.2.q'), options: [L('traps.1.2.options.0'), L('traps.1.2.options.1'), L('traps.1.2.options.2')], correct: 0, why: L('traps.1.2.why') },
   ],
   2: [
-    { q: 'Sternov–Gerlachov experiment ukázal…', options: ['dve oddelené stopy pri meraní v zvolenom smere', 'ako sa elektrón naozaj točí', 'spojitý pás všetkých výchyliek'], correct: 0, why: 'Ukázal výsledky presne určeného merania, nie „film“ rotujúceho elektrónu.' },
-    { q: 'Atóm prejde filtrom „+z“, potom meriame v osi x. Čo platí?', options: ['+x aj −x po 50 %', 'vždy +x', 'vždy +z'], correct: 0, why: 'Istota v jednej báze neznamená istotu v inej.' },
-    { q: 'Čo znamená „spin ½“?', options: ['druh kvantového spinu s dvoma možnými projekciami', 'polovičnú otáčku elektrónu', 'polovičnú rýchlosť otáčania'], correct: 0, why: 'Je to označenie typu spinu, nie mechanická rotácia.' },
+    { q: L('traps.2.0.q'), options: [L('traps.2.0.options.0'), L('traps.2.0.options.1'), L('traps.2.0.options.2')], correct: 0, why: L('traps.2.0.why') },
+    { q: L('traps.2.1.q'), options: [L('traps.2.1.options.0'), L('traps.2.1.options.1'), L('traps.2.1.options.2')], correct: 0, why: L('traps.2.1.why') },
+    { q: L('traps.2.2.q'), options: [L('traps.2.2.options.0'), L('traps.2.2.options.1'), L('traps.2.2.options.2')], correct: 0, why: L('traps.2.2.why') },
   ],
   3: [
-    { q: 'Ako je správne povedať, čo robí Hadamardovo hradlo?', options: ['vykoná unitárnu rotáciu, ktorá vymení osi x a z', 'vždy vytvorí superpozíciu', 'odmeria qubit'], correct: 0, why: 'H|+⟩ = |0⟩ — superpozíciu teda aj „zruší“. Závisí od bázy.' },
-    { q: '−iX ∼ X znamená…', options: ['rovnaké až na globálnu fázu (fyzikálne totožné)', 'viem jedno premeniť na druhé', 'líšia sa relatívnou fázou'], correct: 0, why: 'Faktor −i je spoločný pre celý stav → globálna fáza, nepozorovateľná.' },
-    { q: 'Kde ležia ortogonálne stavy |0⟩ a |1⟩ na Blochovej sfére?', options: ['na opačných póloch', 'kolmo na seba (90°)', 'v tom istom bode'], correct: 0, why: 'V Hilbertovom priestore kolmé, na Blochovej sfére protiľahlé (kvôli θ/2).' },
-    { q: 'Hradlo Z aplikované na |+⟩…', options: ['zmení stav na |−⟩, P(0) a P(1) v Z-báze zostanú ½', 'nezmení nič, lebo pravdepodobnosti sú rovnaké', 'preklopí |0⟩ na |1⟩'], correct: 0, why: 'Rotácia okolo z mení relatívnu fázu — rozlíšiš to meraním v X-báze.' },
+    { q: L('traps.3.0.q'), options: [L('traps.3.0.options.0'), L('traps.3.0.options.1'), L('traps.3.0.options.2')], correct: 0, why: L('traps.3.0.why') },
+    { q: L('traps.3.1.q'), options: [L('traps.3.1.options.0'), L('traps.3.1.options.1'), L('traps.3.1.options.2')], correct: 0, why: L('traps.3.1.why') },
+    { q: L('traps.3.2.q'), options: [L('traps.3.2.options.0'), L('traps.3.2.options.1'), L('traps.3.2.options.2')], correct: 0, why: L('traps.3.2.why') },
+    { q: L('traps.3.3.q'), options: [L('traps.3.3.options.0'), L('traps.3.3.options.1'), L('traps.3.3.options.2')], correct: 0, why: L('traps.3.3.why') },
   ],
   4: [
-    { q: 'Medzi dve H vložíme meranie v Z-báze a výsledok zabudneme. Prečo už nedostaneme 0 s istotou?', options: ['meranie zničilo koherenciu (mimodiagonálne prvky ρ)', 'meranie pokazilo hradlo', 'qubit sa unavil'], correct: 0, why: 'Bez fázového vzťahu nemá druhé H čo premeniť na interferenciu.' },
-    { q: 'Matica hustoty sa označuje…', options: ['ρ (ró)', 'p', 'P'], correct: 0, why: 'Grécke ró. Písmeno p je hybnosť alebo pravdepodobnosť.' },
-    { q: 'Ktorá veta je správna?', options: ['Superpozícia a zmes môžu mať rovnaké Z-štatistiky, ale líšia sa pri interferencii.', 'Superpozícia znamená, že nevieme, v ktorom stave qubit je.', 'Kvantový počítač vyskúša všetky možnosti a vyberie správnu.'], correct: 0, why: 'Superpozícia nie je neznalosť a kvantový paralelizmus nie je 2ⁿ procesorov.' },
+    { q: L('traps.4.0.q'), options: [L('traps.4.0.options.0'), L('traps.4.0.options.1'), L('traps.4.0.options.2')], correct: 0, why: L('traps.4.0.why') },
+    { q: L('traps.4.1.q'), options: [L('traps.4.1.options.0'), L('traps.4.1.options.1'), L('traps.4.1.options.2')], correct: 0, why: L('traps.4.1.why') },
+    { q: L('traps.4.2.q'), options: [L('traps.4.2.options.0'), L('traps.4.2.options.1'), L('traps.4.2.options.2')], correct: 0, why: L('traps.4.2.why') },
   ],
   5: [
-    { q: 'Čo je ⟨φ|ψ⟩?', options: ['komplexné číslo (amplitúda)', 'operátor', 'pravdepodobnosť'], correct: 0, why: 'Pravdepodobnosť je až |⟨φ|ψ⟩|².' },
-    { q: 'Čo je |ψ⟩⟨φ|?', options: ['operátor (matica)', 'číslo', 'stav'], correct: 0, why: 'Stĺpec krát riadok = matica. Poradie je významové!' },
-    { q: 'Vlnová funkcia ψ(x) je…', options: ['reprezentácia stavu v polohovej báze: ⟨x|ψ⟩', 'samotný abstraktný stav', 'pravdepodobnosť nájdenia častice'], correct: 0, why: 'Ten istý |ψ⟩ má aj hybnostnú reprezentáciu ⟨p|ψ⟩.' },
+    { q: L('traps.5.0.q'), options: [L('traps.5.0.options.0'), L('traps.5.0.options.1'), L('traps.5.0.options.2')], correct: 0, why: L('traps.5.0.why') },
+    { q: L('traps.5.1.q'), options: [L('traps.5.1.options.0'), L('traps.5.1.options.1'), L('traps.5.1.options.2')], correct: 0, why: L('traps.5.1.why') },
+    { q: L('traps.5.2.q'), options: [L('traps.5.2.options.0'), L('traps.5.2.options.1'), L('traps.5.2.options.2')], correct: 0, why: L('traps.5.2.why') },
   ],
   6: [
-    { q: 'Čo „osciluje“ pri Rabiho osciláciách?', options: ['amplitúdy a pravdepodobnosti výsledkov', 'elektrón medzi dvoma polohami', 'magnet v prístroji'], correct: 0, why: 'Nič sa mechanicky nekýve — mení sa stav.' },
-    { q: 'Precesia okolo osi z pri meraní v Z-báze…', options: ['nemení P(0) ani P(1), mení fázu', 'preklápa spin', 'zväčšuje energiu'], correct: 0, why: 'Rotácia okolo z = zmena relatívnej fázy.' },
-    { q: 'NMR signál (napr. SpinQ) zodpovedá…', options: ['strednej hodnote priečnej magnetizácie ansámblu', 'jednému výsledku jednej molekuly', 'kolapsu jedného spinu'], correct: 0, why: 'Meriame súbor molekúl naraz.' },
-    { q: 'Blochov vektor sa vplyvom T₂ skráti na polovicu. Stav je…', options: ['zmiešaný (vnútri sféry)', 'stále čistý', 'neplatný'], correct: 0, why: '|r| < 1 → zmiešaný stav. Normalizácia (stopa ρ = 1) však stále platí.' },
+    { q: L('traps.6.0.q'), options: [L('traps.6.0.options.0'), L('traps.6.0.options.1'), L('traps.6.0.options.2')], correct: 0, why: L('traps.6.0.why') },
+    { q: L('traps.6.1.q'), options: [L('traps.6.1.options.0'), L('traps.6.1.options.1'), L('traps.6.1.options.2')], correct: 0, why: L('traps.6.1.why') },
+    { q: L('traps.6.2.q'), options: [L('traps.6.2.options.0'), L('traps.6.2.options.1'), L('traps.6.2.options.2')], correct: 0, why: L('traps.6.2.why') },
+    { q: L('traps.6.3.q'), options: [L('traps.6.3.options.0'), L('traps.6.3.options.1'), L('traps.6.3.options.2')], correct: 0, why: L('traps.6.3.why') },
   ],
   7: [
-    { q: 'Alice zmení svoju meraciu os. Čo uvidí Bob vo svojich výsledkoch?', options: ['stále 50/50 — nič sa nezmení', 'okamžitú zmenu štatistiky', 'správu od Alice'], correct: 0, why: 'Previazanosť neumožňuje signalizáciu. Korelácie vidno až po porovnaní.' },
-    { q: 'Prečo previazaný qubit nemá šípku na Blochovej sfére?', options: ['nemá vlastný čistý stav — jeho redukovaný stav je zmes', 'lebo je pokazený', 'lebo sa točí príliš rýchlo'], correct: 0, why: 'Celok je čistý, časť je zmiešaná — „celok je viac než súčet častí“.' },
-    { q: 'Porušenie Bellovej nerovnosti znamená…', options: ['nemožno zároveň zachovať lokálnosť a predexistujúce hodnoty', 'kvantová mechanika je vyvrátená', 'informácia letí rýchlejšie ako svetlo'], correct: 0, why: 'Bohm volí nelokálnosť, operačný prístup opúšťa predexistujúce hodnoty.' },
+    { q: L('traps.7.0.q'), options: [L('traps.7.0.options.0'), L('traps.7.0.options.1'), L('traps.7.0.options.2')], correct: 0, why: L('traps.7.0.why') },
+    { q: L('traps.7.1.q'), options: [L('traps.7.1.options.0'), L('traps.7.1.options.1'), L('traps.7.1.options.2')], correct: 0, why: L('traps.7.1.why') },
+    { q: L('traps.7.2.q'), options: [L('traps.7.2.options.0'), L('traps.7.2.options.1'), L('traps.7.2.options.2')], correct: 0, why: L('traps.7.2.why') },
   ],
   8: [
-    { q: '„Elektrón neexistuje, kým sa naň nepozrieme.“ Je to presné vyjadrenie Bohra?', options: ['Nie — Bohr žiadal uviesť experimentálne podmienky opisu javu.', 'Áno, presne tak to tvrdil.'], correct: 0, why: 'Bohrovi išlo o jednoznačnú komunikáciu výsledkov, nie o popieranie existencie.' },
-    { q: 'Komplementarita je…', options: ['štruktúrovaný pluralizmus opisu (nezlučiteľné experimentálne rámce)', 'relativizmus — každý má svoju pravdu', 'psychologický vplyv pozorovateľa'], correct: 0, why: 'Každý opis je presný a objektívny v rámci svojich podmienok.' },
-    { q: 'Spája výsledok merania vedomie pozorovateľa?', options: ['Nie — rozhoduje fyzikálna interakcia a usporiadanie experimentu.', 'Áno, vedomie vytvára výsledok.'], correct: 0, why: 'Úloha vedomia z kvantového formalizmu nevyplýva.' },
-    { q: 'Ktorá otázka je EPISTEMOLOGICKÁ?', options: ['Čo o tom môžeme vedieť?', 'Čo existuje?', 'Ako sa nám jav ukazuje?'], correct: 0, why: 'Ontológia = čo existuje, fenomenológia = ako sa jav ukazuje.' },
-    { q: 'Bohmova mechanika je…', options: ['deterministická, so skrytými premennými, ale nelokálna', 'lokálna a deterministická', 'vyvrátená Bellovými nerovnosťami'], correct: 0, why: 'Bell vylučuje LOKÁLNE skryté premenné, Bohmove sú nelokálne.' },
+    { q: L('traps.8.0.q'), options: [L('traps.8.0.options.0'), L('traps.8.0.options.1')], correct: 0, why: L('traps.8.0.why') },
+    { q: L('traps.8.1.q'), options: [L('traps.8.1.options.0'), L('traps.8.1.options.1'), L('traps.8.1.options.2')], correct: 0, why: L('traps.8.1.why') },
+    { q: L('traps.8.2.q'), options: [L('traps.8.2.options.0'), L('traps.8.2.options.1')], correct: 0, why: L('traps.8.2.why') },
+    { q: L('traps.8.3.q'), options: [L('traps.8.3.options.0'), L('traps.8.3.options.1'), L('traps.8.3.options.2')], correct: 0, why: L('traps.8.3.why') },
+    { q: L('traps.8.4.q'), options: [L('traps.8.4.options.0'), L('traps.8.4.options.1'), L('traps.8.4.options.2')], correct: 0, why: L('traps.8.4.why') },
   ],
 };
 
@@ -292,96 +292,4 @@ if (CODEX_TR) for (const c of CODEX) {
   Object.assign(c, e);
 }
 
-const TRAPS_EN = {
-  1: [
-    { q: 'Amplitude α = 0.6i. What is the probability of the corresponding outcome?', options: ['0.36', '−0.36', '0.6'], correct: 0, why: '|α|² = α·α* = 0.6i · (−0.6i) = 0.36. A probability is never negative.' },
-    { q: 'What does multiplying an amplitude by the factor e<sup>iφ</sup> mean?', options: ['rotating the “hand” in the complex plane by the angle φ', 'increasing the probability', 'physically spinning the particle'], correct: 0, why: 'The magnitude (and hence |α|²) does not change, only the phase does.' },
-    { q: 'Which sentence is correct?', options: ['Amplitudes interfere; only afterwards do we compute the probability.', 'Probabilities interfere.', 'Interference is a purely quantum phenomenon; classical waves don’t have it.'], correct: 0, why: 'Classical waves interfere too — but in quantum mechanics it is probability amplitudes that interfere.' },
-  ],
-  2: [
-    { q: 'The Stern–Gerlach experiment showed…', options: ['two separate spots when measuring along a chosen direction', 'how the electron really spins', 'a continuous band of all deflections'], correct: 0, why: 'It showed the outcomes of a precisely specified measurement, not a “movie” of a spinning electron.' },
-    { q: 'An atom passes a “+z” filter, then we measure along x. What holds?', options: ['+x and −x 50 % each', 'always +x', 'always +z'], correct: 0, why: 'Certainty in one basis does not mean certainty in another.' },
-    { q: 'What does “spin ½” mean?', options: ['a kind of quantum spin with two possible projections', 'half a turn of the electron', 'half the rotation speed'], correct: 0, why: 'It names the type of spin, not a mechanical rotation.' },
-  ],
-  3: [
-    { q: 'What is the correct way to say what the Hadamard gate does?', options: ['it performs a unitary rotation that swaps the x and z axes', 'it always creates a superposition', 'it measures the qubit'], correct: 0, why: 'H|+⟩ = |0⟩ — so it also “undoes” a superposition. It depends on the basis.' },
-    { q: '−iX ∼ X means…', options: ['equal up to a global phase (physically identical)', 'I can turn one into the other', 'they differ by a relative phase'], correct: 0, why: 'The factor −i is common to the whole state → a global phase, unobservable.' },
-    { q: 'Where do the orthogonal states |0⟩ and |1⟩ lie on the Bloch sphere?', options: ['at opposite poles', 'perpendicular to each other (90°)', 'at the same point'], correct: 0, why: 'Perpendicular in Hilbert space, antipodal on the Bloch sphere (because of θ/2).' },
-    { q: 'The Z gate applied to |+⟩…', options: ['turns it into |−⟩; P(0) and P(1) in the Z basis stay ½', 'changes nothing, because the probabilities are the same', 'flips |0⟩ to |1⟩'], correct: 0, why: 'A rotation about z changes the relative phase — you can tell by measuring in the X basis.' },
-  ],
-  4: [
-    { q: 'We insert a Z-basis measurement between two H gates and forget the result. Why don’t we get 0 with certainty any more?', options: ['the measurement destroyed the coherence (off-diagonal elements of ρ)', 'the measurement broke the gate', 'the qubit got tired'], correct: 0, why: 'Without a phase relation, the second H has nothing to turn into interference.' },
-    { q: 'The density matrix is denoted…', options: ['ρ (rho)', 'p', 'P'], correct: 0, why: 'Greek rho. The letter p is momentum or probability.' },
-    { q: 'Which sentence is correct?', options: ['A superposition and a mixture can have the same Z statistics but differ under interference.', 'Superposition means we don’t know which state the qubit is in.', 'A quantum computer tries all possibilities and picks the right one.'], correct: 0, why: 'Superposition is not ignorance, and quantum parallelism is not 2ⁿ processors.' },
-  ],
-  5: [
-    { q: 'What is ⟨φ|ψ⟩?', options: ['a complex number (amplitude)', 'an operator', 'a probability'], correct: 0, why: 'The probability is |⟨φ|ψ⟩|².' },
-    { q: 'What is |ψ⟩⟨φ|?', options: ['an operator (matrix)', 'a number', 'a state'], correct: 0, why: 'Column times row = matrix. The order carries meaning!' },
-    { q: 'The wave function ψ(x) is…', options: ['the representation of the state in the position basis: ⟨x|ψ⟩', 'the abstract state itself', 'the probability of finding the particle'], correct: 0, why: 'The same |ψ⟩ also has a momentum representation ⟨p|ψ⟩.' },
-  ],
-  6: [
-    { q: 'What “oscillates” in Rabi oscillations?', options: ['the amplitudes and probabilities of the outcomes', 'the electron between two positions', 'the magnet in the apparatus'], correct: 0, why: 'Nothing swings mechanically — the state changes.' },
-    { q: 'Precession about the z axis, when measuring in the Z basis…', options: ['changes neither P(0) nor P(1); it changes the phase', 'flips the spin', 'increases the energy'], correct: 0, why: 'Rotation about z = change of the relative phase.' },
-    { q: 'The NMR signal (e.g. SpinQ) corresponds to…', options: ['the expectation value of the transverse magnetisation of the ensemble', 'a single outcome of a single molecule', 'the collapse of one spin'], correct: 0, why: 'We measure a whole collection of molecules at once.' },
-    { q: 'Because of T₂ the Bloch vector shrinks to half its length. The state is…', options: ['mixed (inside the sphere)', 'still pure', 'invalid'], correct: 0, why: '|r| < 1 → mixed state. Normalisation (trace of ρ = 1) still holds.' },
-  ],
-  7: [
-    { q: 'Alice changes her measurement axis. What does Bob see in his results?', options: ['still 50/50 — nothing changes', 'an instant change in the statistics', 'a message from Alice'], correct: 0, why: 'Entanglement does not allow signalling. The correlations show only after comparing.' },
-    { q: 'Why does an entangled qubit have no arrow on the Bloch sphere?', options: ['it has no pure state of its own — its reduced state is a mixture', 'because it is broken', 'because it spins too fast'], correct: 0, why: 'The whole is pure, the part is mixed — “the whole is more than the sum of its parts”.' },
-    { q: 'A violation of Bell’s inequality means…', options: ['one cannot keep both locality and pre-existing values', 'quantum mechanics is refuted', 'information travels faster than light'], correct: 0, why: 'Bohm chooses non-locality; the operational approach abandons pre-existing values.' },
-  ],
-  8: [
-    { q: '“The electron doesn’t exist until we look at it.” Is this an accurate statement of Bohr’s view?', options: ['No — Bohr demanded stating the experimental conditions under which a phenomenon is described.', 'Yes, that is exactly what he claimed.'], correct: 0, why: 'Bohr cared about unambiguous communication of results, not about denying existence.' },
-    { q: 'Complementarity is…', options: ['a structured pluralism of descriptions (incompatible experimental frameworks)', 'relativism — everyone has their own truth', 'the psychological influence of the observer'], correct: 0, why: 'Each description is precise and objective within its own conditions.' },
-    { q: 'Does the observer’s consciousness determine the measurement outcome?', options: ['No — the physical interaction and the experimental arrangement decide.', 'Yes, consciousness creates the outcome.'], correct: 0, why: 'A role for consciousness does not follow from the quantum formalism.' },
-    { q: 'Which question is EPISTEMOLOGICAL?', options: ['What can we know about it?', 'What exists?', 'How does the phenomenon appear to us?'], correct: 0, why: 'Ontology = what exists, phenomenology = how the phenomenon appears.' },
-    { q: 'Bohmian mechanics is…', options: ['deterministic, with hidden variables, but non-local', 'local and deterministic', 'refuted by Bell’s inequalities'], correct: 0, why: 'Bell rules out LOCAL hidden variables; Bohm’s are non-local.' },
-  ],
-};
-const TRAPS_UK = {
-  1: [
-    { q: 'Амплітуда α = 0,6i. Яка ймовірність відповідного результату?', options: ['0,36', '−0,36', '0,6'], correct: 0, why: '|α|² = α·α* = 0,6i · (−0,6i) = 0,36. Імовірність ніколи не буває від’ємною.' },
-    { q: 'Що означає множення амплітуди на множник e<sup>iφ</sup>?', options: ['поворот «стрілки» в комплексній площині на кут φ', 'збільшення ймовірності', 'фізичне обертання частинки'], correct: 0, why: 'Модуль (а отже, і |α|²) не змінюється, змінюється лише фаза.' },
-    { q: 'Яке речення правильне?', options: ['Амплітуди інтерферують; лише потім ми обчислюємо ймовірність.', 'Імовірності інтерферують.', 'Інтерференція — суто квантове явище; класичні хвилі її не мають.'], correct: 0, why: 'Класичні хвилі теж інтерферують — але в квантовій механіці інтерферують амплітуди ймовірності.' },
-  ],
-  2: [
-    { q: 'Експеримент Штерна–Ґерлаха показав…', options: ['дві окремі плями під час вимірювання вздовж обраного напрямку', 'як насправді обертається електрон', 'суцільну смугу всіх відхилень'], correct: 0, why: 'Він показав результати точно заданого вимірювання, а не «кіно» про електрон, що обертається.' },
-    { q: 'Атом проходить фільтр «+z», потім вимірюємо вздовж x. Що справджується?', options: ['+x і −x по 50 %', 'завжди +x', 'завжди +z'], correct: 0, why: 'Певність в одному базисі не означає певності в іншому.' },
-    { q: 'Що означає «спін ½»?', options: ['різновид квантового спіну з двома можливими проєкціями', 'пів оберту електрона', 'половину швидкості обертання'], correct: 0, why: 'Це назва типу спіну, а не механічного обертання.' },
-  ],
-  3: [
-    { q: 'Як правильно сказати, що робить гейт Адамара?', options: ['виконує унітарний поворот, що міняє місцями осі x і z', 'завжди створює суперпозицію', 'вимірює кубіт'], correct: 0, why: 'H|+⟩ = |0⟩ — тож він також «скасовує» суперпозицію. Залежить від базису.' },
-    { q: '−iX ∼ X означає…', options: ['рівні з точністю до глобальної фази (фізично тотожні)', 'одне можна перетворити на інше', 'вони відрізняються відносною фазою'], correct: 0, why: 'Множник −i спільний для всього стану → глобальна фаза, яку неможливо спостерегти.' },
-    { q: 'Де на сфері Блоха лежать ортогональні стани |0⟩ і |1⟩?', options: ['на протилежних полюсах', 'перпендикулярно один до одного (90°)', 'в одній точці'], correct: 0, why: 'Перпендикулярні в гільбертовому просторі, протилежні на сфері Блоха (через θ/2).' },
-    { q: 'Гейт Z, застосований до |+⟩…', options: ['перетворює його на |−⟩; P(0) і P(1) у базисі Z лишаються ½', 'нічого не змінює, бо ймовірності ті самі', 'перевертає |0⟩ на |1⟩'], correct: 0, why: 'Поворот навколо z змінює відносну фазу — це видно під час вимірювання в базисі X.' },
-  ],
-  4: [
-    { q: 'Між два гейти H вставляємо вимірювання в базисі Z і забуваємо результат. Чому ми більше не отримуємо 0 напевно?', options: ['вимірювання зруйнувало когерентність (позадіагональні елементи ρ)', 'вимірювання зламало гейт', 'кубіт утомився'], correct: 0, why: 'Без фазового співвідношення другому H нема чого перетворювати на інтерференцію.' },
-    { q: 'Матрицю густини позначають…', options: ['ρ (ро)', 'p', 'P'], correct: 0, why: 'Грецька ро. Літера p — це імпульс або ймовірність.' },
-    { q: 'Яке речення правильне?', options: ['Суперпозиція та суміш можуть мати однакову статистику Z, але різнитися в інтерференції.', 'Суперпозиція означає, що ми не знаємо, в якому стані кубіт.', 'Квантовий комп’ютер перебирає всі можливості й вибирає правильну.'], correct: 0, why: 'Суперпозиція — не незнання, а квантовий паралелізм — не 2ⁿ процесорів.' },
-  ],
-  5: [
-    { q: 'Що таке ⟨φ|ψ⟩?', options: ['комплексне число (амплітуда)', 'оператор', 'імовірність'], correct: 0, why: 'Імовірність — це |⟨φ|ψ⟩|².' },
-    { q: 'Що таке |ψ⟩⟨φ|?', options: ['оператор (матриця)', 'число', 'стан'], correct: 0, why: 'Стовпець на рядок = матриця. Порядок має значення!' },
-    { q: 'Хвильова функція ψ(x) — це…', options: ['представлення стану в базисі положень: ⟨x|ψ⟩', 'сам абстрактний стан', 'імовірність знайти частинку'], correct: 0, why: 'Той самий |ψ⟩ має й імпульсне представлення ⟨p|ψ⟩.' },
-  ],
-  6: [
-    { q: 'Що «коливається» в осциляціях Рабі?', options: ['амплітуди та ймовірності результатів', 'електрон між двома положеннями', 'магніт у приладі'], correct: 0, why: 'Механічно нічого не хитається — змінюється стан.' },
-    { q: 'Прецесія навколо осі z під час вимірювання в базисі Z…', options: ['не змінює ні P(0), ні P(1); змінює фазу', 'перевертає спін', 'збільшує енергію'], correct: 0, why: 'Поворот навколо z = зміна відносної фази.' },
-    { q: 'ЯМР-сигнал (напр. SpinQ) відповідає…', options: ['середньому значенню поперечної намагніченості ансамблю', 'одному результатові однієї молекули', 'колапсу одного спіну'], correct: 0, why: 'Ми вимірюємо цілу сукупність молекул одночасно.' },
-    { q: 'Через T₂ вектор Блоха скоротився до половини довжини. Стан…', options: ['змішаний (усередині сфери)', 'досі чистий', 'недійсний'], correct: 0, why: '|r| < 1 → змішаний стан. Нормування (слід ρ = 1) і далі виконується.' },
-  ],
-  7: [
-    { q: 'Аліса змінює свою вісь вимірювання. Що бачить Боб у своїх результатах?', options: ['і далі 50/50 — нічого не змінюється', 'миттєву зміну статистики', 'повідомлення від Аліси'], correct: 0, why: 'Сплутаність не дозволяє сигналізації. Кореляції видно лише після порівняння.' },
-    { q: 'Чому сплутаний кубіт не має стрілки на сфері Блоха?', options: ['він не має власного чистого стану — його редукований стан є сумішшю', 'бо він зламаний', 'бо він обертається надто швидко'], correct: 0, why: 'Ціле чисте, частина змішана — «ціле більше за суму частин».' },
-    { q: 'Порушення нерівності Белла означає…', options: ['не можна зберегти водночас локальність і наперед існуючі значення', 'квантову механіку спростовано', 'інформація поширюється швидше за світло'], correct: 0, why: 'Бом обирає нелокальність; операційний підхід відмовляється від наперед існуючих значень.' },
-  ],
-  8: [
-    { q: '«Електрона не існує, доки ми на нього не подивимося». Чи точно це передає погляд Бора?', options: ['Ні — Бор вимагав зазначати експериментальні умови, за яких описують явище.', 'Так, саме це він і стверджував.'], correct: 0, why: 'Бору йшлося про однозначне повідомлення результатів, а не про заперечення існування.' },
-    { q: 'Доповнювальність — це…', options: ['структурований плюралізм описів (несумісні експериментальні рамки)', 'релятивізм — у кожного своя правда', 'психологічний вплив спостерігача'], correct: 0, why: 'Кожен опис точний і об’єктивний у своїх умовах.' },
-    { q: 'Чи визначає свідомість спостерігача результат вимірювання?', options: ['Ні — вирішують фізична взаємодія та експериментальне влаштування.', 'Так, свідомість створює результат.'], correct: 0, why: 'Роль свідомості з квантового формалізму не випливає.' },
-    { q: 'Яке питання ЕПІСТЕМОЛОГІЧНЕ?', options: ['Що ми можемо про це знати?', 'Що існує?', 'Як явище нам постає?'], correct: 0, why: 'Онтологія = що існує, феноменологія = як явище постає.' },
-    { q: 'Бомівська механіка…', options: ['детерміністична, з прихованими змінними, але нелокальна', 'локальна й детерміністична', 'спростована нерівностями Белла'], correct: 0, why: 'Белл виключає ЛОКАЛЬНІ приховані змінні; Бомові — нелокальні.' },
-  ],
-};
-const TRAPS = tr(TRAPS_SK, TRAPS_EN, TRAPS_UK);
+const TRAPS = TRAPS_SK;

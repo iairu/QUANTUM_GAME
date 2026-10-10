@@ -56,19 +56,19 @@ function diracType(tokens, squared) {
 
 const DIRAC_TASKS = [
   { title: tr('AMPLITÚDU, že stav ψ „nájdeme“ ako stav a', 'the AMPLITUDE that the state ψ is “found” as the state a', 'АМПЛІТУДУ того, що стан ψ «буде знайдено» як стан a'), want: 'num', exact: ['⟨a|', '|ψ⟩'], sq: false, grant: ['dirac', 'ket', 'bra', 'braket'],
-    msg: tr('⟨a|ψ⟩ — bra „kladie otázku“ (je to stav a?), ket je odpoveďou. Spolu dajú <b>číslo</b>: amplitúdu. Ako bra-ket = „bracket“ (zátvorka).', '⟨a|ψ⟩ — the bra “asks the question” (is it state a?), the ket is the answer. Together they give a <b>number</b>: the amplitude. Bra-ket = “bracket”.', '⟨a|ψ⟩ — бра «ставить питання» (чи це стан a?), кет — відповідь. Разом вони дають <b>число</b>: амплітуду. Бра-кет = «bracket», дужка.') },
+    msg: L('l5.DIRAC_TASKS.1') },
   { title: tr('PRAVDEPODOBNOSŤ výsledku a pri meraní stavu ψ', 'the PROBABILITY of outcome a when measuring the state ψ', 'ІМОВІРНІСТЬ результату a під час вимірювання стану ψ'), want: 'prob', exact: ['⟨a|', '|ψ⟩'], sq: true, grant: [],
-    msg: tr('|⟨a|ψ⟩|² — Bornovo pravidlo. Amplitúda je teória, pravdepodobnosť je experiment.', '|⟨a|ψ⟩|² — the Born rule. The amplitude is theory, the probability is experiment.', '|⟨a|ψ⟩|² — правило Борна. Амплітуда — це теорія, імовірність — експеримент.') },
+    msg: L('l5.DIRAC_TASKS.2') },
   { title: tr('PROJEKTOR na stav ψ (= matica hustoty čistého stavu)', 'the PROJECTOR onto the state ψ (= density matrix of a pure state)', 'ПРОЄКТОР на стан ψ (= матриця густини чистого стану)'), want: 'op', exact: ['|ψ⟩', '⟨ψ|'], sq: false, grant: ['ketbra'],
-    msg: tr('|ψ⟩⟨ψ| — stĺpec krát riadok = <b>matica</b>. Rovnaké symboly ako pri ⟨ψ|ψ⟩, opačné poradie, úplne iný objekt!', '|ψ⟩⟨ψ| — column times row = a <b>matrix</b>. The same symbols as in ⟨ψ|ψ⟩, the opposite order, a completely different object!', '|ψ⟩⟨ψ| — стовпець на рядок = <b>матриця</b>. Ті самі символи, що в ⟨ψ|ψ⟩, протилежний порядок — зовсім інший об’єкт!') },
+    msg: L('l5.DIRAC_TASKS.3') },
   { title: tr('STREDNÚ HODNOTU veličiny Â v stave ψ', 'the EXPECTATION VALUE of the observable Â in the state ψ', 'СЕРЕДНЄ ЗНАЧЕННЯ спостережуваної Â у стані ψ'), want: 'num', exact: ['⟨ψ|', 'Â', '|ψ⟩'], sq: false, grant: ['hat', 'expect'],
-    msg: tr('⟨ψ|Â|ψ⟩ — priemer mnohých meraní. Pozor: nemusí to byť hodnota, ktorú nameriaš v jednom pokuse!', '⟨ψ|Â|ψ⟩ — the average of many measurements. Careful: it need not be a value you can get in a single run!', '⟨ψ|Â|ψ⟩ — середнє багатьох вимірювань. Обережно: це не обов’язково значення, яке можна отримати за один раз!') },
+    msg: L('l5.DIRAC_TASKS.4') },
   { title: tr('nový STAV, ktorý vznikne pôsobením Hamiltoniánu Ĥ na ψ', 'the new STATE obtained by applying the Hamiltonian Ĥ to ψ', 'новий СТАН, отриманий дією гамільтоніана Ĥ на ψ'), want: 'ket', exact: ['Ĥ', '|ψ⟩'], sq: false, grant: [],
-    msg: tr('Ĥ|ψ⟩ — operátor „spracuje“ ket a vráti ket. Operátor pôsobí doprava na ket.', 'Ĥ|ψ⟩ — the operator “processes” a ket and returns a ket. An operator acts to the right, on a ket.', 'Ĥ|ψ⟩ — оператор «обробляє» кет і повертає кет. Оператор діє праворуч, на кет.') },
+    msg: L('l5.DIRAC_TASKS.5') },
   { title: tr('MATICOVÝ ELEMENT operátora Â medzi φ (vľavo) a ψ (vpravo)', 'the MATRIX ELEMENT of the operator Â between φ (left) and ψ (right)', 'МАТРИЧНИЙ ЕЛЕМЕНТ оператора Â між φ (ліворуч) і ψ (праворуч)'), want: 'num', exact: ['⟨φ|', 'Â', '|ψ⟩'], sq: false, grant: [],
-    msg: tr('⟨φ|Â|ψ⟩ — komplexné číslo, prvok matice. Číta sa sprava: Â pôsobí na ψ, výsledok sa premietne na φ.', '⟨φ|Â|ψ⟩ — a complex number, an element of the matrix. Read from the right: Â acts on ψ, the result is projected onto φ.', '⟨φ|Â|ψ⟩ — комплексне число, елемент матриці. Читай справа: Â діє на ψ, результат проєктується на φ.') },
+    msg: L('l5.DIRAC_TASKS.6') },
   { title: tr('ZLOŽENÝ STAV dvoch systémov: ψ (systém A) a φ (systém B)', 'the COMPOSITE STATE of two systems: ψ (system A) and φ (system B)', 'СКЛАДЕНИЙ СТАН двох систем: ψ (система A) і φ (система B)'), want: 'ket2', exact: ['|ψ⟩', '⊗', '|φ⟩'], sq: false, grant: ['tensor', 'kron'],
-    msg: tr('|ψ⟩ ⊗ |φ⟩ — tenzorový súčin. Pre dva qubity |0⟩ ⊗ |1⟩ = |01⟩. Dimenzie sa násobia: 2 × 2 = 4 amplitúdy.', '|ψ⟩ ⊗ |φ⟩ — the tensor product. For two qubits |0⟩ ⊗ |1⟩ = |01⟩. Dimensions multiply: 2 × 2 = 4 amplitudes.', '|ψ⟩ ⊗ |φ⟩ — тензорний добуток. Для двох кубітів |0⟩ ⊗ |1⟩ = |01⟩. Розмірності перемножуються: 2 × 2 = 4 амплітуди.') },
+    msg: L('l5.DIRAC_TASKS.7') },
 ];
 
 const LEGEND_TIPS = tr({
@@ -95,28 +95,14 @@ class L5Dirac extends Level {
 
   intro() {
     this.quest(tr('Vypočuj si Diraca', 'Listen to Dirac', 'Послухай Дірака'), { easy: tr('💬 Dirac', '💬 Dirac', '💬 Дірак'), hard: tr('bra-ket: typy výrazov', 'bra-ket: expression types', 'бра-кет: типи виразів') });
-    this.say(tr([
-      'Dirac.',
-      { who: 'Knihovníčka Ket', face: '📚', text: '(šepky) Pán profesor Dirac je povestne málovravný. Kolegovia vraj zaviedli jednotku <b>1 dirac = jedno slovo za hodinu</b>. Dovoľ, aby som tlmočila.' },
-      { who: 'Knihovníčka Ket', face: '📚', text: 'Pán profesor vymyslel <b>bra-ket notáciu</b> — gramatiku kvantovej mechaniky. Každý výraz má <b>typ</b>, ako slovo v jazyku má slovný druh: <b>ket |ψ⟩</b> = stav (stĺpec), <b>bra ⟨ψ|</b> = otázka (riadok), <b>Â</b> = operátor (stroj).' },
-      { who: 'Knihovníčka Ket', face: '📚', text: 'Prirovnanie: ket je <b>list</b>, bra je <b>obálka s adresou</b>. Keď list vložíš do obálky — ⟨a|ψ⟩ — dostaneš <b>číslo</b> (známku, amplitúdu). Keď ich položíš opačne |ψ⟩⟨a| — dostaneš <b>stroj</b> (operátor), ktorý z listov vyrába iné listy.' },
-      { who: 'Knihovníčka Ket', face: '📚', text: 'Na stole (3D) uvidíš tvary: <b>šípka</b> = ket, <b>doska</b> = bra, <b>kocka</b> = operátor, <b>minca</b> = číslo, <b>stĺpec</b> = pravdepodobnosť. Skladaj tokeny a nauč sa, čo z čoho vznikne.' },
-      'Správne.',
-    ], [
-      'Dirac.',
-      { who: 'Librarian Ket', face: '📚', text: '(whispering) Professor Dirac is famously taciturn. His colleagues supposedly introduced the unit <b>1 dirac = one word per hour</b>. Allow me to interpret.' },
-      { who: 'Librarian Ket', face: '📚', text: 'The professor invented the <b>bra-ket notation</b> — the grammar of quantum mechanics. Every expression has a <b>type</b>, just as a word in a language has a part of speech: <b>ket |ψ⟩</b> = state (column), <b>bra ⟨ψ|</b> = question (row), <b>Â</b> = operator (machine).' },
-      { who: 'Librarian Ket', face: '📚', text: 'An analogy: a ket is a <b>letter</b>, a bra is an <b>addressed envelope</b>. Put the letter into the envelope — ⟨a|ψ⟩ — and you get a <b>number</b> (a stamp, an amplitude). Put them the other way round, |ψ⟩⟨a|, and you get a <b>machine</b> (an operator) that turns letters into other letters.' },
-      { who: 'Librarian Ket', face: '📚', text: 'On the table (3D) you will see shapes: <b>arrow</b> = ket, <b>plank</b> = bra, <b>cube</b> = operator, <b>coin</b> = number, <b>bar</b> = probability. Put tokens together and learn what comes out of what.' },
-      'Correct.',
-    ], [
-      'Дірак.',
-      { who: 'Бібліотекар Кет', face: '📚', text: '(пошепки) Професор Дірак славиться мовчазністю. Колеги нібито запровадили одиницю <b>1 дірак = одне слово на годину</b>. Дозволь, я перекладу.' },
-      { who: 'Бібліотекар Кет', face: '📚', text: 'Професор винайшов <b>бра-кет запис</b> — граматику квантової механіки. Кожен вираз має <b>тип</b>, як слово в мові має частину мови: <b>кет |ψ⟩</b> = стан (стовпець), <b>бра ⟨ψ|</b> = питання (рядок), <b>Â</b> = оператор (машина).' },
-      { who: 'Бібліотекар Кет', face: '📚', text: 'Аналогія: кет — це <b>лист</b>, бра — <b>підписаний конверт</b>. Поклади лист у конверт — ⟨a|ψ⟩ — і отримаєш <b>число</b> (марку, амплітуду). Поклади навпаки, |ψ⟩⟨a|, — і отримаєш <b>машину</b> (оператор), що перетворює одні листи на інші.' },
-      { who: 'Бібліотекар Кет', face: '📚', text: 'На столі (3D) побачиш фігури: <b>стрілка</b> = кет, <b>дошка</b> = бра, <b>куб</b> = оператор, <b>монета</b> = число, <b>стовпчик</b> = імовірність. Складай жетони й дізнавайся, що з чого виходить.' },
-      'Правильно.',
-    ]), () => this.next());
+    this.say([
+      L('l5.intro.1.0'),
+      { who: L('l5.intro.1.1.who'), face: '📚', text: L('l5.intro.1.1.text') },
+      { who: L('l5.intro.1.2.who'), face: '📚', text: L('l5.intro.1.2.text') },
+      { who: L('l5.intro.1.3.who'), face: '📚', text: L('l5.intro.1.3.text') },
+      { who: L('l5.intro.1.4.who'), face: '📚', text: L('l5.intro.1.4.text') },
+      L('l5.intro.1.5'),
+    ], () => this.next());
   }
 
   tasks() { this.loadTask(this.sub.ti || 0); }
@@ -149,9 +135,9 @@ class L5Dirac extends Level {
     const ok = this.res.type === T.want && this.squared === T.sq && got.join() === T.exact.join();
     if (ok) {
       this.grant(T.grant);
-      this.say([{ who: tr('Knihovníčka Ket', 'Librarian Ket', 'Бібліотекар Кет'), face: '📚', text: '✅ ' + T.msg }], () => {
+      this.say([{ who: L('l5.verify.1'), face: '📚', text: '✅ ' + T.msg }], () => {
         if (this.ti === 2) {
-          this.ask(tr({ q: 'Ktorý výraz je OPERÁTOR?', options: ['|ψ⟩⟨φ|', '⟨φ|ψ⟩', '⟨ψ|Â|ψ⟩'], correct: 0, why: 'Ket-bra = operátor; bra-ket = číslo; ⟨ψ|Â|ψ⟩ = číslo (stredná hodnota).' }, { q: 'Which expression is an OPERATOR?', options: ['|ψ⟩⟨φ|', '⟨φ|ψ⟩', '⟨ψ|Â|ψ⟩'], correct: 0, why: 'Ket-bra = operator; bra-ket = number; ⟨ψ|Â|ψ⟩ = number (expectation value).' }, { q: 'Який вираз є ОПЕРАТОРОМ?', options: ['|ψ⟩⟨φ|', '⟨φ|ψ⟩', '⟨ψ|Â|ψ⟩'], correct: 0, why: 'Кет-бра = оператор; бра-кет = число; ⟨ψ|Â|ψ⟩ = число (середнє значення).' }), () => this.after());
+          this.ask({ q: L('l5.verify.2.q'), options: [L('l5.verify.2.options.0'), L('l5.verify.2.options.1'), L('l5.verify.2.options.2')], correct: 0, why: L('l5.verify.2.why') }, () => this.after());
         } else this.after();
       });
     } else if (Settings.hard) this.mistakes++; // ťažká: každé zlé overenie je chyba
@@ -163,8 +149,7 @@ class L5Dirac extends Level {
   }
   after() {
     if (this.ti + 1 < DIRAC_TASKS.length) this.loadTask(this.ti + 1);
-    else this.say(tr(['Dobre.', { who: 'Knihovníčka Ket', face: '📚', text: '(To je od neho takmer óda!) Hlavná myšlienka: <b>|ψ⟩ je abstraktný stav</b>, a ψ(x) = ⟨x|ψ⟩ je iba jeho „súradnica“ v polohovej báze — rovnako ako c<sub>n</sub> = ⟨n|ψ⟩ v diskrétnej báze.' }],
-      ['Good.', { who: 'Librarian Ket', face: '📚', text: '(From him that is almost an ode!) The main idea: <b>|ψ⟩ is an abstract state</b>, and ψ(x) = ⟨x|ψ⟩ is just its “coordinate” in the position basis — just like c<sub>n</sub> = ⟨n|ψ⟩ in a discrete basis.' }], ['Добре.', { who: 'Бібліотекар Кет', face: '📚', text: '(Від нього це майже ода!) Головна думка: <b>|ψ⟩ — абстрактний стан</b>, а ψ(x) = ⟨x|ψ⟩ — лише його «координата» в базисі положень, так само як c<sub>n</sub> = ⟨n|ψ⟩ у дискретному базисі.' }]), () => this.next());
+    else this.say([L('l5.after.1.0'), { who: L('l5.after.1.1.who'), face: '📚', text: L('l5.after.1.1.text') }], () => this.next());
   }
 
   update(dt) { this.t += dt; this.spin += dt; }

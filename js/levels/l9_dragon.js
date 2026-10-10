@@ -109,19 +109,11 @@ const SHOUTS = {
   S: { word: 'SEK', tip: tr('<b>SEK</b> = hradlo S: 90° okolo osi z. |+⟩ → |+i⟩.', '<b>SEK</b> = the S gate: 90° about the z axis. |+⟩ → |+i⟩.', '<b>SEK</b> = гейт S: 90° навколо осі z. |+⟩ → |+i⟩.') },
 };
 
-const DRAGON_TRAPS = tr([
-  { q: 'Drak má P(zásah) = 70 %. Udrel si a minul. Čo sa stalo?', options: ['Meranie dalo menej pravdepodobný výsledok — 30 % sa tiež stáva; štít skolaboval na opačný pól', 'Pravdepodobnosť bola zle vypočítaná', 'Drak zistil, že ho meriaš, a uhol zmenil'], correct: 0, why: 'Bornovo pravidlo dáva pravdepodobnosti, nie istoty. Po meraní je stav v jednom z dvoch výsledkov.' },
-  { q: 'Prečo ti „Fázové zasyčanie“ (rotácia okolo z) neublížilo, keď si stál na |1⟩?', options: ['Póly sú vlastné stavy Z — rotácia okolo z ich mení len o globálnu fázu', 'Lebo drak minul', 'Lebo |1⟩ je nulový vektor'], correct: 0, why: 'Rz(φ)|1⟩ = e<sup>iφ/2</sup>|1⟩ — globálna fáza je nepozorovateľná.' },
-  { q: 'Hmla dekoherencie zmrštila šípku štítu na dĺžku 0,5. Aké najväčšie P(zásah) dosiahneš len hradlami?', options: ['75 % — rotácie dĺžku šípky nezväčšia: P ≤ (1 + |r|)/2', '100 % — stačí správne hradlo', '50 %'], correct: 0, why: 'Unitárne hradlá sú rotácie; zmiešaný stav zostane zmiešaný. Pomôže až meranie (kolaps) — alebo nedopustiť hmlu na rovníku.' },
-], [
-  { q: 'The dragon has P(hit) = 70 %. You struck and missed. What happened?', options: ['The measurement gave the less likely outcome — 30 % happens too; the ward collapsed onto the opposite pole', 'The probability was computed wrongly', 'The dragon noticed you measuring and changed the angle'], correct: 0, why: 'The Born rule gives probabilities, not certainties. After a measurement the state is in one of the two outcomes.' },
-  { q: 'Why did the “Phase Hiss” (a rotation about z) not hurt you while you stood at |1⟩?', options: ['The poles are eigenstates of Z — a rotation about z changes them only by a global phase', 'Because the dragon missed', 'Because |1⟩ is the zero vector'], correct: 0, why: 'Rz(φ)|1⟩ = e<sup>iφ/2</sup>|1⟩ — a global phase is unobservable.' },
-  { q: 'The Fog of Decoherence shrank the ward’s arrow to length 0.5. What is the highest P(hit) you can reach with gates alone?', options: ['75 % — rotations do not lengthen the arrow: P ≤ (1 + |r|)/2', '100 % — you just need the right gate', '50 %'], correct: 0, why: 'Unitary gates are rotations; a mixed state stays mixed. Only a measurement (collapse) helps — or not letting the fog catch you on the equator.' },
-], [
-  { q: 'Дракон має P(влучання) = 70 %. Ти вдарив(-ла) і промахнувся(-лася). Що сталося?', options: ['Вимірювання дало менш імовірний результат — 30 % теж трапляються; захист сколапсував на протилежний полюс', 'Імовірність була обчислена неправильно', 'Дракон помітив, що ти вимірюєш, і змінив кут'], correct: 0, why: 'Правило Борна дає ймовірності, а не певність. Після вимірювання стан перебуває в одному з двох результатів.' },
-  { q: 'Чому «Фазове сичання» (поворот навколо z) не зашкодило тобі, коли ти стояв(-ла) в |1⟩?', options: ['Полюси — власні стани Z: поворот навколо z змінює їх лише на глобальну фазу', 'Бо дракон промахнувся', 'Бо |1⟩ — нульовий вектор'], correct: 0, why: 'Rz(φ)|1⟩ = e<sup>iφ/2</sup>|1⟩ — глобальну фазу неможливо спостерегти.' },
-  { q: 'Туман декогеренції вкоротив стрілку захисту до довжини 0,5. Яке найвище P(влучання) можна досягти самими гейтами?', options: ['75 % — повороти не подовжують стрілку: P ≤ (1 + |r|)/2', '100 % — потрібен лише правильний гейт', '50 %'], correct: 0, why: 'Унітарні гейти — це повороти; змішаний стан лишається змішаним. Допоможе лише вимірювання (колапс) — або не дати туману застати тебе на екваторі.' },
-]);
+const DRAGON_TRAPS = [
+  { q: L('l9.DRAGON_TRAPS.1.0.q'), options: [L('l9.DRAGON_TRAPS.1.0.options.0'), L('l9.DRAGON_TRAPS.1.0.options.1'), L('l9.DRAGON_TRAPS.1.0.options.2')], correct: 0, why: L('l9.DRAGON_TRAPS.1.0.why') },
+  { q: L('l9.DRAGON_TRAPS.1.1.q'), options: [L('l9.DRAGON_TRAPS.1.1.options.0'), L('l9.DRAGON_TRAPS.1.1.options.1'), L('l9.DRAGON_TRAPS.1.1.options.2')], correct: 0, why: L('l9.DRAGON_TRAPS.1.1.why') },
+  { q: L('l9.DRAGON_TRAPS.1.2.q'), options: [L('l9.DRAGON_TRAPS.1.2.options.0'), L('l9.DRAGON_TRAPS.1.2.options.1'), L('l9.DRAGON_TRAPS.1.2.options.2')], correct: 0, why: L('l9.DRAGON_TRAPS.1.2.why') },
+];
 
 class L9Dragon extends Level {
   get steps() { return [this.intro, this.phase1, this.phase2, this.phase3]; }
@@ -139,25 +131,13 @@ class L9Dragon extends Level {
 
   intro() {
     this.quest(tr('Vypočuj si Schrödingera', 'Listen to Schrödinger', 'Послухай Шредінгера'), { easy: tr('💬 Schrödinger', '💬 Schrödinger', '💬 Шредінгер'), hard: tr('Súboj: štít = qubit, úder = meranie', 'Battle: ward = qubit, strike = measurement', 'Битва: захист = кубіт, удар = вимірювання') });
-    this.say(tr([
-      'Takže si prešiel všetkými ôsmimi portálmi. Som Erwin Schrödinger — áno, ten s mačkou. Na tomto štíte hory hniezdi <b>Ketvarr</b>, kvantový drak.',
-      'Jeho šupiny chráni <b>štít, ktorý je qubitom</b>. Vidíš ho vpravo ako Blochovu guľu. Zlatá šípka <b>n</b> je jeho zraniteľné miesto.',
-      'Tvoj meč je <b>meranie</b>. Úder zasiahne s pravdepodobnosťou <b>P = (1 + r·n)/2</b> — čím bližšie je šípka štítu k zlatej, tým istejšie. A pozor: po údere štít <b>skolabuje</b> na jeden z pólov.',
-      'Nehovor, že drak je „v nebi aj na zemi naraz“. Povedz presne: je v stave, ktorý dáva <b>P(zásah)</b>. Tie dva priesvitné draky ukazujú len pravdepodobnosti výsledkov.',
-      `Bojuje sa na <b>ťahy</b>: vykríkneš jedno slovo moci (hradlo), potom drak urobí <b>ohlásený ťah</b> a chrlí oheň. Ketvarra zraní len úder s <b>P ≥ ${Fmt.pct(this.thr)}</b> — to je metrika, ktorú musíš trafiť.`,
-    ], [
-      'So you have passed through all eight portals. I am Erwin Schrödinger — yes, the one with the cat. On this mountain peak nests <b>Ketvarr</b>, the quantum dragon.',
-      'His scales are guarded by <b>a ward that is a qubit</b>. You see it on the right as a Bloch ball. The golden arrow <b>n</b> is his weak spot.',
-      'Your sword is <b>measurement</b>. A strike hits with probability <b>P = (1 + r·n)/2</b> — the closer the ward’s arrow is to the golden one, the surer the hit. And beware: after a strike the ward <b>collapses</b> onto one of the poles.',
-      'Don’t say the dragon is “in the sky and on the ground at once”. Say it precisely: he is in a state that gives <b>P(hit)</b>. The two translucent dragons only show the probabilities of the outcomes.',
-      `The fight is <b>turn-based</b>: you shout one Word of Power (a gate), then the dragon makes an <b>announced move</b> and breathes fire. Only a strike with <b>P ≥ ${Fmt.pct(this.thr)}</b> wounds Ketvarr — that is the metric you must hit.`,
-    ], [
-      'Отже, ти пройшов(-ла) всі вісім порталів. Я Ервін Шредінгер — так, той самий, що з котом. На цій гірській вершині гніздиться <b>Кетварр</b>, квантовий дракон.',
-      'Його луску оберігає <b>захист, що є кубітом</b>. Ти бачиш його праворуч як кулю Блоха. Золота стрілка <b>n</b> — його вразливе місце.',
-      'Твій меч — <b>вимірювання</b>. Удар влучає з імовірністю <b>P = (1 + r·n)/2</b> — що ближче стрілка захисту до золотої, то певніше влучання. І стережися: після удару захист <b>колапсує</b> на один із полюсів.',
-      'Не кажи, що дракон «водночас у небі й на землі». Кажи точно: він у стані, що дає <b>P(влучання)</b>. Два напівпрозорі дракони лише показують імовірності результатів.',
-      `Бій <b>покроковий</b>: ти вигукуєш одне слово сили (гейт), потім дракон робить <b>оголошений хід</b> і дихає вогнем. Кетварра поранить лише удар із <b>P ≥ ${Fmt.pct(this.thr)}</b> — це метрика, яку ти маєш досягти.`,
-    ]), () => this.next());
+    this.say([
+      L('l9.intro.1.0'),
+      L('l9.intro.1.1'),
+      L('l9.intro.1.2'),
+      L('l9.intro.1.3'),
+      L('l9.intro.1.4', Fmt.pct(this.thr)),
+    ], () => this.next());
   }
 
   phase1() { this.startPhase(0); }
@@ -178,29 +158,15 @@ class L9Dragon extends Level {
       [tr('Kolo 3 — Naklonené srdce: zamier štít na zlatú šípku n', 'Round 3 — Tilted Heart: aim the ward at the golden arrow n', 'Раунд 3 — Нахилене серце: націль захист на золоту стрілку n'), tr('⚔ štít → zlatá šípka n', '⚔ ward → golden arrow n', '⚔ захист → золота стрілка n')],
     ][k];
     this.quest(qs[0], { easy: qs[1], hard: `P(${tr('hit', 'hit', 'влуч.')}) = (1 + r·n)/2 ≥ ${Fmt.pct(this.thr)} · HP ${this.dhp}` });
-    const lines = tr([
-      [`🐉 <b>Ketvarr:</b> „Malý stav ψ chce merať draka? Moje šupiny sú z kameňa a fázy!“`,
-        'Schrödinger: Jeho ťahy v 1. kole sú hlavne <b>rotácie okolo z</b>. Tie póly nepohnú… a raz za čas <b>úder krídlom (X)</b>. Sleduj ohlásený ťah a čísla na tlačidlách — ukazujú P(zásah) po drakovom ťahu.'],
-      [`🐉 <b>Ketvarr:</b> „Hmla! Nech sa tvoja koherencia rozplynie!“`,
-        'Schrödinger: Teraz chrlí <b>hmlu dekoherencie</b>, ktorá zmršťuje šípku na rovníku. Dostal si nové slovo: <b>RABI-RA</b> — impulz s nastaviteľným uhlom θ. Na rovníku sa nezdržuj!'],
-      [`🐉 <b>Ketvarr:</b> „Moje srdce nie je tam, kde ho hľadáš!“`,
-        'Schrödinger: Zraniteľné miesto <b>n</b> je teraz naklonené a drak ho presúva. Impulz má aj <b>os φ</b> v rovníkovej rovine. Mier tak, aby po drakovom ťahu bolo P ≥ prah.'],
-    ], [
-      [`🐉 <b>Ketvarr:</b> “A little state ψ wants to measure a dragon? My scales are made of stone and phases!”`,
-        'Schrödinger: His moves in round 1 are mostly <b>rotations about z</b>. Those don’t move the poles… and now and then a <b>Wing Flip (X)</b>. Watch the announced move and the numbers on the buttons — they show P(hit) after the dragon’s move.'],
-      [`🐉 <b>Ketvarr:</b> “Fog! Let your coherence dissolve!”`,
-        'Schrödinger: Now he breathes the <b>Fog of Decoherence</b>, which shrinks the arrow on the equator. You have learned a new word: <b>RABI-RA</b> — a pulse with an adjustable angle θ. Don’t linger on the equator!'],
-      [`🐉 <b>Ketvarr:</b> “My heart is not where you seek it!”`,
-        'Schrödinger: The weak spot <b>n</b> is now tilted, and the dragon moves it. The pulse also has an <b>axis φ</b> in the equatorial plane. Aim so that after the dragon’s move P ≥ the threshold.'],
-    ], [
-      [`🐉 <b>Кетварр:</b> «Маленький стан ψ хоче виміряти дракона? Моя луска з каменю та фаз!»`,
-        'Шредінгер: Його ходи в 1-му раунді — здебільшого <b>повороти навколо z</b>. Вони не рухають полюсів… а час від часу — <b>Помах крила (X)</b>. Стеж за оголошеним ходом і числами на кнопках — вони показують P(влучання) після ходу дракона.'],
-      [`🐉 <b>Кетварр:</b> «Туман! Хай розчиниться твоя когерентність!»`,
-        'Шредінгер: Тепер він дихає <b>Туманом декогеренції</b>, що вкорочує стрілку на екваторі. Ти вивчив(-ла) нове слово: <b>RABI-RA</b> — імпульс із налаштовуваним кутом θ. Не затримуйся на екваторі!'],
-      [`🐉 <b>Кетварр:</b> «Моє серце не там, де ти його шукаєш!»`,
-        'Шредінгер: Вразливе місце <b>n</b> тепер нахилене, і дракон його переміщує. Імпульс має також <b>вісь φ</b> в екваторіальній площині. Цілься так, щоб після ходу дракона P ≥ порогу.'],
-    ])[k];
-    this.say(lines.map((t) => (t.startsWith('🐉') ? { who: tr('Ketvarr', 'Ketvarr', 'Кетварр'), face: '🐉', text: t.replace(/^🐉 <b>Ketvarr:<\/b> /, '') } : t.replace(/^Schrödinger: /, ''))), () => this.buildPanel());
+    const lines = [
+      [L('l9.lines.1.0.0'),
+        L('l9.lines.1.0.1')],
+      [L('l9.lines.1.1.0'),
+        L('l9.lines.1.1.1')],
+      [L('l9.lines.1.2.0'),
+        L('l9.lines.1.2.1')],
+    ][k];
+    this.say(lines.map((t) => (t.startsWith('🐉') ? { who: L('l9.startPhase.1'), face: '🐉', text: t.replace(/^🐉 <b>Ketvarr:<\/b> /, '') } : t.replace(/^Schrödinger: /, ''))), () => this.buildPanel());
   }
 
   pickMove() {
@@ -317,44 +283,33 @@ class L9Dragon extends Level {
   phaseWon() {
     UI.panelHide(); this.anim = null; Sound.sfx('roar');
     const k = this.phase;
-    const msg = tr([
-      ['Ketvarr zareve a jeho kamenné šupiny popraskajú! „Póly… ty si stál na póloch, kde mi fáza nič nezmôže!“', 'Výborne. Rotácie okolo z menia len fázu — na pólach |0⟩, |1⟩ sú neškodné.'],
-      ['Hmla sa rozostúpi. „Moja hmla… ty si sa na rovníku nezdržal!“', 'Presne. Dekoherencia ničí koherencie — šípku na rovníku. Rýchly impulz a meranie ju porazia.'],
-      ['Ketvarr padá do snehu. „Zamieril si na moje srdce… aj keď sa hýbalo.“', 'Toto je kvantové riadenie v malom: predpovedať vývoj a nastaviť impulz tak, aby výsledok mal vysokú pravdepodobnosť.'],
-    ][k], [
-      ['Ketvarr roars and his stone scales crack! “The poles… you stood on the poles, where my phase can do nothing!”', 'Well done. Rotations about z change only the phase — at the poles |0⟩, |1⟩ they are harmless.'],
-      ['The fog parts. “My fog… you did not linger on the equator!”', 'Exactly. Decoherence destroys coherences — the arrow on the equator. A quick pulse and a measurement beat it.'],
-      ['Ketvarr falls into the snow. “You aimed at my heart… even though it moved.”', 'This is quantum control in miniature: predict the evolution and tune the pulse so that the outcome has a high probability.'],
-    ][k], [
-      ['Кетварр реве, і його кам’яна луска тріскається! «Полюси… ти стояв(-ла) на полюсах, де моя фаза безсила!»', 'Молодець. Повороти навколо z змінюють лише фазу — на полюсах |0⟩, |1⟩ вони нешкідливі.'],
-      ['Туман розступається. «Мій туман… ти не затримався(-лася) на екваторі!»', 'Саме так. Декогеренція руйнує когерентності — стрілку на екваторі. Швидкий імпульс і вимірювання її переможуть.'],
-      ['Кетварр падає в сніг. «Ти цілився(-лася) в моє серце… хоч воно й рухалося».', 'Це квантове керування в мініатюрі: передбач еволюцію й налаштуй імпульс так, щоб результат мав високу ймовірність.'],
-    ][k]);
-    this.say([{ who: tr('Ketvarr', 'Ketvarr', 'Кетварр'), face: '🐉', text: msg[0] }, msg[1]], () => this.next());
+    const msg = [
+      [L('l9.msg.1.0.0'), L('l9.msg.1.0.1')],
+      [L('l9.msg.1.1.0'), L('l9.msg.1.1.1')],
+      [L('l9.msg.1.2.0'), L('l9.msg.1.2.1')],
+    ][k];
+    this.say([{ who: L('l9.phaseWon.1'), face: '🐉', text: msg[0] }, msg[1]], () => this.next());
   }
 
   defeated() {
     UI.panelHide(); this.mistakes += 2;
-    this.say([{ who: tr('Ketvarr', 'Ketvarr', 'Кетварр'), face: '🐉', text: tr('„Popol k popolu, amplitúda k nule!“', '“Ashes to ashes, amplitude to zero!”', '«Попіл до попелу, амплітуда до нуля!»') },
-      tr('Oheň ťa premohol. Nevadí — kolo začína odznova. Tip: pozri sa na čísla na tlačidlách a ohlásený ťah draka skôr, než vykríkneš.',
-        'The fire overwhelmed you. No matter — the round starts over. Tip: look at the numbers on the buttons and the dragon’s announced move before you shout.', 'Вогонь тебе здолав. Не біда — раунд починається знову. Порада: перш ніж вигукувати, поглянь на числа на кнопках і на оголошений хід дракона.')],
+    this.say([{ who: L('l9.defeated.1'), face: '🐉', text: L('l9.defeated.2') },
+      L('l9.defeated.3')],
     () => this.startPhase(this.phase));
   }
 
   finale() {
     UI.panelHide();
     this.quest(tr('Posledná skúška slov moci', 'The last test of the Words of Power', 'Останнє випробування слів сили'), { easy: tr('📝 Skúška', '📝 Exam', '📝 Іспит'), hard: tr('3 otázky o súboji', '3 questions about the battle', '3 питання про битву') });
-    this.say([tr('Ketvarr je porazený. Ešte tri otázky — chcem vedieť, či rozumieš, <b>prečo</b> si vyhral.', 'Ketvarr is defeated. Three more questions — I want to know whether you understand <b>why</b> you won.', 'Кетварра переможено. Ще три питання — хочу знати, чи розумієш ти, <b>чому</b> переміг(-ла).')], () => {
+    this.say([L('l9.finale.1')], () => {
       UI.quizSeries([...DRAGON_TRAPS, ...ancientTraps(this.num)].map((q) => ({ who: this.mentor, face: this.face, ...q })), (m) => {
         this.mistakes += m;
         const k = this.mistakes, stars = byDiff(k <= 2 ? 3 : k <= 5 ? 2 : 1, k <= 1 ? 3 : k <= 3 ? 2 : 1, k === 0 ? 3 : k <= 2 ? 2 : 1);
         Game.completeLevel(this.num, stars);
         const rating = '★'.repeat(stars) + '☆'.repeat(3 - stars);
         this.say([
-          { who: tr('Ketvarr', 'Ketvarr', 'Кетварр'), face: '🐉', text: tr('„Dobre teda, malý stav. Nikto ma ešte nezmeral tak presne. Odletím na severný štít a budem strážiť ostrov — pred zlými prirovnaniami.“',
-            '“Very well, little state. Nobody has ever measured me so precisely. I will fly to the northern peak and guard the island — against bad analogies.”', '«Гаразд, маленький стане. Ніхто ще не вимірював мене так точно. Я полечу на північну вершину й охоронятиму острів — від поганих аналогій».') },
-          tr(`🏆 <b>Hilbertov ostrov je zachránený!</b> Hodnotenie súboja: <b>${rating}</b> (chyby: ${this.mistakes}).<br>Zapamätaj si: amplitúdy interferujú, pravdepodobnosti sa merajú, a drak je v stave — nie „na dvoch miestach naraz“.`,
-            `🏆 <b>Hilbert Island is saved!</b> Battle rating: <b>${rating}</b> (mistakes: ${this.mistakes}).<br>Remember: amplitudes interfere, probabilities are measured, and the dragon is in a state — not “in two places at once”.`, `🏆 <b>Острів Гільберта врятовано!</b> Оцінка битви: <b>${rating}</b> (помилок: ${this.mistakes}).<br>Пам’ятай: амплітуди інтерферують, імовірності вимірюються, а дракон перебуває в стані — а не «у двох місцях водночас».`),
+          { who: L('l9.finale.2'), face: '🐉', text: L('l9.finale.3') },
+          L('l9.finale.4', rating, this.mistakes),
         ], () => Game.backToHub());
       });
     });

@@ -798,5 +798,13 @@ sup .m-rel, sub .m-rel { margin: 0 0.15em; } sup .m-op, sub .m-op { margin: 0 0.
 .lbl.sym0.dim { opacity: 0.6; }
 .lbl.sym0.fade0 { opacity: 0.25; transition: opacity .3s; }
 #panel h3 .l0name { text-transform: none; } /* α by sa v severskej téme zmenila na Α */
+/* panel Siene symbolov: karty pod sebou cez celú šírku, čitateľné písmo */
+.eqlegend.l0cards { grid-template-columns: 1fr; gap: 12px; font-size: 15px; }
+.eqlegend.l0cards .gd, .eqlegend.l0cards .rule { width: 100%; gap: 12px; align-items: flex-start; }
+.eqlegend.l0cards .gd > div, .eqlegend.l0cards .rule > div { flex: 1; min-width: 0; }
+.eqlegend.l0cards .gd > div > b, .eqlegend.l0cards .rule b { font-size: 16px; margin-bottom: 2px; }
+.eqlegend.l0cards .gd small, .eqlegend.l0cards .rule small { display: block; font-size: 15px; line-height: 1.45; }
+.eqlegend.l0cards .rule .demo { flex: 0 0 72px; min-width: 72px; font-size: 22px; }
+.eqlegend.l0cards .gd .gly.big svg { --gh: 3.2em; }
 .l0big { font-size: 34px; text-align: center; line-height: 1.5; }
 .l0big .gly svg { --gh: 1.7em; }

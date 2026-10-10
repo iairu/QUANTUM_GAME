@@ -59,7 +59,7 @@ const TIPS_SK = {
   'RF impulz!': 'Beží rezonančný impulz: stav sa otáča okolo osi v rovine xy (Rabiho oscilácia).',
   'vzorka (ansámbel molekúl)': 'V NMR meriame naraz obrovské množstvo molekúl → signál = stredná hodnota.',
   '🔗 korelácie (nie signál!)': 'Previazanosť: výsledky sú korelované, ale nedá sa ňou poslať správa.',
-  '[E] Hovoriť s Amplitúdou': 'Sprievodkyňa ti pripomenie cieľ a ďalší krok.',
+  '[E] Hovoriť s Iskrou': 'Sprievodkyňa ti pripomenie cieľ a ďalší krok.',
 };
 
 // Tlačidlá a popisky podľa obsiahnutého textu
@@ -92,7 +92,7 @@ const TIP_PATTERNS_SK = [
   [/Laboratórny rámec/, 'Pozeráš z laboratória: spin precesuje okolo B₀.'], [/Rotujúci rámec/, 'Točíš sa so spinom — precesia zmizne.'],
   [/Ostrov/, 'Späť na Hilbertov ostrov (rozpracovaný level sa začne odznova).'],
   [/Mapa/, 'Mapa ostrova s portálmi (M).'], [/Kódex/, 'Odomknuté symboly, osobnosti a pojmy (C).'], [/Denník/, 'Všetky dialógy a vysvetlenia — prečítaj alebo prehraj znova (L).'],
-  [/Amplitúda/, 'Sprievodkyňa Amplitúda — komplexné číslo, ktoré ťa vedie ostrovom.'],
+  [/Iskra/, 'Sprievodkyňa Iskra — iskierka svetla, ktorá ťa vedie ostrovom (nie symbol amplitúdy).'],
   [/^ρ|^\|ρ/, 'Prvok matice hustoty: ρ₀₀, ρ₁₁ = pravdepodobnosti (populácie), |ρ₀₁| = koherencia (pamäť fázy).'],
   [/^\d: \d+/, 'Počet výsledkov 0 alebo 1 na detektore.'],
   [/príprava/, 'Qubit vždy štartuje v stave |0⟩.'],
@@ -191,7 +191,7 @@ const TIPS_EN = {
   'RF pulse!': 'A resonant pulse is running: the state rotates about an axis in the xy plane (Rabi oscillation).',
   'sample (ensemble of molecules)': 'In NMR we measure a huge number of molecules at once → signal = expectation value.',
   '🔗 correlations (not a signal!)': 'Entanglement: the outcomes are correlated, but you cannot send a message with it.',
-  '[E] Talk to Amplitude': 'Your guide will remind you of the goal and the next step.',
+  '[E] Talk to Spark': 'Your guide will remind you of the goal and the next step.',
 };
 const TIPS_UK = {
   '|0⟩': 'Базисний стан |0⟩ ≡ |+z⟩ («спін угору»). Північний полюс сфери Блоха. Це не нульовий вектор!',
@@ -249,7 +249,7 @@ const TIPS_UK = {
   'РЧ-імпульс!': 'Триває резонансний імпульс: стан обертається навколо осі в площині xy (осциляція Рабі).',
   'зразок (ансамбль молекул)': 'У ЯМР ми вимірюємо величезну кількість молекул одночасно → сигнал = середнє значення.',
   '🔗 кореляції (а не сигнал!)': 'Сплутаність: результати корельовані, але надіслати нею повідомлення неможливо.',
-  '[E] Поговорити з Амплітудою': 'Твоя провідниця нагадає мету й наступний крок.',
+  '[E] Поговорити з Іскрою': 'Твоя провідниця нагадає мету й наступний крок.',
 };
 
 const TIP_PATTERNS_EN = [
@@ -281,7 +281,7 @@ const TIP_PATTERNS_EN = [
   [/Laboratory frame/, 'You look from the lab: the spin precesses about B₀.'], [/Rotating frame/, 'You rotate along with the spin — the precession disappears.'],
   [/Island/, 'Back to Hilbert Island (a level in progress will restart).'],
   [/Map/, 'Island map with the portals (M).'], [/Codex/, 'Unlocked symbols, people and concepts (C).'], [/Journal/, 'All dialogues and explanations — read or replay (L).'],
-  [/Amplitude/, 'Your guide Amplitude — a complex number leading you around the island.'],
+  [/Spark/, 'Your guide Spark — a little spark of light leading you around the island (not the amplitude symbol).'],
   [/^ρ|^\|ρ/, 'Density-matrix element: ρ₀₀, ρ₁₁ = probabilities (populations), |ρ₀₁| = coherence (memory of the phase).'],
   [/^\d: \d+/, 'Number of outcomes 0 or 1 at the detector.'],
   [/preparation/, 'The qubit always starts in the state |0⟩.'],
@@ -318,7 +318,7 @@ const TIP_PATTERNS_UK = [
   [/Лабораторна система/, 'Ти дивишся з лабораторії: спін прецесує навколо B₀.'], [/Обертова система/, 'Ти обертаєшся разом зі спіном — прецесія зникає.'],
   [/Острів/, 'Назад на Острів Гільберта (розпочатий рівень почнеться знову).'],
   [/Мапа/, 'Мапа острова з порталами (M).'], [/Кодекс/, 'Відкриті символи, особистості й поняття (C).'], [/Щоденник/, 'Усі діалоги та пояснення — прочитати або відтворити знову (L).'],
-  [/Амплітуда/, 'Твоя провідниця Амплітуда — комплексне число, що водить тебе островом.'],
+  [/Іскра/, 'Твоя провідниця Іскра — іскорка світла, що водить тебе островом (не символ амплітуди).'],
   [/^ρ|^\|ρ/, 'Елемент матриці густини: ρ₀₀, ρ₁₁ = імовірності (заселеності), |ρ₀₁| = когерентність (пам’ять фази).'],
   [/^\d: \d+/, 'Кількість результатів 0 або 1 на детекторі.'],
   [/приготування/, 'Кубіт завжди стартує в стані |0⟩.'],
@@ -410,8 +410,9 @@ function tipFor(html) {
 
 // do HTML textu dialógu pridá podčiarknuté pojmy s vysvetlivkou (prvý výskyt každého pojmu)
 // inline: v laickej obťažnosti aj krátky preklad žargónu v zátvorke (dialógy a kvízy, nie HUD)
-function annotate(html, inline = false) {
-  if (typeof EqG !== 'undefined') html = EqG.wrapInline(html); // vzorce vo vetách dostanú vlastné pozadie
+// explicit = text dialógu z lang/*.csv: vzorce sú označené [[…]], nič sa nehádže
+function annotate(html, inline = false, explicit = false) {
+  if (typeof EqG !== 'undefined') html = EqG.wrapInline(html, explicit); // vzorce vo vetách dostanú vlastné pozadie
   if (Settings.eq && typeof EqM !== 'undefined') html = EqM.paint(html); // rovnice najprv: symboly vo farbách mnemotechniky
   if (Settings.layman) return annotateLayman(html, inline);
   const used = new Set(), tips = [];
