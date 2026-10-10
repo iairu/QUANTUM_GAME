@@ -43,9 +43,9 @@ class L4Interference extends Level {
     this.mode = 'none'; this.resetHist();
     this.ask({ q: DL('l4.pure.1.q'), options: [DL('l4.pure.1.options.0'), DL('l4.pure.1.options.1'), DL('l4.pure.1.options.2')], correct: 0,
       why: DL('l4.pure.1.why') }, () => {
-      const n = byDiff(30, 50, 100);
-      this.quest(tr(`Pošli aspoň ${n} qubitov cez H → H (stred chrámu prázdny). Sleduj stĺpce ρ!`, `Send at least ${n} qubits through H → H (temple centre empty). Watch the ρ bars!`, `Надішли щонайменше ${n} кубітів крізь H → H (центр храму порожній). Стеж за стовпчиками ρ!`), {
-        easy: tr(`📤 ${n} qubitov · H → H`, `📤 ${n} qubits · H → H`, `📤 ${n} кубітів · H → H`), hard: `|0⟩ → H → H → M<sub>Z</sub> · N ≥ ${n} · ρ₀₁ ?` });
+      const n = () => byDiff(30, 50, 100);
+      this.quest(() => tr(`Pošli aspoň ${n()} qubitov cez H → H (stred chrámu prázdny). Sleduj stĺpce ρ!`, `Send at least ${n()} qubits through H → H (temple centre empty). Watch the ρ bars!`, `Надішли щонайменше ${n()} кубітів крізь H → H (центр храму порожній). Стеж за стовпчиками ρ!`), {
+        easy: () => tr(`📤 ${n()} qubitov · H → H`, `📤 ${n()} qubits · H → H`, `📤 ${n()} кубітів · H → H`), hard: () => `|0⟩ → H → H → M<sub>Z</sub> · N ≥ ${n()} · ρ₀₁ ?` });
       this.buildPanel(false);
     });
   }
@@ -54,9 +54,9 @@ class L4Interference extends Level {
     this.mode = 'meas'; this.resetHist();
     this.ask({ q: DL('l4.withMeasure.1.q'), options: [DL('l4.withMeasure.1.options.0'), DL('l4.withMeasure.1.options.1'), DL('l4.withMeasure.1.options.2')], correct: 0,
       why: DL('l4.withMeasure.1.why') }, () => {
-      const n = byDiff(30, 50, 100);
-      this.quest(tr(`Pošli aspoň ${n} qubitov s meraním v strede. Pozri, čo sa stane s mimodiagonálnymi stĺpcami ρ.`, `Send at least ${n} qubits with the measurement in the centre. See what happens to the off-diagonal ρ bars.`, `Надішли щонайменше ${n} кубітів із вимірюванням у центрі. Подивися, що станеться з позадіагональними стовпчиками ρ.`), {
-        easy: tr(`📤 ${n} qubitov · 👁 meranie v strede`, `📤 ${n} qubits · 👁 measurement in the middle`, `📤 ${n} кубітів · 👁 вимірювання посередині`), hard: `H → M<sub>Z</sub>(${tr('zabudnuté', 'forgotten', 'забуте')}) → H · N ≥ ${n} · ρ₀₁ → 0` });
+      const n = () => byDiff(30, 50, 100);
+      this.quest(() => tr(`Pošli aspoň ${n()} qubitov s meraním v strede. Pozri, čo sa stane s mimodiagonálnymi stĺpcami ρ.`, `Send at least ${n()} qubits with the measurement in the centre. See what happens to the off-diagonal ρ bars.`, `Надішли щонайменше ${n()} кубітів із вимірюванням у центрі. Подивися, що станеться з позадіагональними стовпчиками ρ.`), {
+        easy: () => tr(`📤 ${n()} qubitov · 👁 meranie v strede`, `📤 ${n()} qubits · 👁 measurement in the middle`, `📤 ${n()} кубітів · 👁 вимірювання посередині`), hard: () => `H → M<sub>Z</sub>(${tr('zabudnuté', 'forgotten', 'забуте')}) → H · N ≥ ${n()} · ρ₀₁ → 0` });
       this.buildPanel(false);
     });
   }
@@ -64,15 +64,15 @@ class L4Interference extends Level {
   deco() {
     this.mode = 'deco'; this.p = 0; this.phi = 0; this.resetHist();
     this.target = byDiff(0.75, 0.75, [0.6, 0.65, 0.7, 0.8, 0.85, 0.9][Math.floor(rand() * 6)]);
-    const T = Fmt.pct(this.target), n = byDiff(30, 50, 100);
+    const T = Fmt.pct(this.target), n = () => byDiff(30, 50, 100); // počet závisí od obťažnosti — prepočíta sa pri jej zmene
     this.say([
       DL('l4.deco.1.0'),
-      DL('l4.deco.1.1', T, n),
+      () => DL('l4.deco.1.1', T, n()),
       DL('l4.deco.1.2'),
     ], () => {
-      this.quest(tr(`Nastav dekoherenciu p (a fázu φ) tak, aby P(0) = ${T}, a pošli aspoň ${n} qubitov.`, `Set the decoherence p (and the phase φ) so that P(0) = ${T}, and send at least ${n} qubits.`, `Встанови декогеренцію p (і фазу φ) так, щоб P(0) = ${T}, і надішли щонайменше ${n} кубітів.`), {
-        easy: tr(`🌫 p → P(0) = ${T} · 📤 ${n}`, `🌫 p → P(0) = ${T} · 📤 ${n}`, `🌫 p → P(0) = ${T} · 📤 ${n}`),
-        hard: `P(0) = (1 + (1−p)cos φ)/2 = ${T} ± ${Fmt.pct(byDiff(0.06, 0.03, 0.015))} · N ≥ ${n}`,
+      this.quest(() => tr(`Nastav dekoherenciu p (a fázu φ) tak, aby P(0) = ${T}, a pošli aspoň ${n()} qubitov.`, `Set the decoherence p (and the phase φ) so that P(0) = ${T}, and send at least ${n()} qubits.`, `Встанови декогеренцію p (і фазу φ) так, щоб P(0) = ${T}, і надішли щонайменше ${n()} кубітів.`), {
+        easy: () => tr(`🌫 p → P(0) = ${T} · 📤 ${n()}`, `🌫 p → P(0) = ${T} · 📤 ${n()}`, `🌫 p → P(0) = ${T} · 📤 ${n()}`),
+        hard: () => `P(0) = (1 + (1−p)cos φ)/2 = ${T} ± ${Fmt.pct(byDiff(0.06, 0.03, 0.015))} · N ≥ ${n()}`,
       });
       this.buildPanel(true);
     });

@@ -170,9 +170,12 @@ html:not([lang="sk"]) [data-lang="sk"], html:not([lang="en"]) [data-lang="en"], 
 #dialog.scroll .hint { color: #7a6544; }
 #dialog.scroll button { color: #3b2a12; background: #e0c88f; border-color: #9c7a3c; }
 .scroll-head { font-size: 13px; color: #7a4f12; margin-bottom: 2px; }
+/* roky (a tučné slová) na pergamene: tmavočervené ako nadpis zvitku — zlatá z ľahkej/laickej obťažnosti či témy by bola nečitateľná */
+html[data-theme] #dialog.scroll .scroll-head b, html[data-theme] #dialog.scroll .txt b { color: #9a1f12; }
 .scroll-title { font-size: 17px; font-weight: 700; margin-bottom: 6px; color: #9a1f12; }
 #dialog.scroll blockquote, .scrollcard blockquote { margin: 8px 0 0; padding: 6px 10px; border-left: 3px solid #9c7a3c; font-style: italic; background: rgba(156, 122, 60, 0.12); }
 .scrollcard .scroll-head { color: #d9b46a; }
+.scrollcard .scroll-head b { color: #e06a55; } /* rok v Kódexe: svetlejšia červená na tmavom pozadí */
 .scrollcard .scroll-title { font-size: 14px; color: #e06a55; } /* v Kódexe na tmavom pozadí svetlejšia červená */
 /* teória a rovnice v paneli */
 #panel details.theory { border-color: rgba(255, 210, 90, 0.4); }

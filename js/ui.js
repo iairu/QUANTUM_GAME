@@ -190,17 +190,22 @@ const UI = {
 
   // ---------- dialógy ----------
   // lines: [{who, text, face}] alebo reťazce; done sa zavolá po poslednej replike
+  // replika môže byť aj funkcia — prepočíta sa pri zmene obťažnosti (napr. počty, ktoré závisia od obťažnosti)
   say(lines, done, opts = {}) {
-    lines = lines.map((l) => (typeof l === 'string' ? { text: l } : l));
-    if (!opts.replay) this.record({ kind: 'say', lines });
-    const orig = lines;
-    lines = TextMode.lines(orig);
-    let i = 0;
+    const src = [...lines];
+    const resolve = () => src.map((l) => (typeof l === 'function' ? l() : l)).map((l) => (typeof l === 'string' ? { text: l } : l));
+    // karty „po ľudsky“ patria len laickej obťažnosti
+    const build = () => TextMode.lines(resolve()).filter((l) => Settings.layman || l.cls !== 'plaincard');
+    if (!opts.replay) this.record({ kind: 'say', lines: resolve() });
+    lines = build();
+    if (!lines.length) { done && done(); return; }
+    let i = 0, anchor = 0; // anchor = pôvodná replika, na ktorej hráč je (pri zmene obťažnosti sa naň vrátime aj cez zlúčené repliky)
     this.busy = true;
     let opened = false;
-    const show = () => {
+    const show = (silent) => {
       const l = lines[i];
-      Sound.sfx(l.cls === 'scroll' ? 'scroll' : !opened ? 'dialog' : 'page'); opened = true;
+      if (!silent && l.src) anchor = l.src[0];
+      if (!silent) Sound.sfx(l.cls === 'scroll' ? 'scroll' : !opened ? 'dialog' : 'page'); opened = true;
       this.dialog.innerHTML = '';
       this.dialog.appendChild(el('div', 'who', (l.face || '💬') + ' ' + (l.who || '') + (opts.replay ? ` <small>(${tr('opakovanie', 'replay', 'повтор')})</small>` : '')));
       this.dialog.appendChild(el('div', 'txt', l.raw ? EqG.markEq(l.text) : TextMode.render(l.text)));
@@ -225,36 +230,47 @@ const UI = {
     };
     const prev = () => { if (i > 0) { i--; show(); } };
     this._next = next; this._prev = prev;
-    // zmena obťažnosti počas dialógu: prepočítaj stránky a ukáž zodpovedajúcu
+    // zmena obťažnosti počas dialógu: hneď prepočítaj repliky (zlúčenie v ťažkej, preklady v laickej, počty, karty „po ľudsky“)
     this.refreshDialog = () => {
       if (this._next !== next) return;
-      const cur = lines[i], nl = TextMode.lines(orig);
-      i = Math.min(nl.length - 1, Math.max(0, nl.findIndex((x) => x.src && cur.src && x.src.some((k) => cur.src.includes(k)))));
-      lines = nl; show();
+      const at = anchor;
+      // prepnutie na laickú: karty „po ľudsky“ k aktuálnej úlohe sa vložia hneď pred aktuálnu repliku
+      const ins = Settings.layman && Game.scene && Game.scene.plainCardsNow ? Game.scene.plainCardsNow() : [];
+      if (ins.length) src.splice(at, 0, ...ins);
+      const nl = build();
+      if (!nl.length) { this.dialog.classList.remove('show'); this.busy = false; this._next = this._prev = null; done && done(); return; }
+      const same = nl.findIndex((x) => x.src && x.src.includes(at)), after = nl.findIndex((x) => x.src && x.src[0] > at);
+      i = same >= 0 ? same : after >= 0 ? after : nl.length - 1; // zmiznutá karta → ďalšia replika
+      lines = nl; show(true);
     };
     show();
   },
 
   // q: {q, options:[...], correct: index, why, who, face}; cb(spravne)
-  quiz(q, cb) {
+  quiz(q, cb, silent = false) {
     this.busy = true;
     this._next = null; this._prev = null;
     this.dialog.innerHTML = '';
-    Sound.sfx('dialog');
+    if (!silent) Sound.sfx('dialog');
+    let answered = false;
+    // zmena obťažnosti pred odpoveďou: otázka sa hneď prekreslí (počet možností v ľahkej, preklady v laickej)
+    this.refreshDialog = () => { if (!answered) this.quiz(q, cb, true); };
     this.dialog.appendChild(el('div', 'who', (q.face || '❓') + ' ' + (q.who || tr('Otázka', 'Question', 'Питання'))));
     this.dialog.appendChild(el('div', 'txt', annotate(q.q, true, true)));
     const box = el('div', 'choices');
-    let order = q.options.map((_, i) => i);
-    if (Settings.easy && order.length > 2) { // ľahká a laická: o jednu nesprávnu možnosť menej
-      const wrong = order.filter((i) => i !== q.correct);
-      const drop = wrong[Math.floor(rand() * wrong.length)];
-      order = order.filter((i) => i !== drop);
+    // poradie a vypustená nesprávna možnosť sa určia raz — pri prekreslení (zmena obťažnosti) ostanú rovnaké
+    if (!q._order) {
+      q._order = q.options.map((_, i) => i);
+      if (q.shuffle !== false) q._order.sort(() => rand() - 0.5);
+      const wrong = q._order.filter((i) => i !== q.correct);
+      q._drop = wrong[Math.floor(rand() * wrong.length)];
     }
-    if (q.shuffle !== false) order.sort(() => rand() - 0.5);
+    const order = q._order.filter((i) => !(Settings.easy && q.options.length > 2 && i === q._drop)); // ľahká a laická: o jednu nesprávnu možnosť menej
     for (const i of order) {
       const b = el('button', 'choice', mathText(q.options[i], true)); // vzorce v odpovediach: čip rovnice (a glyfy pri rovniciach najprv)
       b.dataset.ok = i === q.correct ? '1' : '0';
       b.onclick = () => {
+        answered = true;
         const ok = i === q.correct;
         Sound.sfx(ok ? 'good' : 'bad');
         Settings.wow && Wow.onAnswer(ok); // MMO: správna odpoveď = zásah bossa, nesprávna = jeho úder

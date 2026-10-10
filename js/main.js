@@ -37,8 +37,11 @@ class Level {
   update() {}
   draw() {}
   // text = normálna úloha; alt.easy = len kľúčové slová, alt.hard = stručne a husto (vzorce, čísla)
+  // text aj alt.easy / alt.hard môžu byť funkcie — pri zmene obťažnosti sa prepočítajú (napr. počty atómov)
   quest(text, alt = {}) {
     this.questArgs = [text, alt];
+    const V = (v) => (typeof v === 'function' ? v() : v);
+    text = V(text); alt = { easy: V(alt.easy), hard: V(alt.hard) };
     const eqHud = Settings.eq && alt.hard && alt.hard !== text ? `${alt.hard}<br><small>${text}</small>` : null;
     UI.setHud(`${this.num} · ${this.title}`, eqHud || byDiff(alt.easy ?? text, text, alt.hard ?? text));
   }
@@ -58,9 +61,9 @@ class Level {
       pre.push(...EqM.cardsFor(this.num, name));
     }
     // laická obťažnosť: pred krokom ho sprievodkyňa vysvetlí bežnými slovami
-    if (!this.seenScrolls.has('plain:' + name)) {
+    if (Settings.layman && !this.seenScrolls.has('plain:' + name)) {
       this.seenScrolls.add('plain:' + name);
-      pre.push(...laymanFor(this.num, name).map((t) => ({ who: tr('Iskra · po ľudsky', 'Spark · in plain words', 'Іскра · простими словами'), face: '🫶', text: t, raw: true, cls: 'plaincard' })));
+      pre.push(...this.plainCards(name));
     }
     // historické zvitky (nastavenie): pred krokom sa rozvinie zvitok s históriou
     const sc = scrollFor(this.num, name).filter((x) => !this.seenScrolls.has(x.id));
@@ -69,8 +72,23 @@ class Level {
     if (!pre.length) return run();
     UI.say(pre, run);
   }
+  // karty „po ľudsky“ (laická obťažnosť) ku kroku
+  plainCards(name) {
+    return laymanFor(this.num, name).map((t) => ({ who: tr('Iskra · po ľudsky', 'Spark · in plain words', 'Іскра · простими словами'), face: '🫶', text: t, raw: true, cls: 'plaincard' }));
+  }
+  // prepnutie na laickú počas dialógu: karty k aktuálnej úlohe, ak ešte neboli ukázané
+  plainCardsNow() {
+    const s = this.steps && this.steps[this.stepIdx], name = s ? s.name : 'finale';
+    if (this.seenScrolls.has('plain:' + name)) return [];
+    this.seenScrolls.add('plain:' + name);
+    return this.plainCards(name);
+  }
   viewState() { return null; }
-  say(lines, done) { UI.say(lines.map((t) => (typeof t === 'string' ? { who: this.mentor, face: this.face, text: t } : t)), done); }
+  // replika môže byť aj funkcia — prepočíta sa pri zmene obťažnosti
+  say(lines, done) {
+    const who = (t) => (typeof t === 'string' ? { who: this.mentor, face: this.face, text: t } : t);
+    UI.say(lines.map((t) => (typeof t === 'function' ? () => who(t()) : who(t))), done);
+  }
   ask(q, done) { UI.quiz({ who: this.mentor, face: this.face, ...q }, (ok) => { if (!ok) this.mistakes++; done && done(ok); }); }
   grant(ids) { Game.unlock(ids); }
   finale() {
@@ -546,8 +564,8 @@ const Game = {
     UI.diffUi && UI.diffUi();
     if (this.scene && this.scene !== Hub) this.scene.request(); else UI.setHud(tr('Hilbertov ostrov', 'Hilbert Island', 'Острів Гільберта'), this.nextQuestText());
     UI.refreshDialog && UI.refreshDialog();
-    UI.toast(tr(`🎚 Obťažnosť: <b>${DIFF_NAME[d]}</b> — tolerancie platia hneď, nové ciele a nápovedy od ďalšej úlohy.`,
-      `🎚 Difficulty: <b>${DIFF_NAME[d]}</b> — tolerances apply now, new targets and hints from the next task.`, `🎚 Складність: <b>${DIFF_NAME[d]}</b> — допуски діють одразу, нові цілі й підказки — з наступного завдання.`), 3600);
+    UI.toast(tr(`🎚 Obťažnosť: <b>${DIFF_NAME[d]}</b> — dialóg, úloha a tolerancie sa zmenili hneď, nové náhodné ciele od ďalšej úlohy.`,
+      `🎚 Difficulty: <b>${DIFF_NAME[d]}</b> — the dialogue, task and tolerances changed right away; new random targets from the next task.`, `🎚 Складність: <b>${DIFF_NAME[d]}</b> — діалог, завдання й допуски змінилися одразу; нові випадкові цілі — з наступного завдання.`), 3600);
     // prvé zapnutie laickej obťažnosti na ostrove: sprievodkyňa zopakuje úvod bežnými slovami
     if (d === 'layman' && !this.progress.laymanSeen && this.scene === Hub && !UI.busy) this.guideTalk();
   },

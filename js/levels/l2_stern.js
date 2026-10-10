@@ -25,8 +25,8 @@ class L2Stern extends Level {
 
   // ---------- úloha 1: klasika vs. skutočnosť ----------
   twoSpots() {
-    const n = byDiff(30, 50, 80);
-    this.quest(tr(`Vystreľ aspoň ${n} atómov v KLASICKOM modeli a aspoň ${n} v SKUTOČNOM (kvantovom).`, `Fire at least ${n} atoms in the CLASSICAL model and at least ${n} in REALITY (quantum).`, `Випусти щонайменше ${n} атомів у КЛАСИЧНІЙ моделі та щонайменше ${n} у РЕАЛЬНОСТІ (квантово).`), { easy: tr(`🔫 ${n} klasicky · ${n} skutočne`, `🔫 ${n} classical · ${n} real`, `🔫 ${n} класично · ${n} реально`), hard: tr(`N ≥ ${n}: klasicky vs. kvantovo · počet stôp?`, `N ≥ ${n}: classical vs. quantum · number of spots?`, `N ≥ ${n}: класично проти квантово · кількість плям?`) });
+    const n = () => byDiff(30, 50, 80);
+    this.quest(() => tr(`Vystreľ aspoň ${n()} atómov v KLASICKOM modeli a aspoň ${n()} v SKUTOČNOM (kvantovom).`, `Fire at least ${n()} atoms in the CLASSICAL model and at least ${n()} in REALITY (quantum).`, `Випусти щонайменше ${n()} атомів у КЛАСИЧНІЙ моделі та щонайменше ${n()} у РЕАЛЬНОСТІ (квантово).`), { easy: () => tr(`🔫 ${n()} klasicky · ${n()} skutočne`, `🔫 ${n()} classical · ${n()} real`, `🔫 ${n()} класично · ${n()} реально`), hard: () => tr(`N ≥ ${n()}: klasicky vs. kvantovo · počet stôp?`, `N ≥ ${n()}: classical vs. quantum · number of spots?`, `N ≥ ${n()}: класично проти квантово · кількість плям?`) });
     this.check = () => {
       const need = byDiff(30, 50, 80);
       if (this.f.s1 || this.seen.q < need || this.seen.c < need) return;
@@ -46,8 +46,8 @@ class L2Stern extends Level {
   // ---------- úloha 2: postupné merania ----------
   sequences() {
     this.edit = true; this.model = 'q';
-    const n = byDiff(25, 40, 60);
-    this.quest(tr(`Vyskúšaj zostavu A (Z+ → Z) a zostavu B (Z+ → X+ → Z). Pri každej musí na tienidlo dopadnúť aspoň ${n} atómov (filtre časť pohltia).`, `Try setup A (Z+ → Z) and setup B (Z+ → X+ → Z). For each, at least ${n} atoms must reach the screen (filters absorb some).`, `Спробуй схему A (Z+ → Z) і схему B (Z+ → X+ → Z). Для кожної на екран має потрапити щонайменше ${n} атомів (фільтри частину поглинуть).`), { easy: tr(`🧲 Zostava A · Zostava B · ${n} atómov`, `🧲 Setup A · Setup B · ${n} atoms`, `🧲 Схема A · Схема B · ${n} атомів`), hard: `A: Z+ → Z · B: Z+ → X+ → Z · N ≥ ${n}` });
+    const n = () => byDiff(25, 40, 60);
+    this.quest(() => tr(`Vyskúšaj zostavu A (Z+ → Z) a zostavu B (Z+ → X+ → Z). Pri každej musí na tienidlo dopadnúť aspoň ${n()} atómov (filtre časť pohltia).`, `Try setup A (Z+ → Z) and setup B (Z+ → X+ → Z). For each, at least ${n()} atoms must reach the screen (filters absorb some).`, `Спробуй схему A (Z+ → Z) і схему B (Z+ → X+ → Z). Для кожної на екран має потрапити щонайменше ${n()} атомів (фільтри частину поглинуть).`), { easy: () => tr(`🧲 Zostava A · Zostava B · ${n()} atómov`, `🧲 Setup A · Setup B · ${n()} atoms`, `🧲 Схема A · Схема B · ${n()} атомів`), hard: () => `A: Z+ → Z · B: Z+ → X+ → Z · N ≥ ${n()}` });
     this.say([
       { who: DL('l2.sequences.1.0.who'), face: '🧲', text: DL('l2.sequences.1.0.text') },
       { who: DL('l2.sequences.1.1.who'), face: '🧲', text: DL('l2.sequences.1.1.text') },
@@ -81,8 +81,8 @@ class L2Stern extends Level {
       why: DL('l2.predict.2', a, pc(p)),
     }, () => {
       this.hideTheory = false; this.updStats();
-      const need = byDiff(60, 100, 200);
-      this.quest(tr(`Over predpoveď: na tienidlo musí dopadnúť aspoň ${need} atómov (cos²(${a}°/2) = ${pc(p)}).`, `Test the prediction: at least ${need} atoms must reach the screen (cos²(${a}°/2) = ${pc(p)}).`, `Перевір передбачення: на екран має потрапити щонайменше ${need} атомів (cos²(${a}°/2) = ${pc(p)}).`), { easy: tr(`🔫 ${need} atómov`, `🔫 ${need} atoms`, `🔫 ${need} атомів`), hard: `N ≥ ${need} · cos²(${a}°/2)` });
+      const need = () => byDiff(60, 100, 200);
+      this.quest(() => tr(`Over predpoveď: na tienidlo musí dopadnúť aspoň ${need()} atómov (cos²(${a}°/2) = ${pc(p)}).`, `Test the prediction: at least ${need()} atoms must reach the screen (cos²(${a}°/2) = ${pc(p)}).`, `Перевір передбачення: на екран має потрапити щонайменше ${need()} атомів (cos²(${a}°/2) = ${pc(p)}).`), { easy: () => tr(`🔫 ${need()} atómov`, `🔫 ${need()} atoms`, `🔫 ${need()} атомів`), hard: () => `N ≥ ${need()} · cos²(${a}°/2)` });
       this.check = () => {
         const tot = this.cnt.up + this.cnt.down;
         if (this.sig() === `z+|${a}°` && tot >= byDiff(60, 100, 200) && !this.f.s3) {
