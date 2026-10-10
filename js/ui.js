@@ -30,18 +30,10 @@ const UI = {
     ls.onchange = () => setLang(ls.value);
     const ua = $('#btn-unlock-all');
     ua.textContent = tr('🔓 Odomknúť všetky levely', '🔓 Unlock all levels', '🔓 Відкрити всі рівні');
-    ua.onclick = () => {
-      if (!confirm(tr('Naozaj odomknúť všetky levely? Preskočíš postupný výklad.', 'Really unlock all levels? You will skip the step-by-step explanations.', 'Справді відкрити всі рівні? Ти пропустиш поступове пояснення.'))) return;
-      Game.unlockAll();
-      this.toggleHelp(false);
-    };
+    ua.onclick = () => this.unlockAllAsk();
     const rb = $('#btn-reset');
     rb.textContent = tr('🗑 Reset hry', '🗑 Reset game', '🗑 Скинути гру');
-    rb.onclick = () => {
-      if (!confirm(tr('Naozaj zmazať celý postup (hviezdičky, Kódex, Denník, rozohranú hru)? Nedá sa to vrátiť.',
-        'Really erase all progress (stars, Codex, Journal, game in progress)? This cannot be undone.', 'Справді стерти весь поступ (зірки, Кодекс, Щоденник, розпочату гру)? Це не можна скасувати.'))) return;
-      Game.resetAll();
-    };
+    rb.onclick = () => this.resetAsk();
     const ds = $('#diff-select');
     for (const d of DIFFS) { const o = el('option', null, DIFF_NAME[d]); o.value = d; ds.appendChild(o); }
     const diffUi = () => { ds.value = Settings.diff; ds.className = Settings.diff; ds.dataset.tip = `<b>${tr('Obťažnosť', 'Difficulty', 'Складність')}: ${DIFF_NAME[Settings.diff]}</b> — ${DIFF_DESC[Settings.diff]}.<br>${tr('Dá sa zmeniť kedykoľvek.', 'Can be changed at any time.', 'Можна змінити будь-коли.')}`; };
@@ -369,6 +361,8 @@ const UI = {
     if (t) b.dataset.tip = t;
     return b;
   },
+  // tlačidlo bez blokovania počas dialógu (nastavenia, pomoc)
+  plainButton(html, onclick) { const b = el('button', null, html); b.onclick = onclick; return b; },
   row(...nodes) { const r = el('div', 'row'); nodes.forEach((n) => r.appendChild(n)); return r; },
   slider(label, min, max, step, value, oninput, tip) {
     const w = el('label', 'slider'), s = el('span', null, label), i = el('input');
@@ -455,6 +449,17 @@ const UI = {
   },
 
   // ---------- nastavenia ----------
+  // odomknúť všetko / reset hry — z pomoci aj z nastavení
+  unlockAllAsk() {
+    if (!confirm(tr('Naozaj odomknúť všetky levely? Preskočíš postupný výklad.', 'Really unlock all levels? You will skip the step-by-step explanations.', 'Справді відкрити всі рівні? Ти пропустиш поступове пояснення.'))) return;
+    Game.unlockAll();
+    this.toggleHelp(false); this.toggleSettings(false);
+  },
+  resetAsk() {
+    if (!confirm(tr('Naozaj zmazať celý postup (hviezdičky, Kódex, Denník, rozohranú hru)? Nedá sa to vrátiť.',
+      'Really erase all progress (stars, Codex, Journal, game in progress)? This cannot be undone.', 'Справді стерти весь поступ (зірки, Кодекс, Щоденник, розпочату гру)? Це не можна скасувати.'))) return;
+    Game.resetAll();
+  },
   toggleSettings(force) {
     const o = $('#settings'), show = force ?? !o.classList.contains('show');
     if (show !== o.classList.contains('show')) Sound.sfx(show ? 'page' : 'close');
@@ -548,6 +553,15 @@ const UI = {
     body.appendChild(g2);
     body.appendChild(el('p', 'muted', tr('Nastavenia sa ukladajú automaticky. Ďalšie geometrické ovládanie (uhly magnetov, os rotácie, fázový posun, sila poľa B₀…) nájdeš priamo v paneloch levelov.',
       'Settings are saved automatically. More geometric controls (magnet angles, rotation axis, phase shifter, field strength B₀…) are in the level panels.', 'Налаштування зберігаються автоматично. Більше геометричних елементів керування (кути магнітів, вісь обертання, фазозсувач, сила поля B₀…) — у панелях рівнів.')));
+    // postup: odomknúť všetko / reset hry (rovnaké ako na konci pomoci)
+    body.appendChild(el('h3', null, tr('🔐 Postup', '🔐 Progress', '🔐 Поступ')));
+    const box = el('div', 'unlock-all');
+    const warn = document.querySelector(`#help .unlock-all p.warn[data-lang="${LANG}"]`);
+    if (warn) box.appendChild(el('p', 'warn', warn.innerHTML));
+    box.appendChild(this.row(
+      this.plainButton(tr('🔓 Odomknúť všetky levely', '🔓 Unlock all levels', '🔓 Відкрити всі рівні'), () => this.unlockAllAsk()),
+      this.plainButton(tr('🗑 Reset hry', '🗑 Reset game', '🗑 Скинути гру'), () => this.resetAsk())));
+    body.appendChild(box);
   },
 
   // ---------- kódex ----------
