@@ -488,6 +488,9 @@ const Game = {
     // ovládanie, ktoré práve nič neurobí, je zošedené: počas dialógu tlačidlá panelu a kúzla, na ostrove tlačidlo „Ostrov“
     document.body.classList.toggle('dlg-open', UI.busy);
     UI.hubBtn.disabled = this.scene === Hub;
+    // 🔑 kľúč počas rozhovoru nie je dostupný — dialóg sa má sústrediť na fyziku, nie na pravidlá hry
+    EqM.keyBtn.disabled = UI.busy;
+    if (UI.busy && EqM.keyEl.classList.contains('show')) EqM.toggleKey(false);
     UI.labelsBegin();
     this.scene.draw(this.r);
     UI.labelsEnd();
@@ -503,7 +506,6 @@ const Game = {
       if ((e.code === 'Enter' || e.code === 'Space') && UI.busy && UI._next) { e.preventDefault(); UI._next(); return; }
       if ((e.code === 'ArrowLeft' || e.code === 'Backspace') && UI.busy && UI._prev) { e.preventDefault(); UI._prev(); return; }
       if (e.code === 'KeyL') { UI.toggleLog(); return; }
-      if (e.code === 'KeyK' && Settings.eq) { EqM.toggleKey(); return; } // 🔑 kľúč mnemotechniky aj počas dialógu
       if (e.code === 'KeyV') { Views.toggle(); return; } // pohľady aj počas dialógu
       if (e.code === 'KeyN') { Sound.toggleMute(); return; }
       if (e.code === 'KeyM') { this.toggleMap(); return; } // mapa (a teleport) aj počas dialógu
@@ -512,6 +514,7 @@ const Game = {
       if (Settings.wow && Wow.key(e)) return; // lišta kúziel 1 … =, Tab, B, skok
       if (e.code === 'KeyE' && this.scene === Hub) Hub.interact();
       if (e.code === 'KeyC') UI.toggleCodex();
+      if (e.code === 'KeyK' && Settings.eq) EqM.toggleKey(); // 🔑 kľúč (nie počas rozhovoru)
       if (e.code === 'KeyO') UI.toggleSettings();
       if (e.code === 'KeyH' || e.code === 'F1') { e.preventDefault(); UI.toggleHelp(); }
       if (e.code === 'Escape') { UI.toggleCodex(false); UI.toggleHelp(false); UI.toggleLog(false); this.toggleMap(false); Settings.wow && Wow.escape(); }
@@ -607,8 +610,6 @@ const Game = {
     return [
       A(L('main.eqIntroLines.1')),
       A(L('main.eqIntroLines.2')),
-      A(`<div class="eqlegend inline">${EqM.legendHtml(0, 7)}</div>`, true),
-      A(`<div class="eqlegend inline">${EqM.legendHtml(7)}</div>`, true),
       A(L('main.eqIntroLines.3')),
     ];
   },

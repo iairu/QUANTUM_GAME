@@ -225,12 +225,12 @@ const EqM = {
     // 🔑 kľúč mnemotechniky: tlačidlo vpravo hore (len v type „Experimentálna“) — dostupné vždy, aj na ostrove a počas dialógu
     const leg = this.keyEl = el('div', 'eqlegend'); leg.id = 'eqkey';
     leg.innerHTML = this.keyHtml();
-    leg.dataset.t = 'rules';
+    leg.dataset.t = 'dict';
     leg.querySelectorAll('.ltabs button').forEach((b) => { b.onclick = () => { leg.dataset.t = b.dataset.t; leg.querySelectorAll('.ltabs button').forEach((x) => x.classList.toggle('on', x === b)); }; });
     document.body.appendChild(leg);
-    const kb = $('#btn-key');
+    const kb = this.keyBtn = $('#btn-key');
     kb.textContent = '🔑';
-    kb.dataset.tip = tr('Kľúč rovnicovej mnemotechniky: pravidlá a slovník glyfov (K)', 'Key to the equation mnemonics: rules and glyph dictionary (K)', 'Ключ мнемоніки рівнянь: правила та словник гліфів (K)');
+    kb.dataset.tip = tr('Kľúč: slovník glyfov a pravidlá mnemotechniky (K) — počas rozhovoru nedostupný', 'Key: glyph dictionary and mnemonic rules (K) — unavailable during conversations', 'Ключ: словник гліфів і правила мнемоніки (K) — недоступний під час розмови');
     kb.onclick = () => this.toggleKey();
     EqG.initSound();
     st.querySelector('.eqmin').onclick = () => { st.classList.toggle('min'); Settings.view.eqMin = st.classList.contains('min'); Settings.save(); };
@@ -238,7 +238,7 @@ const EqM = {
     this.apply();
   },
   toggleKey(force) {
-    const on = Settings.eq && (force ?? !this.keyEl.classList.contains('show'));
+    const on = Settings.eq && !UI.busy && (force ?? !this.keyEl.classList.contains('show')); // počas rozhovoru sa kľúč neotvára
     if (on !== this.keyEl.classList.contains('show')) Sound.sfx(on ? 'map' : 'close');
     this.keyEl.classList.toggle('show', on);
     $('#btn-key').classList.toggle('on', on);
@@ -253,8 +253,9 @@ const EqM = {
   },
   // 🔑 panel: pravidlá a slovník všetkých glyfov
   keyHtml() {
-    return `<div class="ltabs"><button class="on" data-t="rules">${tr('📏 Pravidlá', '📏 Rules', '📏 Правила')}</button><button data-t="dict">${tr('📖 Slovník glyfov', '📖 Glyph dictionary', '📖 Словник гліфів')}</button></div>`
-      + `<div class="lpage rules">${this.legendHtml()}</div><div class="lpage dict">${EqG.dictionaryHtml()}</div>`;
+    // najprv glyfy (čo symbol znamená), pravidlá mnemotechniky až v druhej záložke
+    return `<div class="ltabs"><button class="on" data-t="dict">${tr('📖 Slovník glyfov', '📖 Glyph dictionary', '📖 Словник гліфів')}</button><button data-t="rules">${tr('📏 Pravidlá', '📏 Rules', '📏 Правила')}</button></div>`
+      + `<div class="lpage dict">${EqG.dictionaryHtml()}</div><div class="lpage rules">${this.legendHtml()}</div>`;
   },
   update() {
     if (!this.stage) return;

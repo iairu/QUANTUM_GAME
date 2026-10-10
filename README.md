@@ -33,7 +33,7 @@ Prepínač **SK / EN / UA** je vpravo hore aj na uvítacej obrazovke (zmena znov
 ## Typ hry: 🖼 Odporúčaná · obrazy najprv / ∑ Experimentálna · symboly najprv
 Volí sa na uvítacej obrazovke aj v nastaveniach (⚙ → 🎮 Typ hry); prepína sa za behu, bez znovunačítania.
 - **🖼 Odporúčaná · obrazy najprv** — pôvodná hra: najprv obraz a intuícia (ručičky, Blochova guľa, pokusy), rovnice len v paneli 📐.
-- **∑ Experimentálna · symboly najprv** — navyše **portál 0 — Sieň symbolov**: 19 podstavcov, na každom jeden symbol mnemotechniky ako 3D model v tej istej farbe ako v rovniciach (α, β, kety, bra, θ, φ, γ, e<sup>iφ</sup> a i, operátory, P, |…|², ρ, konštanty, kolaps, σ/r/n, ω/Δ/Ω, p/t/A, obyčajné časti vzorca, zvuk); po každom otázka, po každej kapitole opakovanie, na konci veľká skúška. Ďalej: skutočná rovnica, ktorá práve platí, sa vznáša v 3D nad scénou (nakláňa sa s kamerou) a jej hodnoty sa menia s hrou:
+- **∑ Experimentálna · symboly najprv** — navyše **portál 0 — Sieň symbolov**: 17 podstavcov, na každom jeden symbol ako 3D pokus (α, β, kety, bra, θ, φ, γ, e<sup>iφ</sup> a i, operátory, P, |α|², ρ, ħ/π/Σ/∂/⊗, meranie a kolaps, σ/r/n, ω/Ω/Δ, p/t/A); rozhovory a otázky vysvetľujú len fyzikálny význam symbolov, nie pravidlá kľúča. Po každom otázka, po každej kapitole opakovanie, na konci veľká skúška. Ďalej: skutočná rovnica, ktorá práve platí, sa vznáša v 3D nad scénou (nakláňa sa s kamerou) a jej hodnoty sa menia s hrou:
   ostrov e<sup>iγ</sup>(α|0⟩ + β|1⟩) s točiacou sa globálnou fázou, |α|², interferencia |A₁ + A₂|², SG P(↑) = ½(1 + r·n), hradlo G|ψ⟩ počas rotácie,
   dekoherencia ρ₀₁ → (1 − p)e<sup>−iφ</sup>ρ₀₁, Diracov výraz a jeho typ, H̃ = (ħ/2)(ΔZ + Ω<sub>R</sub>X), dva qubity a determinant previazanosti,
   Schrödingerova rovnica, P(zásah) = ½(1 + r·n) v boji s drakom. Pred každou úlohou karta „∑ Rovnica najprv“, teória je vždy otvorená,
@@ -97,7 +97,7 @@ Dialógy, kvízy, levely, Kódex, Denník aj tlačidlá ostávajú rovnaké — 
 | Enter, medzerník | ďalej v dialógu |
 | ← / Backspace | späť v dialógu |
 | L | Denník — všetky rozhovory a vysvetlenia (prečítať / prehrať znova) |
-| K | 🔑 kľúč rovnicovej mnemotechniky (typ „Experimentálna“), aj počas dialógu |
+| K | 🔑 kľúč — slovník glyfov, potom pravidlá mnemotechniky (typ „Experimentálna“; počas rozhovoru nedostupný, aby sa dialóg sústredil na fyziku) |
 | C | Kódex symbolov, osobností a pojmov |
 | M | mapa · H pomoc · O nastavenia · V pohľady · Esc zavrieť okná |
 | F9 | odomknúť všetky levely (režim učiteľa) — aj tlačidlom na konci okna Pomoc (H) |

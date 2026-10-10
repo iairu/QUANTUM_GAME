@@ -65,6 +65,7 @@ function L(key, ...args) {
   if (s == null) { console.warn('Chýba text dialógu:', key); return key; }
   return args.length ? s.replace(/\{(\d+)\}/g, (m, k) => (args[k] ?? m)) : s;
 }
+L.has = (key) => !!((DLG[LANG] && DLG[LANG].has(key)) || (DLG.en && DLG.en.has(key)));
 
 function setLang(lang) {
   if (!LANGS.includes(lang) || lang === LANG) return;

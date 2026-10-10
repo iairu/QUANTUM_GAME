@@ -5,8 +5,9 @@
 // vysvetlí a hneď sa pýta; po každej kapitole opakovanie, na konci veľká skúška.
 
 const G0 = (k, l = k) => EqG.html(k, l);
-// správna odpoveď je vždy prvá, kvíz ich zamieša
-const Q0 = ([q, options, why]) => ({ q, options, correct: 0, why }); // otázka z lang/*.csv: [text, [správna, …nesprávne], vysvetlenie]
+// texty z lang/*.csv podľa predpony kľúča: repliky <k>.0, <k>.1 …; otázka <k>.q, možnosti <k>.o.0 … (prvá je správna), <k>.why
+const LN = (k) => { const out = []; for (let i = 0; L.has(`${k}.${i}`); i++) out.push(L(`${k}.${i}`)); return out; };
+const LQ = (k) => { const options = []; for (let i = 0; L.has(`${k}.o.${i}`); i++) options.push(L(`${k}.o.${i}`)); return { q: L(`${k}.q`), options, correct: 0, why: L(`${k}.why`) }; };
 // farby mnemotechniky (style.css: --mn-* a .m-*) v RGB 0..1 — 3D model má vždy farbu svojho symbolu v rovnici
 const MC = {
   a: [0.31, 0.55, 1], b: [1, 0.42, 0.49], ket: [0.37, 0.89, 1], op: [0.73, 0.55, 1], th: [1, 0.6, 0.9], ph: [0.49, 1, 0.63],
@@ -51,12 +52,9 @@ const EXHIBITS0 = [
   {
     id: 'alpha', ch: 1, keys: ['α'], chime: 'α', glyph: () => G0('α'),
     name: tr('α — amplitúda |0⟩', 'α — amplitude of |0⟩', 'α — амплітуда |0⟩'),
-    lines: () => [
-      L('l0.alpha.lines.0'),
-      L('l0.alpha.lines.1'),
-    ],
-    q1: () => Q0([L('l0.alpha.q1.0'), [L('l0.alpha.q1.1.0'), L('l0.alpha.q1.1.1'), L('l0.alpha.q1.1.2'), L('l0.alpha.q1.1.3')], L('l0.alpha.q1.2')]),
-    q2: () => Q0([L('l0.alpha.q2.0'), [L('l0.alpha.q2.1.0'), L('l0.alpha.q2.1.1'), L('l0.alpha.q2.1.2')], L('l0.alpha.q2.2')]),
+    lines: () => LN('l0.alpha.lines'),
+    q1: () => LQ('l0.alpha.q1'),
+    q2: () => LQ('l0.alpha.q2'),
     draw(r, S, t) {
       const c = S.P(0, 1.2), mag = 0.5 + 0.4 * (0.5 + 0.5 * Math.sin(t * 1.3)), tip = S.P(0, 1.2 + 0.8 * mag), ph = t * 2.2, hR = 0.2;
       D0.ball(r, c, 0.8);
@@ -71,12 +69,9 @@ const EXHIBITS0 = [
   {
     id: 'beta', ch: 1, keys: ['β'], chime: 'β', glyph: () => G0('β'),
     name: tr('β — amplitúda |1⟩', 'β — amplitude of |1⟩', 'β — амплітуда |1⟩'),
-    lines: () => [
-      L('l0.beta.lines.0'),
-      L('l0.beta.lines.1'),
-    ],
-    q1: () => Q0([L('l0.beta.q1.0'), [L('l0.beta.q1.1.0'), L('l0.beta.q1.1.1'), L('l0.beta.q1.1.2')], L('l0.beta.q1.2')]),
-    q2: () => Q0([L('l0.beta.q2.0'), [L('l0.beta.q2.1.0'), L('l0.beta.q2.1.1'), L('l0.beta.q2.1.2'), L('l0.beta.q2.1.3')], L('l0.beta.q2.2')]),
+    lines: () => LN('l0.beta.lines'),
+    q1: () => LQ('l0.beta.q1'),
+    q2: () => LQ('l0.beta.q2'),
     draw(r, S, t) {
       const c = S.P(0, 1.2), mag = 0.5 + 0.4 * (0.5 + 0.5 * Math.sin(t * 1.3 + 2)), tip = S.P(0, 1.2 - 0.8 * mag), ph = t * 2.2 + 1, hR = 0.2;
       D0.ball(r, c, 0.8);
@@ -92,12 +87,9 @@ const EXHIBITS0 = [
     id: 'ket', ch: 1, keys: ['ket', 'ket0', 'ket1', 'ketpm', 'ψ', 'Ψ'], chime: 'ket',
     glyph: (t) => [G0('ket', 'ψ'), G0('ket0', '0'), G0('ket1', '1'), G0('ketpm', '+')],
     name: tr('kety |ψ⟩, |0⟩, |1⟩, |±⟩ — stavy', 'kets |ψ⟩, |0⟩, |1⟩, |±⟩ — states', 'кети |ψ⟩, |0⟩, |1⟩, |±⟩ — стани'),
-    lines: () => [
-      L('l0.ket.lines.0'),
-      L('l0.ket.lines.1'),
-    ],
-    q1: () => Q0([L('l0.ket.q1.0'), [L('l0.ket.q1.1.0'), L('l0.ket.q1.1.1'), L('l0.ket.q1.1.2'), L('l0.ket.q1.1.3')], L('l0.ket.q1.2')]),
-    q2: () => Q0([L('l0.ket.q2.0'), [L('l0.ket.q2.1.0'), L('l0.ket.q2.1.1'), L('l0.ket.q2.1.2')], L('l0.ket.q2.2')]),
+    lines: () => LN('l0.ket.lines'),
+    q1: () => LQ('l0.ket.q1'),
+    q2: () => LQ('l0.ket.q2'),
     draw(r, S, t) {
       const x = Math.sin(t * 1.4) * 0.22, k = Math.floor(t / 2.6) % 4, o = { emissive: 0.6 };
       D0.ket(r, S, x, 1.2, 1.1, 1, MC.ket);
@@ -111,12 +103,9 @@ const EXHIBITS0 = [
   {
     id: 'bra', ch: 1, keys: ['bra'], chime: 'ket', glyph: () => G0('bra', 'a') + G0('ket', 'ψ'),
     name: tr('bra ⟨a| — otázka', 'bra ⟨a| — a question', 'бра ⟨a| — питання'),
-    lines: () => [
-      L('l0.bra.lines.0'),
-      L('l0.bra.lines.1'),
-    ],
-    q1: () => Q0([L('l0.bra.q1.0'), [L('l0.bra.q1.1.0'), L('l0.bra.q1.1.1'), L('l0.bra.q1.1.2')], L('l0.bra.q1.2')]),
-    q2: () => Q0([L('l0.bra.q2.0'), [L('l0.bra.q2.1.0'), L('l0.bra.q2.1.1'), L('l0.bra.q2.1.2')], L('l0.bra.q2.2')]),
+    lines: () => LN('l0.bra.lines'),
+    q1: () => LQ('l0.bra.q1'),
+    q2: () => LQ('l0.bra.q2'),
     draw(r, S, t) {
       const u = (t % 4) / 4, d = u < 0.45 ? 1.0 - 0.8 * smooth0(u / 0.45) : u < 0.8 ? 0.2 : 0.2 + 0.8 * smooth0((u - 0.8) / 0.2);
       D0.ket(r, S, -d, 1.2, 1.0, -1, MC.ket);
@@ -134,12 +123,9 @@ const EXHIBITS0 = [
   {
     id: 'theta', ch: 2, keys: ['θ'], chime: 'θ', glyph: () => G0('θ'),
     name: tr('θ — sklon od pólu', 'θ — tilt from the pole', 'θ — нахил від полюса'),
-    lines: () => [
-      L('l0.theta.lines.0'),
-      L('l0.theta.lines.1'),
-    ],
-    q1: () => Q0([L('l0.theta.q1.0'), [L('l0.theta.q1.1.0'), L('l0.theta.q1.1.1'), L('l0.theta.q1.1.2')], L('l0.theta.q1.2')]),
-    q2: () => Q0([L('l0.theta.q2.0'), [L('l0.theta.q2.1.0'), L('l0.theta.q2.1.1'), L('l0.theta.q2.1.2')], L('l0.theta.q2.2')]),
+    lines: () => LN('l0.theta.lines'),
+    q1: () => LQ('l0.theta.q1'),
+    q2: () => LQ('l0.theta.q2'),
     draw(r, S, t) {
       const c = S.P(-0.25, 1.2), th = Math.PI / 2 * (1 - Math.cos(t * 0.7)), d = V3.add(V3.scale(UP0, Math.cos(th)), V3.scale(S.R, Math.sin(th)));
       D0.ball(r, c, 0.75);
@@ -155,12 +141,9 @@ const EXHIBITS0 = [
   {
     id: 'phi', ch: 2, keys: ['φ'], chime: 'φ', glyph: () => G0('φ'),
     name: tr('φ — relatívna fáza', 'φ — relative phase', 'φ — відносна фаза'),
-    lines: () => [
-      L('l0.phi.lines.0'),
-      L('l0.phi.lines.1'),
-    ],
-    q1: () => Q0([L('l0.phi.q1.0'), [L('l0.phi.q1.1.0'), L('l0.phi.q1.1.1'), L('l0.phi.q1.1.2')], L('l0.phi.q1.2')]),
-    q2: () => Q0([L('l0.phi.q2.0'), [L('l0.phi.q2.1.0'), L('l0.phi.q2.1.1'), L('l0.phi.q2.1.2')], L('l0.phi.q2.2')]),
+    lines: () => LN('l0.phi.lines'),
+    q1: () => LQ('l0.phi.q1'),
+    q2: () => LQ('l0.phi.q2'),
     draw(r, S, t) {
       const c = S.P(-0.25, 1.2), ph = (t * 0.9) % (2 * Math.PI), d = V3.add(V3.scale(S.R, Math.cos(ph)), V3.scale(S.F, Math.sin(ph)));
       D0.ball(r, c, 0.75);
@@ -178,12 +161,9 @@ const EXHIBITS0 = [
   {
     id: 'gamma', ch: 2, keys: ['γ'], chime: 'γ', glyph: () => G0('γ') + G0('exp', 'iγ'),
     name: tr('γ — globálna fáza', 'γ — global phase', 'γ — глобальна фаза'),
-    lines: () => [
-      L('l0.gamma.lines.0'),
-      L('l0.gamma.lines.1'),
-    ],
-    q1: () => Q0([L('l0.gamma.q1.0'), [L('l0.gamma.q1.1.0'), L('l0.gamma.q1.1.1'), L('l0.gamma.q1.1.2')], L('l0.gamma.q1.2')]),
-    q2: () => Q0([L('l0.gamma.q2.0'), [L('l0.gamma.q2.1.0'), L('l0.gamma.q2.1.1'), L('l0.gamma.q2.1.2')], L('l0.gamma.q2.2')]),
+    lines: () => LN('l0.gamma.lines'),
+    q1: () => LQ('l0.gamma.q1'),
+    q2: () => LQ('l0.gamma.q2'),
     draw(r, S, t) {
       const c = S.P(-0.25, 1.25), g = t * 1.1, o = { emissive: 0.5 };
       r.draw('torus', M4.orient(c, S.F, 0.62), MC.g, o);
@@ -197,12 +177,9 @@ const EXHIBITS0 = [
   {
     id: 'expi', ch: 2, keys: ['exp', 'i'], chime: 'exp', glyph: () => G0('exp', 'iφ') + G0('i'),
     name: tr('e^{iφ} a i — otočenia', 'e^{iφ} and i — turns', 'e^{iφ} та i — оберти'),
-    lines: () => [
-      L('l0.expi.lines.0'),
-      L('l0.expi.lines.1'),
-    ],
-    q1: () => Q0([L('l0.expi.q1.0'), [L('l0.expi.q1.1.0'), L('l0.expi.q1.1.1'), L('l0.expi.q1.1.2')], L('l0.expi.q1.2')]),
-    q2: () => Q0([L('l0.expi.q2.0'), [L('l0.expi.q2.1.0'), L('l0.expi.q2.1.1'), L('l0.expi.q2.1.2'), L('l0.expi.q2.1.3')], L('l0.expi.q2.2')]),
+    lines: () => LN('l0.expi.lines'),
+    q1: () => LQ('l0.expi.q1'),
+    q2: () => LQ('l0.expi.q2'),
     draw(r, S, t) {
       D0.clock(r, S.P(-0.55, 1.3), S.F, 0.48, MC.ph, t * 1.3, S);
       const k = Math.floor(t * 0.8), f = t * 0.8 - k;
@@ -218,13 +195,10 @@ const EXHIBITS0 = [
     id: 'ops', ch: 3, keys: ['X', 'Y', 'Z', 'H', 'S', 'T', 'I', 'U', 'Ĥ', 'Â'], chime: 'X',
     glyph: () => ['X', 'Y', 'Z', 'H', 'S', 'T', 'I', 'Ĥ', 'Â'].map((o) => G0(o)),
     glyphAt: (t) => Math.floor(t / 3.2) % 9,
-    name: tr('operátory — fialové krabičky', 'operators — violet boxes', 'оператори — фіолетові коробки'),
-    lines: () => [
-      L('l0.ops.lines.0'),
-      L('l0.ops.lines.1'),
-    ],
-    q1: () => Q0([L('l0.ops.q1.0'), [L('l0.ops.q1.1.0'), L('l0.ops.q1.1.1'), L('l0.ops.q1.1.2')], L('l0.ops.q1.2')]),
-    q2: () => Q0([L('l0.ops.q2.0'), [L('l0.ops.q2.1.0'), L('l0.ops.q2.1.1'), L('l0.ops.q2.1.2'), L('l0.ops.q2.1.3')], L('l0.ops.q2.2')]),
+    name: tr('operátory — hradlá', 'operators — gates', 'оператори — гейти'),
+    lines: () => LN('l0.ops.lines'),
+    q1: () => LQ('l0.ops.q1'),
+    q2: () => LQ('l0.ops.q2'),
     draw(r, S, t) {
       const u = (t % 3.2) / 3.2, n = Math.floor(t / 3.2), spin = u < 0.35 ? smooth0(u / 0.35) * 2 * Math.PI : 0;
       r.draw('box', M4.trs(S.P(-0.5, 1.2), S.yaw + spin, 0.62), MC.op, { emissive: u < 0.35 ? 0.6 : 0.25, alpha: 0.88 });
@@ -237,13 +211,10 @@ const EXHIBITS0 = [
   },
   {
     id: 'P', ch: 3, keys: ['P'], chime: 'P', glyph: () => G0('P'),
-    name: tr('P — stĺp pravdepodobnosti', 'P — the probability pillar', 'P — стовп імовірності'),
-    lines: () => [
-      L('l0.P.lines.0'),
-      L('l0.P.lines.1'),
-    ],
-    q1: () => Q0([L('l0.P.q1.0'), [L('l0.P.q1.1.0'), L('l0.P.q1.1.1'), L('l0.P.q1.1.2')], L('l0.P.q1.2')]),
-    q2: () => Q0([L('l0.P.q2.0'), [L('l0.P.q2.1.0'), L('l0.P.q2.1.1'), L('l0.P.q2.1.2')], L('l0.P.q2.2')]),
+    name: tr('P — pravdepodobnosť', 'P — probability', 'P — імовірність'),
+    lines: () => LN('l0.P.lines'),
+    q1: () => LQ('l0.P.q1'),
+    q2: () => LQ('l0.P.q2'),
     draw(r, S, t) {
       const p = 0.5 + 0.5 * Math.sin(t * 0.8);
       D0.pillar(r, S.P(0, 0), p, MC.P, 1.9, 0.24);
@@ -253,13 +224,10 @@ const EXHIBITS0 = [
   },
   {
     id: 'sq', ch: 3, keys: ['sq'], chime: 'P', glyph: () => G0('sq', 'α'),
-    name: tr('|…|² — zarámovať a zmraziť', '|…|² — frame and freeze', '|…|² — оправити й заморозити'),
-    lines: () => [
-      L('l0.sq.lines.0'),
-      L('l0.sq.lines.1'),
-    ],
-    q1: () => Q0([L('l0.sq.q1.0'), [L('l0.sq.q1.1.0'), L('l0.sq.q1.1.1'), L('l0.sq.q1.1.2')], L('l0.sq.q1.2')]),
-    q2: () => Q0([L('l0.sq.q2.0'), [L('l0.sq.q2.1.0'), L('l0.sq.q2.1.1'), L('l0.sq.q2.1.2')], L('l0.sq.q2.2')]),
+    name: tr('|α|² — Bornovo pravidlo', '|α|² — the Born rule', '|α|² — правило Борна'),
+    lines: () => LN('l0.sq.lines'),
+    q1: () => LQ('l0.sq.q1'),
+    q2: () => LQ('l0.sq.q2'),
     draw(r, S, t) {
       const u = (t % 5) / 5, c = S.P(-0.3, 1.25), L = 0.5;
       const frozen = u >= 0.4, ang = frozen ? (Math.floor(t / 5) * 5 + 2) * 2.5 : t * 2.5, close = frozen ? smooth0((u - 0.4) / 0.1) : 0;
@@ -275,13 +243,10 @@ const EXHIBITS0 = [
   },
   {
     id: 'rho', ch: 3, keys: ['ρ'], chime: 'ρ', glyph: () => G0('ρ'),
-    name: tr('ρ — tabuľka stavu, dekoherencia', 'ρ — the state table, decoherence', 'ρ — таблиця стану, декогеренція'),
-    lines: () => [
-      L('l0.rho.lines.0'),
-      L('l0.rho.lines.1'),
-    ],
-    q1: () => Q0([L('l0.rho.q1.0'), [L('l0.rho.q1.1.0'), L('l0.rho.q1.1.1'), L('l0.rho.q1.1.2')], L('l0.rho.q1.2')]),
-    q2: () => Q0([L('l0.rho.q2.0'), [L('l0.rho.q2.1.0'), L('l0.rho.q2.1.1'), L('l0.rho.q2.1.2')], L('l0.rho.q2.2')]),
+    name: tr('ρ — matica hustoty, dekoherencia', 'ρ — the density matrix, decoherence', 'ρ — матриця густини, декогеренція'),
+    lines: () => LN('l0.rho.lines'),
+    q1: () => LQ('l0.rho.q1'),
+    q2: () => LQ('l0.rho.q2'),
     draw(r, S, t) {
       const c = S.P(0, 1.25), at = (x, y) => V3.add(c, V3.add(V3.scale(S.R, x * 0.4), V3.scale(UP0, y * 0.4)));
       for (const [x, y] of [[-1, 1], [1, 1], [-1, -1], [1, -1]]) r.draw('box', M4.trs(V3.add(at(x, y), V3.scale(S.F, -0.1)), S.yaw, [0.7, 0.7, 0.04]), MC.coh, { alpha: 0.25 });
@@ -304,13 +269,10 @@ const EXHIBITS0 = [
   // ===== 4. kapitola: konštanty, udalosti a parametre =====
   {
     id: 'const', ch: 4, keys: ['ħ', 'π', 'Σ', '∂', '⊗', 'cos', 'sin', 'det'], chime: 'ħ', glyph: () => G0('ħ') + G0('π') + G0('Σ') + G0('∂') + G0('⊗'),
-    name: tr('sivé a nehybné = KONŠTANTA', 'grey and still = CONSTANT', 'сіре й нерухоме = СТАЛА'),
-    lines: () => [
-      L('l0.const.lines.0'),
-      L('l0.const.lines.1'),
-    ],
-    q1: () => Q0([L('l0.const.q1.0'), [L('l0.const.q1.1.0'), L('l0.const.q1.1.1'), L('l0.const.q1.1.2')], L('l0.const.q1.2')]),
-    q2: () => Q0([L('l0.const.q2.0'), [L('l0.const.q2.1.0'), L('l0.const.q2.1.1'), L('l0.const.q2.1.2'), L('l0.const.q2.1.3')], L('l0.const.q2.2')]),
+    name: tr('ħ, π, Σ, ∂, ⊗ — konštanty a operácie', 'ħ, π, Σ, ∂, ⊗ — constants and operations', 'ħ, π, Σ, ∂, ⊗ — сталі й операції'),
+    lines: () => LN('l0.const.lines'),
+    q1: () => LQ('l0.const.q1'),
+    q2: () => LQ('l0.const.q2'),
     draw(r, S, t) {
       const K = MC.k, o = {}, xs = [-1.0, -0.5, 0, 0.5, 1.0];
       r.draw('box', M4.trs(S.P(xs[0], 0.1), S.yaw, [0.36, 0.2, 0.3]), K, o);                      // ħ: schodík
@@ -330,13 +292,10 @@ const EXHIBITS0 = [
   },
   {
     id: 'collapse', ch: 4, keys: ['P'], chime: 'P', glyph: () => '<span class="mn mn-m">⚡</span>',
-    name: tr('záblesk a pád = KOLAPS', 'flash and drop = COLLAPSE', 'спалах і падіння = КОЛАПС'),
-    lines: () => [
-      L('l0.collapse.lines.0'),
-      L('l0.collapse.lines.1'),
-    ],
-    q1: () => Q0([L('l0.collapse.q1.0'), [L('l0.collapse.q1.1.0'), L('l0.collapse.q1.1.1'), L('l0.collapse.q1.1.2')], L('l0.collapse.q1.2')]),
-    q2: () => Q0([L('l0.collapse.q2.0'), [L('l0.collapse.q2.1.0'), L('l0.collapse.q2.1.1'), L('l0.collapse.q2.1.2')], L('l0.collapse.q2.2')]),
+    name: tr('meranie a kolaps', 'measurement and collapse', 'вимірювання й колапс'),
+    lines: () => LN('l0.collapse.lines'),
+    q1: () => LQ('l0.collapse.q1'),
+    q2: () => LQ('l0.collapse.q2'),
     draw(r, S, t) {
       const u = (t % 4) / 4, win = Math.floor(t / 4) % 2, col = [MC.a, MC.b], ra = [0.3, 0.24];
       for (let k = 0; k < 2; k++) {
@@ -354,13 +313,10 @@ const EXHIBITS0 = [
   },
   {
     id: 'srn', ch: 4, keys: ['σ', 'r', 'n'], chime: 'ket', glyph: () => G0('σ') + G0('r') + G0('n'),
-    name: tr('σ, r, n — osi, Blochov vektor, otázka', 'σ, r, n — axes, Bloch vector, question', 'σ, r, n — осі, вектор Блоха, питання'),
-    lines: () => [
-      L('l0.srn.lines.0'),
-      L('l0.srn.lines.1'),
-    ],
-    q1: () => Q0([L('l0.srn.q1.0'), [L('l0.srn.q1.1.0'), L('l0.srn.q1.1.1'), L('l0.srn.q1.1.2')], L('l0.srn.q1.2')]),
-    q2: () => Q0([L('l0.srn.q2.0'), [L('l0.srn.q2.1.0'), L('l0.srn.q2.1.1'), L('l0.srn.q2.1.2')], L('l0.srn.q2.2')]),
+    name: tr('σ, r, n — Pauliho matice, Blochov vektor, os merania', 'σ, r, n — Pauli matrices, Bloch vector, measurement axis', 'σ, r, n — матриці Паулі, вектор Блоха, вісь вимірювання'),
+    lines: () => LN('l0.srn.lines'),
+    q1: () => LQ('l0.srn.q1'),
+    q2: () => LQ('l0.srn.q2'),
     draw(r, S, t) {
       const c1 = S.P(-0.75, 1.0), o = { emissive: 0.4 };
       for (const [d, nm] of [[S.R, 'x'], [UP0, 'z'], [S.F, 'y']]) { r.arrow(c1, V3.add(c1, V3.scale(d, 0.42)), MC.ket, 0.025, o); S.lab('ax' + nm, V3.add(c1, V3.scale(d, 0.55)), nm, 'axis tiny'); }
@@ -377,13 +333,10 @@ const EXHIBITS0 = [
   },
   {
     id: 'nmr', ch: 4, keys: ['ω', 'Δ', 'Ω'], chime: 'φ', glyph: () => G0('ω') + G0('Δ') + G0('Ω'),
-    name: tr('ω, Δ, Ω — fázy v pohybe', 'ω, Δ, Ω — phases in motion', 'ω, Δ, Ω — фази в русі'),
-    lines: () => [
-      L('l0.nmr.lines.0'),
-      L('l0.nmr.lines.1'),
-    ],
-    q1: () => Q0([L('l0.nmr.q1.0'), [L('l0.nmr.q1.1.0'), L('l0.nmr.q1.1.1'), L('l0.nmr.q1.1.2')], L('l0.nmr.q1.2')]),
-    q2: () => Q0([L('l0.nmr.q2.0'), [L('l0.nmr.q2.1.0'), L('l0.nmr.q2.1.1'), L('l0.nmr.q2.1.2')], L('l0.nmr.q2.2')]),
+    name: tr('ω, Ω, Δ — precesia, Rabiho frekvencia, rozladenie', 'ω, Ω, Δ — precession, Rabi frequency, detuning', 'ω, Ω, Δ — прецесія, частота Рабі, розлад'),
+    lines: () => LN('l0.nmr.lines'),
+    q1: () => LQ('l0.nmr.q1'),
+    q2: () => LQ('l0.nmr.q2'),
     draw(r, S, t) {
       const c1 = S.P(-0.75, 0.8), tilt = 0.55, w = t * 2, o = { emissive: 0.45 };
       r.rod(c1, V3.add(c1, [0, 1.05, 0]), [0.5, 0.55, 0.7], 0.012);
@@ -405,13 +358,10 @@ const EXHIBITS0 = [
   },
   {
     id: 'ptA', ch: 4, keys: ['p', 't', 'A'], chime: 'P', glyph: () => G0('p') + G0('t') + G0('A'),
-    name: tr('p, t, A — hmla, čas, cesty', 'p, t, A — fog, time, paths', 'p, t, A — туман, час, шляхи'),
-    lines: () => [
-      L('l0.ptA.lines.0'),
-      L('l0.ptA.lines.1'),
-    ],
-    q1: () => Q0([L('l0.ptA.q1.0'), [L('l0.ptA.q1.1.0'), L('l0.ptA.q1.1.1'), L('l0.ptA.q1.1.2')], L('l0.ptA.q1.2')]),
-    q2: () => Q0([L('l0.ptA.q2.0'), [L('l0.ptA.q2.1.0'), L('l0.ptA.q2.1.1'), L('l0.ptA.q2.1.2')], L('l0.ptA.q2.2')]),
+    name: tr('p, t, A — dekoherencia, čas, amplitúdy ciest', 'p, t, A — decoherence, time, path amplitudes', 'p, t, A — декогеренція, час, амплітуди шляхів'),
+    lines: () => LN('l0.ptA.lines'),
+    q1: () => LQ('l0.ptA.q1'),
+    q2: () => LQ('l0.ptA.q2'),
     draw(r, S, t) {
       const c1 = S.P(-0.8, 1.1), fog = (t % 5) / 5;
       r.sphere(c1, 0.12 * (1 - fog) + 0.02, hue0(t * 1.5), { emissive: 0.7, alpha: 1 - 0.8 * fog });
@@ -433,81 +383,20 @@ const EXHIBITS0 = [
   },
 
   // ===== 5. kapitola: obyčajné časti vzorca, zvuk a slovné pomôcky =====
-  {
-    id: 'plain', ch: 5, keys: [], chime: null,
-    glyph: () => '<span class="m-num">2</span><span class="m-rel">=</span><span class="m-fn">cos</span><span class="m-br">(</span><span class="m-var">x</span><span class="m-op">+</span><span class="m-num">1</span><span class="m-br">)</span>',
-    name: tr('obyčajné časti vzorca', 'the plain parts of a formula', 'звичайні частини формули'),
-    lines: () => [
-      L('l0.plain.lines.0'),
-      L('l0.plain.lines.1'),
-    ],
-    q1: () => Q0([L('l0.plain.q1.0'), [L('l0.plain.q1.1.0'), L('l0.plain.q1.1.1'), L('l0.plain.q1.1.2'), L('l0.plain.q1.1.3')], L('l0.plain.q1.2')]),
-    q2: () => Q0([L('l0.plain.q2.0'), [L('l0.plain.q2.1.0'), L('l0.plain.q2.1.1'), L('l0.plain.q2.1.2'), L('l0.plain.q2.1.3')], L('l0.plain.q2.2')]),
-    draw(r, S, t) {
-      const parts = [['num', '2', 'm-num'], ['rel', '=', 'm-rel'], ['fn', 'cos', 'm-fn'], ['br', '(', 'm-br'], ['v', 'x', 'm-var'], ['opn', '+', 'm-op']];
-      parts.forEach(([c, s, cls], k) => {
-        const x = -1.0 + k * 0.4, y = 0.55 + 0.12 * Math.sin(t * 2 + k * 0.9);
-        r.draw('box', M4.trs(S.P(x, y), S.yaw + Math.sin(t + k) * 0.3, 0.24), MC[c], { emissive: 0.35 });
-        S.lab('p' + k, S.P(x, y + 0.42), `<span class="${cls}">${s}</span>`, 'sym0');
-      });
-    },
-  },
-  {
-    id: 'sound', ch: 5, keys: [], chime: null, glyph: () => '🔊 💬',
-    name: tr('zvuk = KTO a slovné pomôcky', 'sound = WHO and memory phrases', 'звук = ХТО і словесні підказки'),
-    lines: () => [
-      L('l0.sound.lines.0'),
-      L('l0.sound.lines.1'),
-    ],
-    q1: () => Q0([L('l0.sound.q1.0'), [L('l0.sound.q1.1.0'), L('l0.sound.q1.1.1'), L('l0.sound.q1.1.2')], L('l0.sound.q1.2')]),
-    q2: () => Q0([L('l0.sound.q2.0'), [L('l0.sound.q2.1.0'), L('l0.sound.q2.1.1'), L('l0.sound.q2.1.2')], L('l0.sound.q2.2')]),
-    draw(r, S, t, act, L) {
-      const keys = ['α', 'β', 'θ', 'φ', 'X', 'P'], cols = [MC.a, MC.b, MC.th, MC.ph, MC.op, MC.P], hi = [1, 0.25, 0.7, 0.5, 0.2, 0.85];
-      const j = Math.floor(t / 0.8) % 6, f = (t / 0.8) % 1;
-      if (act && L.chimeJ !== j) { L.chimeJ = j; EqG.chime(keys[j] === 'X' ? 'X' : keys[j]); }
-      keys.forEach((k, i) => {
-        let y = 0.25;
-        if (i === j) {
-          const b = Math.sin(Math.PI * Math.min(1, f * 1.4));
-          y += b * (i === 2 ? hi[i] * (1 - f) + 0.2 : i === 3 ? hi[i] * f + 0.2 : hi[i]) * 1.4;
-        }
-        r.sphere(S.P(-1.0 + i * 0.4, y), 0.14, cols[i], { emissive: i === j ? 0.8 : 0.3 });
-        S.lab('g' + i, S.P(-1.0 + i * 0.4, -0.1), S.g('g' + i, () => G0(k)), 'sym0 small');
-      });
-    },
-  },
-];
-
-// ktoré pravidlá kľúča 🔑 (indexy v MNEMO_RULES) exponát predvádza
-const RULES0 = { alpha: [0, 3, 4, 5], beta: [0, 3], ket: [2, 3], bra: [2], theta: [1], phi: [5], gamma: [5], expi: [1, 5], ops: [6], P: [2], sq: [7], rho: [8],
-  const: [10], collapse: [9], plain: [11], sound: [12, 13] };
+  ];
 
 // záverečná skúška: otázky naprieč všetkými exponátmi
-const FINAL0 = () => [
-  Q0([L('l0.FINAL0.1.0'), [L('l0.FINAL0.1.1.0'), L('l0.FINAL0.1.1.1'), L('l0.FINAL0.1.1.2')], L('l0.FINAL0.1.2')]),
-  Q0([L('l0.FINAL0.2.0'), [L('l0.FINAL0.2.1.0'), L('l0.FINAL0.2.1.1'), L('l0.FINAL0.2.1.2'), L('l0.FINAL0.2.1.3')], L('l0.FINAL0.2.2')]),
-  Q0([L('l0.FINAL0.3.0'), [L('l0.FINAL0.3.1.0'), L('l0.FINAL0.3.1.1'), L('l0.FINAL0.3.1.2'), L('l0.FINAL0.3.1.3')], L('l0.FINAL0.3.2')]),
-  Q0([L('l0.FINAL0.4.0'), [L('l0.FINAL0.4.1.0'), L('l0.FINAL0.4.1.1'), L('l0.FINAL0.4.1.2')], L('l0.FINAL0.4.2')]),
-  Q0([L('l0.FINAL0.5.0'), [L('l0.FINAL0.5.1.0'), L('l0.FINAL0.5.1.1'), L('l0.FINAL0.5.1.2')], L('l0.FINAL0.5.2')]),
-  Q0([L('l0.FINAL0.6.0'), [L('l0.FINAL0.6.1.0'), L('l0.FINAL0.6.1.1'), L('l0.FINAL0.6.1.2')], L('l0.FINAL0.6.2')]),
-  Q0([L('l0.FINAL0.7.0'), [L('l0.FINAL0.7.1.0'), L('l0.FINAL0.7.1.1'), L('l0.FINAL0.7.1.2')], L('l0.FINAL0.7.2')]),
-  Q0([L('l0.FINAL0.8.0'), [L('l0.FINAL0.8.1.0'), L('l0.FINAL0.8.1.1'), L('l0.FINAL0.8.1.2')], L('l0.FINAL0.8.2')]),
-  Q0([L('l0.FINAL0.9.0'), [L('l0.FINAL0.9.1.0'), L('l0.FINAL0.9.1.1'), L('l0.FINAL0.9.1.2')], L('l0.FINAL0.9.2')]),
-  Q0([L('l0.FINAL0.10.0'), [L('l0.FINAL0.10.1.0'), L('l0.FINAL0.10.1.1'), L('l0.FINAL0.10.1.2')], L('l0.FINAL0.10.2')]),
-  Q0([L('l0.FINAL0.11.0'), [L('l0.FINAL0.11.1.0'), L('l0.FINAL0.11.1.1'), L('l0.FINAL0.11.1.2')], L('l0.FINAL0.11.2')]),
-  Q0([L('l0.FINAL0.12.0'), [L('l0.FINAL0.12.1.0'), L('l0.FINAL0.12.1.1'), L('l0.FINAL0.12.1.2')], L('l0.FINAL0.12.2')]),
-];
+const FINAL0 = () => { const out = []; for (let i = 1; L.has(`l0.final.${i}.q`); i++) out.push(LQ(`l0.final.${i}`)); return out; };
 
 const CHAPTERS0 = {
   1: () => L('l0.chapter.1'),
   2: () => L('l0.chapter.2'),
   3: () => L('l0.chapter.3'),
   4: () => L('l0.chapter.4'),
-  5: () => L('l0.chapter.5'),
 };
 
 class L0Symbols extends Level {
-  get steps() { return [this.intro, this.ch1, this.ch2, this.ch3, this.ch4, this.ch5]; }
+  get steps() { return [this.intro, this.ch1, this.ch2, this.ch3, this.ch4]; }
 
   enter(resume) {
     super.enter(resume);
@@ -535,16 +424,15 @@ class L0Symbols extends Level {
   intro() {
     this.quest(tr('Vypočuj si Iskru', 'Listen to Spark', 'Послухай Іскру'), { easy: tr('💬 Iskra', '💬 Spark', '💬 Іскра') });
     this.say([
-      L('l0.intro.1.0'),
-      L('l0.intro.1.1'),
-      L('l0.intro.1.2'),
+      L('l0.intro.0'),
+      L('l0.intro.1', this.ex.length),
+      L('l0.intro.2'),
     ], () => this.next());
   }
   ch1() { this.chapter(1); }
   ch2() { this.chapter(2); }
   ch3() { this.chapter(3); }
   ch4() { this.chapter(4); }
-  ch5() { this.chapter(5); }
 
   chapter(ch) {
     const list = this.ex.filter((e) => e.ch === ch), k0 = this.sub.k | 0;
@@ -566,7 +454,7 @@ class L0Symbols extends Level {
     this.focus = -1; this.camT = 0;
     UI.panelHide();
     this.quest(tr(`Opakovanie kapitoly ${ch}`, `Chapter ${ch} review`, `Повторення розділу ${ch}`), { easy: tr('📝 Opakovanie', '📝 Review', '📝 Повторення') });
-    this.say([L('l0.review.1', ch, list.length)], () =>
+    this.say([L('l0.review', ch, list.length)], () =>
       UI.quizSeries(shuffle0(list.map((e) => this.q(e.q2()))), (m) => { this.mistakes += m; this.next(); }));
   }
   q(x) { return { who: this.mentor, face: this.face, ...x }; }
@@ -576,11 +464,9 @@ class L0Symbols extends Level {
     // panel vpravo: glyfy exponátu zo slovníka (obrázok, názov, slovná pomôcka)
     const D = EqG.dict(), sample = { ket: 'ψ', ket0: '0', ket1: '1', ketpm: '+', bra: 'a', exp: 'iφ', sq: 'α' };
     const cards = e.keys.map((k) => `<div class="gd"><span class="gly big g-${k === 'sq' ? 'a' : D[k][0]}">${EqG.svg(k, sample[k] ?? k)}</span><div><b>${D[k][2]}</b><small>${D[k][3]}</small></div></div>`).join('');
-    const rules = (RULES0[e.id] || []).map((i) => MNEMO_RULES[i]); // pravidlá kľúča 🔑, ktoré exponát ukazuje
     UI.panelSet(`${e.i + 1} / ${this.ex.length} · <span class="l0name">${e.name}</span>`, [
       UI.info(`<div class="l0big">${Array.isArray(e.gl) ? e.gl.join(' ') : e.gl}</div>`),
       ...(cards ? [UI.info(`<div class="eqlegend inline l0cards">${cards}</div>`)] : []),
-      ...(rules.length ? [UI.info(`<div class="eqlegend inline l0cards">${rules.map(([d, h, x]) => `<div class="rule"><span class="demo">${typeof d === 'function' ? d() : d}</span><div><b>${h}</b><small>${x}</small></div></div>`).join('')}</div>`)] : []),
       UI.info(tr('💡 Kamerou môžeš otáčať — exponát sa hýbe stále.', '💡 Turn the camera as you like — the exhibit keeps moving.', '💡 Камеру можна обертати — експонат рухається постійно.'), 'tip'),
     ]);
   }
@@ -588,17 +474,17 @@ class L0Symbols extends Level {
   finale() {
     UI.panelHide();
     this.focus = -1; this.camT = 0; this.revealed = this.ex.length - 1;
-    const pool = shuffle0(EXHIBITS0.flatMap((e) => [e.q1, e.q2])).slice(0, 8).map((f) => f());
+    const pool = shuffle0(EXHIBITS0.flatMap((e) => [e.q1, e.q2])).slice(0, 6).map((f) => f());
     const list = shuffle0([...FINAL0(), ...pool]).map((x) => this.q(x));
     this.quest(tr('Veľká skúška symbolov', 'The big symbol exam', 'Великий іспит символів'), { easy: tr('📝 Skúška', '📝 Exam', '📝 Іспит'), hard: tr(`${list.length} otázok naprieč všetkými podstavcami`, `${list.length} questions across all pedestals`, `${list.length} питань з усіх постаментів`) });
-    this.say([L('l0.finale.1', list.length)], () =>
+    this.say([L('l0.finale.intro', list.length)], () =>
       UI.quizSeries(list, (m) => {
         this.mistakes += m;
         const total = list.length + this.ex.length * 2, k = this.mistakes / total;
         const stars = byDiff(k <= 0.1 ? 3 : k <= 0.25 ? 2 : 1, k <= 0.05 ? 3 : k <= 0.15 ? 2 : 1, k === 0 ? 3 : k <= 0.08 ? 2 : 1);
         Game.completeLevel(0, stars);
         const rating = '★'.repeat(stars) + '☆'.repeat(3 - stars);
-        this.say([L('l0.finale.2', rating, this.mistakes, total)], () => Game.backToHub());
+        this.say([L('l0.finale.done', rating, this.mistakes, total)], () => Game.backToHub());
       }));
   }
 
@@ -644,7 +530,7 @@ class L0Symbols extends Level {
   }
   colorOf(e) {
     return { alpha: MC.a, beta: MC.b, ket: MC.ket, bra: MC.ket, theta: MC.th, phi: MC.ph, gamma: MC.g, expi: MC.ph, ops: MC.op, P: MC.P, sq: MC.P, rho: MC.coh,
-      const: MC.k, collapse: MC.m, srn: MC.ket, nmr: MC.ph, ptA: MC.m, plain: MC.rel, sound: MC.c }[e.id] || MC.c;
+      const: MC.k, collapse: MC.m, srn: MC.ket, nmr: MC.ph, ptA: MC.m }[e.id] || MC.c;
   }
 }
 
