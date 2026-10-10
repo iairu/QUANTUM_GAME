@@ -33,8 +33,8 @@ Prepínač **SK / EN / UA** je vpravo hore aj na uvítacej obrazovke (zmena znov
 ## Typ hry: 🖼 Prevažne ľudský jazyk / ∑ Jazyk rovníc (experimentálny)
 Volí sa na uvítacej obrazovke aj v nastaveniach (⚙ → 🎮 Typ hry); prepína sa za behu, bez znovunačítania.
 - **🖼 Prevažne ľudský jazyk** — pôvodná hra: najprv obraz a intuícia (ručičky, Blochova guľa, pokusy), rovnice len v paneli 📐.
-- **∑ Jazyk rovníc (experimentálny)** — navyše **portál 0 — Sieň symbolov**: 17 podstavcov, na každom jeden symbol ako 3D pokus (α, β, kety, bra, θ, φ, γ, e<sup>iφ</sup> a i, operátory, P, |α|², ρ, ħ/π/Σ/∂/⊗, meranie a kolaps, σ/r/n, ω/Ω/Δ, p/t/A); rozhovory a otázky vysvetľujú len fyzikálny význam symbolov, nie pravidlá kľúča. Po každom otázka, po každej kapitole opakovanie, na konci veľká skúška. Ďalej: skutočná rovnica, ktorá práve platí, sa vznáša v 3D nad scénou (nakláňa sa s kamerou) a jej hodnoty sa menia s hrou:
-  ostrov e<sup>iγ</sup>(α|0⟩ + β|1⟩) s točiacou sa globálnou fázou, |α|², interferencia |A₁ + A₂|², SG P(↑) = ½(1 + r·n), hradlo G|ψ⟩ počas rotácie,
+- **∑ Jazyk rovníc (experimentálny)** — navyše **portál 0 — Sieň symbolov**: 17 podstavcov, na každom jeden symbol ako 3D pokus (α, β, kety, bra, θ, φ, γ, e<sup>iφ</sup> a i, operátory, P, |α|², ρ, ħ/π/Σ/∂/⊗, meranie a kolaps, σ/r/n, ω/Ω/Δ, p/t/A); rozhovory a otázky vysvetľujú len fyzikálny význam symbolov, nie pravidlá kľúča. Po každom otázka, po každej kapitole opakovanie, na konci veľká skúška. Ďalej: skutočná rovnica, ktorá práve platí, je v paneli hore na obrazovke (na ostrove sa neukazuje) a jej hodnoty sa menia s hrou:
+  |α|², interferencia |A₁ + A₂|², SG P(↑) = ½(1 + r·n), hradlo G|ψ⟩ počas rotácie,
   dekoherencia ρ₀₁ → (1 − p)e<sup>−iφ</sup>ρ₀₁, Diracov výraz a jeho typ, H̃ = (ħ/2)(ΔZ + Ω<sub>R</sub>X), dva qubity a determinant previazanosti,
   Schrödingerova rovnica, P(zásah) = ½(1 + r·n) v boji s drakom. Pred každou úlohou karta „∑ Rovnica najprv“, teória je vždy otvorená,
   symboly v textoch sú vo farbách mnemotechniky a pri póloch Blochovej gule visia |α|, |β|.
@@ -50,7 +50,7 @@ Volí sa na uvítacej obrazovke aj v nastaveniach (⚙ → 🎮 Typ hry); prepí
   Význam sa určuje podľa kontextu: γ pri B = gyromagnetický pomer, α v R(α) = uhol, H v NMR = hamiltonián, T za číslom = tesla.
   Pod 🔑 sú pravidlá aj **slovník všetkých glyfov**.
 
-*Game type: 🖼 Pictures first (the original) or ∑ Equations first — the real equation of the moment lives in 3D above the scene, with equation mnemonics: colour = WHO, size = HOW MUCH, spin = PHASE.*
+*Game type: 🖼 Mainly Human Language (the original) or ∑ Equation Language (Experimental) — the real equation of the moment is shown at the top of the screen, its symbols drawn as glyphs with tooltips.*
 
 ## MMO téma (⚔ World of Warcraft)
 Dialógy, kvízy, levely, Kódex, Denník aj tlačidlá ostávajú rovnaké — mení sa spôsob hry (`js/wow.js`).

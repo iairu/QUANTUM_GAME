@@ -31,7 +31,7 @@ const DIFF_TITLE = {
 };
 const MODE_TAG = {
   pictures: tr('Intuícia cez obrazy a pokusy', 'Intuition through pictures and experiments', 'Інтуїція через образи й досліди'),
-  equations: tr('Skutočná rovnica žije v 3D', 'The real equation comes alive in 3D', 'Справжнє рівняння оживає в 3D'),
+  equations: tr('Skutočná rovnica, ktorá práve platí', 'The real equation of the moment', 'Справжнє рівняння цієї миті'),
 };
 // ukážka typu hry: pár slov bežnou rečou / jedna farebná rovnica (živé HTML, v jazyku hry)
 const MODE_SHOT = {

@@ -1,5 +1,5 @@
 'use strict';
-// ∑ Typ hry „Rovnice najprv“: skutočná rovnica, ktorá práve platí, žije v 3D nad scénou.
+// ∑ Typ hry „Jazyk rovníc“: skutočná rovnica, ktorá práve platí, je v paneli hore na obrazovke.
 // Rovnicová mnemotechnika — každý symbol má farbu (KTO), veľkosť (KOĽKO) a otáčanie (FÁZA):
 //  α modrá · β červená · kety tyrkysové · operátory fialové krabičky · θ ružová · φ zelená · globálna fáza zlatá
 //  · pravdepodobnosť biela so stĺpcom · koherencie vo farbe svojej fázy (blednú pri dekoherencii) · konštanty sivé a nehybné.
@@ -14,9 +14,9 @@ const MODE_DESC = {
   pictures: tr('pôvodná hra: najprv obraz a intuícia (ručičky, Blochova guľa, pokusy), rovnice len v paneli teórie',
     'the original game: the picture and intuition come first (hands, the Bloch ball, experiments); equations only in the theory panel',
     'оригінальна гра: спершу образ та інтуїція (стрілки, куля Блоха, досліди), рівняння — лише в панелі теорії'),
-  equations: tr('navyše portál 0 — Sieň symbolov; skutočná rovnica žije v 3D nad scénou a mení sa s hrou; rovnicová mnemotechnika: farba = KTO, veľkosť = KOĽKO, otáčanie = FÁZA; pred každou úlohou jej rovnica',
-    'adds portal 0 — the Hall of Symbols; the real equation lives in 3D above the scene and changes with the game; equation mnemonics: colour = WHO, size = HOW MUCH, spin = PHASE; every task starts with its equation',
-    'додає портал 0 — Залу символів; справжнє рівняння живе в 3D над сценою й змінюється разом із грою; мнемоніка рівнянь: колір = ХТО, розмір = СКІЛЬКИ, обертання = ФАЗА; кожне завдання починається з рівняння'),
+  equations: tr('navyše portál 0 — Sieň symbolov; hore na obrazovke skutočná rovnica, ktorá práve platí a mení sa s hrou; symboly sú obrázky (glyfy) s vysvetlivkou; pred každou úlohou jej rovnica',
+    'adds portal 0 — the Hall of Symbols; at the top of the screen the real equation that holds right now and changes with the game; symbols are pictures (glyphs) with tooltips; every task starts with its equation',
+    'додає портал 0 — Залу символів; угорі екрана — справжнє рівняння, що діє зараз і змінюється разом із грою; символи — картинки (гліфи) з підказками; кожне завдання починається з рівняння'),
 };
 
 // mnemotechnické pravidlá: [ukážkový token, nadpis, vysvetlenie]

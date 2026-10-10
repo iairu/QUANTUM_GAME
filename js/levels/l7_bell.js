@@ -109,11 +109,15 @@ class L7Bell extends Level {
     };
     const opt = win(0, 90, 45, -45), inR = (v) => v >= -90 && v <= 180;
     let best = null;
-    for (const a0 of [A.a0, A.a0 - 360, A.a0 + 360]) for (const s1 of [90, -90, 270, -270]) for (const s2 of [45, -45, 135, -135, 225, -225]) for (const s3 of [45, -45, 135, -135, 225, -225]) {
-      const c = { a0, a1: a0 + s1, b0: a0 + s2, b1: a0 + s3 };
-      if (!Object.values(c).every(inR) || Math.abs(win(c.a0, c.a1, c.b0, c.b1) - opt) > 1e-9) continue;
-      const d = Object.keys(c).reduce((s, k) => s + Math.abs(c[k] - A[k]), 0);
-      if (!best || d < best.d) best = { c, d };
+    // optimálna zostava = a₀ + posuny; a₀ volíme tak, aby sa uhly spolu posunuli čo najmenej (medián)
+    for (const s1 of [90, -90, 270, -270]) for (const s2 of [45, -45, 135, -135, 225, -225]) for (const s3 of [45, -45, 135, -135, 225, -225]) {
+      const off = [0, s1, s2, s3], ks = ['a0', 'a1', 'b0', 'b1'], d0 = ks.map((k, i) => A[k] - off[i]).sort((x, y) => x - y);
+      for (const a0 of [(d0[1] + d0[2]) / 2, d0[1], d0[2]]) {
+        const c = { a0, a1: a0 + s1, b0: a0 + s2, b1: a0 + s3 };
+        if (!Object.values(c).every(inR) || Math.abs(win(c.a0, c.a1, c.b0, c.b1) - opt) > 1e-9) continue;
+        const d = ks.reduce((sum, k) => sum + Math.abs(c[k] - A[k]), 0);
+        if (!best || d < best.d) best = { c, d };
+      }
     }
     if (best) for (const k of ['a0', 'a1', 'b0', 'b1']) UI.snapSlider(this.sl[k], best.c[k]);
   }
