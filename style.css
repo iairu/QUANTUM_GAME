@@ -165,15 +165,15 @@ html:not([lang="sk"]) [data-lang="sk"], html:not([lang="en"]) [data-lang="en"], 
 #hud-quest.ancient { font-size: 13px; font-family: "Cambria Math", Georgia, serif; }
 #diff-select.ancient { border-color: #c9a25a; }
 #dialog.scroll { background: linear-gradient(#f3e6c4, #e8d6a8); color: #3b2a12; border: 2px solid #9c7a3c; font-family: Georgia, "Times New Roman", serif; }
-#dialog.scroll .who { color: #7a4f12; }
+#dialog.scroll .who, html[data-theme] #dialog.scroll .who { color: #9a1f12; } /* tmavočervená — čitateľná na pergamene v každej téme */
 #dialog.scroll .txt { font-size: 15px; line-height: 1.55; }
 #dialog.scroll .hint { color: #7a6544; }
 #dialog.scroll button { color: #3b2a12; background: #e0c88f; border-color: #9c7a3c; }
 .scroll-head { font-size: 13px; color: #7a4f12; margin-bottom: 2px; }
-.scroll-title { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
+.scroll-title { font-size: 17px; font-weight: 700; margin-bottom: 6px; color: #9a1f12; }
 #dialog.scroll blockquote, .scrollcard blockquote { margin: 8px 0 0; padding: 6px 10px; border-left: 3px solid #9c7a3c; font-style: italic; background: rgba(156, 122, 60, 0.12); }
 .scrollcard .scroll-head { color: #d9b46a; }
-.scrollcard .scroll-title { font-size: 14px; }
+.scrollcard .scroll-title { font-size: 14px; color: #e06a55; } /* v Kódexe na tmavom pozadí svetlejšia červená */
 /* teória a rovnice v paneli */
 #panel details.theory { border-color: rgba(255, 210, 90, 0.4); }
 #panel details.theory h4 { margin: 8px 0 2px; font-size: 12px; color: var(--accent); }
@@ -548,7 +548,9 @@ body.welcoming #hud, body.welcoming #topbar, body.welcoming #panel, body.welcomi
 #welcome .ticon { position: absolute; left: 8px; top: 8px; width: 32px; height: 32px; display: grid; place-items: center; border-radius: 50%;
   background: rgba(7, 11, 26, 0.75); border: 1px solid var(--line); font-size: 17px; }
 #welcome .wtheme.on .ticon { border-color: var(--accent); color: var(--accent); }
-#welcome .wdiffs { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+#welcome .wdiffs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+#welcome .wdiffs.wscrolls { grid-template-columns: repeat(2, 1fr); }
+#welcome .wdiff.wsc.on-scrolls { --c: #e0553f; }
 #welcome .wdiff { --c: var(--accent); }
 #welcome .wdiff.layman { --c: #9fdcae; } #welcome .wdiff.easy { --c: var(--good); } #welcome .wdiff.normal { --c: var(--accent); }
 #welcome .wdiff.hard { --c: var(--bad); } #welcome .wdiff.ancient { --c: #c9a25a; }

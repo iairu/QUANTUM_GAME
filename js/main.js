@@ -62,10 +62,10 @@ class Level {
       this.seenScrolls.add('plain:' + name);
       pre.push(...laymanFor(this.num, name).map((t) => ({ who: tr('Iskra · po ľudsky', 'Spark · in plain words', 'Іскра · простими словами'), face: '🫶', text: t, raw: true, cls: 'plaincard' })));
     }
-    // prastará obťažnosť: pred krokom sa rozvinie starobylý zvitok s históriou
+    // historické zvitky (nastavenie): pred krokom sa rozvinie zvitok s históriou
     const sc = scrollFor(this.num, name).filter((x) => !this.seenScrolls.has(x.id));
     sc.forEach((x) => { this.seenScrolls.add(x.id); Game.unlockScroll(x.id); });
-    pre.push(...sc.map((x) => ({ who: `${tr('Starobylý zvitok', 'Ancient scroll', 'Прадавній сувій')} · ${pick(x.title)}`, face: '📜', text: scrollHtml(x), raw: true, cls: 'scroll' })));
+    pre.push(...sc.map((x) => ({ who: `${tr('Historický zvitok', 'Historic scroll', 'Історичний сувій')} · ${pick(x.title)}`, face: '📜', text: scrollHtml(x), raw: true, cls: 'scroll' })));
     if (!pre.length) return run();
     UI.say(pre, run);
   }
@@ -740,7 +740,7 @@ const Game = {
     try {
       const d = JSON.parse(localStorage.getItem('kvantp-game1') || 'null');
       this.fresh = !d;
-      if (d) this.progress = { stars: d.stars || {}, diff: d.diff || {}, codex: new Set(d.codex || []), scrolls: new Set(d.scrolls || []), introSeen: !!d.introSeen, eqIntroSeen: !!d.eqIntroSeen, laymanSeen: !!d.laymanSeen, moved: !!d.moved, allUnlocked: !!d.allUnlocked, session: d.session || null, wow: d.wow || null };
+      if (d) this.progress = { stars: d.stars || {}, diff: Object.fromEntries(Object.entries(d.diff || {}).map(([k, v]) => [k, v === 'ancient' ? 'hard' : v])), codex: new Set(d.codex || []), scrolls: new Set(d.scrolls || []), introSeen: !!d.introSeen, eqIntroSeen: !!d.eqIntroSeen, laymanSeen: !!d.laymanSeen, moved: !!d.moved, allUnlocked: !!d.allUnlocked, session: d.session || null, wow: d.wow || null };
     } catch (e) { /* čistý začiatok */ }
   },
 };

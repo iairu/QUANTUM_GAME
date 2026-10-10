@@ -317,7 +317,7 @@ const UI = {
     this.appendTheory();
     this.panel.classList.add('show');
   },
-  // „📐 Teória a rovnice“: normálna = len jadro (zbalené), ťažká/prastará = jadro + aktuálny krok (rozbalené)
+  // „📐 Teória a rovnice“: normálna = len jadro (zbalené), ťažká = jadro + aktuálny krok (rozbalené)
   appendTheory() {
     const L = Game.scene;
     if (!L || L === Hub || !L.steps) return;
@@ -442,17 +442,22 @@ const UI = {
   renderSettings() {
     const body = $('#settings .body'), V = Settings.view, ch = () => Settings.save();
     body.innerHTML = '';
-    body.appendChild(el('h3', null, tr('🎮 Typ hry', '🎮 Game type', '🎮 Тип гри')));
-    const modes = el('div', 'diffs');
-    for (const m of MODES) {
+    body.appendChild(el('h3', null, tr('🎨 1 · Štýl hry', '🎨 1 · Gameplay style', '🎨 1 · Стиль гри')));
+    const th = el('div', 'diffs');
+    for (const [k, name, desc] of [
+      ['classic', tr('Klasická', 'Classic', 'Класична'), tr('pôvodný modrý Hilbertov ostrov, 8 levelov', 'the original blue Hilbert Island, 8 levels', 'оригінальний синій Острів Гільберта, 8 рівнів')],
+      ['nordic', tr('🐉 Severská (Skyrim)', '🐉 Nordic (Skyrim)', '🐉 Північна (Skyrim)'), tr('zasnežený ostrov s borovicami a menhirmi, severské písmo a farby, detailné textúry a záverečný 9. level: ťahový súboj s kvantovým drakom Ketvarrom', 'a snowy island with pines and standing stones, Nordic lettering and colours, detailed textures and a final 9th level: a turn-based battle with the quantum dragon Ketvarr', 'засніжений острів із соснами та кам’яними брилами, північні шрифти й кольори, детальні текстури та фінальний 9-й рівень: покроковий бій із квантовим драконом Кетварром')],
+      ['wow', tr('⚔ MMO (World of Warcraft)', '⚔ MMO (World of Warcraft)', '⚔ MMO (World of Warcraft)'), tr('hrá sa ako MMO: kvantový mág s úrovňami, lišta kúziel (hradlá X, H, meranie…), nepriatelia „klasické omyly“, úlohy, obchodník, taška a korisť; levely sú dungeony s bossom, ktorého porazíš vedomosťami; aj drak Ketvarr', 'plays like an MMO: a quantum mage with levels, a spell bar (X and H gates, measurement…), “classical misconception” enemies, quests, a merchant, bags and loot; levels are dungeons with a boss you defeat with knowledge; Ketvarr the dragon too', 'грається як MMO: квантовий маг із рівнями, панель заклять (гейти X і H, вимірювання…), вороги — «класичні хибні уявлення», завдання, торговець, сумки та здобич; рівні — підземелля з босом, якого перемагаєш знаннями; є й дракон Кетварр')],
+    ]) {
       const l = el('label'), r = el('input');
-      r.type = 'radio'; r.name = 'mode'; r.checked = Settings.mode === m;
-      r.onchange = () => Game.setMode(m);
-      l.append(r, el('b', null, MODE_NAME[m]), el('small', null, MODE_DESC[m]));
-      modes.appendChild(l);
+      r.type = 'radio'; r.name = 'theme'; r.checked = Settings.theme === k;
+      r.onchange = () => Game.setTheme(k);
+      l.append(r, el('b', null, name), el('small', null, desc));
+      th.appendChild(l);
     }
-    body.appendChild(modes);
-    body.appendChild(el('h3', null, tr('🎚 Obťažnosť', '🎚 Difficulty', '🎚 Складність')));
+    body.appendChild(th);
+    body.appendChild(el('p', 'muted', tr('Zmena témy znovu načíta hru; postup, hudba a zvuky ostávajú.', 'Changing the theme reloads the game; progress, music and sounds stay.', 'Зміна теми перезавантажить гру; поступ, музика та звуки залишаться.')));
+    body.appendChild(el('h3', null, tr('🎚 2 · Obťažnosť', '🎚 2 · Difficulty', '🎚 2 · Складність')));
     const diffs = el('div', 'diffs');
     for (const d of DIFFS) {
       const l = el('label'), r = el('input');
@@ -462,6 +467,18 @@ const UI = {
       diffs.appendChild(l);
     }
     body.appendChild(diffs);
+    body.appendChild(el('h3', null, tr('📜 3 · História', '📜 3 · History', '📜 3 · Історія')));
+    body.appendChild(this.checkbox(SCROLLS_DESC, Settings.scrolls, (v) => { Settings.scrolls = v; Settings.save(); }));
+    body.appendChild(el('h3', null, tr('∑ 4 · Rovnice', '∑ 4 · Equations', '∑ 4 · Рівняння')));
+    const modes = el('div', 'diffs');
+    for (const m of MODES) {
+      const l = el('label'), r = el('input');
+      r.type = 'radio'; r.name = 'mode'; r.checked = Settings.mode === m;
+      r.onchange = () => Game.setMode(m);
+      l.append(r, el('b', null, MODE_NAME[m]), el('small', null, MODE_DESC[m]));
+      modes.appendChild(l);
+    }
+    body.appendChild(modes);
     body.appendChild(el('h3', null, tr('📊 Vizualizácie', '📊 Visualizations', '📊 Візуалізації')));
     const g1 = el('div', 'grid2');
     for (const [k, label, tip] of [
@@ -481,21 +498,6 @@ const UI = {
       this.checkbox(tr('stlmiť všetko (N)', 'mute everything (N)', 'вимкнути все (N)'), A.muted, (v) => { A.muted = v; Sound.init(); chA(); Sound.muteUi(); }),
     );
     body.appendChild(ga);
-    body.appendChild(el('h3', null, tr('🎨 Téma', '🎨 Theme', '🎨 Тема')));
-    const th = el('div', 'diffs');
-    for (const [k, name, desc] of [
-      ['classic', tr('Klasická', 'Classic', 'Класична'), tr('pôvodný modrý Hilbertov ostrov, 8 levelov', 'the original blue Hilbert Island, 8 levels', 'оригінальний синій Острів Гільберта, 8 рівнів')],
-      ['nordic', tr('🐉 Severská (Skyrim)', '🐉 Nordic (Skyrim)', '🐉 Північна (Skyrim)'), tr('zasnežený ostrov s borovicami a menhirmi, severské písmo a farby, detailné textúry a záverečný 9. level: ťahový súboj s kvantovým drakom Ketvarrom', 'a snowy island with pines and standing stones, Nordic lettering and colours, detailed textures and a final 9th level: a turn-based battle with the quantum dragon Ketvarr', 'засніжений острів із соснами та кам’яними брилами, північні шрифти й кольори, детальні текстури та фінальний 9-й рівень: покроковий бій із квантовим драконом Кетварром')],
-      ['wow', tr('⚔ MMO (World of Warcraft)', '⚔ MMO (World of Warcraft)', '⚔ MMO (World of Warcraft)'), tr('hrá sa ako MMO: kvantový mág s úrovňami, lišta kúziel (hradlá X, H, meranie…), nepriatelia „klasické omyly“, úlohy, obchodník, taška a korisť; levely sú dungeony s bossom, ktorého porazíš vedomosťami; aj drak Ketvarr', 'plays like an MMO: a quantum mage with levels, a spell bar (X and H gates, measurement…), “classical misconception” enemies, quests, a merchant, bags and loot; levels are dungeons with a boss you defeat with knowledge; Ketvarr the dragon too', 'грається як MMO: квантовий маг із рівнями, панель заклять (гейти X і H, вимірювання…), вороги — «класичні хибні уявлення», завдання, торговець, сумки та здобич; рівні — підземелля з босом, якого перемагаєш знаннями; є й дракон Кетварр')],
-    ]) {
-      const l = el('label'), r = el('input');
-      r.type = 'radio'; r.name = 'theme'; r.checked = Settings.theme === k;
-      r.onchange = () => Game.setTheme(k);
-      l.append(r, el('b', null, name), el('small', null, desc));
-      th.appendChild(l);
-    }
-    body.appendChild(th);
-    body.appendChild(el('p', 'muted', tr('Zmena témy znovu načíta hru; postup, hudba a zvuky ostávajú.', 'Changing the theme reloads the game; progress, music and sounds stay.', 'Зміна теми перезавантажить гру; поступ, музика та звуки залишаться.')));
     if (Settings.nordic || Settings.wow) {
     body.appendChild(el('h3', null, tr('🖼 Textúry', '🖼 Textures', '🖼 Текстури')));
     const tx = el('div', 'diffs');
@@ -556,12 +558,12 @@ const UI = {
   },
   renderScrolls(list) {
     const got = Game.progress.scrolls;
-    $('#codex .count').textContent = `${got.size} / ${SCROLLS.length} ${tr('zvitkov', 'scrolls', 'сувої')} · ${tr('rozvinú sa v obťažnosti 📜 Prastará', 'they unroll in the 📜 Ancient difficulty', 'розгортаються на складності 📜 Прадавня')}`;
+    $('#codex .count').textContent = `${got.size} / ${SCROLLS.length} ${tr('zvitkov', 'scrolls', 'сувої')} · ${tr('rozvinú sa pri zapnutých 📜 historických zvitkoch (⚙ nastavenia)', 'they unroll with 📜 Historic scrolls turned on (⚙ settings)', 'розгортаються з увімкненими 📜 історичними сувоями (⚙ налаштування)')}`;
     for (const s of SCROLLS) {
       const have = got.has(s.id), card = el('div', 'card scrollcard ' + (have ? '' : 'locked'));
       card.innerHTML = have
         ? `<div class="sym">📜 ${s.year}</div>${scrollHtml(s)}<div class="src">${tr('Level', 'Level', 'Рівень')} ${s.level}</div>`
-        : `<div class="sym">📜 ?</div><div class="nm">${tr('zvinutý zvitok', 'a rolled-up scroll', 'згорнутий сувій')}</div><div class="ds">${tr(`Level ${s.level} v obťažnosti Prastará.`, `Level ${s.level} on Ancient difficulty.`, `Рівень ${s.level} на складності «Прадавня».`)}</div>`;
+        : `<div class="sym">📜 ?</div><div class="nm">${tr('zvinutý zvitok', 'a rolled-up scroll', 'згорнутий сувій')}</div><div class="ds">${tr(`Level ${s.level} so zapnutými historickými zvitkami.`, `Level ${s.level} with Historic scrolls on.`, `Рівень ${s.level} з увімкненими історичними сувоями.`)}</div>`;
       list.appendChild(card);
     }
   },
@@ -605,7 +607,7 @@ const SLIDER_TIPS = tr([
 // ---------- čitateľnosť textu podľa obťažnosti ----------
 // ľahká: pôvodný text, väčším písmom a so zlatými kľúčovými slovami (CSS)
 // normálna: pôvodný text
-// ťažká/prastará: husto a s viac poznatkami — bez analógií, repliky jedného hovoriaceho sa zlúčia; rovnice sú v paneli „📐“
+// ťažká: husto a s viac poznatkami — bez analógií, repliky jedného hovoriaceho sa zlúčia; rovnice sú v paneli „📐“
 const TextMode = {
   ANALOGY: /^(<[^>]+>)*\s*(Prirovnanie|An analogy)/,
   sentences(html) { return String(html).split(/(?<=[.!?…])\s+(?=[„“(<|A-ZÁ-ŽÄÔ0-9])/u); },

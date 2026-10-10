@@ -1,5 +1,5 @@
 'use strict';
-// 📜 Starobylé zvitky (obťažnosť „prastará“): história objavov — roky, autori, ich rozhovory a slávne výroky.
+// 📜 Historické zvitky (nastavenie „📜 Historické zvitky“, pri ľubovoľnej obťažnosti): história objavov — roky, autori, ich rozhovory a slávne výroky.
 // Zvitok sa ukáže pred krokom levelu `step` (názov metódy kroku; 'finale' = pred záverečnou skúškou)
 // a zostane v Kódexe na karte „📜 Zvitky“. Citáty sú v preklade; pri anekdotách je to uvedené.
 
@@ -113,7 +113,7 @@ const SCROLLS = [
     quote: DL('scrolls.s8c.quote') },
 ];
 
-// jedna otázka z histórie na konci každého levelu (prastará)
+// jedna otázka z histórie na konci každého levelu (pri zapnutých historických zvitkoch)
 const TRAPS_ANCIENT = {
   1: { q: DL('traps.ancient.1.q'), options: [DL('traps.ancient.1.options.0'), DL('traps.ancient.1.options.1'), DL('traps.ancient.1.options.2')], correct: 0, why: DL('traps.ancient.1.why') },
   2: { q: DL('traps.ancient.2.q'), options: [DL('traps.ancient.2.options.0'), DL('traps.ancient.2.options.1'), DL('traps.ancient.2.options.2')], correct: 0, why: DL('traps.ancient.2.why') },
@@ -125,10 +125,10 @@ const TRAPS_ANCIENT = {
   8: { q: DL('traps.ancient.8.q'), options: [DL('traps.ancient.8.options.0'), DL('traps.ancient.8.options.1'), DL('traps.ancient.8.options.2')], correct: 0, why: DL('traps.ancient.8.why') },
 };
 
-function scrollFor(num, step) { return Settings.diff === 'ancient' ? SCROLLS.filter((s) => s.level === num && s.step === step) : []; }
+function scrollFor(num, step) { return Settings.scrolls ? SCROLLS.filter((s) => s.level === num && s.step === step) : []; }
 function scrollHtml(s) {
   const M = (x) => EqG.markEq(pick(x)); // vzorce v [[…]] (lang/*.csv)
   return `<div class="scroll-head"><b>${s.year}</b> · ${s.people}</div><div class="scroll-title">${M(s.title)}</div>`
     + `<div>${M(s.text)}</div><blockquote>${M(s.quote)}</blockquote>`;
 }
-function ancientTraps(num) { return Settings.diff === 'ancient' && TRAPS_ANCIENT[num] ? [pick(TRAPS_ANCIENT[num])] : []; }
+function ancientTraps(num) { return Settings.scrolls && TRAPS_ANCIENT[num] ? [pick(TRAPS_ANCIENT[num])] : []; }

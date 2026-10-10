@@ -2,20 +2,20 @@
 // Nastavenia hry: obťažnosť, vizualizácie a geometria zobrazenia. Ukladajú sa do localStorage
 // oddelene od postupu, takže reset hry ich nezmaže.
 
-const DIFFS = ['layman', 'easy', 'normal', 'hard', 'ancient'];
+const DIFFS = ['layman', 'easy', 'normal', 'hard'];
 // témy: klasická (8 levelov), severská (skyrimovský vzhľad + 9. level s drakom Ketvarrom)
 // a MMO (predvolená: hrá sa ako World of Warcraft — kúzla, nepriatelia, úlohy, obchodník, korisť; aj drak)
 const THEMES = ['classic', 'nordic', 'wow'];
 const Settings = {
   diff: 'layman', // nová hra začína laickou obťažnosťou
-  theme: 'wow',
+  theme: 'classic', // prvá voľba na uvítacej obrazovke
   mode: 'pictures', // typ hry: 'pictures' (obrazy najprv) alebo 'equations' (rovnice najprv, rovnicová mnemotechnika)
   get eq() { return this.mode === 'equations'; },
   get nordic() { return this.theme === 'nordic'; },
   get wow() { return this.theme === 'wow'; },
   get dragon() { return this.nordic || this.wow; }, // drak Ketvarr a 9. level
-  // ťažká aj prastará (prastará = ťažká + starobylé zvitky s históriou)
-  get hard() { return this.diff === 'hard' || this.diff === 'ancient'; },
+  get hard() { return this.diff === 'hard'; },
+  scrolls: false, // 📜 historické zvitky: história objavov pred krokmi levelov + otázka z histórie v každom leveli (pri ľubovoľnej obťažnosti)
   // ľahká aj laická (laická = ľahká + všetko bežnými slovami)
   get easy() { return this.diff === 'easy' || this.diff === 'layman'; },
   get layman() { return this.diff === 'layman'; },
@@ -50,6 +50,8 @@ const Settings = {
       const d = JSON.parse(localStorage.getItem('kvantp-game1-settings') || 'null');
       if (!d) return;
       if (DIFFS.includes(d.diff)) this.diff = d.diff;
+      if (typeof d.scrolls === 'boolean') this.scrolls = d.scrolls;
+      if (d.diff === 'ancient') { this.diff = 'hard'; this.scrolls = true; } // bývalá obťažnosť „prastará“ = ťažká + zvitky
       if (THEMES.includes(d.theme)) this.theme = d.theme;
       if (['pictures', 'equations'].includes(d.mode)) this.mode = d.mode;
       for (const k of Object.keys(this.view)) if (typeof d.view?.[k] === typeof this.view[k]) this.view[k] = d.view[k];
@@ -58,7 +60,7 @@ const Settings = {
     } catch (e) { /* predvolené nastavenia */ }
   },
   save() {
-    try { localStorage.setItem('kvantp-game1-settings', JSON.stringify({ diff: this.diff, theme: this.theme, mode: this.mode, view: this.view, audio: this.audio })); } catch (e) { /* bez ukladania */ }
+    try { localStorage.setItem('kvantp-game1-settings', JSON.stringify({ diff: this.diff, scrolls: this.scrolls, theme: this.theme, mode: this.mode, view: this.view, audio: this.audio })); } catch (e) { /* bez ukladania */ }
   },
 };
 Settings.load();
@@ -77,6 +79,10 @@ const DIFF_DESC = {
   normal: tr('pôvodná hra', 'the original game', 'оригінальна гра'),
   hard: tr('viac poznatkov: teória a rovnice pri každom kroku, extra otázky s rovnicami; presnosť, náhodné ciele, bez nápovied, prísnejšie hviezdičky',
     'more knowledge: theory and equations at every step, extra equation questions; precision, random targets, no hints, stricter stars', 'більше знань: теорія та рівняння на кожному кроці, додаткові питання з рівняннями; точність, випадкові цілі, без підказок, суворіші зірки'),
-  ancient: tr('ťažká + starobylé zvitky: história objavov, roky, autori, ich rozhovory a slávne výroky; otázka z histórie v každom leveli',
-    'hard + ancient scrolls: the history of the discoveries, years, authors, their conversations and famous words; a history question in every level', 'складна + прадавні сувої: історія відкриттів, роки, автори, їхні розмови та славетні вислови; питання з історії в кожному рівні'),
 };
+
+// 📜 historické zvitky (nastavenie nezávislé od obťažnosti)
+const SCROLLS_NAME = tr('📜 Historické zvitky', '📜 Historic scrolls', '📜 Історичні сувої');
+const SCROLLS_DESC = tr('pred krokmi levelov sa rozvinie zvitok s históriou objavov — roky, autori, ich rozhovory a slávne výroky; na konci každého levelu otázka z histórie',
+  'before level steps a scroll unrolls with the history of the discoveries — years, authors, their conversations and famous words; a history question at the end of every level',
+  'перед кроками рівнів розгортається сувій з історією відкриттів — роки, автори, їхні розмови та славетні слова; наприкінці кожного рівня — питання з історії');

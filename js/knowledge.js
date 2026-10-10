@@ -1,7 +1,7 @@
 'use strict';
 // Poznatky navyše podľa obťažnosti:
-//  THEORY  — „📐 Teória a rovnice“ v paneli levelu (normálna: len jadro, ťažká/prastará: jadro + krok)
-//  TRAPS_HARD    — extra otázky s rovnicami na konci levelu (ťažká, prastará)
+//  THEORY  — „📐 Teória a rovnice“ v paneli levelu (normálna: len jadro, ťažká: jadro + krok)
+//  TRAPS_HARD    — extra otázky s rovnicami na konci levelu (ťažká)
 // Farby: α je vždy modrá, β červená — rovnako ako v pohľadoch 👁, aby sa symbol dal spojiť s obrázkom.
 
 const cA = '<i class="ca">α</i>', cB = '<i class="cb">β</i>';
@@ -67,7 +67,7 @@ const THEORY = {
   },
 };
 
-// extra otázky (ťažká, prastará) — viac poznatkov a rovníc
+// extra otázky (ťažká) — viac poznatkov a rovníc
 const TRAPS_HARD = {
   1: [
     { q: DL('traps.hard.1.0.q'), options: [DL('traps.hard.1.0.options.0'), DL('traps.hard.1.0.options.1'), DL('traps.hard.1.0.options.2'), DL('traps.hard.1.0.options.3')], correct: 0, why: DL('traps.hard.1.0.why') },

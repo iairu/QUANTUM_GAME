@@ -24,8 +24,8 @@ Prepínač **SK / EN / UA** je vpravo hore aj na uvítacej obrazovke (zmena znov
 
 ## Témy
 - V nastaveniach (⚙ → 🎨 Téma) sa volí **téma** hry; zmena znovu načíta hru, postup ostáva.
-  - *⚔ MMO (World of Warcraft)* (predvolená v novej hre) — hrá sa ako MMO, obsah ostáva rovnaký (nižšie); aj 9. level s drakom.
-  - *Klasická* — pôvodný modrý Hilbertov ostrov, 8 levelov.
+  - *⚔ MMO (World of Warcraft)* — hrá sa ako MMO, obsah ostáva rovnaký (nižšie); aj 9. level s drakom.
+  - *Klasická* (predvolená v novej hre) — pôvodný modrý Hilbertov ostrov, 8 levelov.
   - *🐉 Severská (Skyrim)* — zasnežený ostrov, severské farby a písmo, detailné textúry a 9. level s drakom (nižšie).
 - Hudba a zvukové efekty sú v oboch témach rovnaké.
 - Každá téma má vlastný kurzor (šípka + varianta nad klikateľným; v MMO téme aj meč nad omylmi a bublina nad postavami). Počas otáčania kamery kurzor zmizne.
@@ -81,7 +81,7 @@ Dialógy, kvízy, levely, Kódex, Denník aj tlačidlá ostávajú rovnaké — 
   - *Ľahká* — väčšie tolerancie, menej meraní, nápovedy, v kvízoch o jednu nesprávnu možnosť menej, väčšie písmo a zlaté kľúčové slová v texte.
   - *Normálna* — pôvodná hra; v paneli zbalený box „📐 Teória a rovnice“ s jadrom levelu.
   - *Ťažká* — viac poznatkov: rozbalená teória s rovnicami ku každej úlohe, 2 extra otázky s rovnicami na level, husté texty bez analógií; presnosť, náhodné ciele, bez nápovied, extra hádanky v leveli 3, prísnejšie hviezdičky.
-  - *📜 Prastará* — ťažká + starobylé zvitky (história objavov: roky, autori, ich rozhovory a slávne výroky; zbierka v Kódexe → „📜 Zvitky“) a otázka z histórie v každom leveli.
+- **📜 História — historické zvitky** (samostatné nastavenie, pri ľubovoľnej obťažnosti; na uvítacej obrazovke a v ⚙ ako 3. voľba „História“ po štýle hry a obťažnosti; predvolene vypnuté): pred krokmi levelov sa rozvinie zvitok s históriou objavov (roky, autori, ich rozhovory a slávne výroky; zbierka v Kódexe → „📜 Zvitky“) a na konci každého levelu je otázka z histórie. Uložená hra s bývalou obťažnosťou „Prastará“ sa načíta ako Ťažká so zapnutými zvitkami.
 - **👁 Pohľady** (V, kedykoľvek, v každej obťažnosti): ten istý stav ako hodinové ručičky amplitúd, Blochove rezy zboku a zhora, pravdepodobnosti v bázach Z/X/Y, mapa matice ρ (plocha = veľkosť, farba = fáza) a farebný zápis; α je všade modrá, β červená. Tlačidlo „👁 Ukáž to obrázkom“ v teórii otvorí pohľad k rovnici.
 - **⚙ Nastavenia** (O): vizualizácie (mriežka sféry, projekcie ⟨X⟩⟨Y⟩⟨Z⟩, uhly θ/φ, stĺpce P(0)/P(1), stopa, grafy) a geometria zobrazenia (zorný uhol, veľkosť popiskov, priehľadnosť sféry, automatické otáčanie).
 - Geometrické ovládanie v leveloch: voľné uhly magnetov (L2), geometrické laboratórium — ľubovoľný stav, rotácia R<sub>n</sub>(α), meranie pozdĺž osi m (L3), fázový posun φ (L4), sila poľa B₀ (L6).

@@ -64,7 +64,12 @@ const THEME_INFO = {
 const Welcome = {
   show(done) {
     this.done = done;
-    this.theme = Settings.theme; this.diff = Settings.diff; this.mode = Settings.mode;
+    // predvolená je v každej sekcii prvá voľba: klasická téma, laická obťažnosť, bez zvitkov, prevažne ľudský jazyk
+    // (po zmene jazyka na uvítacej obrazovke ostanú voľby hráča)
+    let keep = false;
+    try { keep = sessionStorage.getItem('kvantp-welcome-keep') === '1'; sessionStorage.removeItem('kvantp-welcome-keep'); } catch (e) { /* bez úložiska */ }
+    if (keep) { this.theme = Settings.theme; this.diff = Settings.diff; this.scrolls = Settings.scrolls; this.mode = Settings.mode; }
+    else { this.theme = THEMES[0]; this.diff = DIFFS[0]; this.scrolls = false; this.mode = MODES[0]; }
     this.prevTheme = Settings.theme;
     document.documentElement.dataset.theme = 'classic'; // neutrálny vzhľad, kým nie je zvolená téma
     document.body.classList.add('welcoming');
@@ -75,17 +80,9 @@ const Welcome = {
       <div class="whead">
         <div class="wpsi">ψ</div>
         <h1>${tr('Psíčko v kvantovom svete', 'Little Psi in the Quantum World', 'Псічко у квантовому світі')}</h1>
-        <p>${tr('Vyber si, ako bude svet vyzerať a ako veľmi ťa má potrápiť. Obe voľby sa dajú neskôr zmeniť v nastaveniach.',
-          'Choose how the world should look and how hard it should push you. Both can be changed later in the settings.', 'Обери, як виглядатиме світ і наскільки сильно він має тебе випробувати. Обидва вибори можна згодом змінити в налаштуваннях.')}</p>
+        <p>${tr('Vyber si štýl hry, obťažnosť, historické zvitky a rovnice. Všetko sa dá neskôr zmeniť v nastaveniach.', 'Choose the gameplay style, the difficulty, historic scrolls and equations. Everything can be changed later in the settings.', 'Обери стиль гри, складність, історичні сувої та рівняння. Усе можна згодом змінити в налаштуваннях.')}</p>
       </div>
-      <h2>${tr('1 · Typ hry', '1 · Game type', '1 · Тип гри')}</h2>
-      <div class="wmodes">${MODES.map((m) => `
-        <button class="wmode" data-v="${m}">
-          <span class="shot live ${m}">${MODE_SHOT[m]()}</span>
-          <span class="mtext"><b>${MODE_NAME[m]}</b><i>${MODE_TAG[m]}</i><span class="d">${MODE_DESC[m].replace(/^./, (c) => c.toUpperCase())}.</span></span>
-        </button>`).join('')}
-      </div>
-      <h2>${tr('2 · Téma', '2 · Theme', '2 · Тема')}</h2>
+      <h2>${tr('1 · Štýl hry', '1 · Gameplay style', '1 · Стиль гри')}</h2>
       <div class="wthemes">${THEMES.map((t) => `
         <button class="wtheme" data-v="${t}">
           <span class="shot"><img src="assets/theme-${t}.webp" alt="" loading="eager"><span class="ticon">${THEME_INFO[t].icon}</span></span>
@@ -93,12 +90,27 @@ const Welcome = {
           <span class="d">${THEME_INFO[t].desc}</span>
         </button>`).join('')}
       </div>
-      <h2>${tr('3 · Obťažnosť', '3 · Difficulty', '3 · Складність')}</h2>
+      <h2>${tr('2 · Obťažnosť', '2 · Difficulty', '2 · Складність')}</h2>
       <div class="wdiffs">${DIFFS.map((d) => `
         <button class="wdiff ${d}" data-v="${d}">
           <span class="dicon">${DIFF_ICON[d]}</span>
           <b>${DIFF_TITLE[d]}</b><i>${DIFF_TAG[d]}</i>
           <span class="d">${(WELCOME_DESC[d] || DIFF_DESC[d]).replace(/^./, (c) => c.toUpperCase())}.</span>
+        </button>`).join('')}
+      </div>
+      <h2>${tr('3 · História', '3 · History', '3 · Історія')}</h2>
+      <div class="wdiffs wscrolls">${[false, true].map((on) => `
+        <button class="wdiff wsc${on ? ' on-scrolls' : ''}" data-s="${on ? 1 : 0}">
+          <span class="dicon">${on ? DIFF_ICON.ancient : '—'}</span>
+          <b>${on ? SCROLLS_NAME : tr('Bez zvitkov', 'No scrolls', 'Без сувоїв')}</b>
+          <span class="d">${on ? SCROLLS_DESC.replace(/^./, (c) => c.toUpperCase()) + '.' : tr('Len fyzika — bez historických vložiek.', 'Physics only — no historical interludes.', 'Лише фізика — без історичних вставок.')}</span>
+        </button>`).join('')}
+      </div>
+      <h2>${tr('4 · Rovnice', '4 · Equations', '4 · Рівняння')}</h2>
+      <div class="wmodes">${MODES.map((m) => `
+        <button class="wmode" data-v="${m}">
+          <span class="shot live ${m}">${MODE_SHOT[m]()}</span>
+          <span class="mtext"><b>${MODE_NAME[m]}</b><i>${MODE_TAG[m]}</i><span class="d">${MODE_DESC[m].replace(/^./, (c) => c.toUpperCase())}.</span></span>
         </button>`).join('')}
       </div>
       <div class="wgo"><button class="primary big">${tr('▶ Začať hru', '▶ Start the game', '▶ Почати гру')}</button></div>
@@ -107,21 +119,23 @@ const Welcome = {
     const sync = () => {
       el.querySelectorAll('.wtheme').forEach((b) => b.classList.toggle('on', b.dataset.v === this.theme));
       el.querySelectorAll('.wmode').forEach((b) => b.classList.toggle('on', b.dataset.v === this.mode));
-      el.querySelectorAll('.wdiff').forEach((b) => b.classList.toggle('on', b.dataset.v === this.diff));
+      el.querySelectorAll('.wdiff[data-v]').forEach((b) => b.classList.toggle('on', b.dataset.v === this.diff));
+      el.querySelectorAll('.wsc').forEach((b) => b.classList.toggle('on', b.dataset.s === (this.scrolls ? '1' : '0')));
     };
     el.querySelectorAll('.wmode').forEach((b) => { b.onclick = () => { this.mode = b.dataset.v; Sound.sfx('click'); sync(); }; });
     el.querySelectorAll('.wtheme').forEach((b) => { b.onclick = () => { this.theme = b.dataset.v; Sound.sfx('click'); sync(); }; });
-    el.querySelectorAll('.wdiff').forEach((b) => { b.onclick = () => { this.diff = b.dataset.v; Sound.sfx('click'); sync(); }; });
+    el.querySelectorAll('.wdiff[data-v]').forEach((b) => { b.onclick = () => { this.diff = b.dataset.v; Sound.sfx('click'); sync(); }; });
+    el.querySelectorAll('.wsc').forEach((b) => { b.onclick = () => { this.scrolls = b.dataset.s === '1'; Sound.sfx('click'); sync(); }; });
     const ls = el.querySelector('.wlang');
     ls.value = LANG;
-    ls.onchange = () => { Settings.theme = this.theme; Settings.diff = this.diff; Settings.mode = this.mode; Settings.save(); setLang(ls.value); }; // voľby prežijú znovunačítanie
+    ls.onchange = () => { Settings.theme = this.theme; Settings.diff = this.diff; Settings.mode = this.mode; Settings.scrolls = this.scrolls; Settings.save(); try { sessionStorage.setItem('kvantp-welcome-keep', '1'); } catch (e) { /* bez úložiska */ } setLang(ls.value); }; // voľby prežijú znovunačítanie
     el.querySelector('.wgo button').onclick = () => this.start();
     sync();
     this.running = true;
     requestAnimationFrame((t) => this.frame(t));
   },
   start() {
-    Settings.theme = this.theme; Settings.diff = this.diff; Settings.mode = this.mode; Settings.save();
+    Settings.theme = this.theme; Settings.diff = this.diff; Settings.mode = this.mode; Settings.scrolls = this.scrolls; Settings.save();
     // značka „hra začatá“: prázdny postup, aby sa uvítanie znovu neukázalo
     try { localStorage.setItem('kvantp-game1', '{}'); } catch (e) { /* bez ukladania */ }
     if (this.theme !== this.prevTheme) { location.reload(); return; } // téma mení obsah hry (levely, ostrov)

@@ -592,7 +592,7 @@ const Wow = {
     const n = L.steps.length, done = Math.min(Math.max(L.stepIdx, 0), n);
     if (L.boss && typeof DRAGON_PHASES !== 'undefined') { // drak: zdravie zo štítových fáz
       if (L.stepIdx >= n) return Math.max(0.03, 0.08 - I.bonus);
-      const anc = Settings.diff === 'ancient' ? 1 : 0, hp = DRAGON_PHASES.map((P) => P.hp + anc), tot = hp.reduce((a, b) => a + b, 0);
+      const hp = DRAGON_PHASES.map((P) => P.hp), tot = hp.reduce((a, b) => a + b, 0);
       const k = L.phase ?? -1;
       if (k < 0) return 1;
       const rest = hp.slice(k + 1).reduce((a, b) => a + b, 0) + Math.max(L.dhp ?? hp[k], 0);

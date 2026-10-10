@@ -146,7 +146,7 @@ class L9Dragon extends Level {
 
   startPhase(k) {
     const P = this.ph = DRAGON_PHASES[k];
-    this.phase = k; this.dhp = P.hp + byDiff(0, 0, Settings.diff === 'ancient' ? 1 : 0); this.dmax = this.dhp;
+    this.phase = k; this.dhp = P.hp; this.dmax = this.dhp;
     this.hp = this.hpMax = byDiff(12, 9, 7);
     this.r = k === 0 ? pick2([[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0]]) : [0, 0, 1];
     this.n = k === 2 ? V3.norm([Math.cos(rand() * 6.28) * 0.8, Math.sin(rand() * 6.28) * 0.8, -0.6]) : [0, 0, -1];
