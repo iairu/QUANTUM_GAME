@@ -6,6 +6,7 @@ jazykové vyjadrenia, symboly, správne obrazy a typické omyly — nie výpočt
 ## Spustenie
 Dvojklik na `index.html` (Chrome, Edge alebo Firefox). Netreba server ani inštaláciu.
 Postup sa ukladá v prehliadači (localStorage).
+Pri prvom spustení (a po resete) sa ukáže uvítanie v dvoch krokoch: **1 · štýl hry, 2 · obťažnosť** → *Ďalej* → **3 · história, 4 · rovnice, 5 · levely** (postupne / odomknúť všetko, predvolene postupne) → *Začať hru*. Predvolená je vždy prvá voľba; všetko sa dá neskôr zmeniť v ⚙.
 
 ## Jazyk / Language
 Hra je po slovensky, po anglicky a po ukrajinsky. Bez uloženej voľby sa jazyk určí podľa prehliadača: čeština a slovenčina → SK, ukrajinčina, ruština a bieloruština (ktorýkoľvek z jazykov prehliadača) → UA, všetky ostatné → EN.
@@ -96,7 +97,7 @@ Dialógy, kvízy, levely, Kódex, Denník aj tlačidlá ostávajú rovnaké — 
 | E | vstúpiť do portálu / hovoriť |
 | Enter, medzerník | ďalej v dialógu |
 | ← / Backspace | späť v dialógu |
-| L | Denník — všetky rozhovory a vysvetlenia (prečítať / prehrať znova) |
+| L | Denník — všetky rozhovory, rovnice úloh (∑, v oboch typoch hry) a vysvetlenia (prečítať / prehrať znova) |
 | K | 🔑 kľúč — slovník glyfov, potom pravidlá mnemotechniky (typ „Jazyk rovníc“; počas rozhovoru nedostupný, aby sa dialóg sústredil na fyziku) |
 | C | Kódex symbolov, osobností a pojmov |
 | M | mapa · H pomoc · O nastavenia · V pohľady · Esc zavrieť okná |

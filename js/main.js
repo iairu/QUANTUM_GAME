@@ -54,6 +54,9 @@ class Level {
     Settings.wow && this.num > 0 && Wow.onStep(this); // MMO: dokončený krok = zásah bossa
     const s = this.steps[this.stepIdx], run = () => (s ? s.call(this) : this.finale()), name = s ? s.name : 'finale';
     const pre = [];
+    // denník: rovnica úlohy sa zapíše v oboch typoch hry
+    const eqHtml = EqM.eqFor(this.num, name);
+    if (eqHtml && !this.seenScrolls.has('eqlog:' + name)) { this.seenScrolls.add('eqlog:' + name); UI.record({ kind: 'eq', html: eqHtml }); }
     // rovnice najprv: pred krokom jeho rovnica vo farbách mnemotechniky
     if (Settings.eq && !Game.progress.eqIntroSeen) pre.push(...Game.eqIntroLines()); // mnemotechnika sa ešte nepredstavila (prepnuté počas rozhovoru)
     if (Settings.eq && !this.seenScrolls.has('eq:' + name)) {

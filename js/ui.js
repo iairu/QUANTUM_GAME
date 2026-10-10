@@ -161,7 +161,7 @@ const UI = {
   renderLog() {
     const list = $('#journal .list');
     list.innerHTML = '';
-    if (!this.log.length) { list.appendChild(el('p', 'muted', tr('Zatiaľ prázdny. Každý rozhovor a vysvetlenie z kvízu sa sem uloží.', 'Empty so far. Every conversation and quiz explanation will be saved here.', 'Поки що порожньо. Тут зберігатиметься кожна розмова й кожне пояснення з вікторин.'))); return; }
+    if (!this.log.length) { list.appendChild(el('p', 'muted', tr('Zatiaľ prázdny. Každý rozhovor, rovnica úlohy a vysvetlenie z kvízu sa sem uloží.', 'Empty so far. Every conversation, task equation and quiz explanation will be saved here.', 'Поки що порожньо. Сюди збережеться кожна розмова, рівняння завдання та пояснення з вікторини.'))); return; }
     let lastScene = null;
     [...this.log].reverse().forEach((en, idx) => {
       if (en.scene !== lastScene) { list.appendChild(el('h3', null, en.scene)); lastScene = en.scene; }
@@ -177,6 +177,12 @@ const UI = {
           this.say(en.lines, null, { replay: true });
         };
         box.appendChild(rb);
+      } else if (en.kind === 'eq') {
+        // ∑ rovnica úlohy (v oboch typoch hry); v type „Jazyk rovníc“ s glyfmi
+        const plain = en.html.replace(/<[^>]+>|\[\[|\]\]/g, '').replace(/\s+/g, ' ').trim();
+        box.classList.add('eqentry');
+        box.appendChild(el('summary', null, `∑ <b>${tr('Rovnica', 'Equation', 'Рівняння')}</b>: ${plain.slice(0, 90)}…`));
+        box.appendChild(el('div', 'line', annotate(en.html, false, true)));
       } else {
         box.appendChild(el('summary', null, `${en.ok ? '✅' : '❌'} <b>${tr('Otázka', 'Question', 'Питання')}:</b> ${en.q.replace(/<[^>]+>/g, '').slice(0, 90)}`));
         box.appendChild(el('div', 'line', annotate(en.q, false, true)));
@@ -196,7 +202,7 @@ const UI = {
     const resolve = () => src.map((l) => (typeof l === 'function' ? l() : l)).map((l) => (typeof l === 'string' ? { text: l } : l));
     // karty „po ľudsky“ patria len laickej obťažnosti
     const build = () => TextMode.lines(resolve()).filter((l) => Settings.layman || l.cls !== 'plaincard');
-    if (!opts.replay) this.record({ kind: 'say', lines: resolve() });
+    if (!opts.replay) { const rec = resolve().filter((l) => l.cls !== 'eqcard'); if (rec.length) this.record({ kind: 'say', lines: rec }); } // rovnica má v denníku vlastný záznam ∑
     lines = build();
     if (!lines.length) { done && done(); return; }
     let i = 0, anchor = 0; // anchor = pôvodná replika, na ktorej hráč je (pri zmene obťažnosti sa naň vrátime aj cez zlúčené repliky)

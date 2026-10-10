@@ -333,10 +333,13 @@ const EqM = {
   },
 
   // karta „∑ Rovnica najprv“ pred krokom levelu: rovnica kroku (alebo jadro levelu) vo farbách mnemotechniky
-  cardsFor(num, step) {
+  eqFor(num, step) {
     const T = THEORY[num];
-    if (!T) return [];
-    const html = T[step] ? pick(T[step]) : step === 'intro' ? pick(T.core) : null;
+    if (!T) return null;
+    return T[step] ? pick(T[step]) : step === 'intro' ? pick(T.core) : null;
+  },
+  cardsFor(num, step) {
+    const html = this.eqFor(num, step);
     if (!html) return [];
     return [{ who: tr('Rovnica najprv', 'Equation first', 'Спершу рівняння'), face: '∑', text: html, cls: 'eqcard' }];
   },

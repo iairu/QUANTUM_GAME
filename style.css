@@ -566,6 +566,17 @@ body.welcoming #hud, body.welcoming #topbar, body.welcoming #panel, body.welcomi
 #welcome .wgo { position: sticky; bottom: -16px; display: flex; justify-content: center; margin: 4px -22px -16px; padding: 14px 0 16px;
   background: linear-gradient(transparent, rgba(13, 20, 48, 0.96) 45%); }
 #welcome .wgo button { font-size: 18px; padding: 10px 34px; border-radius: 12px; }
+/* upozornenie: prednášky sú hlavný zdroj, hra môže obsahovať chyby */
+#welcome .wnotice { max-width: 760px; margin: 10px auto 0; padding: 8px 14px; border: 1px solid rgba(255, 200, 90, 0.55); border-left: 4px solid #ffc85a;
+  border-radius: 8px; background: rgba(255, 200, 90, 0.09); color: #ffe7b3; font-size: 13.5px; line-height: 1.45; text-align: left; }
+#welcome .wnotice b { color: #ffd77a; }
+/* dve snímky uvítania */
+#welcome .wslide { display: none; }
+#welcome .wslide.on { display: block; animation: wslide .25s ease-out; }
+@keyframes wslide { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: none; } }
+#welcome .wgo { gap: 14px; align-items: center; }
+#welcome .wgo .wstep { color: var(--muted); font-size: 14px; }
+#welcome .wgo .wback { font-size: 16px; padding: 9px 22px; }
 @media (max-width: 900px) { #welcome .wdiffs { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 720px) {
   #welcome .wthemes { grid-template-columns: 1fr; }
