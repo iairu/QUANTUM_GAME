@@ -162,11 +162,24 @@ const EqG = {
     }
     return `<svg viewBox="0 0 ${w} 40" style="aspect-ratio:${w}/40" aria-hidden="true">${body}</svg>`;
   },
+  // samotný piktogram (bez písmena, v plnej veľkosti) — do bubliny vedľa symbolu, kde ho písmeno nezakrýva
+  iconSvg(key, letter) {
+    const D = this.dict()[key];
+    let body, w = 40;
+    if (D && D[0] === 'op') { w = 44; body = this.box(letter).replace(/<text[\s\S]*?<\/text>/g, ''); }
+    else if (key.startsWith('ket') || key === 'bra') { const k = this.ket(letter, key === 'bra'); w = k.w; body = k.svg.replace(/<text[\s\S]*?<\/text>/g, ''); }
+    else if (key === 'exp') body = this.ICON.clock;
+    else if (key === 'sq') body = this.ICON.frame;
+    else body = D && D[1] && this.ICON[D[1]];
+    if (!body) return '';
+    return `<svg viewBox="0 0 ${w} 40" style="aspect-ratio:${w}/40" aria-hidden="true"><g class="gi">${body}</g></svg>`;
+  },
   esc: (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'),
   html(key, letter, extraCls = '') {
     const D = this.dict()[key] || this.dict().U, cat = key === 'sq' ? (letter === 'α' ? 'a' : letter === 'β' ? 'b' : 'P') : key === 'exp' && /γ/.test(letter) ? 'g' : D[0];
     const svg = this.svg(key, letter);
-    const tip = `<div class="gtip"><span class="gly big g-${cat}">${svg}</span><div><b>${D[2]}</b><br>${D[3]}</div></div>`;
+    const icon = this.iconSvg(key, letter);
+    const tip = `<div class="gtip"><span class="gly big g-${cat}">${svg}</span>${icon ? `<span class="gly big pic g-${cat}">${icon}</span>` : ''}<div><b>${D[2]}</b><br>${D[3]}</div></div>`;
     return `<span class="gly g-${cat}${extraCls}" data-g="${key}" data-tip="${this.esc(tip)}">${svg}</span>`;
   },
 

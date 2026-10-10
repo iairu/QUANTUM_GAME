@@ -692,6 +692,10 @@ body.eqmode #eqstage { display: block; }
 .gly.big { display: inline-block; line-height: 0; }
 .gly.big svg { --gh: 3.1em; vertical-align: top; }
 .gtip .gly.big { background: #0d1430; border-radius: 8px; padding: 5px; }
+/* piktogram bez písmena vedľa symbolu (písmeno ho v glyfe prekrýva) */
+.gtip .gly.big.pic { border: 1px dashed currentColor; margin-left: -4px; }
+.gtip .gly.big.pic .gl-ic, .gtip .gly.big.pic .gl-faint.gl-ic { opacity: 0.95; }
+.gtip .pic.g-g .gi { animation: glspin 7s linear infinite; } .gtip .pic.g-ph .gi { animation: glrock 3.2s ease-in-out infinite; } .gtip .pic.g-th .gi { animation: gltilt 3.6s ease-in-out infinite; }
 /* na javisku: glyfy v tokenoch, menšie popisky */
 .tk .gl .gly svg { --gh: 1.9em; }
 .tk .lb .gly svg { --gh: 1.45em; }
