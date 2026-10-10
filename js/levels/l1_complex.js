@@ -32,7 +32,7 @@ class L1Complex extends Level {
     this.target = C.scale(C.exp(this.tPh), this.tMag);
     const hard = Settings.hard;
     this.quest(tr('Nastav ručičku amplitúdy α na zlatý cieľ (veľkosť aj fázu).', 'Set the amplitude hand α onto the golden target (both magnitude and phase).', 'Встанови стрілку амплітуди α на золоту ціль (і модуль, і фазу).'), { easy: tr('🎯 α → zlatý cieľ', '🎯 α → golden target', '🎯 α → золота ціль'), hard: `α → ${hard ? '?' : Fmt.complex(this.target)} · ε < ${Fmt.num(byDiff(0.12, 0.06, 0.03), 2)}` });
-    let r = 1, ph = 0;
+    let r = 1, ph = 0, sR = null, sPh = null;
     const info = UI.info('');
     const upd = () => {
       this.z = C.scale(C.exp(ph), r);
@@ -43,14 +43,16 @@ class L1Complex extends Level {
       if (Settings.easy) info.innerHTML += `<br><small>${tr('vzdialenosť od cieľa', 'distance from the target', 'відстань до цілі')}: ${Fmt.num(dist, 2)}</small>`;
       if (!this.done1 && dist < byDiff(0.12, 0.06, 0.03)) {
         this.done1 = true;
+        // správne: ručička sa dosunie presne na zlatý cieľ (veľkosť aj fáza)
+        UI.snapSlider(sR, this.tMag); UI.snapSlider(sPh, this.tPh);
         this.grant(['euler', 'eiphi', 'amp']);
         this.say([DL('l1.upd.1')], () =>
           this.ask({ q: DL('l1.upd.2.q'), options: [DL('l1.upd.2.options.0'), DL('l1.upd.2.options.1'), DL('l1.upd.2.options.2')], correct: 0, why: DL('l1.upd.2.why') }, () => this.next()));
       }
     };
     UI.panelSet(tr('Ručička amplitúdy α', 'Amplitude hand α', 'Стрілка амплітуди α'), [
-      UI.slider(tr('veľkosť |α|', 'magnitude |α|', 'модуль |α|'), 0, 1, hard ? 0.005 : 0.01, 1, (v) => { r = v; upd(); return Fmt.num(v, 2); }),
-      UI.slider(tr('fáza φ', 'phase φ', 'фаза φ'), 0, 6.28, hard ? 0.005 : 0.01, 0, (v) => { ph = v; upd(); return Fmt.angle(v); }),
+      sR = UI.slider(tr('veľkosť |α|', 'magnitude |α|', 'модуль |α|'), 0, 1, hard ? 0.005 : 0.01, 1, (v) => { r = v; upd(); return Fmt.num(v, 2); }),
+      sPh = UI.slider(tr('fáza φ', 'phase φ', 'фаза φ'), 0, 6.28, hard ? 0.005 : 0.01, 0, (v) => { ph = v; upd(); return Fmt.angle(v); }),
       info,
       hard ? UI.info(tr('🎯 Ťažká: cieľ je náhodný. Odčítaj ho z polárnej mriežky (kruhy po 0,25, lúče po 22,5°).', '🎯 Hard: the target is random. Read it off the polar grid (circles every 0.25, spokes every 22.5°).', '🎯 Складна: ціль випадкова. Зчитай її з полярної сітки (кола через 0,25, промені через 22,5°).'), 'tip')
         : UI.info(tr(`💡 Tip: zlatý cieľ má veľkosť ${Fmt.num(this.tMag, 2)} a fázu ${Fmt.angle(this.tPh)} (${Math.round(this.tPh * 180 / Math.PI)}°).`, `💡 Tip: the golden target has magnitude ${Fmt.num(this.tMag, 2)} and phase ${Fmt.angle(this.tPh)} (${Math.round(this.tPh * 180 / Math.PI)}°).`, `💡 Підказка: золота ціль має модуль ${Fmt.num(this.tMag, 2)} і фазу ${Fmt.angle(this.tPh)} (${Math.round(this.tPh * 180 / Math.PI)}°).`), 'tip'),
@@ -112,8 +114,9 @@ class L1Complex extends Level {
         points: [...this.visited.map(([x, y]) => ({ x, y, color: '#ff7d8f88', r: 1.5 })), { x: v, y: P, color: '#ffd25a', r: 5 }],
         legend: [['#ff7d8f', tr('kvantovo |A₁+A₂|²', 'quantum |A₁+A₂|²', 'квантово |A₁+A₂|²')], ['#9aa6d1', '|A₁|²+|A₂|²']],
       });
-      if (P < eps && !this.gotZero) { this.gotZero = true; UI.toast(tr('✅ Deštruktívna interferencia: ručičky smerujú proti sebe!', '✅ Destructive interference: the hands point against each other!', '✅ Деструктивна інтерференція: стрілки дивляться одна проти одної!')); }
-      if (P > 1 - eps && !this.gotMax && this.gotZero) { this.gotMax = true; UI.toast(tr('✅ Konštruktívna interferencia!', '✅ Constructive interference!', '✅ Конструктивна інтерференція!')); }
+      // správne: posuvník sa dosunie presne na π (vyrušenie), resp. na 0 / 2π (zosilnenie)
+      if (P < eps && !this.gotZero) { this.gotZero = true; UI.snapSlider(sl, Math.PI); UI.toast(tr('✅ Deštruktívna interferencia: ručičky smerujú proti sebe!', '✅ Destructive interference: the hands point against each other!', '✅ Деструктивна інтерференція: стрілки дивляться одна проти одної!')); }
+      if (P > 1 - eps && !this.gotMax && this.gotZero) { this.gotMax = true; UI.snapSlider(sl, v < Math.PI ? 0 : 2 * Math.PI); UI.toast(tr('✅ Konštruktívna interferencia!', '✅ Constructive interference!', '✅ Конструктивна інтерференція!')); }
       if (this.gotZero && this.gotMax && !this.done3) {
         this.done3 = true;
         setTimeout(() => {
@@ -124,7 +127,8 @@ class L1Complex extends Level {
       }
       return Fmt.angle(v);
     };
-    UI.panelSet(tr('Interferencia dvoch ciest', 'Interference of two paths', 'Інтерференція двох шляхів'), [UI.slider(tr('fáza cesty 2', 'phase of path 2', 'фаза шляху 2'), 0, 6.28, byDiff(0.02, 0.01, 0.004), 0, upd), info, chart,
+    const sl = UI.slider(tr('fáza cesty 2', 'phase of path 2', 'фаза шляху 2'), 0, 2 * Math.PI, byDiff(0.02, 0.01, 0.004), 0, upd);
+    UI.panelSet(tr('Interferencia dvoch ciest', 'Interference of two paths', 'Інтерференція двох шляхів'), [sl, info, chart,
       UI.info(tr('Najprv nájdi P = 0, potom P = 1.', 'First find P = 0, then P = 1.', 'Спершу знайди P = 0, потім P = 1.'), 'tip')]);
   }
 

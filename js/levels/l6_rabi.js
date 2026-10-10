@@ -30,8 +30,8 @@ class L6Rabi extends Level {
       UI.button((this.frame === 'rot' ? '● ' : '○ ') + tr('Rotujúci rámec', 'Rotating frame', 'Обертова система'), () => { this.frame = 'rot'; this.buildPanel(o); this.onFrame && this.onFrame(); })));
     if (o.frame) nodes.push(UI.slider(tr('sila poľa B₀ (Larmorova frekvencia ω₀)', 'field strength B₀ (Larmor frequency ω₀)', 'сила поля B₀ (ларморова частота ω₀)'), 1, 8, 0.5, this.w0, (v) => { this.w0 = v; return Fmt.num(v, 1) + tr(' rad/s', ' rad/s', ' рад/с'); },
       tr('ω₀ = γB₀: silnejšie pole → rýchlejšia precesia. P(|1⟩) sa ani tak nemení.', 'ω₀ = γB₀: a stronger field → faster precession. P(|1⟩) still does not change.', 'ω₀ = γB₀: сильніше поле → швидша прецесія. P(|1⟩) і далі не змінюється.')));
-    if (o.area) nodes.push(UI.slider(tr('plocha impulzu Ω<sub>R</sub>t', 'pulse area Ω<sub>R</sub>t', 'площа імпульсу Ω<sub>R</sub>t'), 0, 2 * Math.PI, byDiff(Math.PI / 8, Math.PI / 8, Math.PI / 16), this.area, (v) => { this.area = v; return Fmt.angle(v); }));
-    if (o.tune) nodes.push(UI.slider(tr('frekvencia RF (posun)', 'RF frequency (offset)', 'РЧ-частота (зсув)'), -2, 2, byDiff(0.1, 0.1, 0.05), this.f, (v) => { this.f = v; return Fmt.num(v, 1); }));
+    if (o.area) nodes.push(this.slArea = UI.slider(tr('plocha impulzu Ω<sub>R</sub>t', 'pulse area Ω<sub>R</sub>t', 'площа імпульсу Ω<sub>R</sub>t'), 0, 2 * Math.PI, byDiff(Math.PI / 8, Math.PI / 8, Math.PI / 16), this.area, (v) => { this.area = v; return Fmt.angle(v); }));
+    if (o.tune) nodes.push(this.slF = UI.slider(tr('frekvencia RF (posun)', 'RF frequency (offset)', 'РЧ-частота (зсув)'), -2, 2, byDiff(0.1, 0.1, 0.05), this.f, (v) => { this.f = v; return Fmt.num(v, 1); }));
     if (o.area) nodes.push(UI.row(UI.button(tr('▶ Impulz z |0⟩', '▶ Pulse from |0⟩', '▶ Імпульс із |0⟩'), () => this.startPulse(), 'big'), UI.button('Reset |0⟩', () => { this.r = [0, 0, 1]; this.pulse = null; })));
     if (o.t2) nodes.push(UI.info(tr('Dekoherencia T₂ je <b>zapnutá</b> (T₂ ≈ 2,5 s).', 'Decoherence T₂ is <b>on</b> (T₂ ≈ 2.5 s).', 'Декогеренцію T₂ <b>увімкнено</b> (T₂ ≈ 2,5 с).'), 'tip'));
     this.read = UI.info('');
@@ -71,6 +71,8 @@ class L6Rabi extends Level {
     this.check = () => {
       if (this.r[2] < -byDiff(0.9, 0.96, 0.99) && !this.flags.pi) {
         this.flags.pi = true;
+        // správne: plocha impulzu presne π a šípka presne na južnom póle |1⟩
+        UI.snapSlider(this.slArea, Math.PI); this.r = [0, 0, -1];
         this.grant(['rabi', 'OmegaR', 'rabiosc']);
         this.say([DL('l6.piPulse.1.0'),
           DL('l6.piPulse.1.1')], () => this.next());
@@ -84,6 +86,9 @@ class L6Rabi extends Level {
     this.check = () => {
       if (Math.abs(this.r[2]) < byDiff(0.12, 0.06, 0.03) && !this.flags.half) {
         this.flags.half = true;
+        // správne: plocha presne π/2 (alebo 3π/2) a šípka presne na rovníku
+        UI.snapSlider(this.slArea, this.area < Math.PI ? Math.PI / 2 : 3 * Math.PI / 2);
+        const h = Math.hypot(this.r[0], this.r[1]) || 1; this.r = [this.r[0] / h, this.r[1] / h, 0];
         this.say([DL('l6.halfPulse.1')], () => this.next());
       }
     };
@@ -97,6 +102,8 @@ class L6Rabi extends Level {
     this.check = () => {
       if (this.r[2] < -byDiff(0.88, 0.94, 0.98) && !this.flags.tune) {
         this.flags.tune = true;
+        // správne: frekvencia presne na rezonancii a spin presne preklopený
+        UI.snapSlider(this.slF, this.d0); this.r = [0, 0, -1];
         this.say([DL('l6.tuning.2')], () => this.next());
       }
     };

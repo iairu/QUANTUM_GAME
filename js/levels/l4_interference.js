@@ -85,7 +85,7 @@ class L4Interference extends Level {
     const names = tr({ none: 'stred prázdny', meas: 'meranie Z (zabudnuté)', deco: 'dekoherencia p' }, { none: 'centre empty', meas: 'Z measurement (forgotten)', deco: 'decoherence p' }, { none: 'центр порожній', meas: 'вимірювання Z (забуте)', deco: 'декогеренція p' });
     nodes.push(UI.info(`${tr('Stred chrámu', 'Temple centre', 'Центр храму')}: <b>${names[this.mode]}</b>`));
     if (withSlider) nodes.push(
-      UI.slider(tr('sila p', 'strength p', 'сила p'), 0, 1, byDiff(0.05, 0.05, 0.01), this.p, (v) => { if (v !== this.p) { this.p = v; this.resetHist(); } return Fmt.num(v, 2); }),
+      this.slP = UI.slider(tr('sila p', 'strength p', 'сила p'), 0, 1, byDiff(0.05, 0.05, 0.01), this.p, (v) => { if (v !== this.p) { this.p = v; this.resetHist(); } return Fmt.num(v, 2); }),
       UI.slider(tr('fázový posun φ (okolo z)', 'phase shift φ (about z)', 'фазовий зсув φ (навколо z)'), 0, 2 * Math.PI, Math.PI / 12, this.phi || 0, (v) => { if (v !== this.phi) { this.phi = v; this.resetHist(); } return Fmt.angle(v); },
         tr('Rotácia okolo osi z medzi bránami H. φ = π prevráti interferenciu: P(0) ↔ P(1).', 'A rotation about the z axis between the H gates. φ = π flips the interference: P(0) ↔ P(1).', 'Поворот навколо осі z між гейтами H. φ = π перевертає інтерференцію: P(0) ↔ P(1).')));
     nodes.push(UI.row(UI.button(tr('Pošli 1 (pomaly)', 'Send 1 (slowly)', 'Надіслати 1 (повільно)'), () => this.sendOne()), UI.button(tr('Pošli 100', 'Send 100', 'Надіслати 100'), () => this.sendMany(100), 'big'), UI.button(tr('Vymaž', 'Clear', 'Очистити'), () => this.resetHist())));
@@ -133,6 +133,9 @@ class L4Interference extends Level {
         DL('l4.check.2.1')], () => this.next());
     } else if (this.stepIdx === 3 && !this.f.c && this.mode === 'deco' && Math.abs(this.P0() - this.target) < byDiff(0.06, 0.03, 0.015)) {
       this.f.c = true;
+      // správne: p sa dosunie presne tak, aby teória dala P(0) = cieľ (pri danej fáze φ); histogram ostane
+      const c = Math.cos(this.phi || 0), pT = Math.abs(c) > 1e-6 ? 1 - (2 * this.target - 1) / c : null;
+      if (pT !== null && pT >= 0 && pT <= 1) { this.p = pT; UI.snapSlider(this.slP, pT, false); this.updInfo(); }
       this.grant(['deco', 'dagger']);
       this.say([DL('l4.check.3.0', Fmt.num(this.p, 2), Fmt.pct(1 - this.p), Fmt.pct(this.P0())),
         DL('l4.check.3.1'),

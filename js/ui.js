@@ -360,6 +360,20 @@ const UI = {
     if (t) w.dataset.tip = t;
     return w;
   },
+  // správna odpoveď: posuvník (a s ním 3D obraz) sa dosunie presne na cieľ — krátka animácia, potom presná hodnota.
+  // tween: false = hneď (napr. keď by medzihodnoty niečo vynulovali)
+  snapSlider(w, target, tween = true) {
+    if (!w || !w.input) return;
+    const i = w.input, from = parseFloat(i.value), set = (v) => { i.step = 'any'; i.value = v; i.oninput(); };
+    if (!tween || Math.abs(target - from) < 1e-9) return set(target);
+    const t0 = performance.now(), ms = 260;
+    const tick = (now) => {
+      const k = Math.min(1, (now - t0) / ms), e = k * k * (3 - 2 * k);
+      set(k < 1 ? from + (target - from) * e : target);
+      if (k < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  },
   info(html, cls = '') {
     const d = el('div', 'info ' + cls, annotate(html));
     // živé hodnoty (panely levelov ich prepisujú cez innerHTML): vzorce dostanú čip rovnice a pri „Rovnice najprv“ glyfy

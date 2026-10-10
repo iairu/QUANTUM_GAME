@@ -92,13 +92,30 @@ class L7Bell extends Level {
     ], () => {
       this.read = UI.info('');
       this.chart = UI.chart(300, 130); this.pairWin = null;
-      const sl = (k, label) => UI.slider(label, -90, 180, byDiff(15, 7.5, 7.5), this.ang[k], (v) => { this.ang[k] = v; this.drawChsh(); return v + '°'; });
+      this.sl = {};
+      const sl = (k, label) => (this.sl[k] = UI.slider(label, -90, 180, byDiff(15, 7.5, 7.5), this.ang[k], (v) => { this.ang[k] = v; this.drawChsh(); return Math.round(v * 10) / 10 + '°'; }));
       UI.panelSet(tr('CHSH hra', 'CHSH game', 'Гра CHSH'), [sl('a0', tr('Alica, x=0: a₀', 'Alice, x=0: a₀', 'Аліса, x=0: a₀')), sl('a1', tr('Alica, x=1: a₁', 'Alice, x=1: a₁', 'Аліса, x=1: a₁')), sl('b0', 'Bob, y=0: b₀'), sl('b1', 'Bob, y=1: b₁'),
         UI.row(UI.button(tr(`Hraj ${byDiff(400, 400, 1000)} kôl`, `Play ${byDiff(400, 400, 1000)} rounds`, `Зіграти ${byDiff(400, 400, 1000)} раундів`), () => this.play(), 'big'), UI.button(tr('Klasicky (vždy 0)', 'Classically (always 0)', 'Класично (завжди 0)'), () => this.playClassic())),
         Settings.hard ? null : UI.button(tr('💡 Nápoveda', '💡 Hint', '💡 Підказка'), () => UI.toast(tr('Skús a₀ = 0°, a₁ = 90°, b₀ = 45°, b₁ = −45°. Rozdiely uhlov 45° (a 135° pre x=y=1).', 'Try a₀ = 0°, a₁ = 90°, b₀ = 45°, b₁ = −45°. Angle differences of 45° (and 135° for x=y=1).', 'Спробуй a₀ = 0°, a₁ = 90°, b₀ = 45°, b₁ = −45°. Різниці кутів 45° (і 135° для x=y=1).'), 6000)),
         this.read, this.chart].filter(Boolean));
       this.drawChsh();
     });
+  }
+  // správne: uhly sa dosunú na najbližšiu optimálnu zostavu (rozdiely 45° a pre x = y = 1 135° → výhra cos²(π/8) ≈ 85 %)
+  snapOptimal() {
+    const A = this.ang, win = (a0, a1, b0, b1) => {
+      const c = (d) => Math.cos(d * Math.PI / 360) ** 2;
+      return (c(a0 - b0) + c(a0 - b1) + c(a1 - b0) + (1 - c(a1 - b1))) / 4;
+    };
+    const opt = win(0, 90, 45, -45), inR = (v) => v >= -90 && v <= 180;
+    let best = null;
+    for (const a0 of [A.a0, A.a0 - 360, A.a0 + 360]) for (const s1 of [90, -90, 270, -270]) for (const s2 of [45, -45, 135, -135, 225, -225]) for (const s3 of [45, -45, 135, -135, 225, -225]) {
+      const c = { a0, a1: a0 + s1, b0: a0 + s2, b1: a0 + s3 };
+      if (!Object.values(c).every(inR) || Math.abs(win(c.a0, c.a1, c.b0, c.b1) - opt) > 1e-9) continue;
+      const d = Object.keys(c).reduce((s, k) => s + Math.abs(c[k] - A[k]), 0);
+      if (!best || d < best.d) best = { c, d };
+    }
+    if (best) for (const k of ['a0', 'a1', 'b0', 'b1']) UI.snapSlider(this.sl[k], best.c[k]);
   }
   play() {
     const d = (x) => x * Math.PI / 180, phi = this.bell();
@@ -116,6 +133,7 @@ class L7Bell extends Level {
     this.read.innerHTML = tr(`Kvantová stratégia: <b>${Fmt.pct(p)}</b> výhier (${win}/${N})<br>Bellova (klasická) hranica: 75 %`, `Quantum strategy: <b>${Fmt.pct(p)}</b> wins (${win}/${N})<br>Bell (classical) bound: 75 %`, `Квантова стратегія: <b>${Fmt.pct(p)}</b> виграшів (${win}/${N})<br>Беллова (класична) межа: 75 %`);
     if (p > byDiff(0.78, 0.8, 0.83) && !this.flags.chsh) {
       this.flags.chsh = true;
+      this.snapOptimal();
       this.grant(['bell', 'chsh']);
       this.say([DL('l7.play.1.0', Fmt.pct(p)),
         { ...this.E, text: DL('l7.play.1.1.text') },
