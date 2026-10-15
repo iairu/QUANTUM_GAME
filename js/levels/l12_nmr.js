@@ -1,5 +1,5 @@
 'use strict';
-// LEVEL 13 — NMR dielňa (mentor: Edward Purcell) — praktické ovládanie NMR počítača (odomknutý od začiatku).
+// LEVEL 12 — NMR dielňa (mentor: Edward Purcell) — praktické ovládanie NMR počítača (odomknutý od začiatku).
 // Ladenie vysielača na Larmorovu frekvenciu ν₀ = γB₀/2π, prúdový RF impulz v priečnej cievke (θ = γB₁τ),
 // meracie sekvencie (90° → FID), kalibrácia impulzu podľa nuly signálu, shim a spinové echo proti nehomogenite poľa.
 
@@ -8,7 +8,7 @@ const NMR_K = 0.6e-3;     // B₁ na 1 A prúdu v cievke (T/A)
 const NMR_PHASES = { x: [1, 0, 0], y: [0, 1, 0], '−x': [-1, 0, 0], '−y': [0, -1, 0] };
 const NMR_SEQ = ['none', 'p90', 'p180', 'echo'];
 
-class L13Nmr extends Level {
+class L12Nmr extends Level {
   get steps() { return [this.intro, this.tune, this.pulse, this.sequence, this.calibrate, this.echo]; }
 
   setup() {
@@ -38,7 +38,7 @@ class L13Nmr extends Level {
 
   intro() {
     this.quest(tr('Vypočuj si Edwarda Purcella', 'Listen to Edward Purcell', 'Послухай Едварда Перселла'), { easy: tr('💬 Purcell', '💬 Purcell', '💬 Перселл'), hard: 'ν₀ = γB₀/2π · θ = γB₁τ · FID · echo' });
-    this.say([DL('l13.intro.1.0'), DL('l13.intro.1.1'), DL('l13.intro.1.2'), DL('l13.intro.1.3')], () => { this.grant(['purcell', 'nmrsetup']); this.next(); });
+    this.say([DL('l12.intro.1.0'), DL('l12.intro.1.1'), DL('l12.intro.1.2'), DL('l12.intro.1.3')], () => { this.grant(['purcell', 'nmrsetup']); this.next(); });
   }
 
   // ---------- 1 · ladenie vysielača na Larmorovu frekvenciu ----------
@@ -65,8 +65,8 @@ class L13Nmr extends Level {
     this.solvedT = true;
     UI.snapSlider(this.slNu, this.nu0);
     this.grant(['larmortune']);
-    this.say([DL('l13.tune.ok', this.nu0.toFixed(3))], () => {
-      this.ask({ q: DL('l13.tune.q.q'), options: [DL('l13.tune.q.options.0'), DL('l13.tune.q.options.1'), DL('l13.tune.q.options.2')], correct: 0, why: DL('l13.tune.q.why') }, () => this.next());
+    this.say([DL('l12.tune.ok', this.nu0.toFixed(3))], () => {
+      this.ask({ q: DL('l12.tune.q.q'), options: [DL('l12.tune.q.options.0'), DL('l12.tune.q.options.1'), DL('l12.tune.q.options.2')], correct: 0, why: DL('l12.tune.q.why') }, () => this.next());
     });
   }
 
@@ -104,7 +104,7 @@ class L13Nmr extends Level {
       const ok = Math.abs(th * 180 / Math.PI - T) <= this.tolP && this.phase === this.wantPh;
       if (!ok) { UI.toast(tr(`Preklopenie ${Fmt.num(th * 180 / Math.PI, 0)}° okolo ${this.phase} — cieľ je ${T}° okolo ${this.wantPh}.`, `Flipped by ${Fmt.num(th * 180 / Math.PI, 0)}° about ${this.phase} — the target is ${T}° about ${this.wantPh}.`, `Відхилення ${Fmt.num(th * 180 / Math.PI, 0)}° навколо ${this.phase} — ціль ${T}° навколо ${this.wantPh}.`), 3200); return; }
       this.m = V3.rotate([0, 0, 1], NMR_PHASES[this.phase], T * Math.PI / 180);
-      const msg = DL(T === 90 ? (this.pi === 2 ? 'l13.pulse.ok90y' : 'l13.pulse.ok90') : 'l13.pulse.ok180');
+      const msg = DL(T === 90 ? (this.pi === 2 ? 'l12.pulse.ok90y' : 'l12.pulse.ok90') : 'l12.pulse.ok180');
       this.say([msg], () => {
         if (++this.pi < this.targets.length) return this.loadPulse();
         this.grant(['flipangle']);
@@ -149,8 +149,8 @@ class L13Nmr extends Level {
       if (Object.keys(this.f.ran).length >= 3 && this.f.ran.p90 && !this.f.seqDone) {
         this.f.seqDone = true;
         this.grant(['fid']);
-        this.say([DL('l13.sequence.ok')], () => {
-          this.ask({ q: DL('l13.sequence.q.q'), options: [DL('l13.sequence.q.options.0'), DL('l13.sequence.q.options.1'), DL('l13.sequence.q.options.2')], correct: 0, why: DL('l13.sequence.q.why') }, () => this.next());
+        this.say([DL('l12.sequence.ok')], () => {
+          this.ask({ q: DL('l12.sequence.q.q'), options: [DL('l12.sequence.q.options.0'), DL('l12.sequence.q.options.1'), DL('l12.sequence.q.options.2')], correct: 0, why: DL('l12.sequence.q.why') }, () => this.next());
         });
       }
     };
@@ -193,7 +193,7 @@ class L13Nmr extends Level {
         const t180 = Math.PI / this.flip(1, 1);
         UI.snapSlider(this.slTau, t180); this.m = [0, 0, -1];
         this.grant(['nutation']);
-        this.say([DL('l13.calibrate.ok', Fmt.num(t180, 1), Fmt.num(t180 / 2, 1), Fmt.num(this.eff * 100, 0))], () => this.next());
+        this.say([DL('l12.calibrate.ok', Fmt.num(t180, 1), Fmt.num(t180 / 2, 1), Fmt.num(this.eff * 100, 0))], () => this.next());
       } else if (Math.abs(S) < this.tolC) UI.toast(tr('Signál je nulový — ale magnetizácia je stále hore (0° alebo 360°). Hľadaj nulu, pri ktorej sa preklopí nadol.', 'The signal is zero — but the magnetisation is still up (0° or 360°). Look for the null where it is flipped down.', 'Сигнал нульовий — але намагніченість досі вгорі (0° або 360°). Шукай нуль, за якого вона перевернута вниз.'), 3400);
     });
   }
@@ -241,8 +241,8 @@ class L13Nmr extends Level {
     if (S >= this.needE) {
       this.solvedE = true;
       this.grant(['spinecho', 'shim']);
-      this.say([DL('l13.echo.ok', Fmt.pct(S)), DL('l13.echo.chain')], () => {
-        this.ask({ q: DL('l13.echo.q.q'), options: [DL('l13.echo.q.options.0'), DL('l13.echo.q.options.1'), DL('l13.echo.q.options.2')], correct: 0, why: DL('l13.echo.q.why') }, () => this.next());
+      this.say([DL('l12.echo.ok', Fmt.pct(S)), DL('l12.echo.chain')], () => {
+        this.ask({ q: DL('l12.echo.q.q'), options: [DL('l12.echo.q.options.0'), DL('l12.echo.q.options.1'), DL('l12.echo.q.options.2')], correct: 0, why: DL('l12.echo.q.why') }, () => this.next());
       });
     } else UI.toast(tr(`Signál v 10 ms je len ${Fmt.pct(S)}. Samotný shim nestačí — refokusuj izochromaty echom (180° v čase τ, echo v 2τ).`, `The signal at 10 ms is only ${Fmt.pct(S)}. Shimming alone is not enough — refocus the isochromats with an echo (180° at τ, echo at 2τ).`, `Сигнал у 10 мс лише ${Fmt.pct(S)}. Самого шиму замало — перефокусуй ізохромати відлунням (180° у τ, відлуння в 2τ).`), 3600);
   }

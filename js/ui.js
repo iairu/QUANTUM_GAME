@@ -197,7 +197,9 @@ const UI = {
     const build = () => TextMode.lines(resolve()).filter((l) => Settings.layman || l.cls !== 'plaincard');
     if (!opts.replay) { const rec = resolve().filter((l) => l.cls !== 'eqcard'); if (rec.length) this.record({ kind: 'say', lines: rec }); } // rovnica má v denníku vlastný záznam ∑
     lines = build();
-    if (!lines.length) { done && done(); return; }
+    // 💬 preskočiť dialógy: ostanú len historické zvitky a karty rovníc (opakovanie z denníka sa prehrá celé)
+    if (Settings.skipDialog && !opts.replay) lines = lines.filter((l) => l.cls === 'scroll' || l.cls === 'eqcard');
+    if (!lines.length) { if (done) setTimeout(done, 0); return; }
     let i = 0, anchor = 0; // anchor = pôvodná replika, na ktorej hráč je (pri zmene obťažnosti sa naň vrátime aj cez zlúčené repliky)
     this.busy = true;
     let opened = false;
@@ -333,8 +335,8 @@ const UI = {
         const d = this.dialog.getBoundingClientRect(), b = btn.getBoundingClientRect();
         menu.style.left = (b.left + b.width / 2 - d.left) + 'px';
         menu.classList.add('show');
-        // dialóg je dole na obrazovke: ak sa ponuka nezmestí pod prázdne miesto, otvorí sa nad ním
-        const up = b.bottom + 4 + menu.offsetHeight > window.innerHeight - 6;
+        // dialóg je dole na obrazovke: ponuka sa otvára nahor (nadol len vtedy, keď sa nad prázdne miesto nezmestí)
+        const up = b.top - 4 - menu.offsetHeight >= 6 || b.bottom + 4 + menu.offsetHeight > window.innerHeight - 6;
         menu.style.top = (up ? b.top - d.top - 4 - menu.offsetHeight : b.bottom - d.top + 4) + 'px';
       };
       sp.appendChild(btn);
@@ -555,8 +557,9 @@ const UI = {
     body.appendChild(el('h3', null, tr('🎨 1 · Štýl hry', '🎨 1 · Gameplay style', '🎨 1 · Стиль гри')));
     const th = el('div', 'diffs');
     for (const [k, name, desc] of [
+      ['menu', tr('🗂 Výberové menu', '🗂 Selection menu', '🗂 Меню вибору'), tr('predvolená: všetky portály ako 3D okná v riadkoch, ktoré sa zalamujú podľa šírky obrazovky; klik = vstup do levelu, Iskra vľavo hore, bez mapy', 'default: all portals as 3D windows in rows that wrap to the screen width; click = enter the level, Spark top left, no map', 'типова: усі портали як 3D-вікна в рядках, що переносяться за шириною екрана; клік = вхід у рівень, Іскра вгорі ліворуч, без мапи')],
       ['classic', tr('Klasická', 'Classic', 'Класична'), tr('pôvodný modrý Hilbertov ostrov, 11 levelov', 'the original blue Hilbert Island, 11 levels', 'оригінальний синій Острів Гільберта, 11 рівнів')],
-      ['nordic', tr('🐉 Severská (Skyrim)', '🐉 Nordic (Skyrim)', '🐉 Північна (Skyrim)'), tr('zasnežený ostrov s borovicami a menhirmi, severské písmo a farby, detailné textúry a záverečný 12. level: ťahový súboj s kvantovým drakom Ketvarrom', 'a snowy island with pines and standing stones, Nordic lettering and colours, detailed textures and a final 12th level: a turn-based battle with the quantum dragon Ketvarr', 'засніжений острів із соснами та кам’яними брилами, північні шрифти й кольори, детальні текстури та фінальний 12-й рівень: покроковий бій із квантовим драконом Кетварром')],
+      ['nordic', tr('🐉 Severská (Skyrim)', '🐉 Nordic (Skyrim)', '🐉 Північна (Skyrim)'), tr('zasnežený ostrov s borovicami a menhirmi, severské písmo a farby, detailné textúry a záverečný 13. level: ťahový súboj s kvantovým drakom Ketvarrom', 'a snowy island with pines and standing stones, Nordic lettering and colours, detailed textures and a final 13th level: a turn-based battle with the quantum dragon Ketvarr', 'засніжений острів із соснами та кам’яними брилами, північні шрифти й кольори, детальні текстури та фінальний 13-й рівень: покроковий бій із квантовим драконом Кетварром')],
       ['wow', tr('⚔ MMO (World of Warcraft)', '⚔ MMO (World of Warcraft)', '⚔ MMO (World of Warcraft)'), tr('hrá sa ako MMO: kvantový mág s úrovňami, lišta kúziel (hradlá X, H, meranie…), nepriatelia „klasické omyly“, úlohy, obchodník, taška a korisť; levely sú dungeony s bossom, ktorého porazíš vedomosťami; aj drak Ketvarr', 'plays like an MMO: a quantum mage with levels, a spell bar (X and H gates, measurement…), “classical misconception” enemies, quests, a merchant, bags and loot; levels are dungeons with a boss you defeat with knowledge; Ketvarr the dragon too', 'грається як MMO: квантовий маг із рівнями, панель заклять (гейти X і H, вимірювання…), вороги — «класичні хибні уявлення», завдання, торговець, сумки та здобич; рівні — підземелля з босом, якого перемагаєш знаннями; є й дракон Кетварр')],
     ]) {
       const l = el('label'), r = el('input');
@@ -579,6 +582,7 @@ const UI = {
     body.appendChild(diffs);
     body.appendChild(el('h3', null, tr('📜 3 · História', '📜 3 · History', '📜 3 · Історія')));
     body.appendChild(this.checkbox(SCROLLS_DESC, Settings.scrolls, (v) => { Settings.scrolls = v; Settings.save(); }));
+    body.appendChild(this.checkbox(DIALOG_DESC, Settings.skipDialog, (v) => { Settings.skipDialog = v; Settings.save(); }));
     body.appendChild(el('h3', null, tr('∑ 4 · Rovnice', '∑ 4 · Equations', '∑ 4 · Рівняння')));
     const modes = el('div', 'diffs');
     for (const m of MODES) {

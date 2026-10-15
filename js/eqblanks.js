@@ -232,33 +232,33 @@ const EQ_BLANKS = {
       { c: '11.bellReadout.2', eq: 'Δρ ∝ ⟦0⟧', blanks: [['|Φ⁺⟩⟨Φ⁺|', 'I₄/4', 'ρ<sub>mix</sub>', '|00⟩⟨00|']], hard: true },
     ],
   },
-  // ---------- 13 · NMR dielňa (praktické NMR) ----------
-  13: {
-    intro: [
-      { c: '13.intro.0', eq: 'ν₀ = ⟦0⟧ / 2π', blanks: [['γB₀', 'γB₁', 'B₀/γ', 'ħB₀']] },
-    ],
-    tune: [
-      { c: '13.tune.0', eq: 'Δν = ν₀ − ⟦0⟧', blanks: [['ν<sub>RF</sub>', 'γB₁', 'ν₀/2', '1/T₂']] },
-    ],
-    pulse: [
-      { c: '13.pulse.0', eq: 'θ = γ ⟦0⟧ τ', blanks: [['B₁', 'B₀', 'ν₀', 'I²']] },
-      { c: '13.pulse.1', eq: 'R<sub>x</sub>(π/2)|0⟩ ∼ (|0⟩ − ⟦0⟧|1⟩)/√2', blanks: [['i', '1', '−1', '−i']], hard: true },
-    ],
-    sequence: [
-      { c: '13.sequence.0', eq: 'S(t) ∝ M<sub>⊥</sub>(0) cos(2πΔν t) · ⟦0⟧', blanks: [['e<sup>−t/T₂*</sup>', 'e<sup>t/T₂*</sup>', 'e<sup>−T₂*/t</sup>', 'sin(t/T₂*)']] },
-    ],
-    calibrate: [
-      { c: '13.calibrate.0', eq: 'τ₉₀ = ⟦0⟧', blanks: [['τ₁₈₀/2', '2τ₁₈₀', 'τ₁₈₀', 'τ₁₈₀/4']] },
-    ],
-    echo: [
-      { c: '13.echo.0', eq: 't<sub>echo</sub> = ⟦0⟧', blanks: [['2τ', 'τ', 'τ/2', '4τ']] },
-      { c: '13.echo.1', eq: 'T₂ ≤ ⟦0⟧', blanks: [['2T₁', 'T₂*', 'T₁/2', '0']], hard: true },
-    ],
-  },
-  // ---------- 12 · Dračí štít ----------
+  // ---------- 12 · NMR dielňa (praktické NMR) ----------
   12: {
     intro: [
-      { c: '12.intro.0', eq: 'P = ½(1 + r · ⟦0⟧)', blanks: [['n', 'r', 'σ', '|r|']] },
+      { c: '12.intro.0', eq: 'ν₀ = ⟦0⟧ / 2π', blanks: [['γB₀', 'γB₁', 'B₀/γ', 'ħB₀']] },
+    ],
+    tune: [
+      { c: '12.tune.0', eq: 'Δν = ν₀ − ⟦0⟧', blanks: [['ν<sub>RF</sub>', 'γB₁', 'ν₀/2', '1/T₂']] },
+    ],
+    pulse: [
+      { c: '12.pulse.0', eq: 'θ = γ ⟦0⟧ τ', blanks: [['B₁', 'B₀', 'ν₀', 'I²']] },
+      { c: '12.pulse.1', eq: 'R<sub>x</sub>(π/2)|0⟩ ∼ (|0⟩ − ⟦0⟧|1⟩)/√2', blanks: [['i', '1', '−1', '−i']], hard: true },
+    ],
+    sequence: [
+      { c: '12.sequence.0', eq: 'S(t) ∝ M<sub>⊥</sub>(0) cos(2πΔν t) · ⟦0⟧', blanks: [['e<sup>−t/T₂*</sup>', 'e<sup>t/T₂*</sup>', 'e<sup>−T₂*/t</sup>', 'sin(t/T₂*)']] },
+    ],
+    calibrate: [
+      { c: '12.calibrate.0', eq: 'τ₉₀ = ⟦0⟧', blanks: [['τ₁₈₀/2', '2τ₁₈₀', 'τ₁₈₀', 'τ₁₈₀/4']] },
+    ],
+    echo: [
+      { c: '12.echo.0', eq: 't<sub>echo</sub> = ⟦0⟧', blanks: [['2τ', 'τ', 'τ/2', '4τ']] },
+      { c: '12.echo.1', eq: 'T₂ ≤ ⟦0⟧', blanks: [['2T₁', 'T₂*', 'T₁/2', '0']], hard: true },
+    ],
+  },
+  // ---------- 13 · Dračí štít ----------
+  13: {
+    intro: [
+      { c: '13.intro.0', eq: 'P = ½(1 + r · ⟦0⟧)', blanks: [['n', 'r', 'σ', '|r|']] },
     ],
   },
 };

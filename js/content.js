@@ -107,15 +107,15 @@ const CODEX = [
   { id: 'feedbackc', level: 11, type: 'pojem', sym: '📏→🤔→▶', name: 'klasická spätná väzba', text: 'Zmeraj → rozhodni → pokračuj: výsledok merania určí ďalšie hradlo (aktívny reset, korekcia chýb cez syndrómy).', dont: 'Meranie nemusí byť poslednou operáciou výpočtu.' },
   { id: 'decoread', level: 11, type: 'pojem', sym: '🌫 ≠ 📏', name: 'dekoherencia ≠ readout', text: 'Dekoherencia potláča mimodiagonálu ρ (interferenciu), ale sama nevytvorí konkrétny klasický záznam. Readout je fyzický reťazec: interakcia → zosilnenie → signál → register.' },
   { id: 'tomography', level: 11, type: 'pojem', sym: 'ρ ← {ZZ, XX, …}', name: 'tomografia stavu', text: 'Jedna báza vidí len diagonálu ρ. Bellov stav a zmes ½|00⟩⟨00| + ½|11⟩⟨11| dajú v ZZ to isté; líšia sa mimodiagonálou ρ<sub>00,11</sub> = ½ — viditeľnou až v inej báze (XX).', dont: 'Samotná korelácia A = B nedokazuje previazanosť.' },
-  // ---------- Level 13: NMR dielňa (praktické NMR) ----------
-  { id: 'purcell', level: 13, type: 'osobnost', sym: '👤', name: 'Edward Mills Purcell (1912–1997)', text: 'V roku 1946 nezávisle od Felixa Blocha zmeral jadrovú magnetickú rezonanciu v pevnej látke (parafín). Nobelova cena 1952 spolu s Blochom.' },
-  { id: 'nmrsetup', level: 13, type: 'pojem', sym: '🧲⟂📻', name: 'zostava NMR spektrometra', text: 'Magnet so stálym poľom B₀ (os z), vzorka a priečna RF cievka (os x): impulzmi prúdu na frekvencii ν<sub>RF</sub> vytvára pole B₁ ⟂ B₀ a potom tá istá cievka zachytí indukovaný signál.', dont: 'Cievka nie je napájaná stálym prúdom — dostáva krátke RF impulzy; stály je magnet B₀.' },
-  { id: 'larmortune', level: 13, type: 'symbol', sym: 'ν₀ = γB₀/2π', name: 'rezonancia vysielača', text: 'Larmorovu frekvenciu určuje pole B₀ a jadro (protón: 42,577 MHz/T). Vysielač sa nastaví na ν<sub>RF</sub> = ν₀; rozladenie Δν = ν₀ − ν<sub>RF</sub> je precesia v rotujúcom rámci.', dont: 'Larmorovu frekvenciu „neladíš“ gombíkom — meníš B₀ alebo ladíš vysielač.' },
-  { id: 'flipangle', level: 13, type: 'symbol', sym: 'θ = γB₁τ', name: 'uhol preklopenia', text: 'Uhol, o ktorý RF impulz otočí magnetizáciu: závisí od amplitúdy B₁ (prúdu v cievke) a dĺžky τ. Fáza impulzu určuje os v priečnej rovine (x, y, …).' },
-  { id: 'fid', level: 13, type: 'pojem', sym: 'FID', name: 'voľný indukčný rozpad', text: 'Po 90° impulze priečna magnetizácia precesuje okolo B₀ a indukuje v cievke striedavé napätie, ktoré doznieva s T₂*. 180° impulz z rovnováhy signál nedá (M<sub>⊥</sub> = 0).' },
-  { id: 'nutation', level: 13, type: 'pojem', sym: '∿ 0', name: 'kalibrácia impulzu (nutácia)', text: 'Amplitúda FID ∝ sin(γB₁τ). Nula signálu pri preklopení nadol = skutočný 180° impulz; 90° je polovica. Tak sa opraví neznáma chyba B₁.' },
-  { id: 'spinecho', level: 13, type: 'pojem', sym: '90° – τ – 180° – τ', name: 'spinové echo (Hahn 1950)', text: '180° impulz v čase τ zrkadlí fázy izochromát rozbehnutých nehomogenitou B₀; v čase 2τ sa znova zložia. Echo obnoví signál až po skutočné T₂.', dont: 'Echo nezvráti skutočnú dekoherenciu T₂ — len statickú nehomogenitu.' },
-  { id: 'shim', level: 13, type: 'pojem', sym: '🔧 B₀', name: 'shim', text: 'Prídavné korekčné cievky (shimy) vyrovnávajú nehomogenitu poľa B₀ a predlžujú T₂*. Úplne dokonalé pole sa nedosiahne.' },
+  // ---------- Level 12: NMR dielňa (praktické NMR) ----------
+  { id: 'purcell', level: 12, type: 'osobnost', sym: '👤', name: 'Edward Mills Purcell (1912–1997)', text: 'V roku 1946 nezávisle od Felixa Blocha zmeral jadrovú magnetickú rezonanciu v pevnej látke (parafín). Nobelova cena 1952 spolu s Blochom.' },
+  { id: 'nmrsetup', level: 12, type: 'pojem', sym: '🧲⟂📻', name: 'zostava NMR spektrometra', text: 'Magnet so stálym poľom B₀ (os z), vzorka a priečna RF cievka (os x): impulzmi prúdu na frekvencii ν<sub>RF</sub> vytvára pole B₁ ⟂ B₀ a potom tá istá cievka zachytí indukovaný signál.', dont: 'Cievka nie je napájaná stálym prúdom — dostáva krátke RF impulzy; stály je magnet B₀.' },
+  { id: 'larmortune', level: 12, type: 'symbol', sym: 'ν₀ = γB₀/2π', name: 'rezonancia vysielača', text: 'Larmorovu frekvenciu určuje pole B₀ a jadro (protón: 42,577 MHz/T). Vysielač sa nastaví na ν<sub>RF</sub> = ν₀; rozladenie Δν = ν₀ − ν<sub>RF</sub> je precesia v rotujúcom rámci.', dont: 'Larmorovu frekvenciu „neladíš“ gombíkom — meníš B₀ alebo ladíš vysielač.' },
+  { id: 'flipangle', level: 12, type: 'symbol', sym: 'θ = γB₁τ', name: 'uhol preklopenia', text: 'Uhol, o ktorý RF impulz otočí magnetizáciu: závisí od amplitúdy B₁ (prúdu v cievke) a dĺžky τ. Fáza impulzu určuje os v priečnej rovine (x, y, …).' },
+  { id: 'fid', level: 12, type: 'pojem', sym: 'FID', name: 'voľný indukčný rozpad', text: 'Po 90° impulze priečna magnetizácia precesuje okolo B₀ a indukuje v cievke striedavé napätie, ktoré doznieva s T₂*. 180° impulz z rovnováhy signál nedá (M<sub>⊥</sub> = 0).' },
+  { id: 'nutation', level: 12, type: 'pojem', sym: '∿ 0', name: 'kalibrácia impulzu (nutácia)', text: 'Amplitúda FID ∝ sin(γB₁τ). Nula signálu pri preklopení nadol = skutočný 180° impulz; 90° je polovica. Tak sa opraví neznáma chyba B₁.' },
+  { id: 'spinecho', level: 12, type: 'pojem', sym: '90° – τ – 180° – τ', name: 'spinové echo (Hahn 1950)', text: '180° impulz v čase τ zrkadlí fázy izochromát rozbehnutých nehomogenitou B₀; v čase 2τ sa znova zložia. Echo obnoví signál až po skutočné T₂.', dont: 'Echo nezvráti skutočnú dekoherenciu T₂ — len statickú nehomogenitu.' },
+  { id: 'shim', level: 12, type: 'pojem', sym: '🔧 B₀', name: 'shim', text: 'Prídavné korekčné cievky (shimy) vyrovnávajú nehomogenitu poľa B₀ a predlžujú T₂*. Úplne dokonalé pole sa nedosiahne.' },
 ];
 
 // Jazykové pasce: na konci každého levelu (správne formulácie vs. časté omyly)
@@ -179,10 +179,10 @@ const TRAPS_SK = {
     { q: DL('traps.11.1.q'), options: [DL('traps.11.1.options.0'), DL('traps.11.1.options.1'), DL('traps.11.1.options.2')], correct: 0, why: DL('traps.11.1.why') },
     { q: DL('traps.11.2.q'), options: [DL('traps.11.2.options.0'), DL('traps.11.2.options.1'), DL('traps.11.2.options.2')], correct: 0, why: DL('traps.11.2.why') },
   ],
-  13: [
-    { q: DL('traps.13.0.q'), options: [DL('traps.13.0.options.0'), DL('traps.13.0.options.1'), DL('traps.13.0.options.2')], correct: 0, why: DL('traps.13.0.why') },
-    { q: DL('traps.13.1.q'), options: [DL('traps.13.1.options.0'), DL('traps.13.1.options.1'), DL('traps.13.1.options.2')], correct: 0, why: DL('traps.13.1.why') },
-    { q: DL('traps.13.2.q'), options: [DL('traps.13.2.options.0'), DL('traps.13.2.options.1'), DL('traps.13.2.options.2')], correct: 0, why: DL('traps.13.2.why') },
+  12: [
+    { q: DL('traps.12.0.q'), options: [DL('traps.12.0.options.0'), DL('traps.12.0.options.1'), DL('traps.12.0.options.2')], correct: 0, why: DL('traps.12.0.why') },
+    { q: DL('traps.12.1.q'), options: [DL('traps.12.1.options.0'), DL('traps.12.1.options.1'), DL('traps.12.1.options.2')], correct: 0, why: DL('traps.12.1.why') },
+    { q: DL('traps.12.2.q'), options: [DL('traps.12.2.options.0'), DL('traps.12.2.options.1'), DL('traps.12.2.options.2')], correct: 0, why: DL('traps.12.2.why') },
   ],
 };
 

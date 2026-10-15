@@ -518,7 +518,7 @@ const Bloch = {
         lab(key + 'ax' + t, V3.add(center, V3.scale(qToWorld(q), radius)), t, 'axis');
     }
     // rovnice najprv: amplitúdy α, β visia pri póloch |0⟩, |1⟩ — farba = KTO, veľkosť = KOĽKO (|α| = cos θ/2, |β| = sin θ/2)
-    if (lab && vec && Settings.eq && L > 0.02) {
+    if (lab && vec && Settings.glyphs && L > 0.02) {
       const th = Math.acos(clamp(vec[2] / L, -1, 1)), a = Math.cos(th / 2), b = Math.sin(th / 2), pure = L > 0.99;
       const tok = (cls, sym, v) => `<span class="mnt ${cls}" style="font-size:${(0.7 + 0.9 * v).toFixed(2)}em;opacity:${(0.35 + 0.65 * v).toFixed(2)}">${EqG.glyphify(sym, true)}${pure ? ' = ' + Fmt.num(v, 2) : ''}</span>`;
       lab(key + 'eqA', V3.add(center, V3.scale(qToWorld([0.42, 0, 1]), radius * 1.18)), tok('a', '|α|', a), 'eqlbl',

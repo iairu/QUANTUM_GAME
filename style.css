@@ -879,3 +879,19 @@ body:not(.eqmode) #eqkey { display: none !important; }
 /* obsah levelu v bubline portálu */
 #tip ol.plist { margin: 6px 0 2px 18px; padding: 0; font-size: 0.95em; }
 #tip ol.plist li { margin: 1px 0; }
+/* normálna a ťažká obťažnosť: rovnice bez farebnej mnemotechniky — klasická sadzba (Baskerville) */
+body.plaineq .eq, body.plaineq .eqi, body.plaineq .expr, body.plaineq .blankeq, body.plaineq .bmenu .bopt {
+  font-family: Baskerville, "Libre Baskerville", "Baskerville Old Face", "Book Antiqua", Palatino, Georgia, serif; color: #f2efe6 !important; }
+body.plaineq .eq.eqb { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.14); box-shadow: none; font-style: normal; }
+body.plaineq .eq.eqb::after { display: none; }
+body.plaineq .eqi { background: none; border: none; box-shadow: none; padding: 0 1px; font-size: 1.06em; }
+body.plaineq .eq *, body.plaineq .eqi *, body.plaineq .blankeq * { color: inherit !important; text-shadow: none !important; }
+body.plaineq #eqstage, body.plaineq #btn-key, body.plaineq #eqkey { display: none !important; }
+body.plaineq .lbl.mnl-a, body.plaineq .lbl.mnl-b, body.plaineq .lbl.mnl-th, body.plaineq .lbl.mnl-ph, body.plaineq .lbl.mnl-ket { color: #e8ecff; }
+body.plaineq #dialog.eqcard { border-color: var(--accent); box-shadow: 0 10px 40px #000a; }
+body.plaineq #dialog.eqcard .who, body.plaineq #dialog.blankq .who { color: var(--gold); }
+/* téma „výberové menu“: bez mapy, popisky portálov ako karty */
+html[data-theme="menu"] #btn-map { display: none !important; }
+html[data-theme="menu"] .lbl.portal.menu { min-width: 150px; max-width: 205px; white-space: normal; text-align: center; line-height: 1.25; }
+html[data-theme="menu"] .lbl.portal.menu.hover { border-color: var(--accent); box-shadow: 0 0 14px rgba(95, 227, 255, 0.45); }
+body.c-ptr #gl { cursor: pointer; }

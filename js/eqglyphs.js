@@ -186,6 +186,7 @@ const EqG = {
   // ---------- text → glyfy (rovnice na javisku aj symboly v dialógoch) ----------
   // math: celé je to vzorec (javisko) — vtedy aj samostatné I, i, n, r, p, t sú symboly
   glyphify(html, math = false) {
+    if (Settings.plainEq) return String(html); // normálna/ťažká: bez glyfov
     const marks = [], mark = (h) => `\u0001${marks.push(h) - 1}\u0002`;
     let s = String(html).replace(/e<sup>([^<]{1,10})<\/sup>/g, (m, x) => mark(this.html('exp', x)));
     let depth = 0, chip = 0; // chip > 0: vnútri čipu rovnice [[…]] — tam je všetko vzorec (ako math)
@@ -371,6 +372,7 @@ const EqG = {
   // · funkcie (cos, sin, Re …) tyrkysové · premenné biele kurzívou · operátory (H, X …) fialové · P biela · grécke a kety podľa mnemotechniky
   GREEK: { 'α': 'a', 'β': 'b', 'θ': 'th', 'φ': 'ph', 'γ': 'g', 'ψ': 'ket', 'Ψ': 'ket', 'ρ': 'rho', 'σ': 'ket', 'Δ': 'ph', 'Ω': 'th', 'ω': 'ph', 'ħ': 'k', 'π': 'k', '∂': 'k', 'Σ': 'k', '⊗': 'k', '∇': 'k', 'ℂ': 'k' },
   colorMath(html) {
+    if (Settings.plainEq) return String(html); // normálna/ťažká: bez farieb
     const TOK = /(\|[^|⟩\s<]{1,5}⟩)|(⟨[^⟨|\s<]{1,4}\|)|(?<![A-Za-zÀ-ĦĨ-žА-яІіЇїЄєҐґ])(cos|sin|tan|exp|log|ln|Re|Im|Tr|det|dim|diag|const|max|min)(?![A-Za-zÀ-ĦĨ-žА-яІіЇїЄєҐґ])|(H̃|[ĤÂ])|([αβθφγψΨρσΔΩωħπ∂Σ⊗∇ℂ])|(\d+(?:[.,]\d+)?(?:\s?%)?|[½¼¾⅓√∞°])|(⇔|⇒|→|≈|≥|≤|∼|≠|=)|([+−\-·×*/])|([()[\]{}|⟨⟩])|(?<![A-Za-zÀ-ĦĨ-žА-яІіЇїЄєҐґ])([A-Za-z])(?![A-Za-zÀ-ĦĨ-žА-яІіЇїЄєҐґ])|(\s+)|([^]+?)/gu;
     let depth = 0, keep = 0, prevKind = 'start';
     // fázový faktor e<sup>…</sup> ostane celý (zelený) — pri „Rovnice najprv“ z neho glyphify spraví ručičku hodín

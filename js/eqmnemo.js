@@ -205,7 +205,7 @@ const EqM = {
         return { noState: true, rows: [[T('i', 'k', 'iħ'), T('d', 'n', '∂'), T('psi', 'ket', '|ψ⟩'), T('dt', 'n', '/∂t'), eq('e', '='), T('H', 'op', 'Ĥ'), T('psi2', 'ket', '|ψ⟩')],
           [T('P', 'P', 'P(a)'), eq('e2', '='), T('l', 'k', '|'), T('bra', 'bra', '⟨a|'), T('ket', 'ket', '|ψ⟩'), T('r', 'k', '|²'), eq('s', '·'),
             T('q', 'n', tr('čo existuje? · čo vieme? · ako sa javí?', 'what exists? · what can we know? · how does it appear?', 'що існує? · що ми знаємо? · як постає?'))]] };
-      case 12: {
+      case 13: {
         if (!S.n) return null;
         const r = S.animR ? S.animR() : S.r, P = clamp((1 + V3.dot(r, S.n)) / 2, 0, 1);
         return { rows: [[T('P', 'P', tr('P(zásah)', 'P(hit)', 'P(влуч.)')), eq('e', '='), T('h', 'k', '½(1 +'), T('r', 'ket', 'r'), eq('d', '·'), T('n', 'g', 'n', { ph: Math.atan2(S.n[1], S.n[0]), s: 1 }), T('c', 'k', ')'), eq('e2', '='),
@@ -238,14 +238,15 @@ const EqM = {
     this.apply();
   },
   toggleKey(force) {
-    const on = Settings.eq && !UI.busy && (force ?? !this.keyEl.classList.contains('show')); // počas rozhovoru sa kľúč neotvára
+    const on = Settings.glyphs && !UI.busy && (force ?? !this.keyEl.classList.contains('show')); // počas rozhovoru sa kľúč neotvára
     if (on !== this.keyEl.classList.contains('show')) Sound.sfx(on ? 'map' : 'close');
     this.keyEl.classList.toggle('show', on);
     $('#btn-key').classList.toggle('on', on);
   },
   apply() {
-    document.body.classList.toggle('eqmode', Settings.eq);
-    if (!Settings.eq && this.keyEl) this.toggleKey(false);
+    document.body.classList.toggle('eqmode', Settings.glyphs);
+    document.body.classList.toggle('plaineq', Settings.plainEq);
+    if (!Settings.glyphs && this.keyEl) this.toggleKey(false);
     this.sig = null;
   },
   legendHtml(from = 0, to = MNEMO_RULES.length) {
@@ -259,7 +260,7 @@ const EqM = {
   },
   update() {
     if (!this.stage) return;
-    const on = Settings.eq && !document.body.classList.contains('welcoming');
+    const on = Settings.glyphs && !document.body.classList.contains('welcoming'); // normálna/ťažká: bez farebného javiska
     if (!on) { this.stage.style.display = 'none'; return; }
     // na ostrove sa rovnica neukazuje (🔑 kľúč je vpravo hore)
     if (Game.scene === Hub) { this.stage.style.display = 'none'; this.sig = null; return; }

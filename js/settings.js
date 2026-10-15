@@ -3,19 +3,25 @@
 // oddelene od postupu, takže reset hry ich nezmaže.
 
 const DIFFS = ['layman', 'easy', 'normal', 'hard'];
-// témy: klasická (11 levelov), severská (skyrimovský vzhľad + 12. level s drakom Ketvarrom)
+// témy: klasická (11 levelov), severská (skyrimovský vzhľad + 13. level s drakom Ketvarrom)
 // a MMO (predvolená: hrá sa ako World of Warcraft — kúzla, nepriatelia, úlohy, obchodník, korisť; aj drak)
-const THEMES = ['classic', 'nordic', 'wow'];
+// menu (predvolená): Hilbertov ostrov ako veľké výberové menu — 3D portály v riadkoch, ktoré sa samy zalamujú
+const THEMES = ['menu', 'classic', 'nordic', 'wow'];
 const Settings = {
-  diff: 'easy', // nová hra začína ľahkou obťažnosťou
-  theme: 'classic', // prvá voľba na uvítacej obrazovke
+  diff: 'normal', // nová hra začína normálnou obťažnosťou
+  theme: 'menu', // predvolená téma: výberové menu portálov (na uvítaní sa už nevyberá)
   mode: 'equations', // predvolený je jazyk rovníc; typ hry: 'pictures' (obrazy najprv) alebo 'equations' (rovnice najprv, rovnicová mnemotechnika)
   get eq() { return this.mode === 'equations'; },
+  // normálna a ťažká: rovnice bez farieb a glyfov, len klasická sadzba (Baskerville); farebná mnemotechnika patrí ľahkej a laickej
+  get plainEq() { return !this.easy; },
+  get glyphs() { return this.eq && !this.plainEq; }, // farebný jazyk rovníc: javisko, 🔑 kľúč, Sieň symbolov
   get nordic() { return this.theme === 'nordic'; },
+  get menu() { return this.theme === 'menu'; },
   get wow() { return this.theme === 'wow'; },
-  get dragon() { return this.nordic || this.wow; }, // drak Ketvarr a 12. level
+  get dragon() { return this.nordic || this.wow; }, // drak Ketvarr a 13. level
   get hard() { return this.diff === 'hard'; },
-  scrolls: false, // 📜 historické zvitky: história objavov pred krokmi levelov + otázka z histórie v každom leveli (pri ľubovoľnej obťažnosti)
+  skipDialog: false, // 💬 preskočiť všetky dialógy (kvízy, zvitky a karty rovníc ostávajú)
+  scrolls: true, // 📜 historické zvitky: história objavov pred krokmi levelov + otázka z histórie v každom leveli (pri ľubovoľnej obťažnosti)
   // ľahká aj laická (laická = ľahká + všetko bežnými slovami)
   get easy() { return this.diff === 'easy' || this.diff === 'layman'; },
   get layman() { return this.diff === 'layman'; },
@@ -51,6 +57,7 @@ const Settings = {
       if (!d) return;
       if (DIFFS.includes(d.diff)) this.diff = d.diff;
       if (typeof d.scrolls === 'boolean') this.scrolls = d.scrolls;
+      if (typeof d.skipDialog === 'boolean') this.skipDialog = d.skipDialog;
       if (d.diff === 'ancient') { this.diff = 'hard'; this.scrolls = true; } // bývalá obťažnosť „prastará“ = ťažká + zvitky
       if (THEMES.includes(d.theme)) this.theme = d.theme;
       if (['pictures', 'equations'].includes(d.mode)) this.mode = d.mode;
@@ -60,7 +67,7 @@ const Settings = {
     } catch (e) { /* predvolené nastavenia */ }
   },
   save() {
-    try { localStorage.setItem('kvantp-game1-settings', JSON.stringify({ diff: this.diff, scrolls: this.scrolls, theme: this.theme, mode: this.mode, view: this.view, audio: this.audio })); } catch (e) { /* bez ukladania */ }
+    try { localStorage.setItem('kvantp-game1-settings', JSON.stringify({ diff: this.diff, scrolls: this.scrolls, skipDialog: this.skipDialog, theme: this.theme, mode: this.mode, view: this.view, audio: this.audio })); } catch (e) { /* bez ukladania */ }
   },
 };
 Settings.load();
@@ -74,14 +81,18 @@ const DIFF_NAME = {
 const DIFF_DESC = {
   layman: tr('ľahká, ale všetko bežnými slovami: pred každou úlohou vysvetlenie „po ľudsky“, odborné slová s prekladom v zátvorke, jednoduché vysvetlivky — ideálny štart do kvantových počítačov',
     'easy, but everything in everyday words: a plain-language explanation before every task, technical words translated in brackets, simple tooltips — the ideal start into quantum computing', 'легка, але все звичайними словами: перед кожним завданням пояснення «по-людськи», фахові слова з перекладом у дужках, прості підказки — ідеальний старт у квантові комп’ютери'),
-  easy: tr('väčšie tolerancie, menej pokusov, nápovedy, v kvízoch o jednu nesprávnu možnosť menej; rovnice sa ukážu hneď — bez kvízov „doplň rovnicu“',
-    'wider tolerances, fewer trials, hints, one wrong option fewer in quizzes; equations are shown right away — no “complete the equation” quizzes', 'ширші допуски, менше спроб, підказки, у вікторинах на одну неправильну відповідь менше; рівняння показуються одразу — без вікторин «доповни рівняння»'),
-  normal: tr('pôvodná hra; pred každou úlohou najprv doplníš chýbajúce časti jej rovnice', 'the original game; before every task you first fill in the missing parts of its equation', 'оригінальна гра; перед кожним завданням спершу доповниш пропущені частини його рівняння'),
+  easy: tr('väčšie tolerancie, menej pokusov, nápovedy, v kvízoch o jednu nesprávnu možnosť menej; rovnice sa ukážu hneď — bez kvízov „doplň rovnicu“ — a vo farebnom jazyku glyfov',
+    'wider tolerances, fewer trials, hints, one wrong option fewer in quizzes; equations are shown right away — no “complete the equation” quizzes — in the colourful glyph language', 'ширші допуски, менше спроб, підказки, у вікторинах на одну неправильну відповідь менше; рівняння показуються одразу — без вікторин «доповни рівняння» — кольоровою мовою гліфів'),
+  normal: tr('pôvodná hra; pred každou úlohou najprv doplníš chýbajúce časti jej rovnice; rovnice v klasickej sadzbe bez farieb a glyfov', 'the original game; before every task you first fill in the missing parts of its equation; equations in classic type without colours or glyphs', 'оригінальна гра; перед кожним завданням спершу доповниш пропущені частини його рівняння; рівняння класичним шрифтом без кольорів і гліфів'),
   hard: tr('viac poznatkov: teória a rovnice pri každom kroku, viac kvízov „doplň rovnicu“ a extra otázky s rovnicami; presnosť, náhodné ciele, bez nápovied, prísnejšie hviezdičky',
     'more knowledge: theory and equations at every step, more “complete the equation” quizzes and extra equation questions; precision, random targets, no hints, stricter stars', 'більше знань: теорія та рівняння на кожному кроці, більше вікторин «доповни рівняння» і додаткові питання з рівняннями; точність, випадкові цілі, без підказок, суворіші зірки'),
 };
 
 // 📜 historické zvitky (nastavenie nezávislé od obťažnosti)
+// 💬 dialógy: hrať s rozhovormi mentorov, alebo ich preskočiť (úlohy v HUD, kvízy, zvitky a rovnice ostávajú)
+const DIALOG_DESC = tr('preskočiť všetky rozhovory mentorov — ostanú len úlohy, kvízy, karty rovníc a historické zvitky; rozhovory sa aj tak zapíšu do denníka (L)',
+  'skip all mentor conversations — only tasks, quizzes, equation cards and historic scrolls remain; the conversations are still written to the Journal (L)',
+  'пропустити всі розмови наставників — лишаються тільки завдання, вікторини, картки рівнянь та історичні сувої; розмови все одно записуються до щоденника (L)');
 const SCROLLS_NAME = tr('📜 Historické zvitky', '📜 Historic scrolls', '📜 Історичні сувої');
 const SCROLLS_DESC = tr('pred krokmi levelov sa rozvinie zvitok s históriou objavov — roky, autori, ich rozhovory a slávne výroky; na konci každého levelu otázka z histórie',
   'before level steps a scroll unrolls with the history of the discoveries — years, authors, their conversations and famous words; a history question at the end of every level',

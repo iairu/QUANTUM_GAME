@@ -54,7 +54,7 @@ class Level {
     Settings.wow && this.num > 0 && Wow.onStep(this); // MMO: dokončený krok = zásah bossa
     const s = this.steps[this.stepIdx], run = () => (s ? s.call(this) : this.finale()), name = s ? s.name : 'finale';
     const pre = [];
-    if (Settings.eq && !Game.progress.eqIntroSeen) pre.push(...Game.eqIntroLines()); // mnemotechnika sa ešte nepredstavila (prepnuté počas rozhovoru)
+    if (Settings.glyphs && !Game.progress.eqIntroSeen) pre.push(...Game.eqIntroLines()); // mnemotechnika sa ešte nepredstavila (prepnuté počas rozhovoru)
     // ∑ doplň rovnicu (normálna a ťažká, v oboch typoch hry): rovnica kroku sa neprezradí hneď — hráč najprv doplní
     // jej chýbajúce časti z ponuky; ľahká a laická kvíz preskočia a rovnicu ukážu rovno
     const blanks = this.seenScrolls.has('blank:' + name) ? [] : EqBlanks.for(this.num, name);
@@ -145,7 +145,7 @@ const Hub = {
   init() {
     // všetky portály stoja v jednom kruhu okolo stredu, rovnomerne a v poradí čísel. Sieň symbolov (0) je len v type hry
     // „Jazyk rovníc“ (rovnice); drakov portál (9), ak je, stojí na severe pod Dračím štítom, inak je na severe portál 1.
-    const ring = [...(Settings.eq ? [LEVEL0] : []), ...LEVELS], n = ring.length, boss = ring.some((L) => L.boss);
+    const ring = [...(Settings.glyphs ? [LEVEL0] : []), ...LEVELS], n = ring.length, boss = ring.some((L) => L.boss);
     const all = ring.map((L, k) => {
       const a = -Math.PI / 2 + ((boss ? k + 1 : k - (Settings.eq ? 1 : 0)) / n) * Math.PI * 2, p = [Math.cos(a) * 20, 0, Math.sin(a) * 20];
       return { L, p, dir: V3.norm(V3.scale(p, -1)), npc: V3.add(p, V3.scale(V3.norm([-Math.sin(a), 0, Math.cos(a)]), 3.2)), boss: !!L.boss, zero: L.num === 0 };
@@ -169,6 +169,66 @@ const Hub = {
     }
   },
   all() { return this.portal0 ? [...this.portals, this.portal0] : this.portals; },
+
+  // ---------- téma „výberové menu“: portály v riadkoch, ktoré sa zalamujú podľa šírky obrazovky ----------
+  // kamera stojí, portály ležia v rovine z = 0; pixel ↔ svet: px/jednotku = H / (2 D tan(fov/2))
+  menuScroll: 0,
+  menuLayout() {
+    const W = window.innerWidth, H = window.innerHeight, fov = Settings.view.fov, D = 30, pxu = H / (2 * D * Math.tan(fov / 2));
+    const items = this.all().slice().sort((a, b) => a.L.num - b.L.num), cell = 230, left = 170, top = 120;
+    const cols = Math.max(1, Math.floor((W - left - 20) / cell)), rows = Math.ceil(items.length / cols);
+    const used = Math.min(cols, items.length) * cell, x0 = left + (W - left - 20 - used) / 2 + cell / 2;
+    const maxScroll = Math.max(0, top + rows * cell + 40 - H);
+    this.menuScroll = clamp(this.menuScroll, 0, maxScroll);
+    const toWorld = (px, py) => [(px - W / 2) / pxu, (H / 2 - py) / pxu, 0];
+    items.forEach((pt, k) => {
+      const px = x0 + (k % cols) * cell, py = top + cell / 2 + Math.floor(k / cols) * cell - 20 - this.menuScroll;
+      pt.mp = toWorld(px, py); pt.mpx = [px, py];
+    });
+    this.menuView = { D, pxu, W, H, cell, toWorld, maxScroll };
+    return items;
+  },
+  menuAt(x, y) {
+    const v = this.menuView;
+    if (!v) return null;
+    const sp = this.menuSpark;
+    if (sp && Math.hypot(x - sp[0], y - sp[1]) < 50) return 'spark';
+    return this.all().find((pt) => pt.mpx && Math.abs(pt.mpx[0] - x) < v.cell * 0.45 && Math.abs(pt.mpx[1] - y) < v.cell * 0.5) || null;
+  },
+  menuClick(x, y) {
+    const hit = this.menuAt(x, y);
+    if (!hit || UI.busy) return;
+    if (hit === 'spark') return Game.guideTalk();
+    if (!Game.isUnlocked(hit.L.num)) { UI.toast(tr(`🔒 Najprv dokonči level ${hit.L.num - 1}.`, `🔒 Complete level ${hit.L.num - 1} first.`, `🔒 Спершу пройди рівень ${hit.L.num - 1}.`)); return; }
+    Game.enterLevel(hit.L.num);
+  },
+  drawMenu(r) {
+    const t = r.time, items = this.menuLayout(), v = this.menuView;
+    r.fog = 0; r.shiftX = 0; r.begin([0, 0, v.D], [0, 0, 0]);
+    const hover = UI.mouse && !UI.busy ? this.menuAt(UI.mouse[0], UI.mouse[1]) : null;
+    document.body.classList.toggle('c-ptr', !!hover);
+    for (const pt of items) {
+      const L = pt.L, open = Game.isUnlocked(L.num), done = Game.progress.stars[L.num], c = pt.mp, hv = hover === pt;
+      if (pt.mpx[1] < -150 || pt.mpx[1] > v.H + 150) continue; // mimo obrazovky
+      const s = (hv ? 1.08 : 1) * 1.05, col = open ? L.color : [0.35, 0.35, 0.4], dir = [0, 0, 1];
+      const art = V3.add(c, [0, 0, 0.3]);
+      if (L.num === 0) { for (let k = 0; k < 8; k++) { const a = t * 0.8 + k * Math.PI / 4; r.sphere(V3.add(c, [Math.cos(a) * 1.3, Math.sin(a) * 1.3, 0.2]), 0.12, [[0.31, 0.55, 1], [1, 0.42, 0.49], [0.37, 0.89, 1], [0.73, 0.55, 1], [1, 0.6, 0.9], [0.49, 1, 0.63], [1, 0.82, 0.35], [1, 1, 1]][k], { emissive: 0.7 }); } }
+      else PortalArt.draw(r, L.num, art, dir, t + L.num, open);
+      r.draw('torus', M4.orient(c, dir, 2.05 * s), col, { emissive: open ? (hv ? 0.9 : 0.5) : 0 });
+      r.draw('disk', M4.orient(V3.add(c, [0, 0, -0.4]), dir, 1.95 * s), col, { alpha: open ? (hv ? 0.3 : 0.16) : 0.08, emissive: 0.8, unlit: 1 });
+      const dd = Game.progress.diff[L.num], st = (done ? ' ' + '★'.repeat(done) + '☆'.repeat(3 - done) : '') + (dd && dd !== 'normal' ? ` <small>(${DIFF_NAME[dd]})</small>` : '');
+      UI.label('portal' + L.num, V3.add(c, [0, -2.75, 0]), `<b>${L.num} · ${L.title}</b>${st}<br><small>${open ? L.face + ' ' + L.mentor : tr('🔒 zamknuté', '🔒 locked', '🔒 закрито')}</small>`, 'portal menu' + (open ? '' : ' locked') + (hv ? ' hover' : ''));
+      const tip = L.num === 0 ? tr('Všetky symboly, farby a tvary rovníc v 3D — s vysvetlením a kvízmi.', 'Every symbol, colour and shape of the equations in 3D — explained and quizzed.', 'Усі символи, кольори й форми рівнянь у 3D — з поясненнями та тестами.') : (Settings.layman ? LAYMAN_LEVEL_TIPS : LEVEL_TIPS)[L.num] + portalList(L.num);
+      UI.hot(c, `<b>${tr('Portál', 'Portal', 'Портал')} ${L.num}: ${L.title}</b><br>${tip}${open ? '' : tr('<br>🔒 Najprv dokonči predchádzajúci level.', '<br>🔒 Complete the previous level first.', '<br>🔒 Спершу пройди попередній рівень.')}`, v.cell * 0.4);
+    }
+    // Iskra vľavo hore (pod hlavičkou): klik = rozhovor
+    const sx = 80, sy = 175, sw = v.toWorld(sx, sy);
+    this.menuSpark = [sx, sy];
+    Spark.draw(r, sw, t, 1.6);
+    UI.label('guide', V3.add(sw, [0, -1.9, 0]), tr('✨ Iskra<br><small>sprievodkyňa · klikni</small>', '✨ Spark<br><small>your guide · click</small>', '✨ Іскра<br><small>провідниця · клікни</small>'), 'npc');
+    UI.hot(sw, tr('<b>Iskra</b> — sprievodkyňa. Klikni na ňu.', '<b>Spark</b> — your guide. Click her.', '<b>Іскра</b> — твоя провідниця. Клікни на неї.'), 50);
+    if (v.maxScroll > 0) UI.label('mscroll', v.toWorld(v.W - 110, v.H - 30), this.menuScroll < v.maxScroll ? tr('▼ koliesko myši', '▼ mouse wheel', '▼ коліщатко миші') : '▲', 'axis', null);
+  },
   enter(fromLevel) {
     Game.r.fog = Settings.wow ? 0.009 : 0.012; Game.r.fogColor = Settings.wow ? [0.62, 0.75, 0.88] : Settings.nordic ? [0.29, 0.34, 0.4] : [0.06, 0.08, 0.16];
     UI.setHud(tr('Hilbertov ostrov', 'Hilbert Island', 'Острів Гільберта'), Game.nextQuestText());
@@ -192,6 +252,7 @@ const Hub = {
   update(dt) {
     const pl = this.player;
     pl.phase += dt * 2.2;
+    if (Settings.menu) { this.near = null; this.nearGuide = false; this.nearVendor = false; return; } // menu: bez chodenia po ostrove
     const W = Settings.wow;
     if (W) Wow.moving = false;
     if (!UI.busy && !(W && Wow.dead)) {
@@ -243,6 +304,7 @@ const Hub = {
     Game.enterLevel(L.num);
   },
   draw(r) {
+    if (Settings.menu) return this.drawMenu(r);
     const pl = this.player, t = r.time;
     r.begin(this.cam.eye(), this.cam.target);
     const N = Settings.nordic, WW = Settings.wow;
@@ -297,7 +359,7 @@ const Hub = {
     }
     this.drawPortal0(r, t);
     // drak Ketvarr (severská téma): krúži nad ostrovom, po porážke sedí na Dračom štíte
-    if (!Settings.dragon) { /* klasická téma: bez draka a snehu */ } else if (Game.progress.stars[12] === undefined) {
+    if (!Settings.dragon) { /* klasická téma: bez draka a snehu */ } else if (Game.progress.stars[13] === undefined) {
       const w = t * 0.11, dp = [Math.cos(w) * 46, 27 + Math.sin(t * 0.5) * 3, Math.sin(w) * 46];
       Dragon.draw(r, dp, Math.atan2(-Math.sin(w), Math.cos(w)), { scale: 2.4, bank: 0.35, t });
       const nw = LEVELS.filter((L) => !L.boss && !L.free).length, bp = LEVELS.find((L) => L.boss)?.num;
@@ -421,8 +483,8 @@ const LEVEL_TIPS = tr({
   9: 'Geometria Blochovej sféry: θ a φ ako súradnice, rotácie R<sub>n</sub>(ϑ), meranie ako smer otázky, unitárne vs. dekoherencia.',
   10: 'Čistota stavu: ρ′ = UρU† nemení |r|, purifikácia meraním, pseudo-čistý stav v NMR, ⟨A⟩ = Tr(ρA), časová evolúcia.',
   11: 'Meranie ako súčasť výpočtu: fáza → interferencia → pravdepodobnosť, meranie uprostred obvodu, spätná väzba, Bellov stav vs. zmes.',
-  13: '🧪 Praktické NMR (odomknuté od začiatku): ladenie vysielača na ν₀ = γB₀/2π, prúdové impulzy v priečnej RF cievke, meracie sekvencie, kalibrácia, shim a spinové echo.',
-  12: '🐉 Záverečný súboj s drakom Ketvarrom: ťahová bitka, štít = qubit, úder = meranie, cieľ P(zásah) ≥ prah.',
+  12: '🧪 Praktické NMR (odomknuté od začiatku): ladenie vysielača na ν₀ = γB₀/2π, prúdové impulzy v priečnej RF cievke, meracie sekvencie, kalibrácia, shim a spinové echo.',
+  13: '🐉 Záverečný súboj s drakom Ketvarrom: ťahová bitka, štít = qubit, úder = meranie, cieľ P(zásah) ≥ prah.',
 }, {
   1: 'Complex numbers: amplitude as a clock hand, phase, i² = −1, interference.',
   2: 'Spin measurement: two spots, ±ħ/2, the measurement basis is part of the question.',
@@ -435,8 +497,8 @@ const LEVEL_TIPS = tr({
   9: 'Bloch-sphere geometry: θ and φ as coordinates, rotations R<sub>n</sub>(ϑ), measurement as the direction of a question, unitary vs. decoherence.',
   10: 'Purity: ρ′ = UρU† keeps |r|, purification by measurement, the NMR pseudo-pure state, ⟨A⟩ = Tr(ρA), time evolution.',
   11: 'Measurement as part of the computation: phase → interference → probability, mid-circuit measurement, feedback, Bell state vs. mixture.',
-  13: '🧪 Hands-on NMR (unlocked from the start): tuning the transmitter to ν₀ = γB₀/2π, current pulses in the transverse RF coil, measurement sequences, calibration, shimming and the spin echo.',
-  12: '🐉 The final battle with the dragon Ketvarr: turn-based, ward = qubit, strike = measurement, aim for P(hit) ≥ the threshold.',
+  12: '🧪 Hands-on NMR (unlocked from the start): tuning the transmitter to ν₀ = γB₀/2π, current pulses in the transverse RF coil, measurement sequences, calibration, shimming and the spin echo.',
+  13: '🐉 The final battle with the dragon Ketvarr: turn-based, ward = qubit, strike = measurement, aim for P(hit) ≥ the threshold.',
 }, {
   1: 'Комплексні числа: амплітуда як стрілка годинника, фаза, i² = −1, інтерференція.',
   2: 'Вимірювання спіну: дві плями, ±ħ/2, базис вимірювання — частина питання.',
@@ -449,8 +511,8 @@ const LEVEL_TIPS = tr({
   9: 'Геометрія сфери Блоха: θ і φ як координати, повороти R<sub>n</sub>(ϑ), вимірювання як напрямок питання, унітарна еволюція проти декогеренції.',
   10: 'Чистота стану: ρ′ = UρU† не змінює |r|, очищення вимірюванням, псевдочистий стан у ЯМР, ⟨A⟩ = Tr(ρA), часова еволюція.',
   11: 'Вимірювання як частина обчислення: фаза → інтерференція → імовірність, вимірювання посеред схеми, зворотний зв’язок, стан Белла проти суміші.',
-  13: '🧪 Практичний ЯМР (відкрито від початку): налаштування передавача на ν₀ = γB₀/2π, імпульси струму в поперечній РЧ-котушці, вимірювальні послідовності, калібрування, шим і спінове відлуння.',
-  12: '🐉 Фінальна битва з драконом Кетварром: покрокова, захист = кубіт, удар = вимірювання, цілься на P(влучання) ≥ порогу.',
+  12: '🧪 Практичний ЯМР (відкрито від початку): налаштування передавача на ν₀ = γB₀/2π, імпульси струму в поперечній РЧ-котушці, вимірювальні послідовності, калібрування, шим і спінове відлуння.',
+  13: '🐉 Фінальна битва з драконом Кетварром: покрокова, захист = кубіт, удар = вимірювання, цілься на P(влучання) ≥ порогу.',
 });
 
 // obsah levelu na portáli: zoznam úloh v bubline (zobrazí sa pri prejdení myšou)
@@ -466,8 +528,8 @@ const PORTAL_CONTENTS = tr({
   9: ['súradnice θ, φ', 'rotácie R<sub>n</sub>(ϑ)', 'φ z merania S<sub>x</sub>, S<sub>y</sub>', 'unitárne vs. dekoherencia'],
   10: ['unitárna stena (|r| sa nemení)', 'purifikácia meraním a chladením', 'pseudo-čistý stav NMR', 'tomografia r = (⟨σ<sub>x</sub>⟩, ⟨σ<sub>y</sub>⟩, ⟨σ<sub>z</sub>⟩)', 'časová evolúcia'],
   11: ['|+⟩ alebo |−⟩? (fáza → H → meranie)', 'meranie uprostred obvodu', 'spätná väzba: zmeraj → rozhodni', 'Bellov stav vs. zmes'],
-  12: ['ťahový súboj: štít = qubit, úder = meranie'],
-  13: ['ladenie vysielača na ν₀', 'prúdový impulz v RF cievke', 'meracie sekvencie a FID', 'kalibrácia impulzu', 'shim a spinové echo'],
+  13: ['ťahový súboj: štít = qubit, úder = meranie'],
+  12: ['ladenie vysielača na ν₀', 'prúdový impulz v RF cievke', 'meracie sekvencie a FID', 'kalibrácia impulzu', 'shim a spinové echo'],
 }, {
   1: ['the amplitude hand and its phase', 'multiplying by i = a 90° turn', 'interference of two paths'],
   2: ['two silver spots', 'measurement sequences Z → X → Z', 'predicting cos²(θ/2)'],
@@ -480,8 +542,8 @@ const PORTAL_CONTENTS = tr({
   9: ['coordinates θ, φ', 'rotations R<sub>n</sub>(ϑ)', 'φ from measuring S<sub>x</sub>, S<sub>y</sub>', 'unitary vs. decoherence'],
   10: ['the unitary wall (|r| stays)', 'purification by measurement and cooling', 'the NMR pseudo-pure state', 'tomography r = (⟨σ<sub>x</sub>⟩, ⟨σ<sub>y</sub>⟩, ⟨σ<sub>z</sub>⟩)', 'time evolution'],
   11: ['|+⟩ or |−⟩? (phase → H → measurement)', 'mid-circuit measurement', 'feedback: measure → decide', 'Bell state vs. mixture'],
-  12: ['turn-based battle: ward = qubit, strike = measurement'],
-  13: ['tuning the transmitter to ν₀', 'a current pulse in the RF coil', 'measurement sequences and the FID', 'pulse calibration', 'shimming and the spin echo'],
+  13: ['turn-based battle: ward = qubit, strike = measurement'],
+  12: ['tuning the transmitter to ν₀', 'a current pulse in the RF coil', 'measurement sequences and the FID', 'pulse calibration', 'shimming and the spin echo'],
 }, {
   1: ['стрілка амплітуди та її фаза', 'множення на i = поворот на 90°', 'інтерференція двох шляхів'],
   2: ['дві плями срібла', 'послідовності вимірювань Z → X → Z', 'передбачення cos²(θ/2)'],
@@ -494,8 +556,8 @@ const PORTAL_CONTENTS = tr({
   9: ['координати θ, φ', 'повороти R<sub>n</sub>(ϑ)', 'φ з вимірювань S<sub>x</sub>, S<sub>y</sub>', 'унітарне проти декогеренції'],
   10: ['унітарна стіна (|r| не змінюється)', 'очищення вимірюванням і охолодженням', 'псевдочистий стан ЯМР', 'томографія r = (⟨σ<sub>x</sub>⟩, ⟨σ<sub>y</sub>⟩, ⟨σ<sub>z</sub>⟩)', 'часова еволюція'],
   11: ['|+⟩ чи |−⟩? (фаза → H → вимірювання)', 'вимірювання посеред схеми', 'зворотний зв’язок: виміряй → виріши', 'стан Белла проти суміші'],
-  12: ['покроковий бій: захист = кубіт, удар = вимірювання'],
-  13: ['налаштування передавача на ν₀', 'імпульс струму в РЧ-котушці', 'вимірювальні послідовності та FID', 'калібрування імпульсу', 'шим і спінове відлуння'],
+  13: ['покроковий бій: захист = кубіт, удар = вимірювання'],
+  12: ['налаштування передавача на ν₀', 'імпульс струму в РЧ-котушці', 'вимірювальні послідовності та FID', 'калібрування імпульсу', 'шим і спінове відлуння'],
 });
 const portalList = (n) => (PORTAL_CONTENTS[n] ? `<ol class="plist">${PORTAL_CONTENTS[n].map((x) => `<li>${x}</li>`).join('')}</ol>` : '');
 
@@ -534,12 +596,12 @@ const PortalArt = {
         r.draw('box', M4.trs(P(0.35, 0), yaw - 0.25, [0.6, 0.85, 0.12]), g([0.3, 0.65, 0.55]));
         if (open) UI.label('pa5' + c[0].toFixed(1), P(0, 0.75), '⟨φ|ψ⟩', 'ket');
         break;
-      case 6: case 13: { // precesia okolo B₀ (v NMR dielni aj RF cievka)
+      case 6: case 12: { // precesia okolo B₀ (v NMR dielni aj RF cievka)
         const ph = t * 2, v = qToWorld([Math.sin(0.6) * Math.cos(ph), Math.sin(0.6) * Math.sin(ph), Math.cos(0.6)]);
         r.arrow(P(0, -1), P(0, 1.05), g([0.5, 0.8, 1]), 0.025);
         r.arrow(c, V3.add(c, V3.scale(v, 0.9)), g([1, 0.35, 0.45]), 0.05, E);
         r.draw('circle', M4.trs(V3.add(c, [0, Math.cos(0.6) * 0.9, 0]), 0, Math.sin(0.6) * 0.9), g([1, 0.6, 0.7]), { alpha: 0.6 });
-        if (n === 13) for (const s of [-1, 1]) r.draw('torus', M4.orient(P(s * 0.8, 0), u, 0.45), g([1, 0.7, 0.3]), { emissive: open ? 0.4 + 0.6 * Math.max(0, Math.sin(t * 3)) : 0 });
+        if (n === 12) for (const s of [-1, 1]) r.draw('torus', M4.orient(P(s * 0.8, 0), u, 0.45), g([1, 0.7, 0.3]), { emissive: open ? 0.4 + 0.6 * Math.max(0, Math.sin(t * 3)) : 0 });
         break;
       }
       case 7: { const s = 1 + 0.15 * Math.sin(t * 3); r.sphere(P(-0.6, 0), 0.22 * s, g([0.31, 0.55, 1]), E); r.sphere(P(0.6, 0), 0.22 * s, g([1, 0.42, 0.49]), E); r.rod(P(-0.6, 0), P(0.6, 0), g([1, 0.45, 0.7]), 0.02, E); break; }
@@ -553,7 +615,7 @@ const PortalArt = {
         r.draw('box', M4.trs(P(-0.45, -0.2), t * 0.4, 0.55), g([0.55, 0.42, 0.25]));
         [0.5 + 0.5 * Math.sin(t * 2), 0.5 - 0.5 * Math.sin(t * 2)].forEach((h, k) => r.draw('cylinder', M4.trs(P(0.45 + k * 0.4, -0.7), 0, [0.12, 0.1 + h * 1.2, 0.12]), g(k ? [1, 0.45, 0.45] : [0.45, 0.65, 1]), E)); break;
       }
-      case 12: { const fl = 0.5 + 0.5 * Math.sin(t * 5); r.sphere(P(0, 0.2), 0.35, g([1, 0.42, 0.15]), { emissive: open ? 0.5 + fl * 0.5 : 0 }); for (const s of [-1, 1]) r.sphere(P(s * 0.14, 0.32, 0.3), 0.06, g([1, 0.9, 0.2]), E); break; }
+      case 13: { const fl = 0.5 + 0.5 * Math.sin(t * 5); r.sphere(P(0, 0.2), 0.35, g([1, 0.42, 0.15]), { emissive: open ? 0.5 + fl * 0.5 : 0 }); for (const s of [-1, 1]) r.sphere(P(s * 0.14, 0.32, 0.3), 0.06, g([1, 0.9, 0.2]), E); break; }
       default: break;
     }
   },
@@ -588,7 +650,7 @@ const Game = {
     this.last = performance.now();
     requestAnimationFrame((t) => this.loop(t));
     if (!this.progress.introSeen) setTimeout(() => this.guideTalk(), 400);
-    else if (Settings.eq && !this.progress.eqIntroSeen) setTimeout(() => this.eqIntro(), 400);
+    else if (Settings.glyphs && !this.progress.eqIntroSeen) setTimeout(() => this.eqIntro(), 400);
   },
   loop(now) {
     const dt = Math.min((now - this.last) / 1000, 0.05);
@@ -626,13 +688,13 @@ const Game = {
       if (e.code === 'KeyL') { UI.toggleLog(); return; }
       if (e.code === 'KeyV') { Views.toggle(); return; } // pohľady aj počas dialógu
       if (e.code === 'KeyN') { Sound.toggleMute(); return; }
-      if (e.code === 'KeyM') { this.toggleMap(); return; } // mapa (a teleport) aj počas dialógu
+      if (e.code === 'KeyM' && !Settings.menu) { this.toggleMap(); return; } // menu: bez mapy // mapa (a teleport) aj počas dialógu
       if (Settings.wow && UI.busy && /^Digit[89]$/.test(e.code)) { Wow.key(e); return; } // elixíry aj počas dialógu
       if (UI.busy) return;
       if (Settings.wow && Wow.key(e)) return; // lišta kúziel 1 … =, Tab, B, skok
       if (e.code === 'KeyE' && this.scene === Hub) Hub.interact();
       if (e.code === 'KeyC') UI.toggleCodex();
-      if (e.code === 'KeyK' && Settings.eq) EqM.toggleKey(); // 🔑 kľúč (nie počas rozhovoru)
+      if (e.code === 'KeyK' && Settings.glyphs) EqM.toggleKey(); // 🔑 kľúč (nie počas rozhovoru)
       if (e.code === 'KeyO') UI.toggleSettings();
       if (e.code === 'KeyH' || e.code === 'F1') { e.preventDefault(); UI.toggleHelp(); }
       if (e.code === 'Escape') { UI.toggleCodex(false); UI.toggleHelp(false); UI.toggleLog(false); this.toggleMap(false); Settings.wow && Wow.escape(); }
@@ -653,6 +715,7 @@ const Game = {
     });
     canvas.addEventListener('pointerup', (e) => {
       if (drag && moved < 6 && Settings.wow) Wow.click(e.clientX, e.clientY, e.button); // klik bez ťahania = zameranie cieľa
+      if (drag && moved < 6 && Settings.menu && this.scene === Hub) Hub.menuClick(e.clientX, e.clientY); // menu: klik na portál = vstup
       drag = null; this.dragging = false;
       document.body.classList.remove('cam-rot');
     });
@@ -663,7 +726,7 @@ const Game = {
     mc.addEventListener('click', (e) => this.mapClick(...mxy(e)));
     mc.addEventListener('pointermove', (e) => { this.mapHover = mxy(e); });
     mc.addEventListener('pointerleave', () => { this.mapHover = null; });
-    canvas.addEventListener('wheel', (e) => { e.preventDefault(); this.scene.cam && this.scene.cam.zoom(e.deltaY); }, { passive: false });
+    canvas.addEventListener('wheel', (e) => { e.preventDefault(); if (Settings.menu && this.scene === Hub) { Hub.menuScroll += e.deltaY * 0.6; return; } this.scene.cam && this.scene.cam.zoom(e.deltaY); }, { passive: false });
   },
   enterLevel(num, resume) {
     Sound.sfx('portal');
@@ -689,7 +752,13 @@ const Game = {
   isUnlocked(n) { return n === 0 || n === 1 || this.progress.allUnlocked || !!LEVELS.find((L) => L.num === n && L.free) || this.progress.stars[n - 1] !== undefined || this.progress.stars[n] !== undefined; },
   setDifficulty(d) {
     if (!DIFFS.includes(d) || d === Settings.diff) return;
+    const plainWas = Settings.plainEq;
     Settings.diff = d; Settings.save();
+    if (plainWas !== Settings.plainEq) { // farebné glyfy (ľahká) ↔ klasická sadzba (normálna, ťažká)
+      EqM.apply();
+      if (this.levels) { Hub.init(); if (this.scene && this.scene.num === 0 && !Settings.glyphs) this.backToHub(); }
+      UI.refreshTheory && UI.refreshTheory();
+    }
     UI.labelsClear(); // 3D popisky si načítajú vysvetlivky pre novú obťažnosť (laická má vlastné)
     UI.diffUi && UI.diffUi();
     if (this.scene && this.scene !== Hub) this.scene.request(); else UI.setHud(tr('Hilbertov ostrov', 'Hilbert Island', 'Острів Гільберта'), this.nextQuestText());
@@ -714,11 +783,11 @@ const Game = {
     EqM.apply();
     UI.labelsClear();
     Hub.init(); // portál 0 (Sieň symbolov) je len v type „Jazyk rovníc“ — kruh portálov sa preusporiada
-    if (this.scene && this.scene.num === 0 && !Settings.eq) this.backToHub();
+    if (this.scene && this.scene.num === 0 && !Settings.glyphs) this.backToHub();
     if (this.scene && this.scene !== Hub) { this.scene.request(); UI.refreshTheory(); } else UI.setHud(tr('Hilbertov ostrov', 'Hilbert Island', 'Острів Гільберта'), this.nextQuestText());
     UI.refreshDialog && UI.refreshDialog();
     UI.toast(tr(`🎮 Typ hry: <b>${MODE_NAME[m]}</b>`, `🎮 Game type: <b>${MODE_NAME[m]}</b>`, `🎮 Тип гри: <b>${MODE_NAME[m]}</b>`), 3000);
-    if (Settings.eq && !this.progress.eqIntroSeen && !UI.busy) { UI.toggleSettings(false); this.eqIntro(); }
+    if (Settings.glyphs && !this.progress.eqIntroSeen && !UI.busy) { UI.toggleSettings(false); this.eqIntro(); }
   },
   // sprievodkyňa predstaví rovnicovú mnemotechniku (raz, pri prvom zapnutí typu „Rovnice najprv“)
   eqIntro() { UI.say(this.eqIntroLines()); },
@@ -746,7 +815,7 @@ const Game = {
   restoreSession() {
     const ss = this.progress.session;
     if (!ss) return;
-    if ((ss.scene === 'L0' && Settings.eq) || (ss.scene > 0 && this.levelOf(ss.scene) && this.isUnlocked(ss.scene))) {
+    if ((ss.scene === 'L0' && Settings.glyphs) || (ss.scene > 0 && this.levelOf(ss.scene) && this.isUnlocked(ss.scene))) {
       this.enterLevel(ss.scene === 'L0' ? 0 : ss.scene, ss);
     } else if (Array.isArray(ss.p)) {
       Hub.player.p = ss.p; Hub.player.heading = ss.h || 0; Hub.cam.yaw = ss.yaw || 0;
@@ -807,7 +876,7 @@ const Game = {
     this.progress.introSeen = true;
     if (Settings.layman && !this.progress.laymanSeen) {
       this.progress.laymanSeen = true; this.save();
-      return UI.say(LAYMAN_INTRO.map(A).concat(Settings.eq && !this.progress.eqIntroSeen ? this.eqIntroLines() : []));
+      return UI.say(LAYMAN_INTRO.map(A).concat(Settings.glyphs && !this.progress.eqIntroSeen ? this.eqIntroLines() : []));
     }
     this.save();
     if (Settings.wow && !first && Wow.guideQuest(A)) return; // MMO: úlohy od Iskry
@@ -819,13 +888,14 @@ const Game = {
       Settings.dragon && A(DL('main.guideTalk.1.4')),
       A(DL('main.guideTalk.1.5')),
       A(DL('main.guideTalk.1.6')),
-      Settings.eq && A(DL('main.guideTalk.1.7')),
+      Settings.glyphs && A(DL('main.guideTalk.1.7')),
       A(DL('main.guideTalk.1.8')),
       Settings.wow && A(DL('main.guideTalk.1.9')),
     ] : [A(this.nextQuestText() + DL('main.guideTalk.2'))]).filter(Boolean)
-      .concat(first && Settings.eq && !this.progress.eqIntroSeen ? this.eqIntroLines() : []));
+      .concat(first && Settings.glyphs && !this.progress.eqIntroSeen ? this.eqIntroLines() : []));
   },
   toggleMap(force) {
+    if (Settings.menu) force = false; // téma „výberové menu“ mapu nemá
     const m = $('#map'), show = force ?? !m.classList.contains('show');
     if (show !== m.classList.contains('show')) Sound.sfx(show ? 'map' : 'close');
     m.classList.toggle('show', show);
@@ -887,15 +957,18 @@ const Game = {
   save() {
     if (this.resetting || !this.levels) return;
     this.progress.session = this.snapshot();
-    try { localStorage.setItem('kvantp-game1', JSON.stringify({ ...this.progress, ver: 2, codex: [...this.progress.codex], scrolls: [...this.progress.scrolls], eqs: [...this.progress.eqs] })); } catch (e) { /* bez ukladania */ }
+    try { localStorage.setItem('kvantp-game1', JSON.stringify({ ...this.progress, ver: 3, codex: [...this.progress.codex], scrolls: [...this.progress.scrolls], eqs: [...this.progress.eqs] })); } catch (e) { /* bez ukladania */ }
   },
   load() {
     try {
       const d = JSON.parse(localStorage.getItem('kvantp-game1') || 'null');
       this.fresh = !d;
-      if (d && (d.ver || 1) < 2) { // pôvodne bol drak level 9; teraz sú 9–11 nové levely (prednášky 4–5) a drak je 12
-        for (const k of ['stars', 'diff']) if (d[k] && d[k][9] !== undefined) { d[k][12] = d[k][9]; delete d[k][9]; }
-        if (d.session && d.session.scene === 9) d.session.scene = 12;
+      if (d && (d.ver || 1) < 2) { // pôvodne bol drak level 9; teraz sú 9–11 nové levely (prednášky 4–5), 12 NMR dielňa a drak 13
+        for (const k of ['stars', 'diff']) if (d[k] && d[k][9] !== undefined) { d[k][13] = d[k][9]; delete d[k][9]; }
+        if (d.session && d.session.scene === 9) d.session.scene = 13;
+      } else if (d && d.ver === 2) { // medziverzia: drak bol 12 a NMR dielňa 13
+        for (const k of ['stars', 'diff']) if (d[k]) { const a = d[k][12], b = d[k][13]; delete d[k][12]; delete d[k][13]; if (a !== undefined) d[k][13] = a; if (b !== undefined) d[k][12] = b; }
+        if (d.session && (d.session.scene === 12 || d.session.scene === 13)) d.session.scene = 25 - d.session.scene;
       }
       if (d) this.progress = { stars: d.stars || {}, diff: Object.fromEntries(Object.entries(d.diff || {}).map(([k, v]) => [k, v === 'ancient' ? 'hard' : v])), codex: new Set(d.codex || []), scrolls: new Set(d.scrolls || []), eqs: new Set(d.eqs || []), introSeen: !!d.introSeen, eqIntroSeen: !!d.eqIntroSeen, laymanSeen: !!d.laymanSeen, moved: !!d.moved, allUnlocked: !!d.allUnlocked, session: d.session || null, wow: d.wow || null };
     } catch (e) { /* čistý začiatok */ }

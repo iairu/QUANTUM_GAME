@@ -48,8 +48,10 @@ Progress, settings, the Codex and the Journal are saved in the browser (`localSt
 
 On the first start (and after a reset) a two-step welcome screen appears:
 
-1. **Gameplay style** and **Difficulty** → *Next ▸*
-2. **History**, **Equations** and **Levels** → *◂ Back* / *▶ Start the game*
+1. **Difficulty** → *Next ▸*
+2. **History and dialogue**, **Equations** and **Levels** → *◂ Back* / *▶ Start the game*
+
+Defaults: Normal difficulty, historic scrolls on, dialogue on, all levels unlocked. The gameplay style (Classic / Nordic / MMO) is no longer offered on the welcome screen — it stays Classic and can be changed in the settings (⚙).
 
 Everything can be changed later in the settings (⚙).
 
@@ -74,30 +76,34 @@ You play **Little Psi**, the quantum state ψ — not a little ball with a posit
 Correct answers **snap into place**: once an input is accepted (an arrow on its target, a π pulse, the optimal CHSH angles…), the slider and the 3D picture glide exactly onto the correct value.
 
 ## Choices on the welcome screen
-### 1 · Gameplay style
+### Gameplay style (settings ⚙ only)
 | Style | |
 |---|---|
 | **Classic** (default) | the original blue grid island with 8 portals — nothing distracts from the physics, runs on weaker computers |
 | **🐉 Nordic** | a snowy island with pines and standing stones, Nordic lettering and detailed procedural textures; every mentor teaches a *Word of Power* and level 9 is a turn-based battle with the quantum dragon **Ketvarr** |
 | **⚔ MMO** | plays like an online RPG: a quantum mage with levels, a spell bar (X and H gates, the Born blade = measurement…), *classical misconceptions* as neutral enemies whose shields are qubits, quests, a vendor (Max Planck), bags and loot; levels are dungeons with bosses, and the dragon is a raid |
 
-### 2 · Difficulty
+### 1 · Difficulty
 Can be changed at any time from the selector in the top-right corner — the open dialogue, quiz and task text update immediately.
 
 - **🫶 Layman** — everything in everyday words: an "in plain words" card before every task, technical words translated in brackets, simple tooltips.
-- **Easy** (default) — wider tolerances, fewer trials, hints, one wrong option fewer in quizzes.
-- **Normal** — the original game.
-- **Hard** — theory and equations at every step, extra equation questions, dense texts without analogies, random targets, no hints, stricter stars.
+- **Easy** — wider tolerances, fewer trials, hints, one wrong option fewer in quizzes; equations are shown straight away in the colourful glyph language.
+- **Normal** (default) — the original game. **∑ Complete the equation:** before every task the mentor does not give away its equation — you first fill in its missing parts from drop-downs (e.g. ρ′ = Uρ( )), each blank with exactly one correct option. Equations are typeset plainly (Baskerville-style serif) — no colours, glyphs, live equation stage or Hall of Symbols.
+- **Hard** — as Normal plus theory and equations at every step, more fill-in blanks, extra equation questions, dense texts, random targets, no hints, stricter stars.
 
-### 3 · History
-**📜 Historic scrolls** (off by default): before level steps a scroll unrolls with the history of the discoveries — years, authors, their conversations and famous words — and every level ends with one history question. Collected scrolls stay in the Codex.
+Layman and Easy skip the fill-in quizzes entirely.
 
-### 4 · Equations
+### 2 · History and dialogue
+**📜 Historic scrolls** (on by default): before level steps a scroll unrolls with the history of the discoveries — years, authors, their conversations and famous words — and every level ends with one history question. Collected scrolls stay in the Codex.
+
+**💬 Dialogue** (on by default) or **⏭ Skip all dialogue** — skipping leaves only the tasks, quizzes, equation cards and scrolls; conversations are still written to the Journal (L).
+
+### 3 · Equations
 - **🖼 Mainly Human Language** — the picture and intuition come first (hands, the Bloch ball, experiments); equations live in the 📐 theory panel and the Journal.
 - **∑ Equation Language (Experimental)** (default) — the real equation that holds right now is shown at the top of the screen and changes as you play; every task starts with its "∑ Equation first" card; all symbols are drawn as glyphs (below); adds **portal 0 — the Hall of Symbols** (17 pedestals, each symbol as a small 3D experiment, with a question after each one, a review after each chapter and a final exam).
 
-### 5 · Levels
-**Step by step** (default — the next portal opens after the previous level) or **Unlock everything** (all portals open right away, e.g. for teachers or revision). Unlocking and resetting are also available at the bottom of the help (H) and settings (⚙) panels.
+### 4 · Levels
+**Unlock everything** (default — all portals open right away) or **Step by step** (the next portal opens after the previous level). Unlocking and resetting are also available at the bottom of the help (H) and settings (⚙) panels.
 
 ## Equation glyphs
 In the Equation Language every symbol becomes an SVG glyph that carries its meaning: **colour = who** it is, a **pictogram behind the letter = what it does**, and the **frame shape = what kind** of object it is. Hover a glyph for its name, a memory phrase and the pictogram on its own; the 🔑 key (top right, key **K**) holds the full glyph dictionary and the mnemonic rules. The files below are exported from the game (`docs/glyphs/`).
@@ -142,9 +148,13 @@ In the Equation Language every symbol becomes an SVG glyph that carries its mean
 | 6 | Rabi's Resonator (NMR) | I. I. Rabi | precession, rotating frame, π and π/2 pulses, resonance, T₂ |
 | 7 | Bell's Bridge | John Bell | Bell state, reduced states, no-signalling, the CHSH game |
 | 8 | Hall of Interpretations | Niels Bohr (+ Kant, Wittgenstein, Stodola, Bohm, Heisenberg, Noether) | collapse, complementarity, interpretations |
-| 9 | Dragon's Peak *(Nordic and MMO styles)* | Erwin Schrödinger | turn-based battle: the dragon's ward is a qubit, a strike is a measurement with P = ½(1 + r·n) |
+| 9 | Pauli's Rotation Workshop *(lecture 4)* | Wolfgang Pauli | θ, φ as coordinates, rotations R<sub>n</sub>(ϑ) = exp(−iϑ n·σ/2), measurement as the direction of a question (φ = atan2(r<sub>y</sub>, r<sub>x</sub>)), unitary vs. decoherence, Bell state limits |
+| 10 | Von Neumann's Purity Refinery *(lecture 5)* | John von Neumann | ρ′ = UρU† keeps \|r\|, purification by measurement or cooling, NMR pseudo-pure state (r = εn), ⟨A⟩ = Tr(ρA), time evolution e<sup>−iHt/ħ</sup> |
+| 11 | Born's Readout Hall *(lecture 5)* | Max Born | phase → interference → probability, mid-circuit measurement, measure → decide → continue, Bell state vs. classical mixture, decoherence ≠ readout |
+| 12 | NMR Workshop *(hands-on, unlocked from the start)* | Edward Purcell | tuning the transmitter to ν₀ = γB₀/2π, current pulses in the transverse RF coil (θ = γB₁τ, phase = axis), measurement sequences and the FID, pulse calibration from the signal null, shimming and the spin echo |
+| 13 | Dragon's Peak *(Nordic and MMO styles)* | Erwin Schrödinger | turn-based battle: the dragon's ward is a qubit, a strike is a measurement with P = ½(1 + r·n) |
 
-Stars depend on the number of mistakes. New Codex cards (symbols, people, concepts, scrolls and every task's **∑ equation**) unlock as you play.
+Each portal shows a small animated preview of its level, and its tooltip lists the level's tasks. Stars depend on the number of mistakes (fill-in-the-equation mistakes count too). New Codex cards (symbols, people, concepts, scrolls and every task's **∑ equation**) unlock as you play.
 
 ## Controls
 | Key | Action |
@@ -178,7 +188,8 @@ All dialogue text — conversations, quizzes, language traps, "in plain words" c
 |---|---|
 | `index.html`, `style.css` | page, help, themes, welcome screen |
 | `js/main.js` | game loop, island (hub), portals, base `Level` class, saving |
-| `js/levels/*.js` | levels 0–9; `registry.js` sets their order |
+| `js/levels/*.js` | levels 0–13; `registry.js` sets their order |
+| `js/eqblanks.js` | ∑ fill-in-the-equation items for every level step (correct option first) |
 | `js/ui.js` | dialogues, quizzes, Journal, Codex, settings, tooltips |
 | `js/gl.js` · `js/math.js` · `js/quantum.js` | WebGL2 renderer and procedural meshes · vectors, matrices, complex numbers · 1- and 2-qubit simulator |
 | `js/eqglyphs.js` · `js/eqmnemo.js` | SVG equation glyphs and `[[…]]` rendering · live equation and the 🔑 key |
