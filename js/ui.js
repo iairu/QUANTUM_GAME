@@ -584,6 +584,7 @@ const UI = {
     body.appendChild(diffs);
     body.appendChild(el('h3', null, tr('📜 3 · História', '📜 3 · History', '📜 3 · Історія')));
     body.appendChild(this.checkbox(SCROLLS_DESC, Settings.scrolls, (v) => { Settings.scrolls = v; Settings.save(); }));
+    body.appendChild(this.checkbox(NOBLANKS_DESC, Settings.noBlanks, (v) => { Settings.noBlanks = v; Settings.save(); }));
     body.appendChild(this.checkbox(DIALOG_DESC, Settings.skipDialog, (v) => { Settings.skipDialog = v; Settings.save(); }));
     body.appendChild(el('h3', null, tr('∑ 4 · Rovnice', '∑ 4 · Equations', '∑ 4 · Рівняння')));
     const modes = el('div', 'diffs');

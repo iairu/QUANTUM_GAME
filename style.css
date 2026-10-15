@@ -674,7 +674,7 @@ body.eqmode #eqstage { display: block; }
 .lbl.mnl-ket { color: var(--mn-ket); } .lbl.mnl-a { text-decoration: underline 2px var(--mn-a); } .lbl.mnl-b { text-decoration: underline 2px var(--mn-b); }
 @media (max-width: 1100px) { #eqstage { top: auto; bottom: 112px; max-width: calc(100vw - 24px); } body.eqmode #toasts { top: 70px; } }
 /* uvítanie: typ hry */
-#welcome .wmodes { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+#welcome .wmodes { display: grid; grid-template-columns: 0.8fr 1fr 1fr; gap: 12px; }
 #welcome button.wmode { display: flex; flex-direction: row; gap: 12px; align-items: stretch; text-align: left; padding: 10px; border-radius: 12px;
   background: rgba(20, 30, 66, 0.75); border: 2px solid var(--line); transition: transform .15s, border-color .15s, box-shadow .15s; }
 #welcome button.wmode:hover { transform: translateY(-2px); background: rgba(30, 44, 92, 0.85); }
@@ -683,6 +683,13 @@ body.eqmode #eqstage { display: block; }
 #welcome button.wmode.on { border-color: var(--accent); background: rgba(24, 48, 92, 0.9); } /* (pravidlo button.wmode je za button.on) */
 #welcome .wmode[data-v="equations"].on { border-color: var(--mn-op); box-shadow: 0 0 0 1px var(--mn-op), 0 0 22px rgba(185, 140, 255, 0.35); }
 @media (max-width: 900px) { #welcome .wmodes { grid-template-columns: 1fr; } }
+/* tri karty v riadku: obrázok hore, text pod ním; „⏭ Bez kvízov“ je prepínač (dá sa kombinovať s typom rovníc) */
+#welcome button.wmode { flex-direction: column; }
+#welcome .wmode .shot { flex: none; width: 100%; aspect-ratio: 16 / 7; }
+#welcome .wmode.wnq .shot { display: flex; align-items: center; justify-content: center; text-align: center; font-size: 15px; }
+#welcome .wmode.wnq .shot b { font-size: 28px; }
+#welcome .wmode.wnq .nqeq { font-family: Baskerville, "Libre Baskerville", Georgia, serif; font-size: 18px; opacity: 0.8; }
+#welcome button.wmode.wnq.on { border-color: var(--good) !important; background: rgba(30, 70, 50, 0.55); box-shadow: 0 0 0 1px var(--good), 0 0 18px rgba(95, 224, 138, 0.3); }
 
 /* ∑ rovnicové glyfy: písmeno + piktogram významu + rám druhu, farba kategórie */
 /* účarie: písmeno glyfu stojí na y = 30.5 zo 40 → svg sa posunie o (40 − 30.5)/40 = 0.2375 svojej výšky pod účarie textu */
@@ -891,3 +898,4 @@ html[data-theme="menu"] #btn-map { display: none !important; }
 html[data-theme="menu"] .lbl.portal.menu { min-width: 150px; max-width: 205px; white-space: normal; text-align: center; line-height: 1.25; }
 html[data-theme="menu"] .lbl.portal.menu.hover { border-color: var(--accent); box-shadow: 0 0 14px rgba(95, 227, 255, 0.45); }
 body.c-ptr #gl { cursor: pointer; }
+#welcome .wdlrow { margin-top: 14px; } /* medzera medzi riadkom histórie a dialógov */

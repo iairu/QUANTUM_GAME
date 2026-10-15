@@ -266,7 +266,7 @@ const EQ_BLANKS = {
 const EqBlanks = {
   // kvízy pred krokom `step` levelu `num` (ľahká a laická: žiadne)
   for(num, step) {
-    if (Settings.easy) return [];
+    if (Settings.easy || Settings.noBlanks) return []; // ľahká/laická alebo „⏭ Bez kvízov“
     return (EQ_BLANKS[num]?.[step] || []).filter((b) => !b.hard || Settings.hard)
       .map((b) => ({ eq: b.eq, blanks: b.blanks, ctx: DL('blanks.' + b.c) }));
   },

@@ -20,6 +20,7 @@ const Settings = {
   get wow() { return this.theme === 'wow'; },
   get dragon() { return this.nordic || this.wow; }, // drak Ketvarr a 13. level
   get hard() { return this.diff === 'hard'; },
+  noBlanks: false, // ⏭ preskočiť kvízy „doplň rovnicu“ (pri ľubovoľnej obťažnosti)
   skipDialog: false, // 💬 preskočiť všetky dialógy (kvízy, zvitky a karty rovníc ostávajú)
   scrolls: true, // 📜 historické zvitky: história objavov pred krokmi levelov + otázka z histórie v každom leveli (pri ľubovoľnej obťažnosti)
   // ľahká aj laická (laická = ľahká + všetko bežnými slovami)
@@ -58,6 +59,7 @@ const Settings = {
       if (DIFFS.includes(d.diff)) this.diff = d.diff;
       if (typeof d.scrolls === 'boolean') this.scrolls = d.scrolls;
       if (typeof d.skipDialog === 'boolean') this.skipDialog = d.skipDialog;
+      if (typeof d.noBlanks === 'boolean') this.noBlanks = d.noBlanks;
       if (d.diff === 'ancient') { this.diff = 'hard'; this.scrolls = true; } // bývalá obťažnosť „prastará“ = ťažká + zvitky
       if (THEMES.includes(d.theme)) this.theme = d.theme;
       if (['pictures', 'equations'].includes(d.mode)) this.mode = d.mode;
@@ -67,7 +69,7 @@ const Settings = {
     } catch (e) { /* predvolené nastavenia */ }
   },
   save() {
-    try { localStorage.setItem('kvantp-game1-settings', JSON.stringify({ diff: this.diff, scrolls: this.scrolls, skipDialog: this.skipDialog, theme: this.theme, mode: this.mode, view: this.view, audio: this.audio })); } catch (e) { /* bez ukladania */ }
+    try { localStorage.setItem('kvantp-game1-settings', JSON.stringify({ diff: this.diff, scrolls: this.scrolls, skipDialog: this.skipDialog, noBlanks: this.noBlanks, theme: this.theme, mode: this.mode, view: this.view, audio: this.audio })); } catch (e) { /* bez ukladania */ }
   },
 };
 Settings.load();
@@ -93,6 +95,10 @@ const DIFF_DESC = {
 const DIALOG_DESC = tr('preskočiť všetky rozhovory mentorov — ostanú len úlohy, kvízy, karty rovníc a historické zvitky; rozhovory sa aj tak zapíšu do denníka (L)',
   'skip all mentor conversations — only tasks, quizzes, equation cards and historic scrolls remain; the conversations are still written to the Journal (L)',
   'пропустити всі розмови наставників — лишаються тільки завдання, вікторини, картки рівнянь та історичні сувої; розмови все одно записуються до щоденника (L)');
+const NOBLANKS_NAME = tr('⏭ Bez kvízov', '⏭ Skip quizzing', '⏭ Без вікторин');
+const NOBLANKS_DESC = tr('vypne kvízy „doplň rovnicu“ pri každej obťažnosti — rovnica úlohy sa ukáže hneď; bežné kvízy na konci levelov ostávajú',
+  'turns off the “complete the equation” quizzes on every difficulty — a task’s equation is shown straight away; the regular quizzes at the end of levels remain',
+  'вимикає вікторини «доповни рівняння» на будь-якій складності — рівняння завдання показується одразу; звичайні вікторини в кінці рівнів лишаються');
 const SCROLLS_NAME = tr('📜 Historické zvitky', '📜 Historic scrolls', '📜 Історичні сувої');
 const SCROLLS_DESC = tr('pred krokmi levelov sa rozvinie zvitok s históriou objavov — roky, autori, ich rozhovory a slávne výroky; na konci každého levelu otázka z histórie',
   'before level steps a scroll unrolls with the history of the discoveries — years, authors, their conversations and famous words; a history question at the end of every level',

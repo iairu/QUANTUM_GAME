@@ -72,8 +72,8 @@ const Welcome = {
     // (po zmene jazyka na uvítacej obrazovke ostanú voľby hráča)
     let keep = false;
     try { keep = sessionStorage.getItem('kvantp-welcome-keep') === '1'; sessionStorage.removeItem('kvantp-welcome-keep'); } catch (e) { /* bez úložiska */ }
-    if (keep) { this.theme = Settings.theme; this.diff = Settings.diff; this.scrolls = Settings.scrolls; this.mode = Settings.mode; this.skip = Settings.skipDialog; }
-    else { this.theme = Settings.theme || THEMES[0]; this.diff = 'normal'; this.scrolls = true; this.mode = 'equations'; this.skip = false; }
+    if (keep) { this.theme = Settings.theme; this.diff = Settings.diff; this.scrolls = Settings.scrolls; this.mode = Settings.mode; this.skip = Settings.skipDialog; this.noBlanks = Settings.noBlanks; }
+    else { this.theme = Settings.theme || THEMES[0]; this.diff = 'normal'; this.scrolls = true; this.mode = 'equations'; this.skip = false; this.noBlanks = false; }
     this.unlock = true; // predvolene sú odomknuté všetky levely
     let slide = 0;
     try { slide = keep ? +(sessionStorage.getItem('kvantp-welcome-slide') || 0) : 0; this.unlock = !keep || sessionStorage.getItem('kvantp-welcome-unlock') === '1'; } catch (e) { /* bez úložiska */ }
@@ -113,7 +113,7 @@ const Welcome = {
           <span class="d">${on ? SCROLLS_DESC.replace(/^./, (c) => c.toUpperCase()) + '.' : tr('Len fyzika — bez historických vložiek.', 'Physics only — no historical interludes.', 'Лише фізика — без історичних вставок.')}</span>
         </button>`).join('')}
       </div>
-      <div class="wdiffs wscrolls">${[true, false].map((skip) => `
+      <div class="wdiffs wscrolls wdlrow">${[true, false].map((skip) => `
         <button class="wdiff wdl" data-d="${skip ? 1 : 0}">
           <span class="dicon">${skip ? '⏭' : '💬'}</span>
           <b>${skip ? tr('Preskočiť dialógy', 'Skip all dialogue', 'Пропустити діалоги') : tr('S dialógmi', 'With dialogue', 'З діалогами')}</b>
@@ -124,7 +124,11 @@ const Welcome = {
       </div>
       <div class="wslide" data-k="2">
       <h2>${tr('3 · Rovnice', '3 · Equations', '3 · Рівняння')}</h2>
-      <div class="wmodes">${MODES.map((m) => `
+      <div class="wmodes">
+        <button class="wmode wnq">
+          <span class="shot live nq"><span class="words"><b>⏭</b><br><span class="nqeq">ρ′ = Uρ<s>( )</s></span></span></span>
+          <span class="mtext"><b>${NOBLANKS_NAME}</b><i>${tr('Zapni / vypni — dá sa kombinovať', 'On / off — combines with the others', 'Увімк. / вимк. — поєднується з іншими')}</i><span class="d">${NOBLANKS_DESC.replace(/^./, (c) => c.toUpperCase())}.</span></span>
+        </button>${MODES.map((m) => `
         <button class="wmode" data-v="${m}">
           <span class="shot live ${m}">${MODE_SHOT[m]()}</span>
           <span class="mtext"><b>${MODE_NAME[m]}</b><i>${MODE_TAG[m]}</i><span class="d">${MODE_DESC[m].replace(/^./, (c) => c.toUpperCase())}.</span></span>
@@ -145,14 +149,16 @@ const Welcome = {
     document.body.appendChild(el);
     const sync = () => {
       el.querySelectorAll('.wtheme').forEach((b) => b.classList.toggle('on', b.dataset.v === this.theme));
-      el.querySelectorAll('.wmode').forEach((b) => b.classList.toggle('on', b.dataset.v === this.mode));
+      el.querySelectorAll('.wmode[data-v]').forEach((b) => b.classList.toggle('on', b.dataset.v === this.mode));
+      el.querySelector('.wnq').classList.toggle('on', !!this.noBlanks);
       el.querySelectorAll('.wdiff[data-v]').forEach((b) => b.classList.toggle('on', b.dataset.v === this.diff));
       el.querySelectorAll('.wsc').forEach((b) => b.classList.toggle('on', b.dataset.s === (this.scrolls ? '1' : '0')));
       el.querySelectorAll('.wdl').forEach((b) => b.classList.toggle('on', b.dataset.d === (this.skip ? '1' : '0')));
       el.querySelectorAll('.wun').forEach((b) => b.classList.toggle('on', b.dataset.u === (this.unlock ? '1' : '0')));
       el.querySelectorAll('.wslide').forEach((x) => x.classList.toggle('on', +x.dataset.k === slide));
     };
-    el.querySelectorAll('.wmode').forEach((b) => { b.onclick = () => { this.mode = b.dataset.v; Sound.sfx('click'); sync(); }; });
+    el.querySelectorAll('.wmode[data-v]').forEach((b) => { b.onclick = () => { this.mode = b.dataset.v; Sound.sfx('click'); sync(); }; });
+    el.querySelector('.wnq').onclick = () => { this.noBlanks = !this.noBlanks; Sound.sfx('click'); sync(); };
     el.querySelectorAll('.wtheme').forEach((b) => { b.onclick = () => { this.theme = b.dataset.v; Sound.sfx('click'); sync(); }; });
     el.querySelectorAll('.wdiff[data-v]').forEach((b) => { b.onclick = () => { this.diff = b.dataset.v; Sound.sfx('click'); sync(); }; });
     el.querySelectorAll('.wsc').forEach((b) => { b.onclick = () => { this.scrolls = b.dataset.s === '1'; Sound.sfx('click'); sync(); }; });
@@ -163,14 +169,14 @@ const Welcome = {
     el.querySelectorAll('.wnext, .wback').forEach((b) => { b.onclick = () => go(+b.dataset.go); }); // tri snímky: Ďalej / Späť
     const ls = el.querySelector('.wlang');
     ls.value = LANG;
-    ls.onchange = () => { Settings.theme = this.theme; Settings.diff = this.diff; Settings.mode = this.mode; Settings.scrolls = this.scrolls; Settings.skipDialog = this.skip; Settings.save(); try { sessionStorage.setItem('kvantp-welcome-keep', '1'); sessionStorage.setItem('kvantp-welcome-slide', slide); sessionStorage.setItem('kvantp-welcome-unlock', this.unlock ? '1' : '0'); } catch (e) { /* bez úložiska */ } setLang(ls.value); }; // voľby prežijú znovunačítanie
+    ls.onchange = () => { Settings.theme = this.theme; Settings.diff = this.diff; Settings.mode = this.mode; Settings.scrolls = this.scrolls; Settings.skipDialog = this.skip; Settings.noBlanks = this.noBlanks; Settings.save(); try { sessionStorage.setItem('kvantp-welcome-keep', '1'); sessionStorage.setItem('kvantp-welcome-slide', slide); sessionStorage.setItem('kvantp-welcome-unlock', this.unlock ? '1' : '0'); } catch (e) { /* bez úložiska */ } setLang(ls.value); }; // voľby prežijú znovunačítanie
     el.querySelector('.wstart').onclick = () => this.start();
     sync();
     this.running = true;
     requestAnimationFrame((t) => this.frame(t));
   },
   start() {
-    Settings.theme = this.theme; Settings.diff = this.diff; Settings.mode = this.mode; Settings.scrolls = this.scrolls; Settings.skipDialog = this.skip; Settings.save();
+    Settings.theme = this.theme; Settings.diff = this.diff; Settings.mode = this.mode; Settings.scrolls = this.scrolls; Settings.skipDialog = this.skip; Settings.noBlanks = this.noBlanks; Settings.save();
     // značka „hra začatá“: prázdny postup, aby sa uvítanie znovu neukázalo
     try { localStorage.setItem('kvantp-game1', this.unlock ? '{"allUnlocked":true}' : '{}'); } catch (e) { /* bez ukladania */ }
     if (this.unlock) Game.progress.allUnlocked = true; // „odomknúť všetko“: všetky portály otvorené
