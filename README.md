@@ -49,7 +49,8 @@ Progress, settings, the Codex and the Journal are saved in the browser (`localSt
 On the first start (and after a reset) a two-step welcome screen appears:
 
 1. **Difficulty** → *Next ▸*
-2. **History and dialogue**, **Equations** and **Levels** → *◂ Back* / *▶ Start the game*
+2. **History and dialogue** (historic scrolls; skip all dialogue / with dialogue) → *◂ Back* / *Next ▸*
+3. **Equations** and **Levels** → *◂ Back* / *▶ Start the game*
 
 Defaults: Normal difficulty, historic scrolls on, dialogue on, all levels unlocked. The gameplay style (Classic / Nordic / MMO) is no longer offered on the welcome screen — it stays Classic and can be changed in the settings (⚙).
 

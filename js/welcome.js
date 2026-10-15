@@ -95,9 +95,6 @@ const Welcome = {
       <div class="wslide" data-k="0">
       <!-- výber témy (štýlu hry) je na uvítaní skrytý — klasická téma; zmeniť sa dá v nastaveniach ⚙ -->
       <h2>${tr('1 · Obťažnosť', '1 · Difficulty', '1 · Складність')}</h2>
-      <p class="wblank">${tr('∑ <b>Doplň rovnicu:</b> pri <b>normálnej</b> a <b>ťažkej</b> obťažnosti ti mentor rovnicu úlohy hneď neprezradí — najprv doplníš jej chýbajúce časti z rozbaľovacej ponuky (napr. [[ρ′ = Uρ( )]]). Pri <b>ľahkej</b> a <b>laickej</b> sa tieto kvízy preskočia a rovnice uvidíš rovno.',
-        '∑ <b>Complete the equation:</b> on <b>Normal</b> and <b>Hard</b> the mentor does not give away a task’s equation right away — you first fill in its missing parts from a drop-down (e.g. [[ρ′ = Uρ( )]]). On <b>Easy</b> and <b>Layman</b> these quizzes are skipped and you see the equations straight away.',
-        '∑ <b>Доповни рівняння:</b> на <b>звичайній</b> і <b>складній</b> складності наставник не видає рівняння завдання одразу — спершу доповниш його пропущені частини з випадного списку (напр. [[ρ′ = Uρ( )]]). На <b>легкій</b> і <b>для новачків</b> ці вікторини пропускаються, і рівняння видно одразу.').replace(/\[\[(.*?)\]\]/g, (m, x) => `<span class="eqi">${EqG.colorMath(x)}</span>`)}</p>
       <div class="wdiffs">${DIFFS.map((d) => `
         <button class="wdiff ${d}" data-v="${d}">
           <span class="dicon">${DIFF_ICON[d]}</span>
@@ -105,7 +102,7 @@ const Welcome = {
           <span class="d">${(WELCOME_DESC[d] || DIFF_DESC[d]).replace(/^./, (c) => c.toUpperCase())}.</span>
         </button>`).join('')}
       </div>
-        <div class="wgo"><span class="wstep">1 / 2</span><button class="primary big wnext">${tr('Ďalej ▸', 'Next ▸', 'Далі ▸')}</button></div>
+        <div class="wgo"><span class="wstep">1 / 3</span><button class="primary big wnext" data-go="1">${tr('Ďalej ▸', 'Next ▸', 'Далі ▸')}</button></div>
       </div>
       <div class="wslide" data-k="1">
       <h2>${tr('2 · História a dialógy', '2 · History and dialogue', '2 · Історія та діалоги')}</h2>
@@ -116,13 +113,16 @@ const Welcome = {
           <span class="d">${on ? SCROLLS_DESC.replace(/^./, (c) => c.toUpperCase()) + '.' : tr('Len fyzika — bez historických vložiek.', 'Physics only — no historical interludes.', 'Лише фізика — без історичних вставок.')}</span>
         </button>`).join('')}
       </div>
-      <div class="wdiffs wscrolls">${[false, true].map((skip) => `
+      <div class="wdiffs wscrolls">${[true, false].map((skip) => `
         <button class="wdiff wdl" data-d="${skip ? 1 : 0}">
           <span class="dicon">${skip ? '⏭' : '💬'}</span>
           <b>${skip ? tr('Preskočiť dialógy', 'Skip all dialogue', 'Пропустити діалоги') : tr('S dialógmi', 'With dialogue', 'З діалогами')}</b>
           <span class="d">${skip ? DIALOG_DESC.replace(/^./, (c) => c.toUpperCase()) + '.' : tr('Mentori vysvetľujú pojmy v rozhovoroch pred úlohami a po nich (odporúčané).', 'Mentors explain the concepts in conversations before and after the tasks (recommended).', 'Наставники пояснюють поняття в розмовах до й після завдань (рекомендовано).')}</span>
         </button>`).join('')}
       </div>
+        <div class="wgo"><button class="wback" data-go="0">${tr('◂ Späť', '◂ Back', '◂ Назад')}</button><span class="wstep">2 / 3</span><button class="primary big wnext" data-go="2">${tr('Ďalej ▸', 'Next ▸', 'Далі ▸')}</button></div>
+      </div>
+      <div class="wslide" data-k="2">
       <h2>${tr('3 · Rovnice', '3 · Equations', '3 · Рівняння')}</h2>
       <div class="wmodes">${MODES.map((m) => `
         <button class="wmode" data-v="${m}">
@@ -139,7 +139,7 @@ const Welcome = {
             : tr('Ďalší portál sa otvorí po dokončení predchádzajúceho levelu — výklad ide krok za krokom.', 'The next portal opens once you finish the previous level — the explanations build step by step.', 'Наступний портал відкривається після проходження попереднього рівня — пояснення йдуть крок за кроком.')}</span>
         </button>`).join('')}
       </div>
-        <div class="wgo"><button class="wback">${tr('◂ Späť', '◂ Back', '◂ Назад')}</button><span class="wstep">2 / 2</span><button class="primary big wstart">${tr('▶ Začať hru', '▶ Start the game', '▶ Почати гру')}</button></div>
+        <div class="wgo"><button class="wback" data-go="1">${tr('◂ Späť', '◂ Back', '◂ Назад')}</button><span class="wstep">3 / 3</span><button class="primary big wstart">${tr('▶ Začať hru', '▶ Start the game', '▶ Почати гру')}</button></div>
       </div>
     </div>`;
     document.body.appendChild(el);
@@ -160,8 +160,7 @@ const Welcome = {
     el.querySelectorAll('.wun').forEach((b) => { b.onclick = () => { this.unlock = b.dataset.u === '1'; Sound.sfx('click'); sync(); }; });
     // dve snímky: Ďalej / Späť; tlačidlo „Začať hru“ je len na poslednej
     const go = (k) => { slide = k; Sound.sfx('page'); sync(); el.querySelector('.wbox').scrollTop = 0; };
-    el.querySelector('.wnext').onclick = () => go(1);
-    el.querySelector('.wback').onclick = () => go(0);
+    el.querySelectorAll('.wnext, .wback').forEach((b) => { b.onclick = () => go(+b.dataset.go); }); // tri snímky: Ďalej / Späť
     const ls = el.querySelector('.wlang');
     ls.value = LANG;
     ls.onchange = () => { Settings.theme = this.theme; Settings.diff = this.diff; Settings.mode = this.mode; Settings.scrolls = this.scrolls; Settings.skipDialog = this.skip; Settings.save(); try { sessionStorage.setItem('kvantp-welcome-keep', '1'); sessionStorage.setItem('kvantp-welcome-slide', slide); sessionStorage.setItem('kvantp-welcome-unlock', this.unlock ? '1' : '0'); } catch (e) { /* bez úložiska */ } setLang(ls.value); }; // voľby prežijú znovunačítanie

@@ -19,7 +19,7 @@ class Level {
   // resume = { step, sub, mistakes } — pokračovanie rozohraného levelu po znovunačítaní stránky
   enter(resume) {
     this.cam = new OrbitCam([0, 0, 0], 6, 0.7, 0.35, 2.5, 20);
-    this.stepIdx = -1; this.mistakes = 0; this.t = 0; this.sub = {}; this.seenScrolls = new Set();
+    this.stepIdx = -1; this.mistakes = 0; this.t = 0; this.sub = {}; this.seenScrolls = new Set(); this.theoryOpen = false; // 📐 teória pri vstupe zbalená
     Game.r.fog = 0;
     this.setup();
     if (resume) {
@@ -198,6 +198,7 @@ const Hub = {
   menuClick(x, y) {
     const hit = this.menuAt(x, y);
     if (!hit || UI.busy) return;
+    Sound.sfx('click');
     if (hit === 'spark') return Game.guideTalk();
     if (!Game.isUnlocked(hit.L.num)) { UI.toast(tr(`🔒 Najprv dokonči level ${hit.L.num - 1}.`, `🔒 Complete level ${hit.L.num - 1} first.`, `🔒 Спершу пройди рівень ${hit.L.num - 1}.`)); return; }
     Game.enterLevel(hit.L.num);
@@ -207,6 +208,10 @@ const Hub = {
     r.fog = 0; r.shiftX = 0; r.begin([0, 0, v.D], [0, 0, 0]);
     const hover = UI.mouse && !UI.busy ? this.menuAt(UI.mouse[0], UI.mouse[1]) : null;
     document.body.classList.toggle('c-ptr', !!hover);
+    if (hover !== this.menuHover) { if (hover) Sound.sfx(hover === 'spark' ? 'glance' : 'target'); this.menuHover = hover; } // zvuk pri prejdení na portál
+    // prehliadač pustí hudbu až po kliknutí alebo klávese — v menu sa nechodí (WASD), preto výzva
+    const audioOff = !Sound.ctx || Sound.ctx.state !== 'running';
+    if (audioOff && !Settings.audio.muted) UI.label('maudio', v.toWorld(v.W / 2, v.H - 34), tr('🔊 Klikni kamkoľvek — zapne sa hudba a zvuky', '🔊 Click anywhere to turn on music and sounds', '🔊 Клікни будь-де — увімкнуться музика та звуки'), 'prompt', null);
     for (const pt of items) {
       const L = pt.L, open = Game.isUnlocked(L.num), done = Game.progress.stars[L.num], c = pt.mp, hv = hover === pt;
       if (pt.mpx[1] < -150 || pt.mpx[1] > v.H + 150) continue; // mimo obrazovky

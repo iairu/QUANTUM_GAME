@@ -872,10 +872,6 @@ body:not(.eqmode) #eqkey { display: none !important; }
 .bmenu .bopt.on { border-color: var(--accent); }
 #dialog.blankq > button.primary { float: right; margin-top: 10px; }
 #dialog.blankq .why .eq.eqb { font-size: 20px; }
-/* uvítanie: poznámka o kvízoch „doplň rovnicu“ pri výbere obťažnosti */
-#welcome .wblank { max-width: 760px; margin: -2px auto 12px; padding: 8px 14px; border: 1px solid rgba(185, 140, 255, 0.5); border-left: 4px solid var(--mn-op);
-  border-radius: 8px; background: rgba(185, 140, 255, 0.09); font-size: 13.5px; line-height: 1.5; text-align: left; }
-#welcome .wblank b { color: #d9c2ff; }
 /* obsah levelu v bubline portálu */
 #tip ol.plist { margin: 6px 0 2px 18px; padding: 0; font-size: 0.95em; }
 #tip ol.plist li { margin: 1px 0; }

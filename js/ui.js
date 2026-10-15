@@ -423,7 +423,9 @@ const UI = {
     const step = L.steps[L.stepIdx], parts = theoryFor(L.num, step ? step.name : '');
     if (!parts) return;
     const d = el('details', 'theory');
-    d.open = Settings.hard || Settings.eq;
+    // predvolene zbalené; ak ho hráč otvorí, ostane otvorené len do odchodu z levelu (nový vstup, reštart či reset ho znova zbalí)
+    d.open = !!L.theoryOpen;
+    d.addEventListener('toggle', () => { L.theoryOpen = d.open; });
     d.appendChild(el('summary', null, tr('📐 Teória a rovnice', '📐 Theory and equations', '📐 Теорія та рівняння')));
     for (const p of parts) {
       d.appendChild(el('h4', null, p.h));
