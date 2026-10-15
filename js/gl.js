@@ -184,7 +184,9 @@ void main() {
 
 class Renderer {
   constructor(canvas) {
-    const gl = canvas.getContext('webgl2', { antialias: true, alpha: true, premultipliedAlpha: false });
+    // priehľadné plátno nad pozadím stránky: farby sú po zmiešaní premultiplikované, takže polopriehľadné objekty
+    // (sklenená Blochova guľa, prázdne časti stĺpcov, disky portálov) sú viditeľné aj tam, kde za nimi nie je zem
+    const gl = canvas.getContext('webgl2', { antialias: true, alpha: true, premultipliedAlpha: true });
     if (!gl) throw new Error(tr('WebGL2 nie je dostupné', 'WebGL2 is not available', 'WebGL2 недоступний'));
     this.gl = gl; this.canvas = canvas;
     this.prog = this.program(VS, FS);
@@ -203,7 +205,7 @@ class Renderer {
     this.shiftX = 0; this.fog = 0; this.fogColor = [0.06, 0.08, 0.16]; this.time = 0;
     gl.enable(gl.DEPTH_TEST);
     gl.enable(gl.BLEND);
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA); // farba: c·a + dst·(1 − a), alfa: a + dstA·(1 − a)
   }
 
   program(vs, fs) {
