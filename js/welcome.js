@@ -23,8 +23,11 @@ const DIFF_TAG = {
 };
 // „normálna“ má v nastaveniach len krátky popis; tu ju treba porovnať s ostatnými
 const WELCOME_DESC = {
-  normal: tr('pôvodná hra: štandardné tolerancie, počet pokusov aj hviezdičky — presne medzi ľahkou a ťažkou',
-    'the original game: standard tolerances, number of trials and stars — right between easy and hard', 'оригінальна гра: стандартні допуски, кількість спроб і зірки — рівно посередині між легкою та складною'),
+  normal: tr('pôvodná hra: štandardné tolerancie, počet pokusov aj hviezdičky — presne medzi ľahkou a ťažkou; pred každou úlohou najprv doplníš chýbajúce časti jej rovnice',
+    'the original game: standard tolerances, number of trials and stars — right between easy and hard; before every task you first fill in the missing parts of its equation', 'оригінальна гра: стандартні допуски, кількість спроб і зірки — рівно посередині між легкою та складною; перед кожним завданням спершу доповниш пропущені частини його рівняння'),
+  layman: tr('ľahká, ale všetko bežnými slovami: pred každou úlohou vysvetlenie „po ľudsky“, odborné slová s prekladom v zátvorke, jednoduché vysvetlivky; rovnice sa ukážu hneď — bez kvízov „doplň rovnicu“',
+    'easy, but everything in everyday words: a plain-language explanation before every task, technical words translated in brackets, simple tooltips; equations are shown right away — no “complete the equation” quizzes',
+    'легка, але все звичайними словами: перед кожним завданням пояснення «по-людськи», фахові слова з перекладом у дужках, прості підказки; рівняння показуються одразу — без вікторин «доповни рівняння»'),
 };
 const DIFF_TITLE = {
   layman: tr('Laická', 'Layman', 'Для новачків'), easy: tr('Ľahká', 'Easy', 'Легка'), normal: tr('Normálna', 'Normal', 'Звичайна'), hard: tr('Ťažká', 'Hard', 'Складна'), ancient: tr('Prastará', 'Ancient', 'Прадавня'),
@@ -44,14 +47,14 @@ const THEME_INFO = {
   classic: {
     name: tr('Klasická', 'Classic', 'Класична'), icon: '🔬',
     tag: tr('Čistý vedecký svet', 'A clean scientific world', 'Чистий науковий світ'),
-    desc: tr('Minimalistický ostrov s mriežkou a 8 portálmi. Nič neodvádza pozornosť od fyziky — a beží aj na slabších počítačoch.',
-      'A minimalist grid island with 8 portals. Nothing distracts from the physics — and it runs on weaker computers too.', 'Мінімалістичний острів із сіткою та 8 порталами. Ніщо не відволікає від фізики — і гра йде навіть на слабших комп’ютерах.'),
+    desc: tr('Minimalistický ostrov s mriežkou a 11 portálmi. Nič neodvádza pozornosť od fyziky — a beží aj na slabších počítačoch.',
+      'A minimalist grid island with 11 portals. Nothing distracts from the physics — and it runs on weaker computers too.', 'Мінімалістичний острів із сіткою та 11 порталами. Ніщо не відволікає від фізики — і гра йде навіть на слабших комп’ютерах.'),
   },
   nordic: {
     name: tr('Severská', 'Nordic', 'Північна'), icon: '🏔',
     tag: tr('Zasnežené hory a runy', 'Snowy mountains and runes', 'Засніжені гори та руни'),
-    desc: tr('Borovicový les pod horami v štýle severských ság. Každý mentor ťa naučí slovo moci a v 9. leveli porazíš kvantového draka Ketvarra.',
-      'A pine forest under the mountains in the style of the northern sagas. Each mentor teaches you a Word of Power, and in level 9 you defeat the quantum dragon Ketvarr.', 'Сосновий ліс під горами в дусі північних саг. Кожен наставник навчить тебе слова сили, а в 9-му рівні ти переможеш квантового дракона Кетварра.'),
+    desc: tr('Borovicový les pod horami v štýle severských ság. Každý mentor ťa naučí slovo moci a v 12. leveli porazíš kvantového draka Ketvarra.',
+      'A pine forest under the mountains in the style of the northern sagas. Each mentor teaches you a Word of Power, and in level 12 you defeat the quantum dragon Ketvarr.', 'Сосновий ліс під горами в дусі північних саг. Кожен наставник навчить тебе слова сили, а в 12-му рівні ти переможеш квантового дракона Кетварра.'),
   },
   wow: {
     name: 'MMO', icon: '⚔️',
@@ -98,6 +101,9 @@ const Welcome = {
         </button>`).join('')}
       </div>
       <h2>${tr('2 · Obťažnosť', '2 · Difficulty', '2 · Складність')}</h2>
+      <p class="wblank">${tr('∑ <b>Doplň rovnicu:</b> pri <b>normálnej</b> a <b>ťažkej</b> obťažnosti ti mentor rovnicu úlohy hneď neprezradí — najprv doplníš jej chýbajúce časti z rozbaľovacej ponuky (napr. [[ρ′ = Uρ( )]]). Pri <b>ľahkej</b> a <b>laickej</b> sa tieto kvízy preskočia a rovnice uvidíš rovno.',
+        '∑ <b>Complete the equation:</b> on <b>Normal</b> and <b>Hard</b> the mentor does not give away a task’s equation right away — you first fill in its missing parts from a drop-down (e.g. [[ρ′ = Uρ( )]]). On <b>Easy</b> and <b>Layman</b> these quizzes are skipped and you see the equations straight away.',
+        '∑ <b>Доповни рівняння:</b> на <b>звичайній</b> і <b>складній</b> складності наставник не видає рівняння завдання одразу — спершу доповниш його пропущені частини з випадного списку (напр. [[ρ′ = Uρ( )]]). На <b>легкій</b> і <b>для новачків</b> ці вікторини пропускаються, і рівняння видно одразу.').replace(/\[\[(.*?)\]\]/g, (m, x) => `<span class="eqi">${EqG.colorMath(x)}</span>`)}</p>
       <div class="wdiffs">${DIFFS.map((d) => `
         <button class="wdiff ${d}" data-v="${d}">
           <span class="dicon">${DIFF_ICON[d]}</span>
@@ -175,7 +181,7 @@ const Welcome = {
     EqM.apply();
     this.done();
   },
-  // jednoduché pozadie: sklenená Blochova sféra s precesujúcim stavom a 8 farebných portálov na obežnej dráhe
+  // jednoduché pozadie: sklenená Blochova sféra s precesujúcim stavom a farebné portály na obežnej dráhe
   frame(now) {
     if (!this.running) return;
     const r = Game.r, t = now / 1000, a = t * 0.12;
@@ -191,8 +197,8 @@ const Welcome = {
     r.arrow([0, 0, 0], tip, [1, 0.35, 0.45], R * 0.035, { emissive: 0.35 });
     r.sphere(tip, R * 0.05, [1, 0.35, 0.45], { emissive: 0.6 });
     r.draw('circle', M4.trs([0, tip[1], 0], 0, Math.hypot(tip[0], tip[2])), [1, 0.6, 0.7], { alpha: 0.5 }); // dráha precesie
-    for (let k = 0; k < 8; k++) {
-      const L = LEVELS[k], b = -t * 0.18 + (k / 8) * Math.PI * 2, rr = 3.6, y = Math.sin(t * 0.8 + k) * 0.25 - 0.4;
+    for (let k = 0, n = LEVELS.length; k < n; k++) {
+      const L = LEVELS[k], b = -t * 0.18 + (k / n) * Math.PI * 2, rr = 3.6, y = Math.sin(t * 0.8 + k) * 0.25 - 0.4;
       r.sphere([Math.cos(b) * rr, y, Math.sin(b) * rr], 0.16, L.color, { emissive: 0.7 });
     }
     r.draw('torus', M4.trs([0, -0.4, 0], 0, 3.6), [0.5, 0.6, 0.9], { alpha: 0.18, emissive: 0.3 });

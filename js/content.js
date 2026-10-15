@@ -83,6 +83,30 @@ const CODEX = [
   { id: 'collapse', level: 8, type: 'pojem', sym: '⚡', name: 'kolaps ako inžinierska operácia', text: 'Readout: zosilnenie → prepojenie s makrosvetom → zápis do klasického registra. Ireverzibilný.', dont: 'Nie je to magický zásah vedomia.' },
   { id: 'onto', level: 8, type: 'pojem', sym: '❓❓❓', name: 'ontológia / epistemológia / fenomenológia', text: 'Čo existuje? / Čo o tom môžeme vedieť? / Ako sa nám jav ukazuje?' },
   { id: 'four', level: 8, type: 'pojem', sym: '4️⃣', name: 'štyri otázky ku každému pojmu', text: 'Aký systém? Aká rovnica a predpoklady? Aký experiment? Čo z opisu NEvyplýva?' },
+  // ---------- Level 9: Pauliho rotačná dielňa (prednáška 4) ----------
+  { id: 'pauli', level: 9, type: 'osobnost', sym: '👤', name: 'Wolfgang Pauli (1900–1958)', text: 'Princíp vylúčenia (1925), Pauliho matice σ<sub>x</sub>, σ<sub>y</sub>, σ<sub>z</sub> pre spin ½ (1927), predpoveď neutrína. Nobelova cena 1945. Povestne prísny kritik: „To nie je ani nesprávne.“' },
+  { id: 'notphysball', level: 9, type: 'pojem', sym: '🌐≠🏀', name: 'Blochova sféra nie je fyzická guľa', text: 'Je to geometrický obraz priestoru stavov. Šípka predstavuje kvantový stav, nie smer malého rotujúceho objektu.', dont: 'Opačné body nie sú „opačné šípky“ — sú to ORTOGONÁLNE stavy. Globálna fáza na sfére vôbec nie je.' },
+  { id: 'sigmavec', level: 9, type: 'symbol', sym: 'σ = (σ<sub>x</sub>, σ<sub>y</sub>, σ<sub>z</sub>)', name: 'Pauliho vektor', text: 'Trojica Pauliho matíc. n·σ je spinová observabla v smere n; ρ = ½(I + r·σ).', dont: 'σ nie je vektor v laboratóriu — je to trojica matíc 2 × 2.' },
+  { id: 'rotgate', level: 9, type: 'symbol', sym: 'R<sub>n</sub>(ϑ)', name: 'rotácia qubitu', text: 'R<sub>n</sub>(ϑ) = exp(−iϑ n·σ/2): otočenie Blochovho vektora o uhol ϑ okolo osi n. X ∼ R<sub>x</sub>(π), Y ∼ R<sub>y</sub>(π), Z ∼ R<sub>z</sub>(π).', do: 'Hradlo = pravidlo pohybu stavu: |ψ′⟩ = U|ψ⟩ ⇔ r′ = Rr.', dont: 'R<sub>y</sub>(π/2) ≠ H ako operátory, hoci z |0⟩ obe dajú |+⟩.' },
+  { id: 'phitomo', level: 9, type: 'pojem', sym: 'φ = atan2(r<sub>y</sub>, r<sub>x</sub>)', name: 'φ zo štatistiky meraní', text: 'Jedno meranie spinu dá vždy len ±ħ/2. Uhol φ sa zistí zo stredných hodnôt ⟨S<sub>x</sub>⟩ a ⟨S<sub>y</sub>⟩ — základ tomografie qubitu.', dont: '⟨S<sub>z</sub>⟩ = (ħ/2) cos θ nie je výsledok jedného merania — je to priemer mnohých.' },
+  { id: 'larmor', level: 9, type: 'symbol', sym: 'ω₀ = γB₀', name: 'Zeemanov Hamiltonián a precesia', text: 'H<sub>Z</sub> = −μ·B = −(γħ/2) σ·B. Schrödingerova evolúcia ⇒ dr/dt = γ r × B: Blochov vektor rotuje okolo poľa s Larmorovou frekvenciou ω₀ = γB₀.', dont: 'Unitárna evolúcia nemení |r| — dekoherencia áno (pohyb dovnútra gule).' },
+
+  // ---------- Level 10: Von Neumannova čistiareň (prednáška 5) ----------
+  { id: 'neumann', level: 10, type: 'osobnost', sym: '👤', name: 'John von Neumann (1903–1957)', text: 'Matica hustoty (1927), Matematické základy kvantovej mechaniky (1932): Hilbertov priestor, projektívne meranie, entropia −Tr ρ ln ρ. Aj architektúra počítačov a teória hier.' },
+  { id: 'purity', level: 10, type: 'symbol', sym: 'Tr ρ²', name: 'čistota stavu', text: 'Pre qubit Tr ρ² = (1 + |r|²)/2: 1 = čistý, ½ = maximálne zmiešaný. Unitárne ρ′ = UρU† ju nemení.', dont: 'Žiadna kombinácia hradiel nedostane stav s |r| = 0,4 na povrch.' },
+  { id: 'purify', level: 10, type: 'pojem', sym: '❄📏', name: 'purifikácia', text: 'Čistejší stav vznikne len neunitárne: meraním so známym výsledkom alebo chladením (relaxácia |1⟩ → |0⟩). Entropia/informácia odchádza do okolia.', dont: 'Meranie so zabudnutým výsledkom stav nevyčistí — zmes zostane.' },
+  { id: 'pps', level: 10, type: 'symbol', sym: 'ρ<sub>pps</sub>', name: 'pseudo-čistý stav (NMR)', text: 'ρ<sub>pps</sub> = (1 − ε) I/4 + ε|00⟩⟨00|, ε ≪ 1. Unitárne U nemení I, takže odchýlka sa transformuje ako čistý stav. Pre qubit r = εn.', dont: 'Nie je to čistý stav — Blochov vektor je blízko stredu, len smeruje správne.' },
+  { id: 'observable', level: 10, type: 'symbol', sym: 'A = A†', name: 'observábla', text: 'Merateľnej veličine zodpovedá samoadjungovaný operátor; vlastné čísla = možné výsledky. ⟨A⟩ = Tr(ρA), ⟨n·σ⟩ = r·n, r = (⟨σ<sub>x</sub>⟩, ⟨σ<sub>y</sub>⟩, ⟨σ<sub>z</sub>⟩).', dont: 'Stredná hodnota nemusí byť vlastným číslom (⟨σ<sub>z</sub>⟩ = 0,3 je v poriadku).' },
+  { id: 'timeevo', level: 10, type: 'symbol', sym: 'e<sup>−iHt/ħ</sup>', name: 'operátor časového vývoja', text: 'U(t) = exp(−iHt/ħ) je unitárny (U†U = I). Energetický vlastný stav získa len fázu e<sup>−iE<sub>n</sub>t/ħ</sup>; |a<sub>n</sub>|² sa nemenia, menia sa relatívne fázy Δφ = −(E₂ − E₁)t/ħ.', dont: 'Pri časovo závislom H(t) nestačí e<sup>−iHt/ħ</sup> — treba časovo usporiadaný exponenciál.' },
+
+  // ---------- Level 11: Bornova meracia sieň (prednáška 5) ----------
+  { id: 'born', level: 11, type: 'osobnost', sym: '👤', name: 'Max Born (1882–1970)', text: 'Pravdepodobnostný výklad vlnovej funkcie (1926): P = |ψ|². S Heisenbergom a Jordanom maticová mechanika. Nobelova cena 1954.' },
+  { id: 'projmeas', level: 11, type: 'symbol', sym: 'P<sub>k</sub> = |k⟩⟨k|', name: 'projektívne meranie', text: 'p(k) = Tr(ρP<sub>k</sub>); po výsledku k: ρ → P<sub>k</sub>ρP<sub>k</sub>/Tr(ρP<sub>k</sub>). Všeobecne POVM: E<sub>k</sub> ≥ 0, ΣE<sub>k</sub> = I.', dont: 'Meranie nie je len „čítanie“ — mení ďalšie možnosti systému.' },
+  { id: 'interfmeas', level: 11, type: 'pojem', sym: 'φ → ∿ → P', name: 'fáza → interferencia → pravdepodobnosť', text: '|+⟩ a |−⟩ majú v Z-báze rovnaké P(0) = P(1) = ½. Až hradlo H premení relatívnu fázu na rozdielne pravdepodobnosti: H|+⟩ = |0⟩, H|−⟩ = |1⟩.' },
+  { id: 'midmeas', level: 11, type: 'pojem', sym: 'H·M·H', name: 'meranie uprostred obvodu', text: 'Bez merania H·H = I (vždy 0). S meraním medzi hradlami sa vetvy už nezložia — výsledok je 50 : 50. Miesto merania je súčasťou algoritmu.' },
+  { id: 'feedbackc', level: 11, type: 'pojem', sym: '📏→🤔→▶', name: 'klasická spätná väzba', text: 'Zmeraj → rozhodni → pokračuj: výsledok merania určí ďalšie hradlo (aktívny reset, korekcia chýb cez syndrómy).', dont: 'Meranie nemusí byť poslednou operáciou výpočtu.' },
+  { id: 'decoread', level: 11, type: 'pojem', sym: '🌫 ≠ 📏', name: 'dekoherencia ≠ readout', text: 'Dekoherencia potláča mimodiagonálu ρ (interferenciu), ale sama nevytvorí konkrétny klasický záznam. Readout je fyzický reťazec: interakcia → zosilnenie → signál → register.' },
+  { id: 'tomography', level: 11, type: 'pojem', sym: 'ρ ← {ZZ, XX, …}', name: 'tomografia stavu', text: 'Jedna báza vidí len diagonálu ρ. Bellov stav a zmes ½|00⟩⟨00| + ½|11⟩⟨11| dajú v ZZ to isté; líšia sa mimodiagonálou ρ<sub>00,11</sub> = ½ — viditeľnou až v inej báze (XX).', dont: 'Samotná korelácia A = B nedokazuje previazanosť.' },
 ];
 
 // Jazykové pasce: na konci každého levelu (správne formulácie vs. časté omyly)
@@ -130,6 +154,21 @@ const TRAPS_SK = {
     { q: DL('traps.8.2.q'), options: [DL('traps.8.2.options.0'), DL('traps.8.2.options.1')], correct: 0, why: DL('traps.8.2.why') },
     { q: DL('traps.8.3.q'), options: [DL('traps.8.3.options.0'), DL('traps.8.3.options.1'), DL('traps.8.3.options.2')], correct: 0, why: DL('traps.8.3.why') },
     { q: DL('traps.8.4.q'), options: [DL('traps.8.4.options.0'), DL('traps.8.4.options.1'), DL('traps.8.4.options.2')], correct: 0, why: DL('traps.8.4.why') },
+  ],
+  9: [
+    { q: DL('traps.9.0.q'), options: [DL('traps.9.0.options.0'), DL('traps.9.0.options.1'), DL('traps.9.0.options.2')], correct: 0, why: DL('traps.9.0.why') },
+    { q: DL('traps.9.1.q'), options: [DL('traps.9.1.options.0'), DL('traps.9.1.options.1'), DL('traps.9.1.options.2')], correct: 0, why: DL('traps.9.1.why') },
+    { q: DL('traps.9.2.q'), options: [DL('traps.9.2.options.0'), DL('traps.9.2.options.1'), DL('traps.9.2.options.2')], correct: 0, why: DL('traps.9.2.why') },
+  ],
+  10: [
+    { q: DL('traps.10.0.q'), options: [DL('traps.10.0.options.0'), DL('traps.10.0.options.1'), DL('traps.10.0.options.2')], correct: 0, why: DL('traps.10.0.why') },
+    { q: DL('traps.10.1.q'), options: [DL('traps.10.1.options.0'), DL('traps.10.1.options.1'), DL('traps.10.1.options.2')], correct: 0, why: DL('traps.10.1.why') },
+    { q: DL('traps.10.2.q'), options: [DL('traps.10.2.options.0'), DL('traps.10.2.options.1'), DL('traps.10.2.options.2')], correct: 0, why: DL('traps.10.2.why') },
+  ],
+  11: [
+    { q: DL('traps.11.0.q'), options: [DL('traps.11.0.options.0'), DL('traps.11.0.options.1'), DL('traps.11.0.options.2')], correct: 0, why: DL('traps.11.0.why') },
+    { q: DL('traps.11.1.q'), options: [DL('traps.11.1.options.0'), DL('traps.11.1.options.1'), DL('traps.11.1.options.2')], correct: 0, why: DL('traps.11.1.why') },
+    { q: DL('traps.11.2.q'), options: [DL('traps.11.2.options.0'), DL('traps.11.2.options.1'), DL('traps.11.2.options.2')], correct: 0, why: DL('traps.11.2.why') },
   ],
 };
 
@@ -208,6 +247,25 @@ const CODEX_EN = {
   collapse: { name: 'collapse as an engineering operation', text: 'Readout: amplification → coupling to the macroworld → writing to a classical register. Irreversible.', dont: 'It is not a magical intervention of consciousness.' },
   onto: { name: 'ontology / epistemology / phenomenology', text: 'What exists? / What can we know about it? / How does the phenomenon appear to us?' },
   four: { name: 'four questions for every concept', text: 'What system? What equation and assumptions? What experiment? What does the description NOT imply?' },
+  pauli: { name: 'Wolfgang Pauli (1900–1958)', text: 'The exclusion principle (1925), the Pauli matrices σ<sub>x</sub>, σ<sub>y</sub>, σ<sub>z</sub> for spin ½ (1927), the prediction of the neutrino. Nobel Prize 1945. A famously stern critic: “That is not even wrong.”' },
+  notphysball: { name: 'the Bloch sphere is not a physical ball', text: 'It is a geometric picture of the state space. The arrow represents a quantum state, not the direction of a small spinning object.', dont: 'Opposite points are not “opposite arrows” — they are ORTHOGONAL states. The global phase does not appear on the sphere at all.' },
+  sigmavec: { name: 'Pauli vector', text: 'The triple of Pauli matrices. n·σ is the spin observable along n; ρ = ½(I + r·σ).', dont: 'σ is not a vector in the lab — it is a triple of 2 × 2 matrices.' },
+  rotgate: { name: 'qubit rotation', text: 'R<sub>n</sub>(ϑ) = exp(−iϑ n·σ/2): turns the Bloch vector by the angle ϑ about the axis n. X ∼ R<sub>x</sub>(π), Y ∼ R<sub>y</sub>(π), Z ∼ R<sub>z</sub>(π).', do: 'A gate = a rule of motion of the state: |ψ′⟩ = U|ψ⟩ ⇔ r′ = Rr.', dont: 'R<sub>y</sub>(π/2) ≠ H as operators, although both turn |0⟩ into |+⟩.' },
+  phitomo: { name: 'φ from measurement statistics', text: 'One spin measurement always gives only ±ħ/2. The angle φ is found from the expectation values ⟨S<sub>x</sub>⟩ and ⟨S<sub>y</sub>⟩ — the basis of qubit tomography.', dont: '⟨S<sub>z</sub>⟩ = (ħ/2) cos θ is not the result of one measurement — it is the average of many.' },
+  larmor: { name: 'Zeeman Hamiltonian and precession', text: 'H<sub>Z</sub> = −μ·B = −(γħ/2) σ·B. Schrödinger evolution ⇒ dr/dt = γ r × B: the Bloch vector rotates about the field at the Larmor frequency ω₀ = γB₀.', dont: 'Unitary evolution does not change |r| — decoherence does (motion into the ball).' },
+  neumann: { name: 'John von Neumann (1903–1957)', text: 'The density matrix (1927), Mathematical Foundations of Quantum Mechanics (1932): Hilbert space, projective measurement, the entropy −Tr ρ ln ρ. Also computer architecture and game theory.' },
+  purity: { name: 'purity of a state', text: 'For a qubit Tr ρ² = (1 + |r|²)/2: 1 = pure, ½ = maximally mixed. A unitary ρ′ = UρU† does not change it.', dont: 'No combination of gates brings a state with |r| = 0.4 to the surface.' },
+  purify: { name: 'purification', text: 'A purer state arises only non-unitarily: by a measurement with a known result or by cooling (relaxation |1⟩ → |0⟩). Entropy/information leaves to the surroundings.', dont: 'A measurement whose result is forgotten does not purify — the mixture remains.' },
+  pps: { name: 'pseudo-pure state (NMR)', text: 'ρ<sub>pps</sub> = (1 − ε) I/4 + ε|00⟩⟨00|, ε ≪ 1. A unitary U leaves I unchanged, so the deviation transforms like a pure state. For a qubit r = εn.', dont: 'It is not a pure state — the Bloch vector is near the centre, it just points the right way.' },
+  observable: { name: 'observable', text: 'A measurable quantity corresponds to a self-adjoint operator; its eigenvalues = the possible results. ⟨A⟩ = Tr(ρA), ⟨n·σ⟩ = r·n, r = (⟨σ<sub>x</sub>⟩, ⟨σ<sub>y</sub>⟩, ⟨σ<sub>z</sub>⟩).', dont: 'An expectation value need not be an eigenvalue (⟨σ<sub>z</sub>⟩ = 0.3 is fine).' },
+  timeevo: { name: 'time-evolution operator', text: 'U(t) = exp(−iHt/ħ) is unitary (U†U = I). An energy eigenstate only gains a phase e<sup>−iE<sub>n</sub>t/ħ</sup>; the |a<sub>n</sub>|² do not change, the relative phases Δφ = −(E₂ − E₁)t/ħ do.', dont: 'For a time-dependent H(t), e<sup>−iHt/ħ</sup> is not enough — you need the time-ordered exponential.' },
+  born: { name: 'Max Born (1882–1970)', text: 'The probabilistic interpretation of the wave function (1926): P = |ψ|². Matrix mechanics with Heisenberg and Jordan. Nobel Prize 1954.' },
+  projmeas: { name: 'projective measurement', text: 'p(k) = Tr(ρP<sub>k</sub>); after the result k: ρ → P<sub>k</sub>ρP<sub>k</sub>/Tr(ρP<sub>k</sub>). In general a POVM: E<sub>k</sub> ≥ 0, ΣE<sub>k</sub> = I.', dont: 'A measurement is not mere “reading” — it changes the system’s further possibilities.' },
+  interfmeas: { name: 'phase → interference → probability', text: '|+⟩ and |−⟩ have the same P(0) = P(1) = ½ in the Z basis. Only the gate H turns the relative phase into different probabilities: H|+⟩ = |0⟩, H|−⟩ = |1⟩.' },
+  midmeas: { name: 'mid-circuit measurement', text: 'Without a measurement H·H = I (always 0). With a measurement between the gates the branches can no longer recombine — the result is 50 : 50. Where we measure is part of the algorithm.' },
+  feedbackc: { name: 'classical feedback', text: 'Measure → decide → continue: the result of a measurement chooses the next gate (active reset, error correction via syndromes).', dont: 'A measurement need not be the last operation of a computation.' },
+  decoread: { name: 'decoherence ≠ readout', text: 'Decoherence suppresses the off-diagonal of ρ (interference) but does not by itself create a definite classical record. Readout is a physical chain: interaction → amplification → signal → register.' },
+  tomography: { name: 'state tomography', text: 'One basis only sees the diagonal of ρ. The Bell state and the mixture ½|00⟩⟨00| + ½|11⟩⟨11| give the same in ZZ; they differ in the off-diagonal ρ<sub>00,11</sub> = ½ — visible only in another basis (XX).', dont: 'A correlation A = B alone does not prove entanglement.' },
 };
 const CODEX_UK = {
   euler: { name: 'Леонард Ейлер (1707–1783)', text: 'Швейцарський математик; запровадив позначення e, i, f(x), Σ. Його формула пов’язує експоненту з косинусом і синусом — сьогодні це «мова фази» в квантовій механіці.' },
@@ -283,6 +341,25 @@ const CODEX_UK = {
   collapse: { name: 'колапс як інженерна операція', text: 'Зчитування: підсилення → зв’язок із макросвітом → запис у класичний регістр. Незворотне.', dont: 'Це не магічне втручання свідомості.' },
   onto: { name: 'онтологія / епістемологія / феноменологія', text: 'Що існує? / Що ми можемо про це знати? / Як явище нам постає?' },
   four: { name: 'чотири питання до кожного поняття', text: 'Яка система? Яке рівняння й припущення? Який експеримент? Чого опис НЕ означає?' },
+  pauli: { name: 'Вольфганг Паулі (1900–1958)', text: 'Принцип заборони (1925), матриці Паулі σ<sub>x</sub>, σ<sub>y</sub>, σ<sub>z</sub> для спіну ½ (1927), передбачення нейтрино. Нобелівська премія 1945. Славетно суворий критик: «Це навіть не хибно».' },
+  notphysball: { name: 'сфера Блоха — не фізична куля', text: 'Це геометричний образ простору станів. Стрілка зображує квантовий стан, а не напрямок маленького обертового об’єкта.', dont: 'Протилежні точки — не «протилежні стрілки», а ОРТОГОНАЛЬНІ стани. Глобальної фази на сфері взагалі немає.' },
+  sigmavec: { name: 'вектор Паулі', text: 'Трійка матриць Паулі. n·σ — спінова спостережувана в напрямку n; ρ = ½(I + r·σ).', dont: 'σ — не вектор у лабораторії, а трійка матриць 2 × 2.' },
+  rotgate: { name: 'поворот кубіта', text: 'R<sub>n</sub>(ϑ) = exp(−iϑ n·σ/2): поворот вектора Блоха на кут ϑ навколо осі n. X ∼ R<sub>x</sub>(π), Y ∼ R<sub>y</sub>(π), Z ∼ R<sub>z</sub>(π).', do: 'Гейт = правило руху стану: |ψ′⟩ = U|ψ⟩ ⇔ r′ = Rr.', dont: 'R<sub>y</sub>(π/2) ≠ H як оператори, хоча обидва переводять |0⟩ у |+⟩.' },
+  phitomo: { name: 'φ зі статистики вимірювань', text: 'Одне вимірювання спіну завжди дає лише ±ħ/2. Кут φ знаходять із середніх значень ⟨S<sub>x</sub>⟩ і ⟨S<sub>y</sub>⟩ — основа томографії кубіта.', dont: '⟨S<sub>z</sub>⟩ = (ħ/2) cos θ — не результат одного вимірювання, а середнє багатьох.' },
+  larmor: { name: 'зееманівський гамільтоніан і прецесія', text: 'H<sub>Z</sub> = −μ·B = −(γħ/2) σ·B. Еволюція за Шредінгером ⇒ dr/dt = γ r × B: вектор Блоха обертається навколо поля з ларморовою частотою ω₀ = γB₀.', dont: 'Унітарна еволюція не змінює |r| — декогеренція змінює (рух усередину кулі).' },
+  neumann: { name: 'Джон фон Нейман (1903–1957)', text: 'Матриця густини (1927), «Математичні основи квантової механіки» (1932): гільбертів простір, проєкційне вимірювання, ентропія −Tr ρ ln ρ. А ще архітектура комп’ютерів і теорія ігор.' },
+  purity: { name: 'чистота стану', text: 'Для кубіта Tr ρ² = (1 + |r|²)/2: 1 — чистий, ½ — максимально змішаний. Унітарне ρ′ = UρU† її не змінює.', dont: 'Жодна комбінація гейтів не виведе стан із |r| = 0,4 на поверхню.' },
+  purify: { name: 'очищення', text: 'Чистіший стан виникає лише неунітарно: вимірюванням із відомим результатом або охолодженням (релаксація |1⟩ → |0⟩). Ентропія/інформація йде в довкілля.', dont: 'Вимірювання із забутим результатом не очищує — суміш лишається.' },
+  pps: { name: 'псевдочистий стан (ЯМР)', text: 'ρ<sub>pps</sub> = (1 − ε) I/4 + ε|00⟩⟨00|, ε ≪ 1. Унітарне U не змінює I, тож відхилення перетворюється як чистий стан. Для кубіта r = εn.', dont: 'Це не чистий стан — вектор Блоха біля центру, лише спрямований правильно.' },
+  observable: { name: 'спостережувана', text: 'Вимірюваній величині відповідає самоспряжений оператор; власні значення = можливі результати. ⟨A⟩ = Tr(ρA), ⟨n·σ⟩ = r·n, r = (⟨σ<sub>x</sub>⟩, ⟨σ<sub>y</sub>⟩, ⟨σ<sub>z</sub>⟩).', dont: 'Середнє значення не мусить бути власним значенням (⟨σ<sub>z</sub>⟩ = 0,3 — це нормально).' },
+  timeevo: { name: 'оператор часової еволюції', text: 'U(t) = exp(−iHt/ħ) унітарний (U†U = I). Енергетичний власний стан набуває лише фази e<sup>−iE<sub>n</sub>t/ħ</sup>; |a<sub>n</sub>|² не змінюються, змінюються відносні фази Δφ = −(E₂ − E₁)t/ħ.', dont: 'Для залежного від часу H(t) e<sup>−iHt/ħ</sup> не досить — потрібна впорядкована в часі експонента.' },
+  born: { name: 'Макс Борн (1882–1970)', text: 'Імовірнісне тлумачення хвильової функції (1926): P = |ψ|². З Гейзенбергом і Йорданом — матрична механіка. Нобелівська премія 1954.' },
+  projmeas: { name: 'проєкційне вимірювання', text: 'p(k) = Tr(ρP<sub>k</sub>); після результату k: ρ → P<sub>k</sub>ρP<sub>k</sub>/Tr(ρP<sub>k</sub>). Загалом POVM: E<sub>k</sub> ≥ 0, ΣE<sub>k</sub> = I.', dont: 'Вимірювання — не просто «читання»: воно змінює подальші можливості системи.' },
+  interfmeas: { name: 'фаза → інтерференція → імовірність', text: '|+⟩ і |−⟩ мають у базисі Z однакові P(0) = P(1) = ½. Лише гейт H перетворює відносну фазу на різні ймовірності: H|+⟩ = |0⟩, H|−⟩ = |1⟩.' },
+  midmeas: { name: 'вимірювання посеред схеми', text: 'Без вимірювання H·H = I (завжди 0). З вимірюванням між гейтами гілки вже не складаються — результат 50 : 50. Місце вимірювання — частина алгоритму.' },
+  feedbackc: { name: 'класичний зворотний зв’язок', text: 'Виміряй → виріши → продовжуй: результат вимірювання визначає наступний гейт (активне скидання, виправлення помилок через синдроми).', dont: 'Вимірювання не мусить бути останньою операцією обчислення.' },
+  decoread: { name: 'декогеренція ≠ зчитування', text: 'Декогеренція пригнічує позадіагональ ρ (інтерференцію), але сама не створює конкретного класичного запису. Зчитування — фізичний ланцюг: взаємодія → підсилення → сигнал → регістр.' },
+  tomography: { name: 'томографія стану', text: 'Один базис бачить лише діагональ ρ. Стан Белла і суміш ½|00⟩⟨00| + ½|11⟩⟨11| дають у ZZ те саме; відрізняються позадіагоналлю ρ<sub>00,11</sub> = ½ — видимою лише в іншому базисі (XX).', dont: 'Сама кореляція A = B не доводить сплутаності.' },
 };
 const CODEX_TR = tr(null, CODEX_EN, CODEX_UK);
 if (CODEX_TR) for (const c of CODEX) {

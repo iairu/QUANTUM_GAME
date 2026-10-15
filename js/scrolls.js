@@ -111,6 +111,20 @@ const SCROLLS = [
     title: DL('scrolls.s8c.title'),
     text: DL('scrolls.s8c.text'),
     quote: DL('scrolls.s8c.quote') },
+
+  // ---------- 9 – 11 · prednášky 4 a 5 ----------
+  { id: 's9a', level: 9, step: 'intro', year: '1924 · 1927', people: 'Wolfgang Pauli, Felix Bloch',
+    title: DL('scrolls.s9a.title'),
+    text: DL('scrolls.s9a.text'),
+    quote: DL('scrolls.s9a.quote') },
+  { id: 's10a', level: 10, step: 'intro', year: '1927 · 1932', people: 'John von Neumann, Lev Landau',
+    title: DL('scrolls.s10a.title'),
+    text: DL('scrolls.s10a.text'),
+    quote: DL('scrolls.s10a.quote') },
+  { id: 's11a', level: 11, step: 'intro', year: '1926 · 1954', people: 'Max Born, Werner Heisenberg',
+    title: DL('scrolls.s11a.title'),
+    text: DL('scrolls.s11a.text'),
+    quote: DL('scrolls.s11a.quote') },
 ];
 
 // jedna otázka z histórie na konci každého levelu (pri zapnutých historických zvitkoch)
@@ -123,6 +137,9 @@ const TRAPS_ANCIENT = {
   6: { q: DL('traps.ancient.6.q'), options: [DL('traps.ancient.6.options.0'), DL('traps.ancient.6.options.1'), DL('traps.ancient.6.options.2')], correct: 0, why: DL('traps.ancient.6.why') },
   7: { q: DL('traps.ancient.7.q'), options: [DL('traps.ancient.7.options.0'), DL('traps.ancient.7.options.1'), DL('traps.ancient.7.options.2')], correct: 0, why: DL('traps.ancient.7.why') },
   8: { q: DL('traps.ancient.8.q'), options: [DL('traps.ancient.8.options.0'), DL('traps.ancient.8.options.1'), DL('traps.ancient.8.options.2')], correct: 0, why: DL('traps.ancient.8.why') },
+  9: { q: DL('traps.ancient.9.q'), options: [DL('traps.ancient.9.options.0'), DL('traps.ancient.9.options.1'), DL('traps.ancient.9.options.2')], correct: 0, why: DL('traps.ancient.9.why') },
+  10: { q: DL('traps.ancient.10.q'), options: [DL('traps.ancient.10.options.0'), DL('traps.ancient.10.options.1'), DL('traps.ancient.10.options.2')], correct: 0, why: DL('traps.ancient.10.why') },
+  11: { q: DL('traps.ancient.11.q'), options: [DL('traps.ancient.11.options.0'), DL('traps.ancient.11.options.1'), DL('traps.ancient.11.options.2')], correct: 0, why: DL('traps.ancient.11.why') },
 };
 
 function scrollFor(num, step) { return Settings.scrolls ? SCROLLS.filter((s) => s.level === num && s.step === step) : []; }

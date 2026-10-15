@@ -78,7 +78,10 @@ const BOSS_LOOT = {
   6: { slot: 'weapon', icon: '📻', name: tr('Rezonančná palica π-impulzu', 'Resonant Rod of the π Pulse', 'Резонансний жезл π-імпульсу') },
   7: { slot: 'chest', icon: '🔔', name: tr('Previazané rúcho Bellovo', 'Bell’s Entangled Vestments', 'Сплутані шати Белла'), robe: [0.9, 0.35, 0.55] },
   8: { slot: 'head', icon: '☯', name: tr('Bohrova kapucňa komplementarity', 'Bohr’s Hood of Complementarity', 'Борів каптур доповнювальності'), hat: 'hood' },
-  9: { slot: 'weapon', icon: '🐉', name: tr('Ketvarrov zub', 'Fang of Ketvarr', 'Ікло Кетварра') },
+  9: { slot: 'weapon', icon: '🔄', name: tr('Pauliho rotačná palica', 'Pauli’s Rod of Rotation', 'Паулів жезл обертання') },
+  10: { slot: 'chest', icon: '⚗', name: tr('Von Neumannovo čisté rúcho', 'Von Neumann’s Pure Robe', 'Чиста мантія фон Неймана'), robe: [0.85, 0.85, 0.95] },
+  11: { slot: 'head', icon: '🎲', name: tr('Bornova kapucňa merania', 'Born’s Hood of Readout', 'Борнів каптур вимірювання'), hat: 'hood' },
+  12: { slot: 'weapon', icon: '🐉', name: tr('Ketvarrov zub', 'Fang of Ketvarr', 'Ікло Кетварра') },
 };
 const BOSSES = {
   1: { icon: '➕', name: tr('Sčítač pravdepodobností', 'The Probability Adder', 'Додавач імовірностей'), tip: tr('Sčítava pravdepodobnosti namiesto amplitúd — a interferencia mu uniká.', 'Adds probabilities instead of amplitudes — and so misses interference.', 'Додає ймовірності замість амплітуд — і тому пропускає інтерференцію.') },
@@ -89,7 +92,10 @@ const BOSSES = {
   6: { icon: '📡', name: tr('Rozladený prízrak', 'The Detuned Wraith', 'Розстроєний привид'), tip: tr('Vysiela mimo rezonancie a čuduje sa, že spin sa nepreklopí.', 'Transmits off resonance and wonders why the spin won’t flip.', 'Передає поза резонансом і дивується, чому спін не перевертається.') },
   7: { icon: '📨', name: tr('Strašidelný posol', 'The Spooky Courier', 'Моторошний кур’єр'), tip: tr('Chce previazanosťou posielať správy rýchlejšie ako svetlo.', 'Wants to send messages faster than light through entanglement.', 'Хоче надсилати повідомлення швидше за світло через сплутаність.') },
   8: { icon: '🕯', name: tr('Veľkňaz kolapsu mysľou', 'High Priest of Mind-Collapse', 'Верховний жрець колапсу розумом'), tip: tr('Káže, že svet skolabuje, až keď sa naň niekto pozrie.', 'Preaches that the world collapses only when someone looks.', 'Проповідує, що світ колапсує, лише коли хтось дивиться.') },
-  9: { icon: '🐉', name: tr('Ketvarr', 'Ketvarr', 'Кетварр'), tip: tr('Kvantový drak. Jeho štít je qubit.', 'The quantum dragon. His ward is a qubit.', 'Квантовий дракон. Його захист — кубіт.') },
+  9: { icon: '🧭', name: tr('Strážca fyzickej gule', 'Warden of the Physical Ball', 'Вартовий фізичної кулі'), tip: tr('Tvrdí, že Blochova sféra je skutočný priestor, v ktorom sa qubit hýbe.', 'Insists the Bloch sphere is real space in which the qubit moves.', 'Стверджує, що сфера Блоха — справжній простір, у якому рухається кубіт.') },
+  10: { icon: '🧹', name: tr('Unitárny upratovač', 'The Unitary Sweeper', 'Унітарний прибиральник'), tip: tr('Chce zmes „vyčistiť“ len otáčaním — a |r| sa mu ani nepohne.', 'Wants to “clean” a mixture by rotations alone — and |r| won’t budge.', 'Хоче «очистити» суміш самими обертаннями — а |r| і не зрушить.') },
+  11: { icon: '📖', name: tr('Pasívny čitateľ', 'The Passive Reader', 'Пасивний читач'), tip: tr('Verí, že meranie len prečíta hodnotu, ktorá tam už bola.', 'Believes a measurement just reads a value that was already there.', 'Вірить, що вимірювання лише зчитує значення, яке вже було.') },
+  12: { icon: '🐉', name: tr('Ketvarr', 'Ketvarr', 'Кетварр'), tip: tr('Kvantový drak. Jeho štít je qubit.', 'The quantum dragon. His ward is a qubit.', 'Квантовий дракон. Його захист — кубіт.') },
 };
 
 // kúzla: id, kláves, ikona, úroveň, čas zosielania, mana, dosah, cooldown, poškodenie

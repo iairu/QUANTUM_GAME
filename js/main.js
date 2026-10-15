@@ -54,15 +54,20 @@ class Level {
     Settings.wow && this.num > 0 && Wow.onStep(this); // MMO: dokončený krok = zásah bossa
     const s = this.steps[this.stepIdx], run = () => (s ? s.call(this) : this.finale()), name = s ? s.name : 'finale';
     const pre = [];
-    // denník: rovnica úlohy sa zapíše v oboch typoch hry
-    const eqHtml = EqM.eqFor(this.num, name);
-    if (eqHtml && !this.seenScrolls.has('eqlog:' + name)) { this.seenScrolls.add('eqlog:' + name); UI.record({ kind: 'eq', html: eqHtml }); Game.progress.eqs.add(this.num + ':' + name); } // aj do Kódexu → ∑ Rovnice
-    // rovnice najprv: pred krokom jeho rovnica vo farbách mnemotechniky
     if (Settings.eq && !Game.progress.eqIntroSeen) pre.push(...Game.eqIntroLines()); // mnemotechnika sa ešte nepredstavila (prepnuté počas rozhovoru)
-    if (Settings.eq && !this.seenScrolls.has('eq:' + name)) {
+    // ∑ doplň rovnicu (normálna a ťažká, v oboch typoch hry): rovnica kroku sa neprezradí hneď — hráč najprv doplní
+    // jej chýbajúce časti z ponuky; ľahká a laická kvíz preskočia a rovnicu ukážu rovno
+    const blanks = this.seenScrolls.has('blank:' + name) ? [] : EqBlanks.for(this.num, name);
+    this.seenScrolls.add('blank:' + name);
+    // až potom: denník (rovnica úlohy v oboch typoch hry, aj do Kódexu → ∑ Rovnice) a pri „Jazyku rovníc“ karta s celou rovnicou
+    const reveal = () => {
+      const eqHtml = EqM.eqFor(this.num, name);
+      if (eqHtml && !this.seenScrolls.has('eqlog:' + name)) { this.seenScrolls.add('eqlog:' + name); UI.record({ kind: 'eq', html: eqHtml }); Game.progress.eqs.add(this.num + ':' + name); }
+      const cards = Settings.eq && !this.seenScrolls.has('eq:' + name) ? EqM.cardsFor(this.num, name, blanks.length > 0) : [];
       this.seenScrolls.add('eq:' + name);
-      pre.push(...EqM.cardsFor(this.num, name));
-    }
+      cards.length ? UI.say(cards, run) : run();
+    };
+    const quiz = () => (blanks.length ? UI.blankSeries(blanks.map((q) => ({ who: this.mentor, face: this.face, ...q })), (m) => { this.mistakes += m; reveal(); }) : reveal());
     // laická obťažnosť: pred krokom ho sprievodkyňa vysvetlí bežnými slovami
     if (Settings.layman && !this.seenScrolls.has('plain:' + name)) {
       this.seenScrolls.add('plain:' + name);
@@ -72,8 +77,8 @@ class Level {
     const sc = scrollFor(this.num, name).filter((x) => !this.seenScrolls.has(x.id));
     sc.forEach((x) => { this.seenScrolls.add(x.id); Game.unlockScroll(x.id); });
     pre.push(...sc.map((x) => ({ who: `${tr('Historický zvitok', 'Historic scroll', 'Історичний сувій')} · ${pick(x.title)}`, face: '📜', text: scrollHtml(x), raw: true, cls: 'scroll' })));
-    if (!pre.length) return run();
-    UI.say(pre, run);
+    if (!pre.length) return quiz();
+    UI.say(pre, quiz);
   }
   // karty „po ľudsky“ (laická obťažnosť) ku kroku
   plainCards(name) {
@@ -168,7 +173,7 @@ const Hub = {
     Game.r.fog = Settings.wow ? 0.009 : 0.012; Game.r.fogColor = Settings.wow ? [0.62, 0.75, 0.88] : Settings.nordic ? [0.29, 0.34, 0.4] : [0.06, 0.08, 0.16];
     UI.setHud(tr('Hilbertov ostrov', 'Hilbert Island', 'Острів Гільберта'), Game.nextQuestText());
     if (fromLevel != null) {
-      const pt = fromLevel === 0 ? this.portal0 : this.portals[fromLevel - 1];
+      const pt = fromLevel === 0 ? this.portal0 : this.portals.find((q) => q.L.num === fromLevel);
       if (pt) {
         this.player.p = V3.add(pt.p, V3.scale(pt.dir, 4.5));
         this.player.heading = Math.atan2(pt.dir[0], pt.dir[2]);
@@ -291,10 +296,11 @@ const Hub = {
     }
     this.drawPortal0(r, t);
     // drak Ketvarr (severská téma): krúži nad ostrovom, po porážke sedí na Dračom štíte
-    if (!Settings.dragon) { /* klasická téma: bez draka a snehu */ } else if (Game.progress.stars[9] === undefined) {
+    if (!Settings.dragon) { /* klasická téma: bez draka a snehu */ } else if (Game.progress.stars[12] === undefined) {
       const w = t * 0.11, dp = [Math.cos(w) * 46, 27 + Math.sin(t * 0.5) * 3, Math.sin(w) * 46];
       Dragon.draw(r, dp, Math.atan2(-Math.sin(w), Math.cos(w)), { scale: 2.4, bank: 0.35, t });
-      UI.hot(dp, tr('<b>Ketvarr</b> — kvantový drak. Porazíš ho na Dračom štíte (portál 9), keď sa naučíš všetkých 8 slov moci.', '<b>Ketvarr</b> — the quantum dragon. You will defeat him on Dragon’s Peak (portal 9) once you learn all 8 Words of Power.', '<b>Кетварр</b> — квантовий дракон. Ти переможеш його на Драконовому піку (портал 9), коли вивчиш усі 8 слів сили.'), 60);
+      const nw = LEVELS.filter((L) => !L.boss).length, bp = LEVELS.find((L) => L.boss)?.num;
+      UI.hot(dp, tr(`<b>Ketvarr</b> — kvantový drak. Porazíš ho na Dračom štíte (portál ${bp}), keď sa naučíš všetkých ${nw} slov moci.`, `<b>Ketvarr</b> — the quantum dragon. You will defeat him on Dragon’s Peak (portal ${bp}) once you learn all ${nw} Words of Power.`, `<b>Кетварр</b> — квантовий дракон. Ти переможеш його на Драконовому піку (портал ${bp}), коли вивчиш усі ${nw} слів сили.`), 60);
     } else {
       const dp = [0, 35.6, -52];
       Dragon.draw(r, dp, 0, { scale: 2.2, landed: true, t });
@@ -392,7 +398,8 @@ const Hub = {
     const next = open && done === undefined;
     if (next) UI.label('qm' + L.num, V3.add(np, [0, 2.75, 0]), '!', 'qmark', tr(`${L.mentor} má pre teba úlohu: dokonči level ${L.num}.`, `${L.mentor} has a quest for you: complete level ${L.num}.`, `${L.mentor} має для тебе завдання: пройди рівень ${L.num}.`));
     const dd = Game.progress.diff[L.num], st = (done ? ' ' + '★'.repeat(done) + '☆'.repeat(3 - done) : '') + (dd && dd !== 'normal' ? ` <small>(${DIFF_NAME[dd]})</small>` : '');
-    const rec = L.boss ? tr('Nájazd · úr. 16+', 'Raid · lvl 16+', 'Рейд · рів. 16+') : tr(`Dungeon · úr. ${L.num * 2 - 1}–${L.num * 2 + 1}`, `Dungeon · lvl ${L.num * 2 - 1}–${L.num * 2 + 1}`, `Підземелля · рів. ${L.num * 2 - 1}–${L.num * 2 + 1}`);
+    const lo = Math.min(L.num * 2 - 1, 18), hi = Math.min(L.num * 2 + 1, 20); // MMO úroveň končí na 20
+    const rec = L.boss ? tr('Nájazd · úr. 20', 'Raid · lvl 20', 'Рейд · рів. 20') : tr(`Dungeon · úr. ${lo}–${hi}`, `Dungeon · lvl ${lo}–${hi}`, `Підземелля · рів. ${lo}–${hi}`);
     UI.hot(c, `<b>${tr('Inštancia', 'Instance', 'Інстанс')} ${L.num}: ${L.title}</b> <small>(${rec})</small><br>${(Settings.layman ? LAYMAN_LEVEL_TIPS : LEVEL_TIPS)[L.num]}<br>${tr('Boss', 'Boss', 'Бос')}: <b>${BOSSES[L.num].icon} ${BOSSES[L.num].name}</b>${open ? '' : tr('<br>🔒 Najprv dokonči predchádzajúci level.', '<br>🔒 Complete the previous level first.', '<br>🔒 Спершу пройди попередній рівень.')}`, 60);
     UI.hot(V3.add(np, [0, 1.2, 0]), tr(`<b>${L.mentor}</b> — mentor levelu ${L.num}.`, `<b>${L.mentor}</b> — mentor of level ${L.num}.`, `<b>${L.mentor}</b> — наставник рівня ${L.num}.`), 30);
     UI.label('portal' + L.num, V3.add(pt.p, [0, hh + 2, 0]), `<b>${L.num} · ${L.title}</b>${st}<br><small>${open ? `${L.face} ${L.mentor} · ${rec}` : tr('🔒 zamknuté', '🔒 locked', '🔒 закрито')}</small>`, 'portal' + (open ? '' : ' locked'));
@@ -409,7 +416,10 @@ const LEVEL_TIPS = tr({
   6: 'NMR: B₀, Zeemanove hladiny, precesia, Rabiho oscilácie, π-impulz, T₂.',
   7: 'Previazanosť, Bellov stav, nemožnosť signalizácie, CHSH hra.',
   8: 'Jazyk a realita: Bohr, Kant, Wittgenstein, Stodola, Bohm, kolaps.',
-  9: '🐉 Záverečný súboj s drakom Ketvarrom: ťahová bitka, štít = qubit, úder = meranie, cieľ P(zásah) ≥ prah.',
+  9: 'Geometria Blochovej sféry: θ a φ ako súradnice, rotácie R<sub>n</sub>(ϑ), meranie ako smer otázky, unitárne vs. dekoherencia.',
+  10: 'Čistota stavu: ρ′ = UρU† nemení |r|, purifikácia meraním, pseudo-čistý stav v NMR, ⟨A⟩ = Tr(ρA), časová evolúcia.',
+  11: 'Meranie ako súčasť výpočtu: fáza → interferencia → pravdepodobnosť, meranie uprostred obvodu, spätná väzba, Bellov stav vs. zmes.',
+  12: '🐉 Záverečný súboj s drakom Ketvarrom: ťahová bitka, štít = qubit, úder = meranie, cieľ P(zásah) ≥ prah.',
 }, {
   1: 'Complex numbers: amplitude as a clock hand, phase, i² = −1, interference.',
   2: 'Spin measurement: two spots, ±ħ/2, the measurement basis is part of the question.',
@@ -419,7 +429,10 @@ const LEVEL_TIPS = tr({
   6: 'NMR: B₀, Zeeman levels, precession, Rabi oscillations, π pulse, T₂.',
   7: 'Entanglement, Bell state, no-signalling, the CHSH game.',
   8: 'Language and reality: Bohr, Kant, Wittgenstein, Stodola, Bohm, collapse.',
-  9: '🐉 The final battle with the dragon Ketvarr: turn-based, ward = qubit, strike = measurement, aim for P(hit) ≥ the threshold.',
+  9: 'Bloch-sphere geometry: θ and φ as coordinates, rotations R<sub>n</sub>(ϑ), measurement as the direction of a question, unitary vs. decoherence.',
+  10: 'Purity: ρ′ = UρU† keeps |r|, purification by measurement, the NMR pseudo-pure state, ⟨A⟩ = Tr(ρA), time evolution.',
+  11: 'Measurement as part of the computation: phase → interference → probability, mid-circuit measurement, feedback, Bell state vs. mixture.',
+  12: '🐉 The final battle with the dragon Ketvarr: turn-based, ward = qubit, strike = measurement, aim for P(hit) ≥ the threshold.',
 }, {
   1: 'Комплексні числа: амплітуда як стрілка годинника, фаза, i² = −1, інтерференція.',
   2: 'Вимірювання спіну: дві плями, ±ħ/2, базис вимірювання — частина питання.',
@@ -429,7 +442,10 @@ const LEVEL_TIPS = tr({
   6: 'ЯМР: B₀, зееманівські рівні, прецесія, осциляції Рабі, π-імпульс, T₂.',
   7: 'Сплутаність, стан Белла, неможливість сигналізації, гра CHSH.',
   8: 'Мова й реальність: Бор, Кант, Вітгенштейн, Стодола, Бом, колапс.',
-  9: '🐉 Фінальна битва з драконом Кетварром: покрокова, захист = кубіт, удар = вимірювання, цілься на P(влучання) ≥ порогу.',
+  9: 'Геометрія сфери Блоха: θ і φ як координати, повороти R<sub>n</sub>(ϑ), вимірювання як напрямок питання, унітарна еволюція проти декогеренції.',
+  10: 'Чистота стану: ρ′ = UρU† не змінює |r|, очищення вимірюванням, псевдочистий стан у ЯМР, ⟨A⟩ = Tr(ρA), часова еволюція.',
+  11: 'Вимірювання як частина обчислення: фаза → інтерференція → імовірність, вимірювання посеред схеми, зворотний зв’язок, стан Белла проти суміші.',
+  12: '🐉 Фінальна битва з драконом Кетварром: покрокова, захист = кубіт, удар = вимірювання, цілься на P(влучання) ≥ порогу.',
 });
 
 // ------------------------------------------------------------------
@@ -558,7 +574,7 @@ const Game = {
     Settings.wow && Wow.onHub();
     this.save();
   },
-  levelOf(n) { return n === 0 ? this.level0 : this.levels[n - 1]; },
+  levelOf(n) { return n === 0 ? this.level0 : this.levels.find((L) => L.num === n); },
   isUnlocked(n) { return n === 0 || n === 1 || this.progress.allUnlocked || this.progress.stars[n - 1] !== undefined || this.progress.stars[n] !== undefined; },
   setDifficulty(d) {
     if (!DIFFS.includes(d) || d === Settings.diff) return;
@@ -572,7 +588,7 @@ const Game = {
     // prvé zapnutie laickej obťažnosti na ostrove: sprievodkyňa zopakuje úvod bežnými slovami
     if (d === 'layman' && !this.progress.laymanSeen && this.scene === Hub && !UI.busy) this.guideTalk();
   },
-  // téma mení obsah hry (9. level, ostrov), preto sa hra po uložení znovu načíta
+  // téma mení obsah hry (12. level s drakom, ostrov), preto sa hra po uložení znovu načíta
   setTheme(t) {
     if (!THEMES.includes(t) || t === Settings.theme) return;
     if (this.scene && this.scene.boss && t !== 'nordic') this.backToHub(); // z dračieho levelu späť na ostrov
@@ -619,7 +635,7 @@ const Game = {
   restoreSession() {
     const ss = this.progress.session;
     if (!ss) return;
-    if ((ss.scene === 'L0' && Settings.eq) || (ss.scene > 0 && ss.scene <= this.levels.length && this.isUnlocked(ss.scene))) {
+    if ((ss.scene === 'L0' && Settings.eq) || (ss.scene > 0 && this.levelOf(ss.scene) && this.isUnlocked(ss.scene))) {
       this.enterLevel(ss.scene === 'L0' ? 0 : ss.scene, ss);
     } else if (Array.isArray(ss.p)) {
       Hub.player.p = ss.p; Hub.player.heading = ss.h || 0; Hub.cam.yaw = ss.yaw || 0;
@@ -642,11 +658,11 @@ const Game = {
     Sound.sfx('fanfare');
     this.progress.stars[n] = Math.max(stars, this.progress.stars[n] || 0);
     Settings.wow && n > 0 && Wow.onLevelComplete(n, stars); // MMO: boss padol, korisť, skúsenosti
-    if (fresh && Settings.dragon && n > 0 && !LEVELS[n - 1].boss) { // každý mentor naučí jedno slovo moci proti drakovi
+    if (fresh && Settings.dragon && n > 0 && !LEVELS.find((L) => L.num === n)?.boss) { // každý mentor naučí jedno slovo moci proti drakovi
       const ring = LEVELS.filter((L) => !L.boss), k = ring.filter((L) => this.progress.stars[L.num] !== undefined).length;
       setTimeout(() => UI.toast(k < ring.length
         ? tr(`🐉 Slovo moci ${k}/${ring.length} — Ketvarr nad ostrovom nepokojne krúži.`, `🐉 Word of Power ${k}/${ring.length} — Ketvarr circles the island restlessly.`, `🐉 Слово сили ${k}/${ring.length} — Кетварр неспокійно кружляє над островом.`)
-        : tr('🐉 Všetkých 8 slov moci! Dračí štít (portál 9) je otvorený.', '🐉 All 8 Words of Power! Dragon’s Peak (portal 9) is open.', '🐉 Усі 8 слів сили! Драконів пік (портал 9) відкрито.'), 4200), 1200);
+        : tr(`🐉 Všetkých ${ring.length} slov moci! Dračí štít (portál ${LEVELS.find((L) => L.boss).num}) je otvorený.`, `🐉 All ${ring.length} Words of Power! Dragon’s Peak (portal ${LEVELS.find((L) => L.boss).num}) is open.`, `🐉 Усі ${ring.length} слів сили! Драконів пік (портал ${LEVELS.find((L) => L.boss).num}) відкрито.`), 4200), 1200);
     }
     const rank = (d) => DIFFS.indexOf(d);
     if (!this.progress.diff[n] || rank(Settings.diff) > rank(this.progress.diff[n])) this.progress.diff[n] = Settings.diff;
@@ -759,12 +775,16 @@ const Game = {
   save() {
     if (this.resetting || !this.levels) return;
     this.progress.session = this.snapshot();
-    try { localStorage.setItem('kvantp-game1', JSON.stringify({ ...this.progress, codex: [...this.progress.codex], scrolls: [...this.progress.scrolls], eqs: [...this.progress.eqs] })); } catch (e) { /* bez ukladania */ }
+    try { localStorage.setItem('kvantp-game1', JSON.stringify({ ...this.progress, ver: 2, codex: [...this.progress.codex], scrolls: [...this.progress.scrolls], eqs: [...this.progress.eqs] })); } catch (e) { /* bez ukladania */ }
   },
   load() {
     try {
       const d = JSON.parse(localStorage.getItem('kvantp-game1') || 'null');
       this.fresh = !d;
+      if (d && (d.ver || 1) < 2) { // pôvodne bol drak level 9; teraz sú 9–11 nové levely (prednášky 4–5) a drak je 12
+        for (const k of ['stars', 'diff']) if (d[k] && d[k][9] !== undefined) { d[k][12] = d[k][9]; delete d[k][9]; }
+        if (d.session && d.session.scene === 9) d.session.scene = 12;
+      }
       if (d) this.progress = { stars: d.stars || {}, diff: Object.fromEntries(Object.entries(d.diff || {}).map(([k, v]) => [k, v === 'ancient' ? 'hard' : v])), codex: new Set(d.codex || []), scrolls: new Set(d.scrolls || []), eqs: new Set(d.eqs || []), introSeen: !!d.introSeen, eqIntroSeen: !!d.eqIntroSeen, laymanSeen: !!d.laymanSeen, moved: !!d.moved, allUnlocked: !!d.allUnlocked, session: d.session || null, wow: d.wow || null };
     } catch (e) { /* čistý začiatok */ }
   },

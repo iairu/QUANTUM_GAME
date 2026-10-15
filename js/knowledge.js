@@ -65,6 +65,31 @@ const THEORY = {
     statues: DL('theory.8.statues'),
     sorting: DL('theory.8.sorting'),
   },
+  9: {
+    views: {coords: 'bloch2d', rotations: 'bloch2d', measureAxis: 'bases', unitaryVsDeco: 'rho'},
+    core: DL('theory.9.core'),
+    coords: DL('theory.9.coords'),
+    rotations: DL('theory.9.rotations'),
+    measureAxis: DL('theory.9.measureAxis'),
+    unitaryVsDeco: DL('theory.9.unitaryVsDeco'),
+  },
+  10: {
+    views: {unitaryWall: 'rho', purify: 'rho', pseudoPure: 'bases', observables: 'bases', evolution: 'hands'},
+    core: DL('theory.10.core'),
+    unitaryWall: DL('theory.10.unitaryWall'),
+    purify: DL('theory.10.purify'),
+    pseudoPure: DL('theory.10.pseudoPure'),
+    observables: DL('theory.10.observables'),
+    evolution: DL('theory.10.evolution'),
+  },
+  11: {
+    views: {phaseReveal: 'bases', midCircuit: 'hands', bellReadout: 'hands'},
+    core: DL('theory.11.core'),
+    phaseReveal: DL('theory.11.phaseReveal'),
+    midCircuit: DL('theory.11.midCircuit'),
+    feedback: DL('theory.11.feedback'),
+    bellReadout: DL('theory.11.bellReadout'),
+  },
 };
 
 // extra otázky (ťažká) — viac poznatkov a rovníc
@@ -100,6 +125,15 @@ const TRAPS_HARD = {
   8: [
     { q: DL('traps.hard.8.0.q'), options: [DL('traps.hard.8.0.options.0'), DL('traps.hard.8.0.options.1'), DL('traps.hard.8.0.options.2')], correct: 0, why: DL('traps.hard.8.0.why') },
     { q: DL('traps.hard.8.1.q'), options: [DL('traps.hard.8.1.options.0'), DL('traps.hard.8.1.options.1'), DL('traps.hard.8.1.options.2')], correct: 0, why: DL('traps.hard.8.1.why') },
+  ],
+  9: [
+    { q: DL('traps.hard.9.0.q'), options: [DL('traps.hard.9.0.options.0'), DL('traps.hard.9.0.options.1'), DL('traps.hard.9.0.options.2'), DL('traps.hard.9.0.options.3')], correct: 0, why: DL('traps.hard.9.0.why') },
+  ],
+  10: [
+    { q: DL('traps.hard.10.0.q'), options: [DL('traps.hard.10.0.options.0'), DL('traps.hard.10.0.options.1'), DL('traps.hard.10.0.options.2'), DL('traps.hard.10.0.options.3')], correct: 0, why: DL('traps.hard.10.0.why') },
+  ],
+  11: [
+    { q: DL('traps.hard.11.0.q'), options: [DL('traps.hard.11.0.options.0'), DL('traps.hard.11.0.options.1'), DL('traps.hard.11.0.options.2'), DL('traps.hard.11.0.options.3')], correct: 0, why: DL('traps.hard.11.0.why') },
   ],
 };
 

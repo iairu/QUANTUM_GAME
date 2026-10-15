@@ -9,5 +9,8 @@ const LEVELS = [
   { num: 6, title: tr('Rabiho rezonátor (NMR)', 'Rabi’s Resonator (NMR)', 'Резонатор Рабі (ЯМР)'), mentor: tr('I. I. Rabi', 'I. I. Rabi', 'І. І. Рабі'), face: '📻', color: [1, 0.8, 0.3], cls: L6Rabi },
   { num: 7, title: tr('Bellov most', 'Bell’s Bridge', 'Міст Белла'), mentor: tr('John Bell', 'John Bell', 'Джон Белл'), face: '🔔', color: [1, 0.45, 0.7], cls: L7Bell },
   { num: 8, title: tr('Sieň výkladov', 'Hall of Interpretations', 'Зала тлумачень'), mentor: tr('Niels Bohr', 'Niels Bohr', 'Нільс Бор'), face: '☯', color: [0.6, 0.9, 0.4], cls: L8Philo },
-  { num: 9, title: tr('Dračí štít', 'Dragon’s Peak', 'Драконів пік'), mentor: tr('Erwin Schrödinger', 'Erwin Schrödinger', 'Ервін Шредінгер'), face: '🐱', color: [1, 0.42, 0.15], cls: L9Dragon, boss: true },
-].filter((L) => !L.boss || Settings.nordic || Settings.wow); // 9. level (drak) v severskej a MMO téme
+  { num: 9, title: tr('Pauliho rotačná dielňa', 'Pauli’s Rotation Workshop', 'Обертова майстерня Паулі'), mentor: tr('Wolfgang Pauli', 'Wolfgang Pauli', 'Вольфганг Паулі'), face: '🔄', color: [0.2, 0.95, 0.95], cls: L9Pauli },
+  { num: 10, title: tr('Von Neumannova čistiareň', 'Von Neumann’s Purity Refinery', 'Очисна станція фон Неймана'), mentor: tr('John von Neumann', 'John von Neumann', 'Джон фон Нейман'), face: '⚗', color: [0.88, 0.88, 1], cls: L10Neumann },
+  { num: 11, title: tr('Bornova meracia sieň', 'Born’s Readout Hall', 'Зала вимірювань Борна'), mentor: tr('Max Born', 'Max Born', 'Макс Борн'), face: '🎲', color: [0.95, 0.72, 0.5], cls: L11Born },
+  { num: 12, title: tr('Dračí štít', 'Dragon’s Peak', 'Драконів пік'), mentor: tr('Erwin Schrödinger', 'Erwin Schrödinger', 'Ервін Шредінгер'), face: '🐱', color: [1, 0.42, 0.15], cls: L12Dragon, boss: true },
+].filter((L) => !L.boss || Settings.nordic || Settings.wow); // 12. level (drak) v severskej a MMO téme

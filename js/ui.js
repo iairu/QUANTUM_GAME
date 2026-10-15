@@ -293,6 +293,86 @@ const UI = {
     this.dialog.classList.add('show');
   },
 
+  // ∑ doplň rovnicu: q = {eq: 'ρ′ = Uρ⟦0⟧', blanks: [[správna, nesprávna, …], …], ctx, why, who, face}; cb(spravne)
+  // každé prázdne miesto ⟦n⟧ je rozbaľovací zoznam možností; správna je v dátach vždy prvá (zobrazia sa zamiešané)
+  blanks(q, cb, silent = false) {
+    this.busy = true;
+    this._next = null; this._prev = null;
+    this.dialog.innerHTML = '';
+    if (!silent) Sound.sfx('dialog');
+    let answered = false;
+    this.refreshDialog = () => { if (!answered) this.blanks(q, cb, true); };
+    const M = (s) => { const h = EqG.colorMath(s); return Settings.eq ? EqG.glyphify(h, true) : h; };
+    const full = q.eq.replace(/⟦(\d+)⟧/g, (m, i) => q.blanks[i][0]);
+    if (!q._ord) { q._ord = q.blanks.map((o) => o.map((_, i) => i).sort(() => rand() - 0.5)); q._pick = q.blanks.map(() => null); }
+    this.dialog.appendChild(el('div', 'who', `${q.face || '∑'} ${q.who || ''} · ${tr('doplň rovnicu', 'complete the equation', 'доповни рівняння')}`));
+    this.dialog.appendChild(el('div', 'txt', annotate(q.ctx || tr('Doplň chýbajúce časti rovnice.', 'Fill in the missing parts of the equation.', 'Доповни пропущені частини рівняння.'), true, true)));
+    const eqEl = el('div', 'eq eqb blankeq', q.eq.split(/⟦(\d+)⟧/).map((p, k) => (k % 2 ? `<span class="blank" data-i="${p}"></span>` : M(p))).join(''));
+    // ponuka sa otvára mimo bloku rovnice (ten má overflow), pod kliknutým prázdnym miestom
+    const menu = el('div', 'bmenu');
+    const closeMenu = () => { menu.classList.remove('show'); eqEl.querySelectorAll('.blank.open').forEach((b) => b.classList.remove('open')); };
+    const check = el('button', 'primary', tr('Skontrolovať ✓', 'Check ✓', 'Перевірити ✓'));
+    const upd = () => { check.disabled = q._pick.some((p) => p == null); };
+    eqEl.querySelectorAll('.blank').forEach((sp) => {
+      const i = +sp.dataset.i, btn = el('button', 'bsel', q._pick[i] == null ? '?' : M(q.blanks[i][q._pick[i]]));
+      sp.classList.toggle('filled', q._pick[i] != null);
+      btn.dataset.tip = tr('Vyber, čo sem patrí.', 'Pick what belongs here.', 'Обери, що сюди належить.');
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        if (answered) return;
+        const was = sp.classList.contains('open');
+        closeMenu();
+        if (was) return;
+        sp.classList.add('open');
+        menu.innerHTML = '';
+        for (const j of q._ord[i]) {
+          const o = el('button', 'bopt' + (q._pick[i] === j ? ' on' : ''), M(q.blanks[i][j]));
+          o.onclick = (ev) => { ev.stopPropagation(); q._pick[i] = j; btn.innerHTML = M(q.blanks[i][j]); sp.classList.add('filled'); Sound.sfx('click'); closeMenu(); upd(); };
+          menu.appendChild(o);
+        }
+        const d = this.dialog.getBoundingClientRect(), b = btn.getBoundingClientRect();
+        menu.style.left = (b.left + b.width / 2 - d.left) + 'px';
+        menu.style.top = (b.bottom - d.top + 4) + 'px';
+        menu.classList.add('show');
+      };
+      sp.appendChild(btn);
+    });
+    this.dialog.onclick = closeMenu;
+    this.dialog.append(eqEl, menu);
+    check.onclick = () => {
+      if (check.disabled || answered) return;
+      answered = true; closeMenu();
+      const ok = q._pick.every((p) => p === 0);
+      Sound.sfx(ok ? 'good' : 'bad');
+      Settings.wow && Wow.onAnswer(ok);
+      eqEl.querySelectorAll('.blank').forEach((sp) => {
+        const i = +sp.dataset.i, good = q._pick[i] === 0;
+        sp.classList.add(good ? 'good' : 'bad');
+        if (!good) sp.querySelector('.bsel').innerHTML = `<s>${M(q.blanks[i][q._pick[i]])}</s> ${M(q.blanks[i][0])}`;
+      });
+      const shown = q.eq.replace(/⟦\d+⟧/g, '( … )');
+      this.record({ kind: 'quiz', q: `${q.ctx || ''} [[${shown}]]`, answer: `[[${full}]]`, why: q.why, ok });
+      check.remove();
+      this.dialog.appendChild(el('div', 'why ' + (ok ? 'ok' : 'no'), (ok ? tr('✅ Správne. ', '✅ Correct. ', '✅ Правильно. ') : tr('❌ Nie celkom — správne je: ', '❌ Not quite — the correct one is: ', '❌ Не зовсім — правильно так: '))
+        + `<div class="eq eqb">${M(full)}</div>` + annotate(q.why || '', true, true)));
+      const c = el('button', 'primary', tr('Pokračovať ▸', 'Continue ▸', 'Продовжити ▸'));
+      c.onclick = () => { this.dialog.classList.remove('show'); this.dialog.onclick = null; this.busy = false; this._next = null; cb && cb(ok); };
+      this.dialog.appendChild(c);
+      this.dialog.appendChild(this.askButton(`${q.ctx || ''}\n${full}\n${q.why || ''}`));
+      this._next = c.onclick;
+      c.focus();
+    };
+    this.dialog.appendChild(check);
+    upd();
+    this.dialog.className = 'show blankq ' + Settings.diff + (Settings.hard ? ' hard' : '');
+  },
+  // séria „doplň rovnicu“ za sebou; cb(počet chýb)
+  blankSeries(list, cb) {
+    let i = 0, mistakes = 0;
+    const step = () => (i >= list.length ? cb(mistakes) : this.blanks(list[i++], (ok) => { if (!ok) mistakes++; step(); }));
+    step();
+  },
+
   // „Opýtaj sa Google“: otvorí text repliky v novej karte v režime AI vyhľadávania Google (udm=50, ako udm=2 pre obrázky)
   askButton(html) {
     const b = el('button', 'ask', tr('🔎 Opýtaj sa Google', '🔎 Ask Google more', '🔎 Запитати Google'));
@@ -310,7 +390,7 @@ const UI = {
 
   // zruší rozbehnutý dialóg/kvíz bez pokračovania (odchod z levelu uprostred rozhovoru)
   cancelDialog() {
-    this.dialog.classList.remove('show'); this.dialog.innerHTML = '';
+    this.dialog.classList.remove('show'); this.dialog.innerHTML = ''; this.dialog.onclick = null;
     this.busy = false; this._next = this._prev = null; this.refreshDialog = null;
   },
 
@@ -473,8 +553,8 @@ const UI = {
     body.appendChild(el('h3', null, tr('🎨 1 · Štýl hry', '🎨 1 · Gameplay style', '🎨 1 · Стиль гри')));
     const th = el('div', 'diffs');
     for (const [k, name, desc] of [
-      ['classic', tr('Klasická', 'Classic', 'Класична'), tr('pôvodný modrý Hilbertov ostrov, 8 levelov', 'the original blue Hilbert Island, 8 levels', 'оригінальний синій Острів Гільберта, 8 рівнів')],
-      ['nordic', tr('🐉 Severská (Skyrim)', '🐉 Nordic (Skyrim)', '🐉 Північна (Skyrim)'), tr('zasnežený ostrov s borovicami a menhirmi, severské písmo a farby, detailné textúry a záverečný 9. level: ťahový súboj s kvantovým drakom Ketvarrom', 'a snowy island with pines and standing stones, Nordic lettering and colours, detailed textures and a final 9th level: a turn-based battle with the quantum dragon Ketvarr', 'засніжений острів із соснами та кам’яними брилами, північні шрифти й кольори, детальні текстури та фінальний 9-й рівень: покроковий бій із квантовим драконом Кетварром')],
+      ['classic', tr('Klasická', 'Classic', 'Класична'), tr('pôvodný modrý Hilbertov ostrov, 11 levelov', 'the original blue Hilbert Island, 11 levels', 'оригінальний синій Острів Гільберта, 11 рівнів')],
+      ['nordic', tr('🐉 Severská (Skyrim)', '🐉 Nordic (Skyrim)', '🐉 Північна (Skyrim)'), tr('zasnežený ostrov s borovicami a menhirmi, severské písmo a farby, detailné textúry a záverečný 12. level: ťahový súboj s kvantovým drakom Ketvarrom', 'a snowy island with pines and standing stones, Nordic lettering and colours, detailed textures and a final 12th level: a turn-based battle with the quantum dragon Ketvarr', 'засніжений острів із соснами та кам’яними брилами, північні шрифти й кольори, детальні текстури та фінальний 12-й рівень: покроковий бій із квантовим драконом Кетварром')],
       ['wow', tr('⚔ MMO (World of Warcraft)', '⚔ MMO (World of Warcraft)', '⚔ MMO (World of Warcraft)'), tr('hrá sa ako MMO: kvantový mág s úrovňami, lišta kúziel (hradlá X, H, meranie…), nepriatelia „klasické omyly“, úlohy, obchodník, taška a korisť; levely sú dungeony s bossom, ktorého porazíš vedomosťami; aj drak Ketvarr', 'plays like an MMO: a quantum mage with levels, a spell bar (X and H gates, measurement…), “classical misconception” enemies, quests, a merchant, bags and loot; levels are dungeons with a boss you defeat with knowledge; Ketvarr the dragon too', 'грається як MMO: квантовий маг із рівнями, панель заклять (гейти X і H, вимірювання…), вороги — «класичні хибні уявлення», завдання, торговець, сумки та здобич; рівні — підземелля з босом, якого перемагаєш знаннями; є й дракон Кетварр')],
     ]) {
       const l = el('label'), r = el('input');

@@ -3,7 +3,7 @@
 // oddelene od postupu, takže reset hry ich nezmaže.
 
 const DIFFS = ['layman', 'easy', 'normal', 'hard'];
-// témy: klasická (8 levelov), severská (skyrimovský vzhľad + 9. level s drakom Ketvarrom)
+// témy: klasická (11 levelov), severská (skyrimovský vzhľad + 12. level s drakom Ketvarrom)
 // a MMO (predvolená: hrá sa ako World of Warcraft — kúzla, nepriatelia, úlohy, obchodník, korisť; aj drak)
 const THEMES = ['classic', 'nordic', 'wow'];
 const Settings = {
@@ -13,7 +13,7 @@ const Settings = {
   get eq() { return this.mode === 'equations'; },
   get nordic() { return this.theme === 'nordic'; },
   get wow() { return this.theme === 'wow'; },
-  get dragon() { return this.nordic || this.wow; }, // drak Ketvarr a 9. level
+  get dragon() { return this.nordic || this.wow; }, // drak Ketvarr a 12. level
   get hard() { return this.diff === 'hard'; },
   scrolls: false, // 📜 historické zvitky: história objavov pred krokmi levelov + otázka z histórie v každom leveli (pri ľubovoľnej obťažnosti)
   // ľahká aj laická (laická = ľahká + všetko bežnými slovami)
@@ -74,11 +74,11 @@ const DIFF_NAME = {
 const DIFF_DESC = {
   layman: tr('ľahká, ale všetko bežnými slovami: pred každou úlohou vysvetlenie „po ľudsky“, odborné slová s prekladom v zátvorke, jednoduché vysvetlivky — ideálny štart do kvantových počítačov',
     'easy, but everything in everyday words: a plain-language explanation before every task, technical words translated in brackets, simple tooltips — the ideal start into quantum computing', 'легка, але все звичайними словами: перед кожним завданням пояснення «по-людськи», фахові слова з перекладом у дужках, прості підказки — ідеальний старт у квантові комп’ютери'),
-  easy: tr('väčšie tolerancie, menej pokusov, nápovedy, v kvízoch o jednu nesprávnu možnosť menej',
-    'wider tolerances, fewer trials, hints, one wrong option fewer in quizzes', 'ширші допуски, менше спроб, підказки, у вікторинах на одну неправильну відповідь менше'),
-  normal: tr('pôvodná hra', 'the original game', 'оригінальна гра'),
-  hard: tr('viac poznatkov: teória a rovnice pri každom kroku, extra otázky s rovnicami; presnosť, náhodné ciele, bez nápovied, prísnejšie hviezdičky',
-    'more knowledge: theory and equations at every step, extra equation questions; precision, random targets, no hints, stricter stars', 'більше знань: теорія та рівняння на кожному кроці, додаткові питання з рівняннями; точність, випадкові цілі, без підказок, суворіші зірки'),
+  easy: tr('väčšie tolerancie, menej pokusov, nápovedy, v kvízoch o jednu nesprávnu možnosť menej; rovnice sa ukážu hneď — bez kvízov „doplň rovnicu“',
+    'wider tolerances, fewer trials, hints, one wrong option fewer in quizzes; equations are shown right away — no “complete the equation” quizzes', 'ширші допуски, менше спроб, підказки, у вікторинах на одну неправильну відповідь менше; рівняння показуються одразу — без вікторин «доповни рівняння»'),
+  normal: tr('pôvodná hra; pred každou úlohou najprv doplníš chýbajúce časti jej rovnice', 'the original game; before every task you first fill in the missing parts of its equation', 'оригінальна гра; перед кожним завданням спершу доповниш пропущені частини його рівняння'),
+  hard: tr('viac poznatkov: teória a rovnice pri každom kroku, viac kvízov „doplň rovnicu“ a extra otázky s rovnicami; presnosť, náhodné ciele, bez nápovied, prísnejšie hviezdičky',
+    'more knowledge: theory and equations at every step, more “complete the equation” quizzes and extra equation questions; precision, random targets, no hints, stricter stars', 'більше знань: теорія та рівняння на кожному кроці, більше вікторин «доповни рівняння» і додаткові питання з рівняннями; точність, випадкові цілі, без підказок, суворіші зірки'),
 };
 
 // 📜 historické zvitky (nastavenie nezávislé od obťažnosti)

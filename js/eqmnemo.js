@@ -14,9 +14,9 @@ const MODE_DESC = {
   pictures: tr('pôvodná hra: najprv obraz a intuícia (ručičky, Blochova guľa, pokusy), rovnice len v paneli teórie',
     'the original game: the picture and intuition come first (hands, the Bloch ball, experiments); equations only in the theory panel',
     'оригінальна гра: спершу образ та інтуїція (стрілки, куля Блоха, досліди), рівняння — лише в панелі теорії'),
-  equations: tr('navyše portál 0 — Sieň symbolov; hore na obrazovke skutočná rovnica, ktorá práve platí a mení sa s hrou; symboly sú obrázky (glyfy) s vysvetlivkou; pred každou úlohou jej rovnica',
-    'adds portal 0 — the Hall of Symbols; at the top of the screen the real equation that holds right now and changes with the game; symbols are pictures (glyphs) with tooltips; every task starts with its equation',
-    'додає портал 0 — Залу символів; угорі екрана — справжнє рівняння, що діє зараз і змінюється разом із грою; символи — картинки (гліфи) з підказками; кожне завдання починається з рівняння'),
+  equations: tr('navyše portál 0 — Sieň symbolov; hore na obrazovke skutočná rovnica, ktorá práve platí a mení sa s hrou; symboly sú obrázky (glyfy) s vysvetlivkou; pred každou úlohou jej rovnica (pri normálnej a ťažkej ju najprv doplníš)',
+    'adds portal 0 — the Hall of Symbols; at the top of the screen the real equation that holds right now and changes with the game; symbols are pictures (glyphs) with tooltips; every task starts with its equation (on Normal and Hard you complete it first)',
+    'додає портал 0 — Залу символів; угорі екрана — справжнє рівняння, що діє зараз і змінюється разом із грою; символи — картинки (гліфи) з підказками; кожне завдання починається з рівняння (на звичайній і складній його спершу доповниш)'),
 };
 
 // mnemotechnické pravidlá: [ukážkový token, nadpis, vysvetlenie]
@@ -205,7 +205,7 @@ const EqM = {
         return { noState: true, rows: [[T('i', 'k', 'iħ'), T('d', 'n', '∂'), T('psi', 'ket', '|ψ⟩'), T('dt', 'n', '/∂t'), eq('e', '='), T('H', 'op', 'Ĥ'), T('psi2', 'ket', '|ψ⟩')],
           [T('P', 'P', 'P(a)'), eq('e2', '='), T('l', 'k', '|'), T('bra', 'bra', '⟨a|'), T('ket', 'ket', '|ψ⟩'), T('r', 'k', '|²'), eq('s', '·'),
             T('q', 'n', tr('čo existuje? · čo vieme? · ako sa javí?', 'what exists? · what can we know? · how does it appear?', 'що існує? · що ми знаємо? · як постає?'))]] };
-      case 9: {
+      case 12: {
         if (!S.n) return null;
         const r = S.animR ? S.animR() : S.r, P = clamp((1 + V3.dot(r, S.n)) / 2, 0, 1);
         return { rows: [[T('P', 'P', tr('P(zásah)', 'P(hit)', 'P(влуч.)')), eq('e', '='), T('h', 'k', '½(1 +'), T('r', 'ket', 'r'), eq('d', '·'), T('n', 'g', 'n', { ph: Math.atan2(S.n[1], S.n[0]), s: 1 }), T('c', 'k', ')'), eq('e2', '='),
@@ -338,9 +338,10 @@ const EqM = {
     if (!T) return null;
     return T[step] ? pick(T[step]) : step === 'intro' ? pick(T.core) : null;
   },
-  cardsFor(num, step) {
+  // solved = hráč práve doplnil rovnicu (normálna/ťažká) — karta ju ukáže celú ako odmenu
+  cardsFor(num, step, solved = false) {
     const html = this.eqFor(num, step);
     if (!html) return [];
-    return [{ who: tr('Rovnica najprv', 'Equation first', 'Спершу рівняння'), face: '∑', text: html, cls: 'eqcard' }];
+    return [{ who: solved ? tr('Celá rovnica', 'The whole equation', 'Усе рівняння') : tr('Rovnica najprv', 'Equation first', 'Спершу рівняння'), face: '∑', text: html, cls: 'eqcard' }];
   },
 };
