@@ -332,8 +332,10 @@ const UI = {
         }
         const d = this.dialog.getBoundingClientRect(), b = btn.getBoundingClientRect();
         menu.style.left = (b.left + b.width / 2 - d.left) + 'px';
-        menu.style.top = (b.bottom - d.top + 4) + 'px';
         menu.classList.add('show');
+        // dialóg je dole na obrazovke: ak sa ponuka nezmestí pod prázdne miesto, otvorí sa nad ním
+        const up = b.bottom + 4 + menu.offsetHeight > window.innerHeight - 6;
+        menu.style.top = (up ? b.top - d.top - 4 - menu.offsetHeight : b.bottom - d.top + 4) + 'px';
       };
       sp.appendChild(btn);
     });

@@ -90,6 +90,15 @@ const THEORY = {
     feedback: DL('theory.11.feedback'),
     bellReadout: DL('theory.11.bellReadout'),
   },
+  13: {
+    views: {tune: 'bloch2d', pulse: 'bloch2d', sequence: 'bases', echo: 'rho'},
+    core: DL('theory.13.core'),
+    tune: DL('theory.13.tune'),
+    pulse: DL('theory.13.pulse'),
+    sequence: DL('theory.13.sequence'),
+    calibrate: DL('theory.13.calibrate'),
+    echo: DL('theory.13.echo'),
+  },
 };
 
 // extra otázky (ťažká) — viac poznatkov a rovníc

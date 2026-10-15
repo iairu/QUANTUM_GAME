@@ -283,14 +283,15 @@ const Hub = {
       for (const s of [-1, 1]) r.draw('box', M4.trs(V3.add(pt.p, V3.add(V3.scale(side, s * 2.7), [0, hh / 2, 0])), Math.atan2(pt.dir[0], pt.dir[2]), [0.8, hh, 0.6]), [0.48, 0.47, 0.45], { pattern: 4 });
       if (pt.boss) r.draw('box', M4.trs(V3.add(pt.p, [0, hh + 0.3, 0]), Math.atan2(pt.dir[0], pt.dir[2]), [6.4, 0.8, 0.8]), [0.48, 0.47, 0.45], { pattern: 4 });
       }
+      PortalArt.draw(r, L.num, c, pt.dir, t + L.num, open); // ukážka obsahu levelu
       r.draw('torus', M4.orient(c, pt.dir, 2.1), col, { emissive: open ? 0.5 : 0 });
-      r.draw('disk', M4.orient(c, pt.dir, 2.0), col, { alpha: open ? 0.35 + 0.1 * Math.sin(t * 2 + L.num) : 0.15, emissive: 0.8, unlit: 1 });
+      r.draw('disk', M4.orient(c, pt.dir, 2.0), col, { alpha: open ? 0.16 + 0.06 * Math.sin(t * 2 + L.num) : 0.1, emissive: 0.8, unlit: 1 });
       // mentor
       const np = pt.npc;
       r.draw('cylinder', M4.trs(np, 0, [0.35, 1.1, 0.35]), V3.scale(L.color, 0.8));
       r.sphere(V3.add(np, [0, 1.45, 0]), 0.32, [0.95, 0.85, 0.75]);
       const dd = Game.progress.diff[L.num], st = (done ? ' ' + '★'.repeat(done) + '☆'.repeat(3 - done) : '') + (dd && dd !== 'normal' ? ` <small>(${DIFF_NAME[dd]})</small>` : '');
-      UI.hot(c, `<b>${tr('Portál', 'Portal', 'Портал')} ${L.num}: ${L.title}</b><br>${(Settings.layman ? LAYMAN_LEVEL_TIPS : LEVEL_TIPS)[L.num]}${open ? '' : tr('<br>🔒 Najprv dokonči predchádzajúci level.', '<br>🔒 Complete the previous level first.', '<br>🔒 Спершу пройди попередній рівень.')}`, 60);
+      UI.hot(c, `<b>${tr('Portál', 'Portal', 'Портал')} ${L.num}: ${L.title}</b><br>${(Settings.layman ? LAYMAN_LEVEL_TIPS : LEVEL_TIPS)[L.num]}${portalList(L.num)}${open ? '' : tr('<br>🔒 Najprv dokonči predchádzajúci level.', '<br>🔒 Complete the previous level first.', '<br>🔒 Спершу пройди попередній рівень.')}`, 60);
       UI.hot(V3.add(np, [0, 1.2, 0]), tr(`<b>${L.mentor}</b> — mentor levelu ${L.num}.`, `<b>${L.mentor}</b> — mentor of level ${L.num}.`, `<b>${L.mentor}</b> — наставник рівня ${L.num}.`), 30);
       UI.label('portal' + L.num, V3.add(c, [0, 2.9, 0]), `<b>${L.num} · ${L.title}</b>${st}<br><small>${open ? L.face + ' ' + L.mentor : tr('🔒 zamknuté', '🔒 locked', '🔒 закрито')}</small>`, 'portal' + (open ? '' : ' locked'));
     }
@@ -299,7 +300,7 @@ const Hub = {
     if (!Settings.dragon) { /* klasická téma: bez draka a snehu */ } else if (Game.progress.stars[12] === undefined) {
       const w = t * 0.11, dp = [Math.cos(w) * 46, 27 + Math.sin(t * 0.5) * 3, Math.sin(w) * 46];
       Dragon.draw(r, dp, Math.atan2(-Math.sin(w), Math.cos(w)), { scale: 2.4, bank: 0.35, t });
-      const nw = LEVELS.filter((L) => !L.boss).length, bp = LEVELS.find((L) => L.boss)?.num;
+      const nw = LEVELS.filter((L) => !L.boss && !L.free).length, bp = LEVELS.find((L) => L.boss)?.num;
       UI.hot(dp, tr(`<b>Ketvarr</b> — kvantový drak. Porazíš ho na Dračom štíte (portál ${bp}), keď sa naučíš všetkých ${nw} slov moci.`, `<b>Ketvarr</b> — the quantum dragon. You will defeat him on Dragon’s Peak (portal ${bp}) once you learn all ${nw} Words of Power.`, `<b>Кетварр</b> — квантовий дракон. Ти переможеш його на Драконовому піку (портал ${bp}), коли вивчиш усі ${nw} слів сили.`), 60);
     } else {
       const dp = [0, 35.6, -52];
@@ -390,7 +391,8 @@ const Hub = {
     }
     r.draw('box', M4.trs(V3.add(pt.p, [0, hh + 0.6, 0]), hd, [2 * w + 1.4, 0.8, 1.1]), stone, { pattern: 11 }); // preklad
     // vír inštancie
-    r.draw('disk', M4.orient(c, pt.dir, 2.15), open ? L.color : [0.3, 0.3, 0.35], { pattern: open ? 8 : 0, alpha: open ? 0.92 : 0.25, unlit: 1, emissive: 0.6 });
+    PortalArt.draw(r, L.num, V3.add(c, V3.scale(pt.dir, 0.15)), pt.dir, t + L.num, open); // ukážka obsahu levelu pred vírom
+    r.draw('disk', M4.orient(c, pt.dir, 2.15), open ? L.color : [0.3, 0.3, 0.35], { pattern: open ? 8 : 0, alpha: open ? 0.55 : 0.25, unlit: 1, emissive: 0.6 });
     r.draw('torus', M4.orient(c, pt.dir, 2.15), open ? L.color : [0.35, 0.35, 0.4], { emissive: open ? 0.8 : 0 });
     // mentor = zadávateľ úlohy
     const done = Game.progress.stars[L.num], np = pt.npc, face = Math.atan2(-np[0], -np[2]);
@@ -400,7 +402,7 @@ const Hub = {
     const dd = Game.progress.diff[L.num], st = (done ? ' ' + '★'.repeat(done) + '☆'.repeat(3 - done) : '') + (dd && dd !== 'normal' ? ` <small>(${DIFF_NAME[dd]})</small>` : '');
     const lo = Math.min(L.num * 2 - 1, 18), hi = Math.min(L.num * 2 + 1, 20); // MMO úroveň končí na 20
     const rec = L.boss ? tr('Nájazd · úr. 20', 'Raid · lvl 20', 'Рейд · рів. 20') : tr(`Dungeon · úr. ${lo}–${hi}`, `Dungeon · lvl ${lo}–${hi}`, `Підземелля · рів. ${lo}–${hi}`);
-    UI.hot(c, `<b>${tr('Inštancia', 'Instance', 'Інстанс')} ${L.num}: ${L.title}</b> <small>(${rec})</small><br>${(Settings.layman ? LAYMAN_LEVEL_TIPS : LEVEL_TIPS)[L.num]}<br>${tr('Boss', 'Boss', 'Бос')}: <b>${BOSSES[L.num].icon} ${BOSSES[L.num].name}</b>${open ? '' : tr('<br>🔒 Najprv dokonči predchádzajúci level.', '<br>🔒 Complete the previous level first.', '<br>🔒 Спершу пройди попередній рівень.')}`, 60);
+    UI.hot(c, `<b>${tr('Inštancia', 'Instance', 'Інстанс')} ${L.num}: ${L.title}</b> <small>(${rec})</small><br>${(Settings.layman ? LAYMAN_LEVEL_TIPS : LEVEL_TIPS)[L.num]}${portalList(L.num)}${tr('Boss', 'Boss', 'Бос')}: <b>${BOSSES[L.num].icon} ${BOSSES[L.num].name}</b>${open ? '' : tr('<br>🔒 Najprv dokonči predchádzajúci level.', '<br>🔒 Complete the previous level first.', '<br>🔒 Спершу пройди попередній рівень.')}`, 60);
     UI.hot(V3.add(np, [0, 1.2, 0]), tr(`<b>${L.mentor}</b> — mentor levelu ${L.num}.`, `<b>${L.mentor}</b> — mentor of level ${L.num}.`, `<b>${L.mentor}</b> — наставник рівня ${L.num}.`), 30);
     UI.label('portal' + L.num, V3.add(pt.p, [0, hh + 2, 0]), `<b>${L.num} · ${L.title}</b>${st}<br><small>${open ? `${L.face} ${L.mentor} · ${rec}` : tr('🔒 zamknuté', '🔒 locked', '🔒 закрито')}</small>`, 'portal' + (open ? '' : ' locked'));
     UI.label('mentor' + L.num, V3.add(np, [0, 2.2, 0]), `${L.mentor}`, 'npc friendly small', null);
@@ -419,6 +421,7 @@ const LEVEL_TIPS = tr({
   9: 'Geometria Blochovej sféry: θ a φ ako súradnice, rotácie R<sub>n</sub>(ϑ), meranie ako smer otázky, unitárne vs. dekoherencia.',
   10: 'Čistota stavu: ρ′ = UρU† nemení |r|, purifikácia meraním, pseudo-čistý stav v NMR, ⟨A⟩ = Tr(ρA), časová evolúcia.',
   11: 'Meranie ako súčasť výpočtu: fáza → interferencia → pravdepodobnosť, meranie uprostred obvodu, spätná väzba, Bellov stav vs. zmes.',
+  13: '🧪 Praktické NMR (odomknuté od začiatku): ladenie vysielača na ν₀ = γB₀/2π, prúdové impulzy v priečnej RF cievke, meracie sekvencie, kalibrácia, shim a spinové echo.',
   12: '🐉 Záverečný súboj s drakom Ketvarrom: ťahová bitka, štít = qubit, úder = meranie, cieľ P(zásah) ≥ prah.',
 }, {
   1: 'Complex numbers: amplitude as a clock hand, phase, i² = −1, interference.',
@@ -432,6 +435,7 @@ const LEVEL_TIPS = tr({
   9: 'Bloch-sphere geometry: θ and φ as coordinates, rotations R<sub>n</sub>(ϑ), measurement as the direction of a question, unitary vs. decoherence.',
   10: 'Purity: ρ′ = UρU† keeps |r|, purification by measurement, the NMR pseudo-pure state, ⟨A⟩ = Tr(ρA), time evolution.',
   11: 'Measurement as part of the computation: phase → interference → probability, mid-circuit measurement, feedback, Bell state vs. mixture.',
+  13: '🧪 Hands-on NMR (unlocked from the start): tuning the transmitter to ν₀ = γB₀/2π, current pulses in the transverse RF coil, measurement sequences, calibration, shimming and the spin echo.',
   12: '🐉 The final battle with the dragon Ketvarr: turn-based, ward = qubit, strike = measurement, aim for P(hit) ≥ the threshold.',
 }, {
   1: 'Комплексні числа: амплітуда як стрілка годинника, фаза, i² = −1, інтерференція.',
@@ -445,8 +449,115 @@ const LEVEL_TIPS = tr({
   9: 'Геометрія сфери Блоха: θ і φ як координати, повороти R<sub>n</sub>(ϑ), вимірювання як напрямок питання, унітарна еволюція проти декогеренції.',
   10: 'Чистота стану: ρ′ = UρU† не змінює |r|, очищення вимірюванням, псевдочистий стан у ЯМР, ⟨A⟩ = Tr(ρA), часова еволюція.',
   11: 'Вимірювання як частина обчислення: фаза → інтерференція → імовірність, вимірювання посеред схеми, зворотний зв’язок, стан Белла проти суміші.',
+  13: '🧪 Практичний ЯМР (відкрито від початку): налаштування передавача на ν₀ = γB₀/2π, імпульси струму в поперечній РЧ-котушці, вимірювальні послідовності, калібрування, шим і спінове відлуння.',
   12: '🐉 Фінальна битва з драконом Кетварром: покрокова, захист = кубіт, удар = вимірювання, цілься на P(влучання) ≥ порогу.',
 });
+
+// obsah levelu na portáli: zoznam úloh v bubline (zobrazí sa pri prejdení myšou)
+const PORTAL_CONTENTS = tr({
+  1: ['ručička amplitúdy a jej fáza', 'násobenie i = otočenie o 90°', 'interferencia dvoch ciest'],
+  2: ['dve stopy striebra', 'postupnosti meraní Z → X → Z', 'predpoveď cos²(θ/2)'],
+  3: ['hádanky s hradlami X, Y, Z, H, S, T', 'meranie: bit vs. štatistika', 'laboratórium rotácií'],
+  4: ['H·H bez merania', 'H · meranie · H', 'dekoherencia a koherencie ρ'],
+  5: ['skladanie bra-ket výrazov: stav, otázka, číslo, operátor'],
+  6: ['precesia', 'π a π/2 impulz', 'rezonancia', 'dekoherencia T₂'],
+  7: ['Bellov stav', 'nemožnosť signalizácie', 'CHSH hra'],
+  8: ['rozhovory s mysliteľmi', 'triedenie otázok: bytie, poznanie, skúsenosť'],
+  9: ['súradnice θ, φ', 'rotácie R<sub>n</sub>(ϑ)', 'φ z merania S<sub>x</sub>, S<sub>y</sub>', 'unitárne vs. dekoherencia'],
+  10: ['unitárna stena (|r| sa nemení)', 'purifikácia meraním a chladením', 'pseudo-čistý stav NMR', 'tomografia r = (⟨σ<sub>x</sub>⟩, ⟨σ<sub>y</sub>⟩, ⟨σ<sub>z</sub>⟩)', 'časová evolúcia'],
+  11: ['|+⟩ alebo |−⟩? (fáza → H → meranie)', 'meranie uprostred obvodu', 'spätná väzba: zmeraj → rozhodni', 'Bellov stav vs. zmes'],
+  12: ['ťahový súboj: štít = qubit, úder = meranie'],
+  13: ['ladenie vysielača na ν₀', 'prúdový impulz v RF cievke', 'meracie sekvencie a FID', 'kalibrácia impulzu', 'shim a spinové echo'],
+}, {
+  1: ['the amplitude hand and its phase', 'multiplying by i = a 90° turn', 'interference of two paths'],
+  2: ['two silver spots', 'measurement sequences Z → X → Z', 'predicting cos²(θ/2)'],
+  3: ['puzzles with the X, Y, Z, H, S, T gates', 'measurement: one bit vs. statistics', 'rotation laboratory'],
+  4: ['H·H without measurement', 'H · measurement · H', 'decoherence and the coherences of ρ'],
+  5: ['building bra-ket expressions: state, question, number, operator'],
+  6: ['precession', 'π and π/2 pulses', 'resonance', 'decoherence T₂'],
+  7: ['the Bell state', 'no-signalling', 'the CHSH game'],
+  8: ['conversations with thinkers', 'sorting questions: being, knowing, experience'],
+  9: ['coordinates θ, φ', 'rotations R<sub>n</sub>(ϑ)', 'φ from measuring S<sub>x</sub>, S<sub>y</sub>', 'unitary vs. decoherence'],
+  10: ['the unitary wall (|r| stays)', 'purification by measurement and cooling', 'the NMR pseudo-pure state', 'tomography r = (⟨σ<sub>x</sub>⟩, ⟨σ<sub>y</sub>⟩, ⟨σ<sub>z</sub>⟩)', 'time evolution'],
+  11: ['|+⟩ or |−⟩? (phase → H → measurement)', 'mid-circuit measurement', 'feedback: measure → decide', 'Bell state vs. mixture'],
+  12: ['turn-based battle: ward = qubit, strike = measurement'],
+  13: ['tuning the transmitter to ν₀', 'a current pulse in the RF coil', 'measurement sequences and the FID', 'pulse calibration', 'shimming and the spin echo'],
+}, {
+  1: ['стрілка амплітуди та її фаза', 'множення на i = поворот на 90°', 'інтерференція двох шляхів'],
+  2: ['дві плями срібла', 'послідовності вимірювань Z → X → Z', 'передбачення cos²(θ/2)'],
+  3: ['головоломки з гейтами X, Y, Z, H, S, T', 'вимірювання: біт проти статистики', 'лабораторія поворотів'],
+  4: ['H·H без вимірювання', 'H · вимірювання · H', 'декогеренція і когерентності ρ'],
+  5: ['складання бра-кет виразів: стан, питання, число, оператор'],
+  6: ['прецесія', 'π- і π/2-імпульси', 'резонанс', 'декогеренція T₂'],
+  7: ['стан Белла', 'неможливість сигналізації', 'гра CHSH'],
+  8: ['розмови з мислителями', 'сортування питань: буття, знання, досвід'],
+  9: ['координати θ, φ', 'повороти R<sub>n</sub>(ϑ)', 'φ з вимірювань S<sub>x</sub>, S<sub>y</sub>', 'унітарне проти декогеренції'],
+  10: ['унітарна стіна (|r| не змінюється)', 'очищення вимірюванням і охолодженням', 'псевдочистий стан ЯМР', 'томографія r = (⟨σ<sub>x</sub>⟩, ⟨σ<sub>y</sub>⟩, ⟨σ<sub>z</sub>⟩)', 'часова еволюція'],
+  11: ['|+⟩ чи |−⟩? (фаза → H → вимірювання)', 'вимірювання посеред схеми', 'зворотний зв’язок: виміряй → виріши', 'стан Белла проти суміші'],
+  12: ['покроковий бій: захист = кубіт, удар = вимірювання'],
+  13: ['налаштування передавача на ν₀', 'імпульс струму в РЧ-котушці', 'вимірювальні послідовності та FID', 'калібрування імпульсу', 'шим і спінове відлуння'],
+});
+const portalList = (n) => (PORTAL_CONTENTS[n] ? `<ol class="plist">${PORTAL_CONTENTS[n].map((x) => `<li>${x}</li>`).join('')}</ol>` : '');
+
+// malá animovaná ukážka pokusu levelu vnútri portálu (u = doprava, w = hore v rovine portálu, d = smer k hráčovi)
+const PortalArt = {
+  draw(r, n, c, dir, t, open) {
+    const d = V3.norm(dir), u = V3.norm(V3.cross([0, 1, 0], d)), w = [0, 1, 0];
+    const P = (x, y, z = 0) => V3.add(c, V3.add(V3.add(V3.scale(u, x), V3.scale(w, y)), V3.scale(d, z)));
+    const g = (col) => (open ? col : [0.45, 0.45, 0.5]), E = { emissive: open ? 0.6 : 0 }, yaw = Math.atan2(d[0], d[2]);
+    const ball = (p, R, v, col = [1, 0.35, 0.45]) => {
+      r.draw('circle', M4.trs(p, 0, R), g([0.55, 0.75, 1]));
+      r.draw('circle', M4.orient(p, d, R), g([0.35, 0.45, 0.7]));
+      r.sphere(p, R, g([0.45, 0.6, 1]), { alpha: 0.15 });
+      if (V3.len(v) > 0.03) r.arrow(p, V3.add(p, V3.scale(v, R)), g(col), R * 0.06, E); else r.sphere(p, R * 0.1, g(col), E);
+    };
+    switch (n) {
+      case 1: { // ručičky amplitúd sa sčítavajú
+        r.draw('circle', M4.orient(c, d, 1.1), g([0.6, 0.65, 0.8]));
+        const a1 = t * 0.9, a2 = t * 1.7, p1 = P(Math.cos(a1) * 0.55, Math.sin(a1) * 0.55), p2 = V3.add(p1, V3.sub(P(Math.cos(a2) * 0.55, Math.sin(a2) * 0.55), c));
+        r.arrow(c, p1, g([0.31, 0.55, 1]), 0.04, E); r.arrow(p1, p2, g([1, 0.42, 0.49]), 0.04, E); r.arrow(c, p2, g([1, 1, 1]), 0.025, E); break;
+      }
+      case 2: { // magnet a dve stopy
+        r.draw('box', M4.trs(P(0, 0.75), yaw, [1.2, 0.3, 0.4]), g([0.75, 0.3, 0.3]));
+        r.draw('box', M4.trs(P(0, -0.75), yaw, [1.2, 0.3, 0.4]), g([0.3, 0.4, 0.8]));
+        for (let k = 0; k < 6; k++) { const x = -1 + ((t * 0.8 + k / 6) % 1) * 2, y = x > -0.2 ? (k % 2 ? 1 : -1) * (x + 0.2) * 0.45 : 0; r.sphere(P(x, y), 0.06, g([0.85, 0.85, 0.9]), E); }
+        r.sphere(P(0.95, 0.5), 0.13, g([1, 0.9, 0.6]), E); r.sphere(P(0.95, -0.5), 0.13, g([1, 0.9, 0.6]), E); break;
+      }
+      case 3: { const th = 1 + Math.sin(t * 0.7) * 0.6, ph = t; ball(c, 1, qToWorld([Math.sin(th) * Math.cos(ph), Math.sin(th) * Math.sin(ph), Math.cos(th)])); break; }
+      case 4: { // dva Hadamardy a zväzok
+        r.rod(P(-1.2, 0), P(1.2, 0), g([0.8, 0.6, 1]), 0.025, E);
+        for (const x of [-0.6, 0.6]) r.draw('torus', M4.orient(P(x, 0), u, 0.45), g([0.85, 0.45, 1]), E);
+        r.sphere(P(-1.2 + 2.4 * ((t * 0.6) % 1), 0), 0.1, g([0.4, 1, 1]), E); break;
+      }
+      case 5: // kniha s bra-ketom
+        r.draw('box', M4.trs(P(-0.35, 0), yaw + 0.25, [0.6, 0.85, 0.12]), g([0.35, 0.75, 0.6]));
+        r.draw('box', M4.trs(P(0.35, 0), yaw - 0.25, [0.6, 0.85, 0.12]), g([0.3, 0.65, 0.55]));
+        if (open) UI.label('pa5' + c[0].toFixed(1), P(0, 0.75), '⟨φ|ψ⟩', 'ket');
+        break;
+      case 6: case 13: { // precesia okolo B₀ (v NMR dielni aj RF cievka)
+        const ph = t * 2, v = qToWorld([Math.sin(0.6) * Math.cos(ph), Math.sin(0.6) * Math.sin(ph), Math.cos(0.6)]);
+        r.arrow(P(0, -1), P(0, 1.05), g([0.5, 0.8, 1]), 0.025);
+        r.arrow(c, V3.add(c, V3.scale(v, 0.9)), g([1, 0.35, 0.45]), 0.05, E);
+        r.draw('circle', M4.trs(V3.add(c, [0, Math.cos(0.6) * 0.9, 0]), 0, Math.sin(0.6) * 0.9), g([1, 0.6, 0.7]), { alpha: 0.6 });
+        if (n === 13) for (const s of [-1, 1]) r.draw('torus', M4.orient(P(s * 0.8, 0), u, 0.45), g([1, 0.7, 0.3]), { emissive: open ? 0.4 + 0.6 * Math.max(0, Math.sin(t * 3)) : 0 });
+        break;
+      }
+      case 7: { const s = 1 + 0.15 * Math.sin(t * 3); r.sphere(P(-0.6, 0), 0.22 * s, g([0.31, 0.55, 1]), E); r.sphere(P(0.6, 0), 0.22 * s, g([1, 0.42, 0.49]), E); r.rod(P(-0.6, 0), P(0.6, 0), g([1, 0.45, 0.7]), 0.02, E); break; }
+      case 8: for (let k = 0; k < 2; k++) { const a = t * 0.8 + k * Math.PI; r.sphere(P(Math.cos(a) * 0.45, Math.sin(a) * 0.45), 0.28, g(k ? [0.95, 0.95, 0.95] : [0.15, 0.15, 0.2]), E); } break;
+      case 9: { // rotácia okolo naklonenej osi
+        const ax = V3.norm(qToWorld([Math.SQRT1_2, 0, Math.SQRT1_2])), v = V3.rotate(qToWorld([0, 1, 0]), ax, t * 1.2);
+        r.rod(V3.sub(c, V3.scale(ax, 1.2)), V3.add(c, V3.scale(ax, 1.2)), g([1, 0.9, 0.35]), 0.018, E); ball(c, 0.95, v); break;
+      }
+      case 10: { const L = 0.25 + 0.75 * (0.5 + 0.5 * Math.sin(t * 0.9)); ball(c, 0.95, V3.scale(V3.norm(qToWorld([0.5, 0.3, 0.8])), L), [0.4, 1, 0.6]); break; }
+      case 11: { // krabica a histogram meraní
+        r.draw('box', M4.trs(P(-0.45, -0.2), t * 0.4, 0.55), g([0.55, 0.42, 0.25]));
+        [0.5 + 0.5 * Math.sin(t * 2), 0.5 - 0.5 * Math.sin(t * 2)].forEach((h, k) => r.draw('cylinder', M4.trs(P(0.45 + k * 0.4, -0.7), 0, [0.12, 0.1 + h * 1.2, 0.12]), g(k ? [1, 0.45, 0.45] : [0.45, 0.65, 1]), E)); break;
+      }
+      case 12: { const fl = 0.5 + 0.5 * Math.sin(t * 5); r.sphere(P(0, 0.2), 0.35, g([1, 0.42, 0.15]), { emissive: open ? 0.5 + fl * 0.5 : 0 }); for (const s of [-1, 1]) r.sphere(P(s * 0.14, 0.32, 0.3), 0.06, g([1, 0.9, 0.2]), E); break; }
+      default: break;
+    }
+  },
+};
 
 // ------------------------------------------------------------------
 // Hra
@@ -575,7 +686,7 @@ const Game = {
     this.save();
   },
   levelOf(n) { return n === 0 ? this.level0 : this.levels.find((L) => L.num === n); },
-  isUnlocked(n) { return n === 0 || n === 1 || this.progress.allUnlocked || this.progress.stars[n - 1] !== undefined || this.progress.stars[n] !== undefined; },
+  isUnlocked(n) { return n === 0 || n === 1 || this.progress.allUnlocked || !!LEVELS.find((L) => L.num === n && L.free) || this.progress.stars[n - 1] !== undefined || this.progress.stars[n] !== undefined; },
   setDifficulty(d) {
     if (!DIFFS.includes(d) || d === Settings.diff) return;
     Settings.diff = d; Settings.save();
@@ -658,8 +769,9 @@ const Game = {
     Sound.sfx('fanfare');
     this.progress.stars[n] = Math.max(stars, this.progress.stars[n] || 0);
     Settings.wow && n > 0 && Wow.onLevelComplete(n, stars); // MMO: boss padol, korisť, skúsenosti
-    if (fresh && Settings.dragon && n > 0 && !LEVELS.find((L) => L.num === n)?.boss) { // každý mentor naučí jedno slovo moci proti drakovi
-      const ring = LEVELS.filter((L) => !L.boss), k = ring.filter((L) => this.progress.stars[L.num] !== undefined).length;
+    const Ln = LEVELS.find((L) => L.num === n);
+    if (fresh && Settings.dragon && n > 0 && Ln && !Ln.boss && !Ln.free) { // každý mentor naučí jedno slovo moci proti drakovi
+      const ring = LEVELS.filter((L) => !L.boss && !L.free), k = ring.filter((L) => this.progress.stars[L.num] !== undefined).length;
       setTimeout(() => UI.toast(k < ring.length
         ? tr(`🐉 Slovo moci ${k}/${ring.length} — Ketvarr nad ostrovom nepokojne krúži.`, `🐉 Word of Power ${k}/${ring.length} — Ketvarr circles the island restlessly.`, `🐉 Слово сили ${k}/${ring.length} — Кетварр неспокійно кружляє над островом.`)
         : tr(`🐉 Všetkých ${ring.length} slov moci! Dračí štít (portál ${LEVELS.find((L) => L.boss).num}) je otvorený.`, `🐉 All ${ring.length} Words of Power! Dragon’s Peak (portal ${LEVELS.find((L) => L.boss).num}) is open.`, `🐉 Усі ${ring.length} слів сили! Драконів пік (портал ${LEVELS.find((L) => L.boss).num}) відкрито.`), 4200), 1200);
@@ -683,7 +795,7 @@ const Game = {
     }
   },
   nextQuestText() {
-    const n = LEVELS.find((L) => this.progress.stars[L.num] === undefined);
+    const n = LEVELS.find((L) => !L.free && this.progress.stars[L.num] === undefined) || LEVELS.find((L) => this.progress.stars[L.num] === undefined); // praktická NMR dielňa až nakoniec
     if (n && n.boss) return tr(`Vystúp na Dračí štít (portál ${n.num}) a poraz draka Ketvarra!`, `Climb Dragon’s Peak (portal ${n.num}) and defeat the dragon Ketvarr!`, `Піднімися на Драконів пік (портал ${n.num}) і перемож дракона Кетварра!`);
     return n ? tr(`Choď k portálu ${n.num}: ${n.title} (${n.mentor})`, `Go to portal ${n.num}: ${n.title} (${n.mentor})`, `Іди до порталу ${n.num}: ${n.title} (${n.mentor})`)
       : Settings.dragon ? tr('Ketvarr je porazený a ostrov zachránený! Skús zlepšiť hviezdičky.', 'Ketvarr is defeated and the island is saved! Try to improve your stars.', 'Кетварра переможено, острів урятовано! Спробуй покращити свої зірки.')

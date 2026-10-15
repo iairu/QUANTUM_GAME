@@ -88,6 +88,14 @@ const LAYMAN_STEPS = {
     feedback: [DL('layman.11.feedback.0')],
     bellReadout: [DL('layman.11.bellReadout.0')],
   },
+  13: {
+    intro: [DL('layman.13.intro.0')],
+    tune: [DL('layman.13.tune.0')],
+    pulse: [DL('layman.13.pulse.0')],
+    sequence: [DL('layman.13.sequence.0')],
+    calibrate: [DL('layman.13.calibrate.0')],
+    echo: [DL('layman.13.echo.0')],
+  },
   8: {
     intro: [DL('layman.8.intro.0')],
     statues: [DL('layman.8.statues.0')],
@@ -306,6 +314,7 @@ const LAYMAN_LEVEL_TIPS = tr({
   9: 'Šípka qubitu v guli: kam mieri, ako ju otočiť a ako sa na ňu „pozrieť“ z rôznych strán.',
   10: 'Dá sa z rozmazaného qubitu urobiť ostrý? Otáčaním nie — treba sa pozrieť alebo ochladiť.',
   11: 'Meranie nie je len prečítanie výsledku — je to súčasť výpočtu.',
+  13: '🧪 Skutočný NMR prístroj: nalaď rádio, pošli prúd do cievky a vypočuj si, čo spiny „odpovedia“.',
   12: '🐉 Súboj s drakom: natoč šípku jeho štítu k zlatej a udri.',
 }, {
   1: 'Arrows on answers: length = chance, direction = timing. How arrows team up or cancel.',
@@ -319,6 +328,7 @@ const LAYMAN_LEVEL_TIPS = tr({
   9: 'The qubit’s arrow in a ball: where it points, how to turn it and how to “look” at it from different sides.',
   10: 'Can a blurry qubit be made sharp? Not by turning it — you have to look or cool it down.',
   11: 'Measuring is not just reading the result — it is part of the computation.',
+  13: '🧪 A real NMR machine: tune the radio, send current into the coil and listen to what the spins “answer”.',
   12: '🐉 The dragon battle: turn his ward’s arrow towards the golden one and strike.',
 }, {
   1: 'Стрілки на відповідях: довжина = шанс, напрямок = час. Як стрілки об’єднуються або гасяться.',
@@ -332,6 +342,7 @@ const LAYMAN_LEVEL_TIPS = tr({
   9: 'Стрілка кубіта в кулі: куди вона дивиться, як її повернути і як «подивитися» на неї з різних боків.',
   10: 'Чи можна з розмитого кубіта зробити чіткий? Обертанням — ні, треба подивитися або охолодити.',
   11: 'Вимірювання — не просто зчитування результату, а частина обчислення.',
+  13: '🧪 Справжній ЯМР-прилад: налаштуй радіо, подай струм у котушку й послухай, що «відповідають» спіни.',
   12: '🐉 Битва з драконом: поверни стрілку його захисту до золотої й бий.',
 });
 

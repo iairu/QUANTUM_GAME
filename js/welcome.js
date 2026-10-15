@@ -47,8 +47,8 @@ const THEME_INFO = {
   classic: {
     name: tr('Klasická', 'Classic', 'Класична'), icon: '🔬',
     tag: tr('Čistý vedecký svet', 'A clean scientific world', 'Чистий науковий світ'),
-    desc: tr('Minimalistický ostrov s mriežkou a 11 portálmi. Nič neodvádza pozornosť od fyziky — a beží aj na slabších počítačoch.',
-      'A minimalist grid island with 11 portals. Nothing distracts from the physics — and it runs on weaker computers too.', 'Мінімалістичний острів із сіткою та 11 порталами. Ніщо не відволікає від фізики — і гра йде навіть на слабших комп’ютерах.'),
+    desc: tr('Minimalistický ostrov s mriežkou, 11 portálmi a NMR dielňou. Nič neodvádza pozornosť od fyziky — a beží aj na slabších počítačoch.',
+      'A minimalist grid island with 11 portals and an NMR workshop. Nothing distracts from the physics — and it runs on weaker computers too.', 'Мінімалістичний острів із сіткою, 11 порталами та ЯМР-майстернею. Ніщо не відволікає від фізики — і гра йде навіть на слабших комп’ютерах.'),
   },
   nordic: {
     name: tr('Severská', 'Nordic', 'Північна'), icon: '🏔',

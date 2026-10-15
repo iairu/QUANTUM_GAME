@@ -81,6 +81,7 @@ const BOSS_LOOT = {
   9: { slot: 'weapon', icon: '🔄', name: tr('Pauliho rotačná palica', 'Pauli’s Rod of Rotation', 'Паулів жезл обертання') },
   10: { slot: 'chest', icon: '⚗', name: tr('Von Neumannovo čisté rúcho', 'Von Neumann’s Pure Robe', 'Чиста мантія фон Неймана'), robe: [0.85, 0.85, 0.95] },
   11: { slot: 'head', icon: '🎲', name: tr('Bornova kapucňa merania', 'Born’s Hood of Readout', 'Борнів каптур вимірювання'), hat: 'hood' },
+  13: { slot: 'trinket', icon: '🧪', name: tr('Purcellova ladička rezonancie', 'Purcell’s Resonance Fork', 'Перселлів камертон резонансу') },
   12: { slot: 'weapon', icon: '🐉', name: tr('Ketvarrov zub', 'Fang of Ketvarr', 'Ікло Кетварра') },
 };
 const BOSSES = {
@@ -95,6 +96,7 @@ const BOSSES = {
   9: { icon: '🧭', name: tr('Strážca fyzickej gule', 'Warden of the Physical Ball', 'Вартовий фізичної кулі'), tip: tr('Tvrdí, že Blochova sféra je skutočný priestor, v ktorom sa qubit hýbe.', 'Insists the Bloch sphere is real space in which the qubit moves.', 'Стверджує, що сфера Блоха — справжній простір, у якому рухається кубіт.') },
   10: { icon: '🧹', name: tr('Unitárny upratovač', 'The Unitary Sweeper', 'Унітарний прибиральник'), tip: tr('Chce zmes „vyčistiť“ len otáčaním — a |r| sa mu ani nepohne.', 'Wants to “clean” a mixture by rotations alone — and |r| won’t budge.', 'Хоче «очистити» суміш самими обертаннями — а |r| і не зрушить.') },
   11: { icon: '📖', name: tr('Pasívny čitateľ', 'The Passive Reader', 'Пасивний читач'), tip: tr('Verí, že meranie len prečíta hodnotu, ktorá tam už bola.', 'Believes a measurement just reads a value that was already there.', 'Вірить, що вимірювання лише зчитує значення, яке вже було.') },
+  13: { icon: '🌫', name: tr('Nehomogénny fantóm', 'The Inhomogeneous Phantom', 'Неоднорідний фантом'), tip: tr('Rozmazáva B₀, aby FID zhaslo skôr, než ho zmeriaš.', 'Smears B₀ so the FID dies before you can measure it.', 'Розмазує B₀, щоб FID згас раніше, ніж ти його виміряєш.') },
   12: { icon: '🐉', name: tr('Ketvarr', 'Ketvarr', 'Кетварр'), tip: tr('Kvantový drak. Jeho štít je qubit.', 'The quantum dragon. His ward is a qubit.', 'Квантовий дракон. Його захист — кубіт.') },
 };
 

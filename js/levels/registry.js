@@ -12,5 +12,7 @@ const LEVELS = [
   { num: 9, title: tr('Pauliho rotačná dielňa', 'Pauli’s Rotation Workshop', 'Обертова майстерня Паулі'), mentor: tr('Wolfgang Pauli', 'Wolfgang Pauli', 'Вольфганг Паулі'), face: '🔄', color: [0.2, 0.95, 0.95], cls: L9Pauli },
   { num: 10, title: tr('Von Neumannova čistiareň', 'Von Neumann’s Purity Refinery', 'Очисна станція фон Неймана'), mentor: tr('John von Neumann', 'John von Neumann', 'Джон фон Нейман'), face: '⚗', color: [0.88, 0.88, 1], cls: L10Neumann },
   { num: 11, title: tr('Bornova meracia sieň', 'Born’s Readout Hall', 'Зала вимірювань Борна'), mentor: tr('Max Born', 'Max Born', 'Макс Борн'), face: '🎲', color: [0.95, 0.72, 0.5], cls: L11Born },
+  // špeciálny praktický level: odomknutý od začiatku (free), nepočíta sa medzi slová moci proti drakovi
+  { num: 13, title: tr('NMR dielňa', 'NMR Workshop', 'ЯМР-майстерня'), mentor: tr('Edward Purcell', 'Edward Purcell', 'Едвард Перселл'), face: '🧪', color: [0.45, 1, 0.75], cls: L13Nmr, free: true },
   { num: 12, title: tr('Dračí štít', 'Dragon’s Peak', 'Драконів пік'), mentor: tr('Erwin Schrödinger', 'Erwin Schrödinger', 'Ервін Шредінгер'), face: '🐱', color: [1, 0.42, 0.15], cls: L12Dragon, boss: true },
 ].filter((L) => !L.boss || Settings.nordic || Settings.wow); // 12. level (drak) v severskej a MMO téme

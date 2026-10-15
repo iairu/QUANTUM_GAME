@@ -863,7 +863,8 @@ body:not(.eqmode) #eqkey { display: none !important; }
 .blankeq .blank.open .bsel { background: #22305e; }
 .blankeq .blank.good .bsel { border-color: var(--good); background: #1d5a36; }
 .blankeq .blank.bad .bsel { border-color: var(--bad); background: #5a1d28; }
-.blankeq .blank.bad .bsel s { opacity: 0.6; margin-right: 6px; }
+.blankeq .blank.bad .bsel s { position: relative; display: inline-block; opacity: 0.55; margin-right: 8px; text-decoration: none; }
+.blankeq .blank.bad .bsel s::after { content: ""; position: absolute; left: -2px; right: -2px; top: 50%; border-top: 2px solid var(--bad); transform: rotate(-14deg); }
 .bmenu { display: none; position: absolute; transform: translateX(-50%); z-index: 3; flex-direction: column; gap: 4px; padding: 6px; min-width: 6em;
   background: #0b1026; border: 1px solid var(--accent); border-radius: 10px; box-shadow: 0 8px 30px #000c; }
 .bmenu.show { display: flex; }
@@ -875,3 +876,6 @@ body:not(.eqmode) #eqkey { display: none !important; }
 #welcome .wblank { max-width: 760px; margin: -2px auto 12px; padding: 8px 14px; border: 1px solid rgba(185, 140, 255, 0.5); border-left: 4px solid var(--mn-op);
   border-radius: 8px; background: rgba(185, 140, 255, 0.09); font-size: 13.5px; line-height: 1.5; text-align: left; }
 #welcome .wblank b { color: #d9c2ff; }
+/* obsah levelu v bubline portálu */
+#tip ol.plist { margin: 6px 0 2px 18px; padding: 0; font-size: 0.95em; }
+#tip ol.plist li { margin: 1px 0; }

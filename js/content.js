@@ -107,6 +107,15 @@ const CODEX = [
   { id: 'feedbackc', level: 11, type: 'pojem', sym: '📏→🤔→▶', name: 'klasická spätná väzba', text: 'Zmeraj → rozhodni → pokračuj: výsledok merania určí ďalšie hradlo (aktívny reset, korekcia chýb cez syndrómy).', dont: 'Meranie nemusí byť poslednou operáciou výpočtu.' },
   { id: 'decoread', level: 11, type: 'pojem', sym: '🌫 ≠ 📏', name: 'dekoherencia ≠ readout', text: 'Dekoherencia potláča mimodiagonálu ρ (interferenciu), ale sama nevytvorí konkrétny klasický záznam. Readout je fyzický reťazec: interakcia → zosilnenie → signál → register.' },
   { id: 'tomography', level: 11, type: 'pojem', sym: 'ρ ← {ZZ, XX, …}', name: 'tomografia stavu', text: 'Jedna báza vidí len diagonálu ρ. Bellov stav a zmes ½|00⟩⟨00| + ½|11⟩⟨11| dajú v ZZ to isté; líšia sa mimodiagonálou ρ<sub>00,11</sub> = ½ — viditeľnou až v inej báze (XX).', dont: 'Samotná korelácia A = B nedokazuje previazanosť.' },
+  // ---------- Level 13: NMR dielňa (praktické NMR) ----------
+  { id: 'purcell', level: 13, type: 'osobnost', sym: '👤', name: 'Edward Mills Purcell (1912–1997)', text: 'V roku 1946 nezávisle od Felixa Blocha zmeral jadrovú magnetickú rezonanciu v pevnej látke (parafín). Nobelova cena 1952 spolu s Blochom.' },
+  { id: 'nmrsetup', level: 13, type: 'pojem', sym: '🧲⟂📻', name: 'zostava NMR spektrometra', text: 'Magnet so stálym poľom B₀ (os z), vzorka a priečna RF cievka (os x): impulzmi prúdu na frekvencii ν<sub>RF</sub> vytvára pole B₁ ⟂ B₀ a potom tá istá cievka zachytí indukovaný signál.', dont: 'Cievka nie je napájaná stálym prúdom — dostáva krátke RF impulzy; stály je magnet B₀.' },
+  { id: 'larmortune', level: 13, type: 'symbol', sym: 'ν₀ = γB₀/2π', name: 'rezonancia vysielača', text: 'Larmorovu frekvenciu určuje pole B₀ a jadro (protón: 42,577 MHz/T). Vysielač sa nastaví na ν<sub>RF</sub> = ν₀; rozladenie Δν = ν₀ − ν<sub>RF</sub> je precesia v rotujúcom rámci.', dont: 'Larmorovu frekvenciu „neladíš“ gombíkom — meníš B₀ alebo ladíš vysielač.' },
+  { id: 'flipangle', level: 13, type: 'symbol', sym: 'θ = γB₁τ', name: 'uhol preklopenia', text: 'Uhol, o ktorý RF impulz otočí magnetizáciu: závisí od amplitúdy B₁ (prúdu v cievke) a dĺžky τ. Fáza impulzu určuje os v priečnej rovine (x, y, …).' },
+  { id: 'fid', level: 13, type: 'pojem', sym: 'FID', name: 'voľný indukčný rozpad', text: 'Po 90° impulze priečna magnetizácia precesuje okolo B₀ a indukuje v cievke striedavé napätie, ktoré doznieva s T₂*. 180° impulz z rovnováhy signál nedá (M<sub>⊥</sub> = 0).' },
+  { id: 'nutation', level: 13, type: 'pojem', sym: '∿ 0', name: 'kalibrácia impulzu (nutácia)', text: 'Amplitúda FID ∝ sin(γB₁τ). Nula signálu pri preklopení nadol = skutočný 180° impulz; 90° je polovica. Tak sa opraví neznáma chyba B₁.' },
+  { id: 'spinecho', level: 13, type: 'pojem', sym: '90° – τ – 180° – τ', name: 'spinové echo (Hahn 1950)', text: '180° impulz v čase τ zrkadlí fázy izochromát rozbehnutých nehomogenitou B₀; v čase 2τ sa znova zložia. Echo obnoví signál až po skutočné T₂.', dont: 'Echo nezvráti skutočnú dekoherenciu T₂ — len statickú nehomogenitu.' },
+  { id: 'shim', level: 13, type: 'pojem', sym: '🔧 B₀', name: 'shim', text: 'Prídavné korekčné cievky (shimy) vyrovnávajú nehomogenitu poľa B₀ a predlžujú T₂*. Úplne dokonalé pole sa nedosiahne.' },
 ];
 
 // Jazykové pasce: na konci každého levelu (správne formulácie vs. časté omyly)
@@ -169,6 +178,11 @@ const TRAPS_SK = {
     { q: DL('traps.11.0.q'), options: [DL('traps.11.0.options.0'), DL('traps.11.0.options.1'), DL('traps.11.0.options.2')], correct: 0, why: DL('traps.11.0.why') },
     { q: DL('traps.11.1.q'), options: [DL('traps.11.1.options.0'), DL('traps.11.1.options.1'), DL('traps.11.1.options.2')], correct: 0, why: DL('traps.11.1.why') },
     { q: DL('traps.11.2.q'), options: [DL('traps.11.2.options.0'), DL('traps.11.2.options.1'), DL('traps.11.2.options.2')], correct: 0, why: DL('traps.11.2.why') },
+  ],
+  13: [
+    { q: DL('traps.13.0.q'), options: [DL('traps.13.0.options.0'), DL('traps.13.0.options.1'), DL('traps.13.0.options.2')], correct: 0, why: DL('traps.13.0.why') },
+    { q: DL('traps.13.1.q'), options: [DL('traps.13.1.options.0'), DL('traps.13.1.options.1'), DL('traps.13.1.options.2')], correct: 0, why: DL('traps.13.1.why') },
+    { q: DL('traps.13.2.q'), options: [DL('traps.13.2.options.0'), DL('traps.13.2.options.1'), DL('traps.13.2.options.2')], correct: 0, why: DL('traps.13.2.why') },
   ],
 };
 
@@ -266,6 +280,14 @@ const CODEX_EN = {
   feedbackc: { name: 'classical feedback', text: 'Measure → decide → continue: the result of a measurement chooses the next gate (active reset, error correction via syndromes).', dont: 'A measurement need not be the last operation of a computation.' },
   decoread: { name: 'decoherence ≠ readout', text: 'Decoherence suppresses the off-diagonal of ρ (interference) but does not by itself create a definite classical record. Readout is a physical chain: interaction → amplification → signal → register.' },
   tomography: { name: 'state tomography', text: 'One basis only sees the diagonal of ρ. The Bell state and the mixture ½|00⟩⟨00| + ½|11⟩⟨11| give the same in ZZ; they differ in the off-diagonal ρ<sub>00,11</sub> = ½ — visible only in another basis (XX).', dont: 'A correlation A = B alone does not prove entanglement.' },
+  purcell: { name: 'Edward Mills Purcell (1912–1997)', text: 'In 1946, independently of Felix Bloch, he measured nuclear magnetic resonance in a solid (paraffin). Nobel Prize 1952 together with Bloch.' },
+  nmrsetup: { name: 'the NMR spectrometer setup', text: 'A magnet with a steady field B₀ (z axis), the sample and a transverse RF coil (x axis): current pulses at the frequency ν<sub>RF</sub> create a field B₁ ⟂ B₀, and then the same coil picks up the induced signal.', dont: 'The coil is not fed a steady current — it gets short RF pulses; the steady part is the magnet B₀.' },
+  larmortune: { name: 'transmitter resonance', text: 'The Larmor frequency is fixed by the field B₀ and the nucleus (proton: 42.577 MHz/T). The transmitter is set to ν<sub>RF</sub> = ν₀; the detuning Δν = ν₀ − ν<sub>RF</sub> is precession in the rotating frame.', dont: 'You do not “tune” the Larmor frequency with a knob — you change B₀ or tune the transmitter.' },
+  flipangle: { name: 'flip angle', text: 'The angle by which an RF pulse turns the magnetisation: it depends on the amplitude B₁ (the coil current) and the length τ. The pulse phase sets the axis in the transverse plane (x, y, …).' },
+  fid: { name: 'free induction decay', text: 'After a 90° pulse the transverse magnetisation precesses about B₀ and induces an alternating voltage in the coil that dies away with T₂*. A 180° pulse from equilibrium gives no signal (M<sub>⊥</sub> = 0).' },
+  nutation: { name: 'pulse calibration (nutation)', text: 'The FID amplitude ∝ sin(γB₁τ). The signal null with the magnetisation flipped down = the true 180° pulse; 90° is half of it. This corrects an unknown error in B₁.' },
+  spinecho: { name: 'spin echo (Hahn 1950)', text: 'A 180° pulse at time τ mirrors the phases of the isochromats fanned out by the inhomogeneity of B₀; at time 2τ they recombine. The echo restores the signal up to the true T₂.', dont: 'An echo does not undo true T₂ decoherence — only static inhomogeneity.' },
+  shim: { name: 'shim', text: 'Extra correction coils (shims) even out the inhomogeneity of the field B₀ and lengthen T₂*. A perfectly uniform field is never reached.' },
 };
 const CODEX_UK = {
   euler: { name: 'Леонард Ейлер (1707–1783)', text: 'Швейцарський математик; запровадив позначення e, i, f(x), Σ. Його формула пов’язує експоненту з косинусом і синусом — сьогодні це «мова фази» в квантовій механіці.' },
@@ -360,6 +382,14 @@ const CODEX_UK = {
   feedbackc: { name: 'класичний зворотний зв’язок', text: 'Виміряй → виріши → продовжуй: результат вимірювання визначає наступний гейт (активне скидання, виправлення помилок через синдроми).', dont: 'Вимірювання не мусить бути останньою операцією обчислення.' },
   decoread: { name: 'декогеренція ≠ зчитування', text: 'Декогеренція пригнічує позадіагональ ρ (інтерференцію), але сама не створює конкретного класичного запису. Зчитування — фізичний ланцюг: взаємодія → підсилення → сигнал → регістр.' },
   tomography: { name: 'томографія стану', text: 'Один базис бачить лише діагональ ρ. Стан Белла і суміш ½|00⟩⟨00| + ½|11⟩⟨11| дають у ZZ те саме; відрізняються позадіагоналлю ρ<sub>00,11</sub> = ½ — видимою лише в іншому базисі (XX).', dont: 'Сама кореляція A = B не доводить сплутаності.' },
+  purcell: { name: 'Едвард Міллс Перселл (1912–1997)', text: '1946 року незалежно від Фелікса Блоха виміряв ядерний магнітний резонанс у твердому тілі (парафіні). Нобелівська премія 1952 разом із Блохом.' },
+  nmrsetup: { name: 'будова ЯМР-спектрометра', text: 'Магніт зі сталим полем B₀ (вісь z), зразок і поперечна РЧ-котушка (вісь x): імпульси струму на частоті ν<sub>RF</sub> створюють поле B₁ ⟂ B₀, а потім та сама котушка вловлює наведений сигнал.', dont: 'Котушку не живлять сталим струмом — вона отримує короткі РЧ-імпульси; сталим є магніт B₀.' },
+  larmortune: { name: 'резонанс передавача', text: 'Ларморову частоту задають поле B₀ і ядро (протон: 42,577 МГц/Тл). Передавач налаштовують на ν<sub>RF</sub> = ν₀; розстроювання Δν = ν₀ − ν<sub>RF</sub> — це прецесія в обертовій системі.', dont: 'Ларморову частоту не «крутять» ручкою — змінюють B₀ або налаштовують передавач.' },
+  flipangle: { name: 'кут відхилення', text: 'Кут, на який РЧ-імпульс повертає намагніченість: залежить від амплітуди B₁ (струму в котушці) і тривалості τ. Фаза імпульсу задає вісь у поперечній площині (x, y, …).' },
+  fid: { name: 'вільний індукційний спад', text: 'Після 90° імпульсу поперечна намагніченість прецесує навколо B₀ і наводить у котушці змінну напругу, що згасає з T₂*. 180° імпульс із рівноваги сигналу не дає (M<sub>⊥</sub> = 0).' },
+  nutation: { name: 'калібрування імпульсу (нутація)', text: 'Амплітуда FID ∝ sin(γB₁τ). Нуль сигналу з перевернутою вниз намагніченістю = справжній 180° імпульс; 90° — половина. Так виправляють невідому похибку B₁.' },
+  spinecho: { name: 'спінове відлуння (Ган, 1950)', text: '180° імпульс у момент τ віддзеркалює фази ізохромат, що розійшлися через неоднорідність B₀; у момент 2τ вони знову сходяться. Відлуння відновлює сигнал аж до справжнього T₂.', dont: 'Відлуння не скасовує справжньої декогеренції T₂ — лише статичну неоднорідність.' },
+  shim: { name: 'шим', text: 'Додаткові коригувальні котушки (шими) вирівнюють неоднорідність поля B₀ і подовжують T₂*. Ідеально однорідного поля не досягають.' },
 };
 const CODEX_TR = tr(null, CODEX_EN, CODEX_UK);
 if (CODEX_TR) for (const c of CODEX) {
