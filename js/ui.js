@@ -249,6 +249,12 @@ const UI = {
 
   // q: {q, options:[...], correct: index, why, who, face}; cb(spravne)
   quiz(q, cb, silent = false) {
+    // ⏭ „Bez kvízov“: výberový dialóg sa neukáže — otázka so správnou odpoveďou a vysvetlením ide len do denníka
+    if (Settings.noBlanks && !silent) {
+      this.record({ kind: 'quiz', q: q.q, answer: q.options[q.correct], why: q.why, ok: true });
+      setTimeout(() => cb && cb(true), 0);
+      return;
+    }
     this.busy = true;
     this._next = null; this._prev = null;
     this.dialog.innerHTML = '';

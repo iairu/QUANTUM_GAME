@@ -96,9 +96,9 @@ const DIALOG_DESC = tr('preskočiť všetky rozhovory mentorov — ostanú len �
   'skip all mentor conversations — only tasks, quizzes, equation cards and historic scrolls remain; the conversations are still written to the Journal (L)',
   'пропустити всі розмови наставників — лишаються тільки завдання, вікторини, картки рівнянь та історичні сувої; розмови все одно записуються до щоденника (L)');
 const NOBLANKS_NAME = tr('⏭ Bez kvízov', '⏭ Skip quizzing', '⏭ Без вікторин');
-const NOBLANKS_DESC = tr('vypne kvízy „doplň rovnicu“ pri každej obťažnosti — rovnica úlohy sa ukáže hneď; bežné kvízy na konci levelov ostávajú',
-  'turns off the “complete the equation” quizzes on every difficulty — a task’s equation is shown straight away; the regular quizzes at the end of levels remain',
-  'вимикає вікторини «доповни рівняння» на будь-якій складності — рівняння завдання показується одразу; звичайні вікторини в кінці рівнів лишаються');
+const NOBLANKS_DESC = tr('vypne kvízy „doplň rovnicu“ aj všetky výberové otázky (počas levelov aj na ich konci) pri každej obťažnosti — rovnica úlohy sa ukáže hneď, otázky so správnymi odpoveďami a vysvetlením sa zapíšu do denníka (L)',
+  'turns off the “complete the equation” quizzes and all multiple-choice questions (during levels and at their end) on every difficulty — a task’s equation is shown straight away, and the questions with their correct answers and explanations go to the Journal (L)',
+  'вимикає вікторини «доповни рівняння» і всі питання з вибором відповіді (під час рівнів і в їхньому кінці) на будь-якій складності — рівняння завдання показується одразу, а питання з правильними відповідями й поясненнями записуються до щоденника (L)');
 const SCROLLS_NAME = tr('📜 Historické zvitky', '📜 Historic scrolls', '📜 Історичні сувої');
 const SCROLLS_DESC = tr('pred krokmi levelov sa rozvinie zvitok s históriou objavov — roky, autori, ich rozhovory a slávne výroky; na konci každého levelu otázka z histórie',
   'before level steps a scroll unrolls with the history of the discoveries — years, authors, their conversations and famous words; a history question at the end of every level',
