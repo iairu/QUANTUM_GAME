@@ -298,6 +298,7 @@ class L9Pauli extends Level {
       Bloch.draw(r, c, R, null, { labelFn: UI.label.bind(UI), key: 'p', axisNames: true });
       UI.label('pq', c, '?', 'prompt');
     } else Bloch.draw(r, c, R, v, { labelFn: UI.label.bind(UI), key: 'p', axisNames: true, bars: true, target: this.stage === 'coords' && !Settings.easy ? null : this.target, trail: this.trail }); // súradnice: cieľ ukáže len ľahká
+    Machine.nmr(r, [-4.5, 0, -0.7], 1.1, this.hidden ? null : this.bell ? [0, 0, 0] : v, { labelFn: UI.label.bind(UI), key: 'p9', rf: this.stage === 'rot' && !!this.anim, precess: !this.anim });
     if (this.stage === 'deco' && this.env) {
       for (let k = 0; k < 24; k++) {
         const a = k * 2.399 + this.t * 0.7, h = Math.sin(k * 1.3 + this.t) * 1.2;

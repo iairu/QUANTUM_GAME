@@ -181,22 +181,24 @@ class L6Rabi extends Level {
   draw(r) {
     r.begin(this.cam.eye(), this.cam.target);
     r.draw('box', M4.trs([0, -0.06, 0], 0, [14, 0.1, 8]), [0.15, 0.18, 0.24], { pattern: 1 });
-    // NMR magnet
-    const mx = -4;
-    r.draw('torus', M4.trs([mx, 0.4, 0], 0, 1.3), [0.6, 0.6, 0.7]);
-    r.draw('torus', M4.trs([mx, 3.0, 0], 0, 1.3), [0.6, 0.6, 0.7]);
-    for (const a of [0, 2.1, 4.2]) r.draw('cylinder', M4.trs([mx + Math.cos(a) * 1.3, 0.4, Math.sin(a) * 1.3], 0, [0.08, 2.6, 0.08]), [0.5, 0.5, 0.6]);
-    r.arrow([mx - 1.9, 0.3, 0], [mx - 1.9, 3.2, 0], [0.5, 0.8, 1], 0.06);
-    UI.label('B0', [mx - 1.9, 3.6, 0], 'B₀', 'ket');
-    r.draw('torus', M4.orient([mx, 1.7, 0], [1, 0, 0], 0.55), this.pulse ? [1, 0.8, 0.2] : [0.6, 0.5, 0.3], { emissive: this.pulse ? 1 : 0 });
-    UI.label('rf', [mx, 2.45, 0.8], this.pulse ? tr('RF impulz!', 'RF pulse!', 'РЧ-імпульс!') : tr('RF cievka', 'RF coil', 'РЧ-котушка'), this.pulse ? 'prompt' : 'axis');
-    const d = this.disp();
-    r.arrow([mx, 1.7, 0], V3.add([mx, 1.7, 0], V3.scale(qToWorld(d), 0.45)), [1, 0.35, 0.45], 0.03);
-    r.draw('cylinder', M4.trs([mx, 0.2, 0], 0, [0.25, 3.2, 0.25]), [0.8, 0.9, 1], { alpha: 0.25 });
-    UI.label('tube', [mx, 3.8, 0], tr('vzorka (ansámbel molekúl)', 'sample (ensemble of molecules)', 'зразок (ансамбль молекул)'), 'axis');
-    UI.hot([mx, 0.4, 1.3], tr('<b>Cievky magnetu</b> — vytvárajú silné, stabilné a homogénne pole B₀.', '<b>Magnet coils</b> — they create a strong, stable and homogeneous field B₀.', '<b>Котушки магніту</b> — створюють сильне, стабільне й однорідне поле B₀.'), 40);
-    UI.hot([mx, 1.7, 0], tr('<b>RF cievka a vzorka</b>: impulzy otáčajú jadrové spiny; indukovaný signál v cievke = NMR signál.', '<b>RF coil and sample</b>: pulses rotate the nuclear spins; the signal induced in the coil = the NMR signal.', '<b>РЧ-котушка та зразок</b>: імпульси обертають ядерні спіни; сигнал, наведений у котушці, = ЯМР-сигнал.'), 40);
-    UI.hot([mx - 1.9, 1.7, 0], TIPS['B₀'], 30);
+    // NMR magnet: skutočný stolový NMR procesor (Machine), inak pôvodný schematický magnet
+    const mx = -4, d = this.disp();
+    if (Machine.on) Machine.nmr(r, [mx, 0, 0], 1.45, d, { labelFn: UI.label.bind(UI), key: 'r6', rf: this.pulse, precess: false });
+    else {
+      r.draw('torus', M4.trs([mx, 0.4, 0], 0, 1.3), [0.6, 0.6, 0.7]);
+      r.draw('torus', M4.trs([mx, 3.0, 0], 0, 1.3), [0.6, 0.6, 0.7]);
+      for (const a of [0, 2.1, 4.2]) r.draw('cylinder', M4.trs([mx + Math.cos(a) * 1.3, 0.4, Math.sin(a) * 1.3], 0, [0.08, 2.6, 0.08]), [0.5, 0.5, 0.6]);
+      r.arrow([mx - 1.9, 0.3, 0], [mx - 1.9, 3.2, 0], [0.5, 0.8, 1], 0.06);
+      UI.label('B0', [mx - 1.9, 3.6, 0], 'B₀', 'ket');
+      r.draw('torus', M4.orient([mx, 1.7, 0], [1, 0, 0], 0.55), this.pulse ? [1, 0.8, 0.2] : [0.6, 0.5, 0.3], { emissive: this.pulse ? 1 : 0 });
+      UI.label('rf', [mx, 2.45, 0.8], this.pulse ? tr('RF impulz!', 'RF pulse!', 'РЧ-імпульс!') : tr('RF cievka', 'RF coil', 'РЧ-котушка'), this.pulse ? 'prompt' : 'axis');
+      r.arrow([mx, 1.7, 0], V3.add([mx, 1.7, 0], V3.scale(qToWorld(d), 0.45)), [1, 0.35, 0.45], 0.03);
+      r.draw('cylinder', M4.trs([mx, 0.2, 0], 0, [0.25, 3.2, 0.25]), [0.8, 0.9, 1], { alpha: 0.25 });
+      UI.label('tube', [mx, 3.8, 0], tr('vzorka (ansámbel molekúl)', 'sample (ensemble of molecules)', 'зразок (ансамбль молекул)'), 'axis');
+      UI.hot([mx, 0.4, 1.3], tr('<b>Cievky magnetu</b> — vytvárajú silné, stabilné a homogénne pole B₀.', '<b>Magnet coils</b> — they create a strong, stable and homogeneous field B₀.', '<b>Котушки магніту</b> — створюють сильне, стабільне й однорідне поле B₀.'), 40);
+      UI.hot([mx, 1.7, 0], tr('<b>RF cievka a vzorka</b>: impulzy otáčajú jadrové spiny; indukovaný signál v cievke = NMR signál.', '<b>RF coil and sample</b>: pulses rotate the nuclear spins; the signal induced in the coil = the NMR signal.', '<b>РЧ-котушка та зразок</b>: імпульси обертають ядерні спіни; сигнал, наведений у котушці, = ЯМР-сигнал.'), 40);
+      UI.hot([mx - 1.9, 1.7, 0], TIPS['B₀'], 30);
+    }
     // Blochova sféra
     const c = [1.6, 1.7, 0];
     Bloch.draw(r, c, 1.6, d, { labelFn: UI.label.bind(UI), key: 'r', axisNames: true, bars: true });

@@ -200,6 +200,7 @@ class L7Bell extends Level {
       const res = this.lamp[key === 'a' ? 0 : 1];
       r.sphere([x, 0.9, 1.4], 0.22, res === null ? [0.3, 0.3, 0.3] : res ? [1, 0.4, 0.4] : [0.4, 0.6, 1], { emissive: res === null ? 0 : 0.8 });
     }
+    Machine.bellSource(r, [0, -0.4, -3.0], 1.5, { span: 2.0, labelFn: UI.label.bind(UI), key: 'b7', a: this.showAxes ? this.ang.a0 : this.basis?.A ?? 0, b: this.showAxes ? this.ang.b0 : this.basis?.B ?? 0, flash: this.lamp, entangled: Q2.entangled(this.psi) });
     if (Q2.entangled(this.psi)) {
       const pulse = 0.25 + 0.2 * Math.sin(this.t * 4);
       r.rod([-3.2, 2.2, 0], [3.2, 2.2, 0], [1, 0.45, 0.75], 0.08, { alpha: pulse, emissive: 1 });

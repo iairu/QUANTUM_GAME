@@ -31,6 +31,7 @@ const Settings = {
     proj: true,       // projekcie Blochovho vektora na osi (⟨X⟩, ⟨Y⟩, ⟨Z⟩)
     angles: true,     // oblúky uhlov θ, φ a fázy
     bars: true,       // stĺpce P(0), P(1) pri sfére
+    machine: true,    // 🔬 skutočný stroj (NMR, interferometer, zdroj fotónov) vedľa Blochovej sféry
     trail: true,      // stopa šípky počas rotácie
     charts: true,     // grafy v paneli levelu
     fov: 0.9,         // zorný uhol kamery (radiány)

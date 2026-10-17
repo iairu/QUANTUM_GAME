@@ -74,6 +74,13 @@ You play **Little Psi**, the quantum state ψ — not a little ball with a posit
 - Gates are rotations of the Bloch ball; mixtures live inside it; decoherence erases the off-diagonal of ρ.
 - Bra-ket grammar, NMR and Rabi oscillations, entanglement and the CHSH game, and the interpretations of quantum mechanics.
 
+**Real machines next to the Bloch sphere.** The Bloch sphere is only a picture of the state, not a device, so the levels also show the hardware where the same qubit actually lives, with its axes lined up with the sphere:
+- **Benchtop NMR processor** (levels 3, 6, 9, 10, 11; like the SpinQ from the lectures): magnet with B₀ along z, sample tube in the RF coil (x axis), the sample magnetisation **M** ∝ ⟨σ⟩ = r that precesses about B₀ in the lab, the coil glowing during gate pulses, and the induced FID signal on the console screen.
+- **Mach–Zehnder interferometer** (level 4): beam splitters = H, arms = |0⟩ and |1⟩, a which-path detector or phase noise in the middle.
+- **Entangled-photon source** (level 7): a laser in a nonlinear crystal, polarisers turned to half the Bloch-sphere measurement angle, single-photon detectors.
+
+They can be switched off in the settings (⚙ → 🔬 real machine).
+
 Correct answers **snap into place**: once an input is accepted (an arrow on its target, a π pulse, the optimal CHSH angles…), the slider and the 3D picture glide exactly onto the correct value.
 
 ## Choices on the welcome screen
@@ -202,6 +209,7 @@ All dialogue text — conversations, quizzes, language traps, "in plain words" c
 | `js/eqglyphs.js` · `js/eqmnemo.js` | SVG equation glyphs and `[[…]]` rendering · live equation and the 🔑 key |
 | `js/i18n.js` · `lang/` · `tools/build-lang.js` | language choice, `tr()` and `DL()` · dialogue CSV files · CSV → JS generator and checker |
 | `js/knowledge.js` · `js/content.js` · `js/scrolls.js` · `js/layman.js` | theory and equations · Codex and language traps · historic scrolls · layman cards and glossary |
+| `js/machine.js` | 3D models of the real machines next to the Bloch sphere (NMR processor, Mach–Zehnder interferometer, entangled-photon source) |
 | `js/views.js` · `js/tips.js` · `js/audio.js` · `js/wow.js` · `js/welcome.js` · `js/settings.js` | 👁 views · tooltips · generative music and sound effects · MMO style · welcome screen · settings |
 | `assets/` · `docs/` | icons, theme pictures · README screenshots and exported glyph SVGs |
 

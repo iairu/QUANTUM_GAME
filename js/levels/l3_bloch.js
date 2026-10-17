@@ -258,6 +258,7 @@ class L3Bloch extends Level {
       r.rod([0, 0, 0], V3.scale(m, -2.5), [0.4, 1, 0.6], 0.012, { alpha: 0.5 });
       UI.label('labm', V3.scale(m, 2.75), '+m', 'ket', tr('Os merania m: výsledok „+“ = stav v smere m, „−“ = protiľahlý stav.', 'Measurement axis m: outcome “+” = the state along m, “−” = the opposite state.', 'Вісь вимірювання m: результат «+» = стан уздовж m, «−» = протилежний стан.'));
     }
+    Machine.nmr(r, [-5.1, -2.6, 0.2], 1.25, v, { labelFn: UI.label.bind(UI), key: 'b3', rf: !!this.anim, precess: !this.anim }); // hradlo = RF impulz
     UI.label('psi', V3.scale(qToWorld(v), 2.35), 'ψ', 'player');
     if (this.hist) {
       for (let k = 0; k < 2; k++) {

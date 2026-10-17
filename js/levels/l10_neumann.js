@@ -283,6 +283,8 @@ class L10Neumann extends Level {
       Bloch.draw(r, c, R, v, { labelFn: UI.label.bind(UI), key: 'n', axisNames: true, bars: true });
       if (this.stage === 'obs' && V3.len(this.guessR) > 0.02) r.arrow(c, V3.add(c, V3.scale(qToWorld(this.guessR), R)), [0.4, 1, 0.6], 0.03, { alpha: 0.6 });
     }
+    const mv = this.stage === 'evo' ? Q.bloch(this.evoAmps()) : this.hidden ? null : v;
+    Machine.nmr(r, [-4.7, 0, 1.0], 1.0, mv, { labelFn: UI.label.bind(UI), key: 'n10', precess: !this.anim, note: this.stage === 'pps' ? tr('celá vzorka: M ∝ r = εn (ε ≪ 1)', 'whole sample: M ∝ r = εn (ε ≪ 1)', 'весь зразок: M ∝ r = εn (ε ≪ 1)') : null });
     if (this.stage === 'purify' && this.cool) {
       for (let k = 0; k < 16; k++) { const a = k * 0.39 + this.t * 0.5; r.sphere(V3.add(c, [Math.cos(a) * 2.1, -1.1 + ((this.t * 0.6 + k * 0.13) % 1) * 2.6, Math.sin(a) * 2.1]), 0.06, [0.6, 0.85, 1], { alpha: 0.5, emissive: 0.5 }); }
       UI.label('ncold', V3.add(c, [0, -1.9, 0]), tr('❄ studený rezervoár odnáša entropiu', '❄ the cold reservoir carries the entropy away', '❄ холодний резервуар забирає ентропію'), 'axis');

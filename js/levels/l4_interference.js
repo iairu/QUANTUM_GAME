@@ -208,5 +208,7 @@ class L4Interference extends Level {
       UI.label(`rho${i}${j}`, V3.add(p, [0, h + 0.35, 0]), `${diag ? 'ρ' : '|ρ'}<sub>${i}${j}</sub>${diag ? '' : '|'} = ${Fmt.num(rho[i][j], 2)}`, 'axis');
     }
     UI.label('rhoT', [3, 0.8, -3], tr('matica hustoty ρ', 'density matrix ρ', 'матриця густини ρ'), 'axis');
+    const inside = this.shot && qx > this.X.h1 && qx < this.X.h2; // medzi deličmi: jas ramien = populácie stavu
+    Machine.mzi(r, [-5.6, 0, -4.8], 1.4, { labelFn: UI.label.bind(UI), key: 'i4', arms: inside ? [(1 + R[2]) / 2, (1 - R[2]) / 2] : [0.5, 0.5], det: this.flash, mid: this.mode === 'none' ? null : this.mode, noise: this.p });
   }
 }

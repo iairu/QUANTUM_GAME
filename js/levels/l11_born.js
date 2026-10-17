@@ -235,6 +235,7 @@ class L11Born extends Level {
       }
       UI.label('bb', [0, 3.2, 0.8], `${tr('báza', 'basis', 'базис')} ${this.basis}`, 'axis');
     } else Bloch.draw(r, c, 1.3, this.r, { labelFn: UI.label.bind(UI), key: 'b', axisNames: true, bars: true });
+    if (this.stage !== 'bell') Machine.nmr(r, [-4.7, 0, 1.1], 1.0, this.stage === 'phase' ? null : this.r, { labelFn: UI.label.bind(UI), key: 'b11' });
     if (this.hist) {
       const base = [3.6, 0, 1.2], tot = this.hist[0] + this.hist[1] || 1;
       this.hist.forEach((n, k) => {
