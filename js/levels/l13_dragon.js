@@ -110,9 +110,9 @@ const SHOUTS = {
 };
 
 const DRAGON_TRAPS = [
-  { q: DL('l13.DRAGON_TRAPS.1.0.q'), options: [DL('l13.DRAGON_TRAPS.1.0.options.0'), DL('l13.DRAGON_TRAPS.1.0.options.1'), DL('l13.DRAGON_TRAPS.1.0.options.2')], correct: 0, why: DL('l13.DRAGON_TRAPS.1.0.why') },
-  { q: DL('l13.DRAGON_TRAPS.1.1.q'), options: [DL('l13.DRAGON_TRAPS.1.1.options.0'), DL('l13.DRAGON_TRAPS.1.1.options.1'), DL('l13.DRAGON_TRAPS.1.1.options.2')], correct: 0, why: DL('l13.DRAGON_TRAPS.1.1.why') },
-  { q: DL('l13.DRAGON_TRAPS.1.2.q'), options: [DL('l13.DRAGON_TRAPS.1.2.options.0'), DL('l13.DRAGON_TRAPS.1.2.options.1'), DL('l13.DRAGON_TRAPS.1.2.options.2')], correct: 0, why: DL('l13.DRAGON_TRAPS.1.2.why') },
+  QZ('l13.DRAGON_TRAPS.1.0'),
+  QZ('l13.DRAGON_TRAPS.1.1'),
+  QZ('l13.DRAGON_TRAPS.1.2'),
 ];
 
 class L13Dragon extends Level {
@@ -301,16 +301,18 @@ class L13Dragon extends Level {
   finale() {
     UI.panelHide();
     this.quest(tr('Posledná skúška slov moci', 'The last test of the Words of Power', 'Останнє випробування слів сили'), { easy: tr('📝 Skúška', '📝 Exam', '📝 Іспит'), hard: tr('3 otázky o súboji', '3 questions about the battle', '3 питання про битву') });
+    this.lrn.post = { ok: 0, n: 0 };
     this.say([DL('l13.finale.1')], () => {
-      UI.quizSeries([...DRAGON_TRAPS, ...ancientTraps(this.num)].map((q) => ({ who: this.mentor, face: this.face, ...q })), (m) => {
+      UI.quizSeries([...DRAGON_TRAPS, ...ancientTraps(this.num), ...Learn.transfer(this.num, 1, { isPost: true })].map((q) => ({ who: this.mentor, face: this.face, ...q, lvl: this.num, _order: null })), (m) => {
         this.mistakes += m;
-        const k = this.mistakes, stars = byDiff(k <= 2 ? 3 : k <= 5 ? 2 : 1, k <= 1 ? 3 : k <= 3 ? 2 : 1, k === 0 ? 3 : k <= 2 ? 2 : 1);
-        Game.completeLevel(this.num, stars);
-        const rating = '★'.repeat(stars) + '☆'.repeat(3 - stars);
-        this.say([
-          { who: DL('l13.finale.2'), face: '🐉', text: DL('l13.finale.3') },
-          DL('l13.finale.4', rating, this.mistakes),
-        ], () => Game.backToHub());
+        Learn.secondChance(this, () => {
+          const k = this.mistakes, res = Learn.finish(this, byDiff(k <= 2 ? 3 : k <= 5 ? 2 : 1, k <= 1 ? 3 : k <= 3 ? 2 : 1, k === 0 ? 3 : k <= 2 ? 2 : 1));
+          const rating = res.reviewed ? '📖' : '★'.repeat(res.stars) + '☆'.repeat(3 - res.stars);
+          this.say([
+            { who: DL('l13.finale.2'), face: '🐉', text: DL('l13.finale.3') },
+            DL('l13.finale.4', rating, this.mistakes), res.card,
+          ].filter(Boolean), () => Game.backToHub());
+        });
       });
     });
   }

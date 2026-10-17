@@ -59,6 +59,8 @@ class L7Bell extends Level {
       return s;
     };
     UI.panelSet(tr('Meranie previazaných párov', 'Measuring entangled pairs', 'Вимірювання сплутаних пар'), [UI.row(pick(tr('Alica', 'Alice', 'Аліса')), pick(tr('Bob', 'Bob', 'Боб'))), UI.button(tr('Meraj 200 párov', 'Measure 200 pairs', 'Виміряти 200 пар'), () => this.measurePairs(200), 'big'), this.read]);
+    // 🔮 predpoveď: čo uvidí Bob sám, keď Alica zmení os (uzamkne sa, vyhodnotí po meraní)
+    this.lockPrediction(QZ('l7.predict'), (pr) => { this.nPred = pr; });
   }
   measurePairs(n) {
     const tA = this.basis.A * Math.PI / 180, tB = this.basis.B * Math.PI / 180, c = [0, 0, 0, 0];
@@ -77,7 +79,7 @@ class L7Bell extends Level {
         { ...this.E, text: DL('l7.measurePairs.1.0.text') },
         DL('l7.measurePairs.1.1'),
         DL('l7.measurePairs.1.2'),
-      ], () => this.next()), 300);
+      ], () => this.revealPrediction(this.nPred, () => this.next())), 300);
     }
   }
 
@@ -96,7 +98,11 @@ class L7Bell extends Level {
       const sl = (k, label) => (this.sl[k] = UI.slider(label, -90, 180, byDiff(15, 7.5, 7.5), this.ang[k], (v) => { this.ang[k] = v; this.drawChsh(); return Math.round(v * 10) / 10 + '°'; }));
       UI.panelSet(tr('CHSH hra', 'CHSH game', 'Гра CHSH'), [sl('a0', tr('Alica, x=0: a₀', 'Alice, x=0: a₀', 'Аліса, x=0: a₀')), sl('a1', tr('Alica, x=1: a₁', 'Alice, x=1: a₁', 'Аліса, x=1: a₁')), sl('b0', 'Bob, y=0: b₀'), sl('b1', 'Bob, y=1: b₁'),
         UI.row(UI.button(tr(`Hraj ${byDiff(400, 400, 1000)} kôl`, `Play ${byDiff(400, 400, 1000)} rounds`, `Зіграти ${byDiff(400, 400, 1000)} раундів`), () => this.play(), 'big'), UI.button(tr('Klasicky (vždy 0)', 'Classically (always 0)', 'Класично (завжди 0)'), () => this.playClassic())),
-        Settings.hard ? null : UI.button(tr('💡 Nápoveda', '💡 Hint', '💡 Підказка'), () => UI.toast(tr('Skús a₀ = 0°, a₁ = 90°, b₀ = 45°, b₁ = −45°. Rozdiely uhlov 45° (a 135° pre x=y=1).', 'Try a₀ = 0°, a₁ = 90°, b₀ = 45°, b₁ = −45°. Angle differences of 45° (and 135° for x=y=1).', 'Спробуй a₀ = 0°, a₁ = 90°, b₀ = 45°, b₁ = −45°. Різниці кутів 45° (і 135° для x=y=1).'), 6000)),
+        Settings.hard ? null : UI.hints([ // stupňovitá nápoveda: myšlienka → metóda → presné uhly (= s pomocou)
+          tr('Tím vyhrá najčastejšie, keď Alica a Bob merajú <b>takmer</b> rovnakú os — okrem prípadu x = y = 1, keď majú dať rôzne výsledky.', 'The team wins most often when Alice and Bob measure <b>almost</b> the same axis — except when x = y = 1, where they must give different results.', 'Команда виграє найчастіше, коли Аліса й Боб вимірюють <b>майже</b> ту саму вісь — окрім випадку x = y = 1, коли вони мають дати різні результати.'),
+          tr('Skús rozdiely uhlov 45° medzi Alicinou a Bobovou osou (a 135° pre x = y = 1). Alicine dve osi nech sú na seba kolmé.', 'Try angle differences of 45° between Alice’s and Bob’s axes (and 135° for x = y = 1). Make Alice’s two axes perpendicular.', 'Спробуй різниці кутів 45° між осями Аліси й Боба (і 135° для x = y = 1). Дві осі Аліси нехай будуть перпендикулярні.'),
+          tr('a₀ = 0°, a₁ = 90°, b₀ = 45°, b₁ = −45°.', 'a₀ = 0°, a₁ = 90°, b₀ = 45°, b₁ = −45°.', 'a₀ = 0°, a₁ = 90°, b₀ = 45°, b₁ = −45°.'),
+        ]),
         this.read, this.chart].filter(Boolean));
       this.drawChsh();
     });
@@ -141,7 +147,7 @@ class L7Bell extends Level {
       this.grant(['bell', 'chsh']);
       this.say([DL('l7.play.1.0', Fmt.pct(p)),
         { ...this.E, text: DL('l7.play.1.1.text') },
-        DL('l7.play.1.2')], () => this.next());
+        DL('l7.play.1.2')], () => this.explainWhy('l7.explain', () => this.next()));
     }
   }
   // výhra pre každú dvojicu (x, y): teória (|Φ⁺⟩, osi v rovine xz) P(rovnaké) = cos²((a − b)/2) a namerané

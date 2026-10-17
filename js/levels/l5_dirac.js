@@ -137,7 +137,7 @@ class L5Dirac extends Level {
       this.grant(T.grant);
       this.say([{ who: DL('l5.verify.1'), face: '📚', text: '✅ ' + T.msg }], () => {
         if (this.ti === 2) {
-          this.ask({ q: DL('l5.verify.2.q'), options: [DL('l5.verify.2.options.0'), DL('l5.verify.2.options.1'), DL('l5.verify.2.options.2')], correct: 0, why: DL('l5.verify.2.why') }, () => this.after());
+          this.ask(QZ('l5.verify.2'), () => this.after());
         } else this.after();
       });
     } else if (Settings.hard) this.mistakes++; // ťažká: každé zlé overenie je chyba

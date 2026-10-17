@@ -24,4 +24,20 @@ for (const [lang, rows] of Object.entries(all)) for (const [k, v] of rows) {
   if (all.sk && all.sk.has(k) && lang !== 'sk' && ph(v) && ph(v) !== ph(all.sk.get(k)) && !ph(all.sk.get(k)).includes(ph(v))) { console.warn(`${lang} ${k}: iné {n} ako v sk`); bad++; }
   if (lang !== 'en' && all.en && !all.en.has(k)) { console.warn(`${lang} ${k}: chýba v en.csv (záložný jazyk)`); bad++; }
 }
+// jazyková stopa v kvízoch: správna možnosť (vždy .options.0) nesmie byť nápadne najdlhšia — inak sa dá „uhádnuť“ bez porozumenia.
+// Otázka je označená, keď je správna možnosť jediná najdlhšia a > 1,3 × medián ostatných. Podiel označených musí byť ≤ 35 % v každom jazyku.
+// node tools/build-lang.js --cue  → vypíše aj zoznam označených otázok
+const plain = (t) => t.replace(/<[^>]+>/g, '').replace(/\[\[|\]\]/g, '');
+for (const [lang, rows] of Object.entries(all)) {
+  const groups = {};
+  for (const [k, v] of rows) { const m = k.match(/^(.*)\.options\.(\d+)$/); if (m) (groups[m[1]] = groups[m[1]] || [])[+m[2]] = plain(v).length; }
+  const keys = Object.keys(groups).filter((g) => groups[g].length >= 2), flagged = keys.filter((g) => {
+    const [c, ...o] = groups[g], med = o.slice().sort((a, b) => a - b)[Math.floor((o.length - 1) / 2)];
+    return c > Math.max(...o) && c > 1.3 * med;
+  });
+  const share = flagged.length / keys.length;
+  console.log(`${lang}: správna možnosť nápadne najdlhšia v ${flagged.length}/${keys.length} otázkach (${Math.round(share * 100)} %, limit 35 %)`);
+  if (process.argv.includes('--cue')) flagged.forEach((g) => console.log('   ' + g));
+  if (share > 0.35) { console.warn(`${lang}: priveľa otázok so stopou dĺžky — prepíš nesprávne možnosti, aby boli rovnako konkrétne`); bad++; }
+}
 process.exitCode = bad ? 1 : 0;

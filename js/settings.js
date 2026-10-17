@@ -20,7 +20,8 @@ const Settings = {
   get wow() { return this.theme === 'wow'; },
   get dragon() { return this.nordic || this.wow; }, // drak Ketvarr a 13. level
   get hard() { return this.diff === 'hard'; },
-  noBlanks: false, // ⏭ preskočiť kvízy „doplň rovnicu“ (pri ľubovoľnej obťažnosti)
+  noBlanks: false, // ⏭ preskočiť kvízy „doplň rovnicu“ (pri ľubovoľnej obťažnosti) — level sa potom ráta len ako „📖 prejdený“
+  confidence: true, // 🎯 po výbere odpovede hráč povie, nakoľko si je istý (istý omyl sa vráti v opakovaní dvakrát)
   skipDialog: false, // 💬 preskočiť všetky dialógy (kvízy, zvitky a karty rovníc ostávajú)
   scrolls: true, // 📜 historické zvitky: história objavov pred krokmi levelov + otázka z histórie v každom leveli (pri ľubovoľnej obťažnosti)
   // ľahká aj laická (laická = ľahká + všetko bežnými slovami)
@@ -61,6 +62,7 @@ const Settings = {
       if (typeof d.scrolls === 'boolean') this.scrolls = d.scrolls;
       if (typeof d.skipDialog === 'boolean') this.skipDialog = d.skipDialog;
       if (typeof d.noBlanks === 'boolean') this.noBlanks = d.noBlanks;
+      if (typeof d.confidence === 'boolean') this.confidence = d.confidence;
       if (d.diff === 'ancient') { this.diff = 'hard'; this.scrolls = true; } // bývalá obťažnosť „prastará“ = ťažká + zvitky
       if (THEMES.includes(d.theme)) this.theme = d.theme;
       if (['pictures', 'equations'].includes(d.mode)) this.mode = d.mode;
@@ -70,7 +72,7 @@ const Settings = {
     } catch (e) { /* predvolené nastavenia */ }
   },
   save() {
-    try { localStorage.setItem('kvantp-game1-settings', JSON.stringify({ diff: this.diff, scrolls: this.scrolls, skipDialog: this.skipDialog, noBlanks: this.noBlanks, theme: this.theme, mode: this.mode, view: this.view, audio: this.audio })); } catch (e) { /* bez ukladania */ }
+    try { localStorage.setItem('kvantp-game1-settings', JSON.stringify({ diff: this.diff, scrolls: this.scrolls, skipDialog: this.skipDialog, noBlanks: this.noBlanks, confidence: this.confidence, theme: this.theme, mode: this.mode, view: this.view, audio: this.audio })); } catch (e) { /* bez ukladania */ }
   },
 };
 Settings.load();
@@ -84,9 +86,9 @@ const DIFF_NAME = {
 const DIFF_DESC = {
   layman: tr('ľahká, ale všetko bežnými slovami: pred každou úlohou vysvetlenie „po ľudsky“, odborné slová s prekladom v zátvorke, jednoduché vysvetlivky — ideálny štart do kvantových počítačov',
     'easy, but everything in everyday words: a plain-language explanation before every task, technical words translated in brackets, simple tooltips — the ideal start into quantum computing', 'легка, але все звичайними словами: перед кожним завданням пояснення «по-людськи», фахові слова з перекладом у дужках, прості підказки — ідеальний старт у квантові комп’ютери'),
-  easy: tr('väčšie tolerancie, menej pokusov, nápovedy, v kvízoch o jednu nesprávnu možnosť menej; rovnice sa ukážu hneď — bez kvízov „doplň rovnicu“ — a vo farebnom jazyku glyfov',
-    'wider tolerances, fewer trials, hints, one wrong option fewer in quizzes; equations are shown right away — no “complete the equation” quizzes — in the colourful glyph language', 'ширші допуски, менше спроб, підказки, у вікторинах на одну неправильну відповідь менше; рівняння показуються одразу — без вікторин «доповни рівняння» — кольоровою мовою гліфів'),
-  normal: tr('pôvodná hra; pred každou úlohou najprv doplníš chýbajúce časti jej rovnice; rovnice v klasickej sadzbe bez farieb a glyfov', 'the original game; before every task you first fill in the missing parts of its equation; equations in classic type without colours or glyphs', 'оригінальна гра; перед кожним завданням спершу доповниш пропущені частини його рівняння; рівняння класичним шрифтом без кольорів і гліфів'),
+  easy: tr('väčšie tolerancie, menej pokusov, stupňovité nápovedy; rovnice sa ukážu hneď — bez kvízov „doplň rovnicu“ — a vo farebnom jazyku glyfov',
+    'wider tolerances, fewer trials, step-by-step hints; equations are shown right away — no “complete the equation” quizzes — in the colourful glyph language', 'ширші допуски, менше спроб, поступові підказки; рівняння показуються одразу — без вікторин «доповни рівняння» — кольоровою мовою гліфів'),
+  normal: tr('pôvodná hra; po každej úlohe doplníš chýbajúce časti rovnice, ktorú si práve videl(a); rovnice v klasickej sadzbe bez farieb a glyfov', 'the original game; after every task you fill in the missing parts of the equation you just saw; equations in classic type without colours or glyphs', 'оригінальна гра; після кожного завдання доповниш пропущені частини рівняння, яке щойно побачив(-ла); рівняння класичним шрифтом без кольорів і гліфів'),
   hard: tr('viac poznatkov: teória a rovnice pri každom kroku, viac kvízov „doplň rovnicu“ a extra otázky s rovnicami; presnosť, náhodné ciele, bez nápovied, prísnejšie hviezdičky',
     'more knowledge: theory and equations at every step, more “complete the equation” quizzes and extra equation questions; precision, random targets, no hints, stricter stars', 'більше знань: теорія та рівняння на кожному кроці, більше вікторин «доповни рівняння» і додаткові питання з рівняннями; точність, випадкові цілі, без підказок, суворіші зірки'),
 };
@@ -96,10 +98,13 @@ const DIFF_DESC = {
 const DIALOG_DESC = tr('preskočiť všetky rozhovory mentorov — ostanú len úlohy, kvízy, karty rovníc a historické zvitky; rozhovory sa aj tak zapíšu do denníka (L)',
   'skip all mentor conversations — only tasks, quizzes, equation cards and historic scrolls remain; the conversations are still written to the Journal (L)',
   'пропустити всі розмови наставників — лишаються тільки завдання, вікторини, картки рівнянь та історичні сувої; розмови все одно записуються до щоденника (L)');
-const NOBLANKS_NAME = tr('⏭ Bez kvízov', '⏭ Skip quizzing', '⏭ Без вікторин');
-const NOBLANKS_DESC = tr('vypne kvízy „doplň rovnicu“ aj všetky výberové otázky (počas levelov aj na ich konci) pri každej obťažnosti — rovnica úlohy sa ukáže hneď, otázky so správnymi odpoveďami a vysvetlením sa zapíšu do denníka (L)',
-  'turns off the “complete the equation” quizzes and all multiple-choice questions (during levels and at their end) on every difficulty — a task’s equation is shown straight away, and the questions with their correct answers and explanations go to the Journal (L)',
-  'вимикає вікторини «доповни рівняння» і всі питання з вибором відповіді (під час рівнів і в їхньому кінці) на будь-якій складності — рівняння завдання показується одразу, а питання з правильними відповідями й поясненнями записуються до щоденника (L)');
+const NOBLANKS_NAME = tr('⏭ Bez kvízov (režim opakovania)', '⏭ Skip quizzing (review mode)', '⏭ Без вікторин (режим повторення)');
+const CONF_DESC = tr('🎯 pri každej otázke povedz, nakoľko si si istý(-á) — istý omyl sa vráti v opakovaní dvakrát, tipnutá správna odpoveď ešte raz',
+  '🎯 say how sure you are for every question — a confident mistake comes back twice in the reviews, a lucky guess once more',
+  '🎯 у кожному питанні вкажи, наскільки ти впевнений(-а) — упевнена помилка повернеться в повтореннях двічі, вдале вгадування — ще раз');
+const NOBLANKS_DESC = tr('vypne kvízy „doplň rovnicu“ aj všetky výberové otázky (počas levelov aj na ich konci) pri každej obťažnosti — rovnica úlohy sa ukáže hneď, otázky so správnymi odpoveďami a vysvetlením sa zapíšu do denníka (L). Je to <b>režim opakovania</b>: level sa otvorí ďalej, ale bez hviezdičiek a bez zvládnutých cieľov (📖)',
+  'turns off the “complete the equation” quizzes and all multiple-choice questions (during levels and at their end) on every difficulty — a task’s equation is shown straight away, and the questions with their correct answers and explanations go to the Journal (L). This is <b>review mode</b>: the next level opens, but with no stars and no mastered goals (📖)',
+  'вимикає вікторини «доповни рівняння» і всі питання з вибором відповіді (під час рівнів і в їхньому кінці) на будь-якій складності — рівняння завдання показується одразу, а питання з правильними відповідями й поясненнями записуються до щоденника (L). Це <b>режим повторення</b>: наступний рівень відкривається, але без зірок і без опанованих цілей (📖)');
 const SCROLLS_NAME = tr('📜 Historické zvitky', '📜 Historic scrolls', '📜 Історичні сувої');
 const SCROLLS_DESC = tr('pred krokmi levelov sa rozvinie zvitok s históriou objavov — roky, autori, ich rozhovory a slávne výroky; na konci každého levelu otázka z histórie',
   'before level steps a scroll unrolls with the history of the discoveries — years, authors, their conversations and famous words; a history question at the end of every level',

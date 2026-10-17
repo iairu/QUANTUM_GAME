@@ -465,23 +465,53 @@ const EQ_BLANKS = {
   },
 };
 
+// výrazy z prednášok, ktoré hra v danom kroku neukazuje (diferenciálne rovnice, rady, Hermitove polynómy, spojité bázy,
+// relativistické rovnice, algoritmy…): po kroku sa nepýtajú — sú v 📄 Precvičovaní z prednášok (Kódex)
+const LECTURE_ONLY = new Set([
+  '1.intro.2', '1.intro.3', '1.intro.4', '1.intro.5', '1.intro.6', '1.intro.7', '1.intro.8', '1.intro.9',
+  '1.setHand.1', '1.setHand.2', '1.setHand.3', '1.setHand.4', '1.setHand.5', '1.setHand.6', '1.setHand.7', '1.setHand.8', '1.setHand.9',
+  '1.timesI.8', '1.timesI.9', '1.timesI.10', '1.timesI.11',
+  '1.interference.2', '1.interference.3', '1.interference.4', '1.interference.5', '1.interference.6',
+  '2.intro.1', '2.intro.4',
+  '5.intro.3', '5.intro.4', '5.tasks.2', '5.tasks.3', '5.tasks.4', '5.tasks.5', '5.tasks.6', '5.tasks.7', '5.tasks.15', '5.tasks.16',
+  '6.intro.3', '6.intro.4', '6.tuning.2',
+  '8.intro.2', '8.intro.3', '8.intro.4', '8.intro.5', '8.intro.6', '8.intro.7', '8.intro.8', '8.intro.9', '8.intro.10',
+  '8.statues.2', '8.statues.3', '8.statues.4', '8.statues.5', '8.statues.6',
+  '8.sorting.1', '8.sorting.2', '8.sorting.3', '8.sorting.4', '8.sorting.5', '8.sorting.6', '8.sorting.7', '8.sorting.8',
+  '9.unitaryVsDeco.1', '9.unitaryVsDeco.2',
+  '10.purify.2', '10.purify.3', '10.evolution.3', '10.evolution.4', '10.evolution.11', '10.evolution.12', '10.evolution.14',
+  '11.intro.3', '11.intro.7',
+]);
+
 const EqBlanks = {
-  // kvízy pred krokom `step` levelu `num` (ľahká a laická: žiadne)
-  // zarámované vždy; z ostatných len náhodný výber, aby každé prejdenie levelu nebolo rovnaké:
-  //  normálna — zarámované + najviac 2 hlavné rovnice úlohy (o 1 menej za každé 3 zarámované v kroku)
-  //  ťažká    — zarámované + najviac 3 z hlavných a nezarámovaných (aspoň 1) + niekedy (40 %) medzikrok odvodenia, najviac 2
+  // kvízy PO kroku `step` levelu `num` — pýtajú sa na vzťah, ktorý hráč práve videl (ľahká a laická: žiadne)
+  // najviac 2 (normálna) / 3 (ťažká) na krok: najprv zarámované, potom hlavné rovnice úlohy, na ťažkej aj nezarámované
+  // a niekedy (40 %) medzikrok odvodenia. Ostatné ostanú v 📄 Precvičovaní z prednášok.
   for(num, step) {
     if (Settings.easy || Settings.noBlanks) return []; // ľahká/laická alebo „⏭ Bez kvízov“
-    const all = EQ_BLANKS[num]?.[step] || [], hard = Settings.hard;
-    const pickN = (list, n) => new Set(list.map((b) => [rand(), b]).sort((a, b) => a[0] - b[0]).slice(0, n).map((x) => x[1]));
-    const nb = all.filter((b) => b.box).length; // veľa zarámovaných v kroku → menej ďalších, aby séria nebola dlhá
-    const core = pickN(all.filter((b) => !b.box && !b.d && (!b.hard || hard)), Math.max(hard ? 1 : 0, (hard ? 3 : 2) - Math.floor(nb / 3)));
-    const deriv = hard ? pickN(all.filter((b) => b.d && rand() < 0.4), 2) : new Set();
-    return all.filter((b) => b.box || core.has(b) || deriv.has(b))
-      .map((b) => ({
-        eq: DL.has(`blanks.${b.c}.eq`) ? DL(`blanks.${b.c}.eq`) : b.eq, // rovnica so slovami je preložená v CSV (blanks.<c>.eq)
-        blanks: b.blanks, ctx: DL('blanks.' + b.c), src: b.src, tier: b.box ? 'box' : b.d ? 'd' : b.hard ? 'hard' : '',
-      }));
+    const all = (EQ_BLANKS[num]?.[step] || []).filter((b) => !LECTURE_ONLY.has(b.c)), hard = Settings.hard, cap = hard ? 3 : 2;
+    const shuf = (list) => list.map((b) => [rand(), b]).sort((a, b) => a[0] - b[0]).map((x) => x[1]);
+    const order = [...shuf(all.filter((b) => b.box)), ...shuf(all.filter((b) => !b.box && !b.d && (!b.hard || hard))), ...(hard ? shuf(all.filter((b) => b.d && rand() < 0.4)) : [])];
+    const keep = new Set(order.slice(0, cap));
+    return all.filter((b) => keep.has(b)).map((b) => this.quiz(b));
+  },
+  quiz(b) {
+    return {
+      id: 'blank.' + b.c,
+      eq: DL.has(`blanks.${b.c}.eq`) ? DL(`blanks.${b.c}.eq`) : b.eq, // rovnica so slovami je preložená v CSV (blanks.<c>.eq)
+      blanks: b.blanks, ctx: DL('blanks.' + b.c), src: b.src, tier: b.box ? 'box' : b.d ? 'd' : b.hard ? 'hard' : '',
+    };
+  },
+  byId(id) {
+    const c = String(id).replace(/^blank\./, '');
+    for (const lv of Object.values(EQ_BLANKS)) for (const list of Object.values(lv)) { const b = list.find((x) => x.c === c); if (b) return this.quiz(b); }
+    return null;
+  },
+  // všetky vzťahy jednej prednášky (src '4' = prednáška 4, '1T' = tabuľa prednášky 1)
+  lecture(lec) {
+    const out = [];
+    for (const lv of Object.values(EQ_BLANKS)) for (const list of Object.values(lv)) for (const b of list) if (b.src && parseInt(b.src, 10) === lec) out.push(this.quiz(b));
+    return out;
   },
   count(num) { return Object.values(EQ_BLANKS[num] || {}).flat().length; },
 };

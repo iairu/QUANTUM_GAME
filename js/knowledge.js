@@ -104,45 +104,45 @@ const THEORY = {
 // extra otázky (ťažká) — viac poznatkov a rovníc
 const TRAPS_HARD = {
   1: [
-    { q: DL('traps.hard.1.0.q'), options: [DL('traps.hard.1.0.options.0'), DL('traps.hard.1.0.options.1'), DL('traps.hard.1.0.options.2'), DL('traps.hard.1.0.options.3')], correct: 0, why: DL('traps.hard.1.0.why') },
-    { q: DL('traps.hard.1.1.q'), options: [DL('traps.hard.1.1.options.0'), DL('traps.hard.1.1.options.1'), DL('traps.hard.1.1.options.2'), DL('traps.hard.1.1.options.3')], correct: 0, why: DL('traps.hard.1.1.why') },
+    QZ('traps.hard.1.0'),
+    QZ('traps.hard.1.1'),
   ],
   2: [
-    { q: DL('traps.hard.2.0.q'), options: [DL('traps.hard.2.0.options.0'), DL('traps.hard.2.0.options.1'), DL('traps.hard.2.0.options.2')], correct: 0, why: DL('traps.hard.2.0.why') },
-    { q: DL('traps.hard.2.1.q'), options: [DL('traps.hard.2.1.options.0'), DL('traps.hard.2.1.options.1'), DL('traps.hard.2.1.options.2')], correct: 0, why: DL('traps.hard.2.1.why') },
+    QZ('traps.hard.2.0'),
+    QZ('traps.hard.2.1'),
   ],
   3: [
-    { q: DL('traps.hard.3.0.q'), options: [DL('traps.hard.3.0.options.0'), DL('traps.hard.3.0.options.1'), DL('traps.hard.3.0.options.2'), DL('traps.hard.3.0.options.3')], correct: 0, why: DL('traps.hard.3.0.why') },
-    { q: DL('traps.hard.3.1.q'), options: [DL('traps.hard.3.1.options.0'), DL('traps.hard.3.1.options.1'), DL('traps.hard.3.1.options.2'), DL('traps.hard.3.1.options.3')], correct: 0, why: DL('traps.hard.3.1.why') },
+    QZ('traps.hard.3.0'),
+    QZ('traps.hard.3.1'),
   ],
   4: [
-    { q: DL('traps.hard.4.0.q'), options: [DL('traps.hard.4.0.options.0'), DL('traps.hard.4.0.options.1'), DL('traps.hard.4.0.options.2'), DL('traps.hard.4.0.options.3')], correct: 0, why: DL('traps.hard.4.0.why') },
-    { q: DL('traps.hard.4.1.q'), options: [DL('traps.hard.4.1.options.0'), DL('traps.hard.4.1.options.1'), DL('traps.hard.4.1.options.2'), DL('traps.hard.4.1.options.3')], correct: 0, why: DL('traps.hard.4.1.why') },
+    QZ('traps.hard.4.0'),
+    QZ('traps.hard.4.1'),
   ],
   5: [
-    { q: DL('traps.hard.5.0.q'), options: [DL('traps.hard.5.0.options.0'), DL('traps.hard.5.0.options.1'), DL('traps.hard.5.0.options.2'), DL('traps.hard.5.0.options.3')], correct: 0, why: DL('traps.hard.5.0.why') },
-    { q: DL('traps.hard.5.1.q'), options: [DL('traps.hard.5.1.options.0'), DL('traps.hard.5.1.options.1'), DL('traps.hard.5.1.options.2'), DL('traps.hard.5.1.options.3')], correct: 0, why: DL('traps.hard.5.1.why') },
+    QZ('traps.hard.5.0'),
+    QZ('traps.hard.5.1'),
   ],
   6: [
-    { q: DL('traps.hard.6.0.q'), options: [DL('traps.hard.6.0.options.0'), DL('traps.hard.6.0.options.1'), DL('traps.hard.6.0.options.2'), DL('traps.hard.6.0.options.3')], correct: 0, why: DL('traps.hard.6.0.why') },
-    { q: DL('traps.hard.6.1.q'), options: [DL('traps.hard.6.1.options.0'), DL('traps.hard.6.1.options.1'), DL('traps.hard.6.1.options.2'), DL('traps.hard.6.1.options.3')], correct: 0, why: DL('traps.hard.6.1.why') },
+    QZ('traps.hard.6.0'),
+    QZ('traps.hard.6.1'),
   ],
   7: [
-    { q: DL('traps.hard.7.0.q'), options: [DL('traps.hard.7.0.options.0'), DL('traps.hard.7.0.options.1'), DL('traps.hard.7.0.options.2'), DL('traps.hard.7.0.options.3')], correct: 0, why: DL('traps.hard.7.0.why') },
-    { q: DL('traps.hard.7.1.q'), options: [DL('traps.hard.7.1.options.0'), DL('traps.hard.7.1.options.1'), DL('traps.hard.7.1.options.2')], correct: 0, why: DL('traps.hard.7.1.why') },
+    QZ('traps.hard.7.0'),
+    QZ('traps.hard.7.1'),
   ],
   8: [
-    { q: DL('traps.hard.8.0.q'), options: [DL('traps.hard.8.0.options.0'), DL('traps.hard.8.0.options.1'), DL('traps.hard.8.0.options.2')], correct: 0, why: DL('traps.hard.8.0.why') },
-    { q: DL('traps.hard.8.1.q'), options: [DL('traps.hard.8.1.options.0'), DL('traps.hard.8.1.options.1'), DL('traps.hard.8.1.options.2')], correct: 0, why: DL('traps.hard.8.1.why') },
+    QZ('traps.hard.8.0'),
+    QZ('traps.hard.8.1'),
   ],
   9: [
-    { q: DL('traps.hard.9.0.q'), options: [DL('traps.hard.9.0.options.0'), DL('traps.hard.9.0.options.1'), DL('traps.hard.9.0.options.2'), DL('traps.hard.9.0.options.3')], correct: 0, why: DL('traps.hard.9.0.why') },
+    QZ('traps.hard.9.0'),
   ],
   10: [
-    { q: DL('traps.hard.10.0.q'), options: [DL('traps.hard.10.0.options.0'), DL('traps.hard.10.0.options.1'), DL('traps.hard.10.0.options.2'), DL('traps.hard.10.0.options.3')], correct: 0, why: DL('traps.hard.10.0.why') },
+    QZ('traps.hard.10.0'),
   ],
   11: [
-    { q: DL('traps.hard.11.0.q'), options: [DL('traps.hard.11.0.options.0'), DL('traps.hard.11.0.options.1'), DL('traps.hard.11.0.options.2'), DL('traps.hard.11.0.options.3')], correct: 0, why: DL('traps.hard.11.0.why') },
+    QZ('traps.hard.11.0'),
   ],
 };
 

@@ -58,7 +58,7 @@ class L10Neumann extends Level {
     this.f.wall = true;
     this.grant(['purity']);
     this.say([DL('l10.unitaryWall.1.0'), DL('l10.unitaryWall.1.1')], () => {
-      this.ask({ q: DL('l10.unitaryWall.q.q'), options: [DL('l10.unitaryWall.q.options.0'), DL('l10.unitaryWall.q.options.1'), DL('l10.unitaryWall.q.options.2')], correct: 0, why: DL('l10.unitaryWall.q.why') }, () => this.next());
+      this.ask(QZ('l10.unitaryWall.q'), () => this.next());
     });
   }
 
@@ -96,12 +96,13 @@ class L10Neumann extends Level {
     this.solvedP = true; this.cool = false;
     this.grant(['purify']);
     this.say([msg, DL('l10.purify.both')], () => {
-      this.ask({ q: DL('l10.purify.q.q'), options: [DL('l10.purify.q.options.0'), DL('l10.purify.q.options.1'), DL('l10.purify.q.options.2')], correct: 0, why: DL('l10.purify.q.why') }, () => this.next());
+      this.ask(QZ('l10.purify.q'), () => this.next());
     });
   }
 
   // ---------- 3 · pseudo-čistý stav (NMR) ----------
-  ppsTarget() { return Settings.hard ? { n: [-1, 0, 0], name: '|−⟩' } : { n: [0, 1, 0], name: '|+i⟩' }; }
+  // náhodný cieľ na každej obťažnosti (pri opakovaní levelu iná úloha)
+  ppsTarget() { return (this.sub.pps = this.sub.pps || pickR([{ n: [-1, 0, 0], name: '|−⟩' }, { n: [0, 1, 0], name: '|+i⟩' }, { n: [0, -1, 0], name: '|−i⟩' }, { n: [0, 0, -1], name: '|1⟩' }, { n: [1, 0, 0], name: '|+⟩' }])); }
   pseudoPure() {
     this.stage = 'pps'; this.n = [0, 0, 1]; this.eps = 0.1; this.r = V3.scale(this.n, this.eps); this.solvedS = false;
     const T = this.ppsTarget();
@@ -123,7 +124,7 @@ class L10Neumann extends Level {
     this.solvedS = true; this.n = T.n.slice(); this.r = V3.scale(this.n, this.eps);
     this.grant(['pps']);
     this.say([DL('l10.pseudoPure.ok', Fmt.num(this.eps, 2)), DL('l10.pseudoPure.signal')], () => {
-      this.ask({ q: DL('l10.pseudoPure.q.q'), options: [DL('l10.pseudoPure.q.options.0'), DL('l10.pseudoPure.q.options.1'), DL('l10.pseudoPure.q.options.2')], correct: 0, why: DL('l10.pseudoPure.q.why') }, () => this.next());
+      this.ask(QZ('l10.pseudoPure.q'), () => this.next());
     });
   }
 
@@ -161,7 +162,7 @@ class L10Neumann extends Level {
       this.slR.forEach((s, i) => UI.snapSlider(s, this.r[i]));
       this.grant(['observable']);
       this.say([DL('l10.observables.ok', Fmt.num(V3.len(this.r), 2))], () => {
-        this.ask({ q: DL('l10.observables.q.q'), options: [DL('l10.observables.q.options.0'), DL('l10.observables.q.options.1'), DL('l10.observables.q.options.2')], correct: 0, why: DL('l10.observables.q.why') }, () => this.next());
+        this.ask(QZ('l10.observables.q'), () => this.next());
       });
     } else { this.mistakes++; Sound.sfx('bad'); UI.toast(tr('Niektorá zložka nesedí. Každá zložka r je stredná hodnota jednej Pauliho matice.', 'A component is off. Each component of r is the expectation value of one Pauli matrix.', 'Якась складова не збігається. Кожна складова r — середнє значення однієї матриці Паулі.'), 3200); }
   }
@@ -192,7 +193,7 @@ class L10Neumann extends Level {
       this.time = (Math.PI + 2 * Math.PI * k) / this.dE; // presne na Δφ = π (+ celé otáčky)
       this.grant(['timeevo']);
       this.say([DL('l10.evolution.ok'), DL('l10.evolution.circuit')], () => {
-        this.ask({ q: DL('l10.evolution.q.q'), options: [DL('l10.evolution.q.options.0'), DL('l10.evolution.q.options.1'), DL('l10.evolution.q.options.2')], correct: 0, why: DL('l10.evolution.q.why') }, () => this.next());
+        this.ask(QZ('l10.evolution.q'), () => this.next());
       });
     } else { this.mistakes++; Sound.sfx('bad'); UI.toast(tr(`Δφ je teraz ${Fmt.angle(((dphi % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI))} — skús to znova (↺ alebo pusti čas ďalej).`, `Δφ is now ${Fmt.angle(((dphi % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI))} — try again (↺ or let time run on).`, `Δφ зараз ${Fmt.angle(((dphi % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI))} — спробуй ще (↺ або запусти час далі).`), 3200); }
   }

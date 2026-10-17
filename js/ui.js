@@ -5,6 +5,18 @@
 const $ = (sel) => document.querySelector(sel);
 const el = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; };
 
+// výberová otázka z lang/*.csv: kľúč.q, kľúč.options.0 … (správna je vždy prvá), kľúč.why;
+// voliteľne kľúč.whyWrong.N = vysvetlenie práve tej nesprávnej možnosti, kľúč.weak = index najmenej vierohodnej
+// (ľahká obťažnosť vypustí len ju). Kľúč je zároveň stabilné id otázky (štatistiky, opakovanie s odstupom).
+function QZ(key) {
+  const options = [];
+  for (let i = 0; DL.has(`${key}.options.${i}`); i++) options.push(DL(`${key}.options.${i}`));
+  const q = { id: key, q: DL(key + '.q'), options, correct: 0, why: DL(key + '.why') };
+  options.forEach((_, i) => { if (i && DL.has(`${key}.whyWrong.${i}`)) (q.whyWrong = q.whyWrong || {})[i] = DL(`${key}.whyWrong.${i}`); });
+  if (DL.has(key + '.weak')) q.weak = +DL(key + '.weak');
+  return q;
+}
+
 const UI = {
   busy: false, // beží dialóg alebo kvíz (pohyb postavy je zablokovaný)
   log: [],     // denník: [{scene, kind:'say'|'quiz', lines | q, answer, why, ok}]
@@ -177,7 +189,7 @@ const UI = {
         box.appendChild(el('summary', null, `∑ <b>${tr('Rovnica', 'Equation', 'Рівняння')}</b>: ${plain.slice(0, 90)}…`));
         box.appendChild(el('div', 'line', annotate(en.html, false, true)));
       } else {
-        box.appendChild(el('summary', null, `${en.ok ? '✅' : '❌'} <b>${tr('Otázka', 'Question', 'Питання')}:</b> ${en.q.replace(/<[^>]+>/g, '').slice(0, 90)}`));
+        box.appendChild(el('summary', null, `${en.ok ? '✅' : en.ok === null ? '⏭' : '❌'} <b>${tr('Otázka', 'Question', 'Питання')}:</b> ${en.q.replace(/<[^>]+>/g, '').slice(0, 90)}`));
         box.appendChild(el('div', 'line', annotate(en.q, false, true)));
         box.appendChild(el('div', 'line good', '✔ ' + en.answer));
         if (en.why) box.appendChild(el('div', 'line', annotate(en.why, false, true)));
@@ -247,58 +259,132 @@ const UI = {
     show();
   },
 
-  // q: {q, options:[...], correct: index, why, who, face}; cb(spravne)
+  // poradie možností sa určí raz — pri prekreslení (zmena obťažnosti) ostane rovnaké.
+  // Ľahká a laická vypustia len možnosť označenú ako najmenej vierohodná (q.weak); bez nej ostanú všetky,
+  // lebo náhodne vypustená možnosť robila z väčšiny otázok hod mincou.
+  quizOrder(q) {
+    if (!q._order) {
+      q._order = q.options.map((_, i) => i);
+      if (q.shuffle !== false) q._order.sort(() => rand() - 0.5);
+      q._drop = q.weak != null && q.weak !== q.correct ? q.weak : null;
+    }
+    return q._order.filter((i) => !(Settings.easy && q.options.length > 2 && i === q._drop));
+  },
+  // q: {q, options:[...], correct: index, why, whyWrong: {index: text}, id, who, face}; cb(true | false | null)
+  // null = otázka sa preskočila (⏭ Bez kvízov) — preskočená otázka sa nepočíta ako správna
   quiz(q, cb, silent = false) {
     // ⏭ „Bez kvízov“: výberový dialóg sa neukáže — otázka so správnou odpoveďou a vysvetlením ide len do denníka
     if (Settings.noBlanks && !silent) {
-      this.record({ kind: 'quiz', q: q.q, answer: q.options[q.correct], why: q.why, ok: true });
-      setTimeout(() => cb && cb(true), 0);
+      this.record({ kind: 'quiz', q: q.q, answer: q.options[q.correct], why: q.why, ok: null });
+      Learn.skipped(q);
+      setTimeout(() => cb && cb(null), 0);
       return;
     }
     this.busy = true;
     this._next = null; this._prev = null;
     this.dialog.innerHTML = '';
     if (!silent) Sound.sfx('dialog');
-    let answered = false;
+    let answered = false, pick = null;
     // zmena obťažnosti pred odpoveďou: otázka sa hneď prekreslí (počet možností v ľahkej, preklady v laickej)
     this.refreshDialog = () => { if (!answered) this.quiz(q, cb, true); };
-    this.dialog.appendChild(el('div', 'who', (q.face || '❓') + ' ' + (q.who || tr('Otázka', 'Question', 'Питання'))));
+    this.dialog.appendChild(el('div', 'who', (q.face || '❓') + ' ' + (q.who || tr('Otázka', 'Question', 'Питання')) + (q.tag ? ` · <span class="bsrc">${q.tag}</span>` : '')));
     this.dialog.appendChild(el('div', 'txt', annotate(q.q, true, true)));
-    const box = el('div', 'choices');
-    // poradie a vypustená nesprávna možnosť sa určia raz — pri prekreslení (zmena obťažnosti) ostanú rovnaké
-    if (!q._order) {
-      q._order = q.options.map((_, i) => i);
-      if (q.shuffle !== false) q._order.sort(() => rand() - 0.5);
-      const wrong = q._order.filter((i) => i !== q.correct);
-      q._drop = wrong[Math.floor(rand() * wrong.length)];
-    }
-    const order = q._order.filter((i) => !(Settings.easy && q.options.length > 2 && i === q._drop)); // ľahká a laická: o jednu nesprávnu možnosť menej
+    const box = el('div', 'choices'), order = this.quizOrder(q);
+    // 🎯 sebadôvera: po výbere možnosti hráč povie, nakoľko si je istý — až potom sa odpoveď vyhodnotí
+    const askConf = Settings.confidence && !q.noConf, conf = el('div', 'conf');
+    const submit = (i, sure) => {
+      answered = true;
+      const ok = i === q.correct, b = box.children[order.indexOf(i)];
+      conf.remove();
+      Sound.sfx(ok ? 'good' : 'bad');
+      Settings.wow && Wow.onAnswer(ok); // MMO: správna odpoveď = zásah bossa, nesprávna = jeho úder
+      this.record({ kind: 'quiz', q: q.q, answer: q.options[q.correct], why: q.why, ok });
+      Learn.answered(q, ok, { pick: i, conf: sure });
+      [...box.children].forEach((c) => (c.disabled = true));
+      b.classList.remove('sel'); b.classList.add(ok ? 'good' : 'bad');
+      if (!ok) box.children[order.indexOf(q.correct)].classList.add('good');
+      // vysvetlenie práve zvolenej nesprávnej možnosti (ak je), potom všeobecné vysvetlenie
+      const own = !ok && q.whyWrong && q.whyWrong[i] ? annotate(q.whyWrong[i], true, true) + '<br>' : '';
+      const note = sure === 2 && !ok ? `<div class="calib">${tr('💡 Bol(a) si si istý(-á) — toto je častý omyl. Otázka sa ti vráti v opakovaní, a to dvakrát.', '💡 You were sure — this is a common misconception. The question will come back in your reviews, twice.', '💡 Ти був(-ла) впевнений(-а) — це поширена хиба. Питання повернеться в повтореннях, і то двічі.')}</div>`
+        : sure === 0 && ok ? `<div class="calib">${tr('🎲 Správne, ale tipoval(a) si — otázka sa ti ešte raz vráti, aby sme vedeli, že to nebola náhoda.', '🎲 Right, but you guessed — it will come back once more to check it wasn’t luck.', '🎲 Правильно, але ти вгадував(-ла) — питання ще раз повернеться, щоб перевірити, що це не випадковість.')}</div>` : '';
+      const fb = el('div', 'why ' + (ok ? 'ok' : 'no'), (ok ? tr('✅ Správne. ', '✅ Correct. ', '✅ Правильно. ') : tr('❌ Nie celkom. ', '❌ Not quite. ', '❌ Не зовсім. ')) + own + annotate(q.why || '', true, true) + note);
+      this.dialog.appendChild(fb);
+      const c = el('button', 'primary', tr('Pokračovať ▸', 'Continue ▸', 'Продовжити ▸'));
+      c.onclick = () => { this.dialog.classList.remove('show'); this.busy = false; this._next = null; cb && cb(ok); };
+      this.dialog.appendChild(c);
+      // až po odpovedi (inak by sa dala odpoveď len vyhľadať): otázka, správna odpoveď a vysvetlenie
+      this.dialog.appendChild(this.askButton(`${q.q}\n${tr('Správna odpoveď', 'Correct answer', 'Правильна відповідь')}: ${q.options[q.correct]}\n${q.why || ''}`));
+      this._next = c.onclick;
+      c.focus();
+    };
     for (const i of order) {
       const b = el('button', 'choice', mathText(q.options[i], true)); // vzorce v odpovediach: čip rovnice (a glyfy pri rovniciach najprv)
-      b.dataset.ok = i === q.correct ? '1' : '0';
       b.onclick = () => {
+        if (answered) return;
+        if (!askConf) return submit(i, null);
+        pick = i;
+        [...box.children].forEach((c) => c.classList.toggle('sel', c === b));
+        if (!conf.isConnected) this.dialog.appendChild(conf);
+      };
+      box.appendChild(b);
+    }
+    conf.appendChild(el('span', null, tr('Nakoľko si si istý(-á)?', 'How sure are you?', 'Наскільки ти впевнений(-а)?')));
+    [[0, tr('🤷 tipujem', '🤷 guessing', '🤷 вгадую')], [1, tr('🙂 asi áno', '🙂 fairly sure', '🙂 мабуть, так')], [2, tr('💯 určite', '💯 certain', '💯 напевно')]].forEach(([k, t]) => {
+      const b = el('button', 'confb', t);
+      b.onclick = () => pick != null && !answered && submit(pick, k);
+      conf.appendChild(b);
+    });
+    this.dialog.appendChild(box);
+    this.dialog.className = 'show quizq ' + Settings.diff + (Settings.layman ? ' easy' : '') + (Settings.hard ? ' hard' : '');
+  },
+  // 🔮 predpoveď: hráč vyberie, čo sa stane, a predpoveď sa uzamkne bez vyhodnotenia — správnosť sa ukáže až po pokuse
+  // (Learn.reveal). cb(index zvolenej možnosti) alebo cb(null) pri ⏭ Bez kvízov.
+  predict(q, cb) {
+    if (Settings.noBlanks) { Learn.skipped(q); setTimeout(() => cb && cb(null), 0); return; }
+    this.busy = true;
+    this._next = null; this._prev = null;
+    this.dialog.innerHTML = '';
+    Sound.sfx('dialog');
+    let answered = false;
+    this.refreshDialog = () => { if (!answered) this.predict(q, cb); };
+    this.dialog.appendChild(el('div', 'who', `🔮 ${q.who || ''} · ${tr('predpoveď', 'prediction', 'передбачення')}`));
+    this.dialog.appendChild(el('div', 'txt', annotate(q.q, true, true) + `<div class="calib">${tr('Najprv tipni, čo sa stane. Či máš pravdu, uvidíš až po pokuse.', 'First predict what will happen. You will find out whether you were right only after the experiment.', 'Спершу передбач, що станеться. Чи маєш рацію, побачиш лише після досліду.')}</div>`));
+    const box = el('div', 'choices'), order = this.quizOrder(q);
+    for (const i of order) {
+      const b = el('button', 'choice', mathText(q.options[i], true));
+      b.onclick = () => {
+        if (answered) return;
         answered = true;
-        const ok = i === q.correct;
-        Sound.sfx(ok ? 'good' : 'bad');
-        Settings.wow && Wow.onAnswer(ok); // MMO: správna odpoveď = zásah bossa, nesprávna = jeho úder
-        this.record({ kind: 'quiz', q: q.q, answer: q.options[q.correct], why: q.why, ok });
+        Sound.sfx('click');
         [...box.children].forEach((c) => (c.disabled = true));
-        b.classList.add(ok ? 'good' : 'bad');
-        if (!ok) box.children[order.indexOf(q.correct)].classList.add('good');
-        const fb = el('div', 'why ' + (ok ? 'ok' : 'no'), (ok ? tr('✅ Správne. ', '✅ Correct. ', '✅ Правильно. ') : tr('❌ Nie celkom. ', '❌ Not quite. ', '❌ Не зовсім. ')) + annotate(q.why || '', true, true));
-        this.dialog.appendChild(fb);
-        const c = el('button', 'primary', tr('Pokračovať ▸', 'Continue ▸', 'Продовжити ▸'));
-        c.onclick = () => { this.dialog.classList.remove('show'); this.busy = false; this._next = null; cb && cb(ok); };
+        b.classList.add('sel');
+        this.dialog.appendChild(el('div', 'why lock', tr(`🔒 Predpoveď uzamknutá: <b>${mathText(q.options[i], true)}</b>. Teraz urob pokus — vyhodnotenie príde potom.`, `🔒 Prediction locked: <b>${mathText(q.options[i], true)}</b>. Now run the experiment — the verdict comes afterwards.`, `🔒 Передбачення зафіксовано: <b>${mathText(q.options[i], true)}</b>. Тепер проведи дослід — оцінка буде потім.`)));
+        const c = el('button', 'primary', tr('Na pokus ▸', 'To the experiment ▸', 'До досліду ▸'));
+        c.onclick = () => { this.dialog.classList.remove('show'); this.busy = false; this._next = null; cb && cb(i); };
         this.dialog.appendChild(c);
-        // až po odpovedi (inak by sa dala odpoveď len vyhľadať): otázka, správna odpoveď a vysvetlenie
-        this.dialog.appendChild(this.askButton(`${q.q}\n${tr('Správna odpoveď', 'Correct answer', 'Правильна відповідь')}: ${q.options[q.correct]}\n${q.why || ''}`));
         this._next = c.onclick;
         c.focus();
       };
       box.appendChild(b);
     }
     this.dialog.appendChild(box);
-    this.dialog.classList.add('show');
+    this.dialog.className = 'show quizq ' + Settings.diff + (Settings.layman ? ' easy' : '') + (Settings.hard ? ' hard' : '');
+  },
+  // 💡 stupňovitá nápoveda: každé kliknutie ukáže ďalší stupeň (smer → metóda → odpoveď). Posledný stupeň prezradí
+  // odpoveď — úloha sa potom počíta ako „s pomocou“ (Learn.hint) a cieľ treba ukázať ešte raz bez nej.
+  hints(steps, panelInfo) {
+    let k = 0;
+    const label = () => (k < steps.length ? tr(`💡 Nápoveda ${k + 1}/${steps.length}`, `💡 Hint ${k + 1}/${steps.length}`, `💡 Підказка ${k + 1}/${steps.length}`) : tr('💡 Nápoveda (všetky)', '💡 Hint (all shown)', '💡 Підказка (усі)'));
+    const b = this.button(label(), () => {
+      if (k >= steps.length) { UI.toast(steps[steps.length - 1], 5200); return; }
+      const last = k === steps.length - 1;
+      Learn.hint(Game.scene, last);
+      const html = (last ? tr('🟡 <b>Odpoveď</b> (úloha sa ráta ako „s pomocou“): ', '🟡 <b>Answer</b> (the task counts as “assisted”): ', '🟡 <b>Відповідь</b> (завдання зараховується як «з допомогою»): ') : '') + steps[k];
+      UI.toast(html, 5200);
+      if (panelInfo) panelInfo.innerHTML = steps.slice(0, k + 1).map((s, j) => `${j + 1}. ${s}`).join('<br>');
+      k++; b.innerHTML = label();
+    }, '', tr('Najprv smer, potom metóda, nakoniec odpoveď. Posledný stupeň označí úlohu ako vyriešenú s pomocou.', 'First a direction, then a method, finally the answer. The last step marks the task as solved with help.', 'Спершу напрямок, потім метод, наостанок відповідь. Останній крок позначає завдання як розв’язане з допомогою.'));
+    return b;
   },
 
   // ∑ doplň rovnicu: q = {eq: 'ρ′ = Uρ⟦0⟧', blanks: [[správna, nesprávna, …], …], ctx, why, who, face}; cb(spravne)
@@ -365,6 +451,7 @@ const UI = {
       });
       const shown = q.eq.replace(/⟦\d+⟧/g, '( … )');
       this.record({ kind: 'quiz', q: `${q.ctx || ''} [[${shown}]]`, answer: `[[${full}]]`, why: q.why, ok });
+      Learn.answered(q, ok, { kind: 'blank' });
       check.remove();
       this.dialog.appendChild(el('div', 'why ' + (ok ? 'ok' : 'no'), (ok ? tr('✅ Správne. ', '✅ Correct. ', '✅ Правильно. ') : tr('❌ Nie celkom — správne je: ', '❌ Not quite — the correct one is: ', '❌ Не зовсім — правильно так: '))
         + `<div class="eq eqb">${M(full)}</div>` + annotate(q.why || '', true, true)));
@@ -407,12 +494,13 @@ const UI = {
     this.busy = false; this._next = this._prev = null; this.refreshDialog = null;
   },
 
-  // séria kvízov za sebou; cb(počet chýb)
+  // séria kvízov za sebou; cb(počet chýb) — preskočené otázky (null) chybou nie sú, ale ani správnou odpoveďou
+  // (Learn.ask: pri chybe v generovanej otázke hneď nasleduje nová obmena s inými číslami)
   quizSeries(list, cb) {
     let i = 0, mistakes = 0;
     const step = () => {
       if (i >= list.length) return cb(mistakes);
-      this.quiz(list[i++], (ok) => { if (!ok) mistakes++; step(); });
+      Learn.ask(Game.scene, list[i++], (ok) => { if (ok === false) mistakes++; step(); });
     };
     step();
   },
@@ -595,6 +683,7 @@ const UI = {
     body.appendChild(this.checkbox(SCROLLS_DESC, Settings.scrolls, (v) => { Settings.scrolls = v; Settings.save(); }));
     body.appendChild(this.checkbox(NOBLANKS_DESC, Settings.noBlanks, (v) => { Settings.noBlanks = v; Settings.save(); }));
     body.appendChild(this.checkbox(DIALOG_DESC, Settings.skipDialog, (v) => { Settings.skipDialog = v; Settings.save(); }));
+    body.appendChild(this.checkbox(CONF_DESC, Settings.confidence, (v) => { Settings.confidence = v; Settings.save(); }));
     body.appendChild(el('h3', null, tr('∑ 4 · Rovnice', '∑ 4 · Equations', '∑ 4 · Рівняння')));
     const modes = el('div', 'diffs');
     for (const m of MODES) {
@@ -661,6 +750,11 @@ const UI = {
     box.appendChild(this.row(
       this.plainButton(tr('🔓 Odomknúť všetky levely', '🔓 Unlock all levels', '🔓 Відкрити всі рівні'), () => this.unlockAllAsk()),
       this.plainButton(tr('🗑 Reset hry', '🗑 Reset game', '🗑 Скинути гру'), () => this.resetAsk())));
+    // ⬇ export pre učiteľa: výsledky otázok, ciele, testy pred/po, nápovedy a časy krokov (JSON, nič sa nikam neposiela)
+    box.appendChild(this.row(this.plainButton(tr('⬇ Exportovať môj postup (JSON)', '⬇ Export my progress (JSON)', '⬇ Експортувати мій поступ (JSON)'), () => Learn.export())));
+    box.appendChild(el('p', 'muted', tr('Súbor sa len stiahne do tvojho počítača — môžeš ho odovzdať vyučujúcemu. Obsahuje výsledky otázok, zvládnuté ciele, testy pred a po leveli, použité nápovedy a časy úloh.',
+      'The file is only downloaded to your computer — you can hand it in to your teacher. It holds your question results, mastered goals, before/after tests, hints used and task times.',
+      'Файл лише завантажується на твій комп’ютер — його можна здати викладачеві. Він містить результати питань, опановані цілі, тести до і після рівня, використані підказки та час завдань.')));
     body.appendChild(box);
   },
 
@@ -675,11 +769,12 @@ const UI = {
     const list = $('#codex .list'), got = Game.progress.codex;
     list.innerHTML = '';
     const tabs = $('#codex .tabs'); tabs.innerHTML = '';
-    for (const [k, n] of [['all', tr('Všetko', 'All', 'Усе')], ['symbol', tr('🔣 Symboly', '🔣 Symbols', '🔣 Символи')], ['osobnost', tr('👤 Osobnosti', '👤 People', '👤 Особистості')], ['pojem', tr('💡 Pojmy', '💡 Concepts', '💡 Поняття')], ['scroll', tr('📜 Zvitky', '📜 Scrolls', '📜 Сувої')], ['eq', tr('∑ Rovnice', '∑ Equations', '∑ Рівняння')]]) {
+    for (const [k, n] of [['all', tr('Všetko', 'All', 'Усе')], ['symbol', tr('🔣 Symboly', '🔣 Symbols', '🔣 Символи')], ['osobnost', tr('👤 Osobnosti', '👤 People', '👤 Особистості')], ['pojem', tr('💡 Pojmy', '💡 Concepts', '💡 Поняття')], ['scroll', tr('📜 Zvitky', '📜 Scrolls', '📜 Сувої')], ['eq', tr('∑ Rovnice', '∑ Equations', '∑ Рівняння')], ['drill', tr('📄 Prednášky', '📄 Lecture drill', '📄 Лекції')]]) {
       const b = el('button', filter === k ? 'on' : '', n); b.onclick = () => this.renderCodex(k); tabs.appendChild(b);
     }
     if (filter === 'scroll') return this.renderScrolls(list);
     if (filter === 'eq') return this.renderEquations(list);
+    if (filter === 'drill') return this.renderDrill(list);
     const entries = CODEX.filter((e) => filter === 'all' || e.type === filter);
     $('#codex .count').textContent = `${got.size} / ${CODEX.length} ${tr('odomknutých', 'unlocked', 'відкрито')}`;
     for (const e of entries) {
@@ -687,9 +782,15 @@ const UI = {
       card.innerHTML = have
         ? `<div class="sym">${e.sym}</div><div class="nm">${e.name}</div><div class="ds">${annotate(e.text)}</div>`
           + (e.do ? `<div class="do">✅ ${e.do}</div>` : '') + (e.dont ? `<div class="dont">❌ ${e.dont}</div>` : '')
-          + `<div class="src">${tr('Level', 'Level', 'Рівень')} ${e.level}</div>`
+          + `<div class="src">${tr('Level', 'Level', 'Рівень')} ${e.level} · ${Learn.mastered(e.level) ? tr('🎓 zvládnuté', '🎓 mastered', '🎓 опановано') : tr('👁 videné', '👁 seen', '👁 бачено')}</div>`
         : `<div class="sym">?</div><div class="nm">${tr('zamknuté', 'locked', 'закрито')}</div><div class="ds">${tr(`Odomkneš v leveli ${e.level}.`, `Unlocked in level ${e.level}.`, `Відкриється в рівні ${e.level}.`)}</div>`;
       if (!have) card.dataset.tip = tr(`Dokonči level ${e.level} (${LEVELS[e.level - 1].title}).`, `Complete level ${e.level} (${LEVELS[e.level - 1].title}).`, `Пройди рівень ${e.level} (${LEVELS[e.level - 1].title}).`);
+      // „precvič ma“: 1–2 otázky z tohto levelu (najprv tie, ktoré sú na rade v opakovaní) — kartu tak treba aj použiť
+      if (have && (TRANSFER[e.level] || TRAPS[e.level])) {
+        const b = this.plainButton(tr('🧪 Precvič ma', '🧪 Test me', '🧪 Перевір мене'), () => Learn.testMe(e.level));
+        b.className = 'testme'; b.dataset.tip = tr('Dve krátke otázky k tomuto levelu. Chyby sa vrátia v opakovaní.', 'Two short questions on this level. Mistakes come back in your reviews.', 'Два короткі питання з цього рівня. Помилки повернуться в повтореннях.');
+        card.appendChild(b);
+      }
       list.appendChild(card);
     }
   },
@@ -707,6 +808,20 @@ const UI = {
       card.innerHTML = have
         ? `<div class="sym">∑</div><div class="nm">${e.L.num} · ${e.L.title} — ${title}</div><div class="ds">${annotate(e.html, false, true)}</div>`
         : `<div class="sym">∑ ?</div><div class="nm">${tr('zamknuté', 'locked', 'закрито')}</div><div class="ds">${tr(`Level ${e.L.num} · ${title}.`, `Level ${e.L.num} · ${title}.`, `Рівень ${e.L.num} · ${title}.`)}</div>`;
+      list.appendChild(card);
+    }
+  },
+  // 📄 precvičovanie z prednášok: všetky doplňovačky jednej prednášky (aj tie, ktoré hra v kroku nepýta) — nehodnotí sa
+  renderDrill(list) {
+    const D = Game.progress.drill;
+    $('#codex .count').textContent = tr('Doplň rovnice z PDF prednášok — bez hviezdičiek, len na precvičenie. Vyber prednášku:', 'Complete the equations from the lecture PDFs — no stars, practice only. Pick a lecture:', 'Доповни рівняння з PDF лекцій — без зірок, лише для вправи. Обери лекцію:');
+    for (let lec = 1; lec <= 5; lec++) {
+      const items = EqBlanks.lecture(lec), done = items.filter((q) => D[q.id] === 1).length;
+      if (!items.length) continue;
+      const card = el('div', 'card drillcard', `<div class="sym">📄 ${lec}</div><div class="nm">${tr('Prednáška', 'Lecture', 'Лекція')} ${lec}</div><div class="ds">${tr(`${done} z ${items.length} vzťahov správne`, `${done} of ${items.length} relations correct`, `${done} із ${items.length} співвідношень правильно`)}</div>`);
+      const b = this.plainButton(tr('▶ 6 doplňovačiek', '▶ 6 fill-ins', '▶ 6 доповнень'), () => Learn.drill(lec));
+      b.className = 'testme';
+      card.appendChild(b);
       list.appendChild(card);
     }
   },

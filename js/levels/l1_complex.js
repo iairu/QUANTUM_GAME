@@ -7,7 +7,7 @@ class L1Complex extends Level {
 
   setup() {
     this.cam = new OrbitCam([0, 0, 0.3], 7.5, 0, 0.95, 3, 16);
-    this.mode = null; this.z = C.of(1); this.target = null;
+    this.mode = null; this.z = C.of(1); this.target = null; this.showGrid = false;
     this.ang = 0; this.angShown = 0; this.mag = 1;
     this.done1 = this.done2 = this.done3 = false;
   }
@@ -26,12 +26,29 @@ class L1Complex extends Level {
   // --- úloha 1: nastav ručičku ---
   setHand() {
     this.mode = 'set';
-    // ťažká: náhodný cieľ (veľkosť po 0,05, fáza po π/8), inak 0,7 · e^{i3π/4}
-    this.tMag = byDiff(0.7, 0.7, 0.4 + Math.round(rand() * 10) * 0.05);
-    this.tPh = byDiff(6, 6, 1 + Math.floor(rand() * 15)) * Math.PI / 8;
+    // náhodný cieľ na každej obťažnosti (opakovanie levelu = nová úloha, nie spomienka na čísla):
+    // ľahká — „pekné“ hodnoty (0,5 … 0,9 a násobky π/4), normálna — veľkosť po 0,05 a fáza po π/8, ťažká — aj malé veľkosti
+    if (this.sub.tMag == null) {
+      this.sub.tMag = byDiff(0.5 + Math.floor(rand() * 5) * 0.1, 0.45 + Math.round(rand() * 9) * 0.05, 0.4 + Math.round(rand() * 10) * 0.05);
+      this.sub.tPh = byDiff((1 + Math.floor(rand() * 7)) * 2, 1 + Math.floor(rand() * 15), 1 + Math.floor(rand() * 15)) * Math.PI / 8;
+    }
+    this.tMag = this.sub.tMag; this.tPh = this.sub.tPh;
     this.target = C.scale(C.exp(this.tPh), this.tMag);
     const hard = Settings.hard;
-    this.quest(tr('Nastav ručičku amplitúdy α na zlatý cieľ (veľkosť aj fázu).', 'Set the amplitude hand α onto the golden target (both magnitude and phase).', 'Встанови стрілку амплітуди α на золоту ціль (і модуль, і фазу).'), { easy: tr('🎯 α → zlatý cieľ', '🎯 α → golden target', '🎯 α → золота ціль'), hard: `α → ${hard ? '?' : Fmt.complex(this.target)} · ε < ${Fmt.num(byDiff(0.12, 0.06, 0.03), 2)}` });
+    this.quest(tr('Nastav ručičku amplitúdy α na zlatý cieľ (veľkosť aj fázu).', 'Set the amplitude hand α onto the golden target (both magnitude and phase).', 'Встанови стрілку амплітуди α на золоту ціль (і модуль, і фазу).'), { easy: tr('🎯 α → zlatý cieľ', '🎯 α → golden target', '🎯 α → золота ціль'), hard: `α → ? · ε < ${Fmt.num(byDiff(0.12, 0.06, 0.03), 2)}` });
+    // 💡 stupňovitá nápoveda: kvadrant a dĺžka slovami → ako to odčítať (mriežka) → presné čísla (= s pomocou)
+    const quad = ((Math.round(this.tPh / (Math.PI / 4)) % 8) + 8) % 8;
+    const dirs = tr(['na kladnej reálnej osi', 'vpravo hore (1. kvadrant)', 'na kladnej imaginárnej osi (hore)', 'vľavo hore (2. kvadrant)', 'na zápornej reálnej osi', 'vľavo dole (3. kvadrant)', 'na zápornej imaginárnej osi (dole)', 'vpravo dole (4. kvadrant)'],
+      ['on the positive real axis', 'upper right (1st quadrant)', 'on the positive imaginary axis (up)', 'upper left (2nd quadrant)', 'on the negative real axis', 'lower left (3rd quadrant)', 'on the negative imaginary axis (down)', 'lower right (4th quadrant)'],
+      ['на додатній дійсній осі', 'праворуч угорі (1-й квадрант)', 'на додатній уявній осі (угорі)', 'ліворуч угорі (2-й квадрант)', 'на від’ємній дійсній осі', 'ліворуч унизу (3-й квадрант)', 'на від’ємній уявній осі (унизу)', 'праворуч унизу (4-й квадрант)']);
+    const len = this.tMag < 0.55 ? tr('asi do polovice kruhu', 'about half way to the circle', 'приблизно до половини кола') : this.tMag < 0.8 ? tr('kratšia ako polomer kruhu', 'shorter than the circle’s radius', 'коротша за радіус кола') : tr('takmer po kruh', 'almost reaching the circle', 'майже до кола');
+    const hintInfo = UI.info('', 'tip');
+    const hints = UI.hints([
+      tr(`Cieľ leží ${dirs[quad]}, ručička je ${len}.`, `The target lies ${dirs[quad]}; the hand is ${len}.`, `Ціль лежить ${dirs[quad]}; стрілка ${len}.`),
+      tr('Zapni mriežku: kruhy sú po 0,25 a lúče po 22,5° (π/8). Najprv nastav fázu, potom veľkosť.', 'Use the grid: circles every 0.25, spokes every 22.5° (π/8). Set the phase first, then the magnitude.', 'Скористайся сіткою: кола через 0,25, промені через 22,5° (π/8). Спершу фаза, потім модуль.'),
+      tr(`veľkosť ${Fmt.num(this.tMag, 2)}, fáza ${Fmt.angle(this.tPh)} (${Math.round(this.tPh * 180 / Math.PI)}°)`, `magnitude ${Fmt.num(this.tMag, 2)}, phase ${Fmt.angle(this.tPh)} (${Math.round(this.tPh * 180 / Math.PI)}°)`, `модуль ${Fmt.num(this.tMag, 2)}, фаза ${Fmt.angle(this.tPh)} (${Math.round(this.tPh * 180 / Math.PI)}°)`),
+    ], hintInfo);
+    hints.addEventListener('click', () => { this.showGrid = true; });
     let r = 1, ph = 0, sR = null, sPh = null;
     const info = UI.info('');
     const upd = () => {
@@ -47,16 +64,16 @@ class L1Complex extends Level {
         UI.snapSlider(sR, this.tMag); UI.snapSlider(sPh, this.tPh);
         this.grant(['euler', 'eiphi', 'amp']);
         this.say([DL('l1.upd.1')], () =>
-          this.ask({ q: DL('l1.upd.2.q'), options: [DL('l1.upd.2.options.0'), DL('l1.upd.2.options.1'), DL('l1.upd.2.options.2')], correct: 0, why: DL('l1.upd.2.why') }, () => this.next()));
+          this.ask(QZ('l1.upd.2'), () => this.next()));
       }
     };
     UI.panelSet(tr('Ručička amplitúdy α', 'Amplitude hand α', 'Стрілка амплітуди α'), [
       sR = UI.slider(tr('veľkosť |α|', 'magnitude |α|', 'модуль |α|'), 0, 1, hard ? 0.005 : 0.01, 1, (v) => { r = v; upd(); return Fmt.num(v, 2); }),
       sPh = UI.slider(tr('fáza φ', 'phase φ', 'фаза φ'), 0, 6.28, hard ? 0.005 : 0.01, 0, (v) => { ph = v; upd(); return Fmt.angle(v); }),
       info,
-      hard ? UI.info(tr('🎯 Ťažká: cieľ je náhodný. Odčítaj ho z polárnej mriežky (kruhy po 0,25, lúče po 22,5°).', '🎯 Hard: the target is random. Read it off the polar grid (circles every 0.25, spokes every 22.5°).', '🎯 Складна: ціль випадкова. Зчитай її з полярної сітки (кола через 0,25, промені через 22,5°).'), 'tip')
-        : UI.info(tr(`💡 Tip: zlatý cieľ má veľkosť ${Fmt.num(this.tMag, 2)} a fázu ${Fmt.angle(this.tPh)} (${Math.round(this.tPh * 180 / Math.PI)}°).`, `💡 Tip: the golden target has magnitude ${Fmt.num(this.tMag, 2)} and phase ${Fmt.angle(this.tPh)} (${Math.round(this.tPh * 180 / Math.PI)}°).`, `💡 Підказка: золота ціль має модуль ${Fmt.num(this.tMag, 2)} і фазу ${Fmt.angle(this.tPh)} (${Math.round(this.tPh * 180 / Math.PI)}°).`), 'tip'),
-    ]);
+      hard ? UI.info(tr('🎯 Ťažká: odčítaj cieľ z polárnej mriežky (kruhy po 0,25, lúče po 22,5°).', '🎯 Hard: read the target off the polar grid (circles every 0.25, spokes every 22.5°).', '🎯 Складна: зчитай ціль із полярної сітки (кола через 0,25, промені через 22,5°).'), 'tip')
+        : UI.row(hints), hard ? null : hintInfo,
+    ].filter(Boolean));
   }
 
   // --- úloha 2: násobenie i = otočenie o 90° ---
@@ -74,7 +91,7 @@ class L1Complex extends Level {
           this.grant(['i']);
           this.say([DL('l1.press.1.0', this.presses, this.presses === 2 ? 'stlačenia' : 'stlačení'),
             DL('l1.press.1.1')], () =>
-            this.ask({ q: DL('l1.press.2.q'), options: [DL('l1.press.2.options.0'), DL('l1.press.2.options.1'), DL('l1.press.2.options.2')], correct: 0, why: DL('l1.press.2.why') }, () => this.next()));
+            this.ask(QZ('l1.press.2'), () => this.next()));
         }, 700);
       }
     };
@@ -122,7 +139,7 @@ class L1Complex extends Level {
         setTimeout(() => {
           this.grant(['interf', 'abs2', 'ReIm', 'conj']);
           this.say([DL('l1.upd.3'),
-            DL('l1.upd.4')], () => this.next());
+            DL('l1.upd.4')], () => this.explainWhy('l1.explain', () => this.next()));
         }, 500);
       }
       return Fmt.angle(v);
@@ -159,7 +176,7 @@ class L1Complex extends Level {
     }
     const O = [0, 0.03, 0];
     // polárna mriežka (vždy na ťažkej, inak podľa nastavení): kruhy |α| = 0,25 … 1, lúče po 22,5°
-    if ((Settings.view.grid || Settings.hard) && this.mode !== 'int') {
+    if ((Settings.view.grid || Settings.hard || this.showGrid) && this.mode !== 'int') {
       for (const k of [0.25, 0.5, 0.75]) r.draw('circle', M4.trs([0, 0.012, 0], 0, 2 * k), [0.55, 0.6, 0.85], { alpha: 0.5 });
       for (let k = 0; k < 16; k++) { const a = k * Math.PI / 8; r.dash([0, 0.012, 0], this.W([Math.cos(a), Math.sin(a)], 0.012), [0.55, 0.6, 0.85], { alpha: 0.5 }); }
       if (this.mode === 'set') for (const k of [0.25, 0.5, 0.75]) UI.label('pg' + k, [2 * k * 0.71 + 0.08, 0.02, 2 * k * 0.71], Fmt.num(k, 2), 'axis tiny');
@@ -180,8 +197,7 @@ class L1Complex extends Level {
       r.rod(this.W([0, this.z[1]]), this.W(this.z), [0.6, 0.8, 1], 0.01);
       UI.label('alpha', V3.add(this.W(this.z), [0, 0.35, 0]), 'α', 'player');
       UI.hot(this.W(this.z), tr(`<b>Amplitúda α</b> = ${Fmt.complex(this.z)}<br>dĺžka ${Fmt.num(C.abs(this.z), 2)}, fáza ${Fmt.angle(C.arg(this.z))}`, `<b>Amplitude α</b> = ${Fmt.complex(this.z)}<br>length ${Fmt.num(C.abs(this.z), 2)}, phase ${Fmt.angle(C.arg(this.z))}`, `<b>Амплітуда α</b> = ${Fmt.complex(this.z)}<br>довжина ${Fmt.num(C.abs(this.z), 2)}, фаза ${Fmt.angle(C.arg(this.z))}`), 30);
-      UI.hot(this.W(this.target), Settings.hard ? tr('<b>Zlatý cieľ</b> — odčítaj veľkosť a fázu z mriežky.', '<b>Golden target</b> — read its magnitude and phase off the grid.', '<b>Золота ціль</b> — зчитай її модуль і фазу із сітки.')
-        : tr(`<b>Zlatý cieľ</b>: veľkosť ${Fmt.num(this.tMag, 2)}, fáza ${Fmt.angle(this.tPh)}.`, `<b>Golden target</b>: magnitude ${Fmt.num(this.tMag, 2)}, phase ${Fmt.angle(this.tPh)}.`, `<b>Золота ціль</b>: модуль ${Fmt.num(this.tMag, 2)}, фаза ${Fmt.angle(this.tPh)}.`), 26);
+      UI.hot(this.W(this.target), tr('<b>Zlatý cieľ</b> — odčítaj veľkosť a fázu z obrázka (mriežka pomôže; čísla prezradí až posledná nápoveda).', '<b>Golden target</b> — read its magnitude and phase off the picture (the grid helps; only the last hint gives the numbers).', '<b>Золота ціль</b> — зчитай її модуль і фазу з картинки (сітка допоможе; числа дасть лише остання підказка).'), 26);
       UI.hot([3.4, 1.2, -1.6], tr(`<b>Stĺpec pravdepodobnosti</b> P = |α|² = ${Fmt.num(C.abs2(this.z), 2)}. Mení sa len s dĺžkou ručičky.`, `<b>Probability bar</b> P = |α|² = ${Fmt.num(C.abs2(this.z), 2)}. It changes only with the length of the hand.`, `<b>Стовпчик імовірності</b> P = |α|² = ${Fmt.num(C.abs2(this.z), 2)}. Змінюється лише з довжиною стрілки.`), 40);
       // stĺpec pravdepodobnosti
       const P = C.abs2(this.z);

@@ -17,7 +17,7 @@ class L11Born extends Level {
   intro() {
     this.quest(tr('Vypočuj si Maxa Borna', 'Listen to Max Born', 'Послухай Макса Борна'), { easy: tr('💬 Born', '💬 Born', '💬 Борн'), hard: tr('U organizuje možnosti · M vytvára výsledok', 'U organises possibilities · M creates the result', 'U впорядковує можливості · M створює результат') });
     this.say([DL('l11.intro.1.0'), DL('l11.intro.1.1'), DL('l11.intro.1.2')], () => {
-      this.ask({ q: DL('l11.intro.2.q'), options: [DL('l11.intro.2.options.0'), DL('l11.intro.2.options.1'), DL('l11.intro.2.options.2')], correct: 0, why: DL('l11.intro.2.why') }, () => { this.grant(['born', 'projmeas']); this.next(); });
+      this.ask(QZ('l11.intro.2'), () => { this.grant(['born', 'projmeas']); this.next(); });
     });
   }
 
@@ -31,7 +31,7 @@ class L11Born extends Level {
     this.newBox();
   }
   newBox() {
-    this.secret = rand() < 0.5 ? '+' : '-'; this.hist = null; this.flash = 0;
+    this.secret = rand() < 0.5 ? '+' : '-'; this.hist = null; this.flash = 0; this.hRun = false;
     this.r = this.secret === '+' ? [1, 0, 0] : [-1, 0, 0];
     this.quest(tr(`Krabica ${this.rounds + 1}/${this.need}: je v nej |+⟩ alebo |−⟩? Meranie v Z-báze dá v oboch prípadoch 50 : 50.`, `Box ${this.rounds + 1}/${this.need}: does it hold |+⟩ or |−⟩? A Z measurement gives 50 : 50 either way.`, `Коробка ${this.rounds + 1}/${this.need}: у ній |+⟩ чи |−⟩? Вимірювання в базисі Z в обох випадках дає 50 : 50.`),
       { easy: tr(`📦 ${this.rounds + 1}/${this.need}: |+⟩ alebo |−⟩?`, `📦 ${this.rounds + 1}/${this.need}: |+⟩ or |−⟩?`, `📦 ${this.rounds + 1}/${this.need}: |+⟩ чи |−⟩?`), hard: `${this.rounds + 1}/${this.need} · P(0) = P(1) = ½ · H|±⟩ = ?` });
@@ -51,7 +51,7 @@ class L11Born extends Level {
     const r = this.useH ? (this.secret === '+' ? [0, 0, 1] : [0, 0, -1]) : this.r, h = [0, 0];
     for (let k = 0; k < 100; k++) h[this.shot(r)]++;
     this.hist = h; this.flash = 1; Sound.sfx('glance');
-    if (this.useH) this.f.usedH = true;
+    if (this.useH) { this.f.usedH = true; this.hRun = true; }
     this.updBox();
   }
   updBox() {
@@ -59,6 +59,12 @@ class L11Born extends Level {
     this.read.innerHTML = `${tr('Obvod', 'Circuit', 'Схема')}: |?⟩ ${this.useH ? '—[H]— ' : '— '}📏 Z<br>` + (this.hist ? this.histText(this.hist) : tr('Zatiaľ nemeraná.', 'Not measured yet.', 'Ще не виміряно.'));
   }
   guessBox(g) {
+    // tip sa ráta, len keď ho podopiera dôkaz: aspoň jedno meranie tejto krabice s H pred meraním
+    if (!this.hRun) {
+      UI.toast(this.hist ? tr('Zatiaľ nemáš dôkaz: bez H sú štatistiky v Z-báze pre obe krabice rovnaké (50 : 50). Vlož H a zmeraj znova.', 'You have no evidence yet: without H the Z statistics are the same for both boxes (50 : 50). Insert H and measure again.', 'У тебе ще немає доказу: без H статистика в базисі Z однакова для обох коробок (50 : 50). Встав H і виміряй знову.')
+        : tr('Najprv krabicu zmeraj — tip bez merania nie je dôkaz.', 'Measure the box first — a guess without a measurement is not evidence.', 'Спершу виміряй коробку — здогадка без вимірювання не є доказом.'), 4200);
+      return;
+    }
     if (g !== this.secret) {
       this.mistakes++; Sound.sfx('bad');
       UI.toast(tr('Vedľa — bez H sú obe krabice v Z-báze nerozlíšiteľné. Nová krabica.', 'Wrong — without H both boxes are indistinguishable in the Z basis. A new box.', 'Не вгадав(-ла) — без H обидві коробки в базисі Z нерозрізненні. Нова коробка.'), 3200);
@@ -68,7 +74,7 @@ class L11Born extends Level {
     this.rounds++;
     if (this.rounds < this.need) return this.newBox();
     this.grant(['interfmeas']);
-    this.say([this.f.usedH ? DL('l11.phaseReveal.ok') : DL('l11.phaseReveal.lucky'), DL('l11.phaseReveal.chain')], () => this.next());
+    this.say([DL('l11.phaseReveal.ok'), DL('l11.phaseReveal.chain')], () => this.explainWhy('l11.explain', () => this.next()));
   }
 
   // ---------- 2 · meranie uprostred obvodu ----------
@@ -77,6 +83,8 @@ class L11Born extends Level {
     this.quest(tr('Spusti obvod |0⟩ → H → (meranie?) → H → meranie raz bez stredného merania a raz s ním.', 'Run the circuit |0⟩ → H → (measurement?) → H → measurement once without the middle measurement and once with it.', 'Запусти схему |0⟩ → H → (вимірювання?) → H → вимірювання раз без проміжного вимірювання і раз із ним.'),
       { easy: tr('⚡ obvod bez / so stredným meraním', '⚡ circuit without / with a mid-circuit measurement', '⚡ схема без / з проміжним вимірюванням'), hard: 'H² = I · H M H → ½ : ½ · p<sub>m</sub> = ⟨ψ|P<sub>m</sub>|ψ⟩' });
     this.buildMid();
+    // 🔮 predpoveď pre obvod so stredným meraním (uzamkne sa, vyhodnotí po oboch behoch)
+    this.lockPrediction(QZ('l11.predict'), (pr) => { this.mPred = pr; });
   }
   buildMid() {
     this.read = UI.info('');
@@ -103,9 +111,9 @@ class L11Born extends Level {
     if (this.f.ranOn && this.f.ranOff && !this.f.midDone) {
       this.f.midDone = true;
       this.grant(['midmeas']);
-      this.say([DL('l11.midCircuit.ok')], () => {
-        this.ask({ q: DL('l11.midCircuit.q.q'), options: [DL('l11.midCircuit.q.options.0'), DL('l11.midCircuit.q.options.1'), DL('l11.midCircuit.q.options.2')], correct: 0, why: DL('l11.midCircuit.q.why') }, () => this.next());
-      });
+      this.say([DL('l11.midCircuit.ok')], () => this.revealPrediction(this.mPred, () => {
+        this.ask(QZ('l11.midCircuit.q'), () => this.next());
+      }));
     }
   }
   updMid() {
@@ -185,6 +193,11 @@ class L11Born extends Level {
   }
   guessBell(s) {
     if (this.solvedB) return;
+    // tip len s dôkazom: v báze ZZ sa zdroje správajú rovnako — treba merať aj v inej báze (XX)
+    if (!this.res.some((o) => o && o.basis === 'XX')) {
+      UI.toast(tr('Zatiaľ nemáš dôkaz: v báze ZZ dávajú oba zdroje rovnaké výsledky. Zmeraj páry v báze XX.', 'No evidence yet: in the ZZ basis both sources give equal results. Measure pairs in the XX basis.', 'Доказу ще немає: у базисі ZZ обидва джерела дають однакові результати. Виміряй пари в базисі XX.'), 4200);
+      return;
+    }
     if (s !== this.bellSrc) {
       this.mistakes++; Sound.sfx('bad');
       UI.toast(tr('Nie. V báze ZZ sa oba zdroje správajú rovnako — skús inú bázu. Zdroje sa premiešali.', 'No. In the ZZ basis both sources behave the same — try another basis. The sources were reshuffled.', 'Ні. У базисі ZZ обидва джерела поводяться однаково — спробуй інший базис. Джерела перемішано.'), 3400);
@@ -193,7 +206,7 @@ class L11Born extends Level {
     this.solvedB = true; Sound.sfx('good');
     this.grant(['decoread', 'tomography']);
     this.say([DL('l11.bellReadout.ok'), DL('l11.bellReadout.nmr')], () => {
-      this.ask({ q: DL('l11.bellReadout.q.q'), options: [DL('l11.bellReadout.q.options.0'), DL('l11.bellReadout.q.options.1'), DL('l11.bellReadout.q.options.2')], correct: 0, why: DL('l11.bellReadout.q.why') }, () => this.next());
+      this.ask(QZ('l11.bellReadout.q'), () => this.next());
     });
   }
 

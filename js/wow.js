@@ -617,7 +617,7 @@ const Wow = {
     const L = Game.scene;
     if (ok) {
       const fin = L.stepIdx >= L.steps.length;
-      const N = L.boss ? DRAGON_TRAPS.length + ancientTraps(L.num).length : TRAPS[L.num].length + hardTraps(L.num).length + ancientTraps(L.num).length;
+      const N = L.boss ? DRAGON_TRAPS.length + ancientTraps(L.num).length : TRAPS[L.num].length + hardTraps(L.num).length + ancientTraps(L.num).length + Math.min(4, Object.keys(TRANSFER[L.num] || {}).length);
       const d = fin ? 0.38 / Math.max(N, 1) : 0.025;
       this.inst.bonus += d;
       this.bossFct(`${Math.round(d * 100)} %`, 'dmg');

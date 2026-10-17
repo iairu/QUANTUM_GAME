@@ -41,8 +41,9 @@ class L4Interference extends Level {
 
   pure() {
     this.mode = 'none'; this.resetHist();
-    this.ask({ q: DL('l4.pure.1.q'), options: [DL('l4.pure.1.options.0'), DL('l4.pure.1.options.1'), DL('l4.pure.1.options.2')], correct: 0,
-      why: DL('l4.pure.1.why') }, () => {
+    // 🔮 predpoveď sa uzamkne; vyhodnotí sa, až keď qubity prejdú chrámom
+    this.lockPrediction(QZ('l4.pure.1'), (pr) => {
+      this.pPred = pr;
       const n = () => byDiff(30, 50, 100);
       this.quest(() => tr(`Pošli aspoň ${n()} qubitov cez H → H (stred chrámu prázdny). Sleduj stĺpce ρ!`, `Send at least ${n()} qubits through H → H (temple centre empty). Watch the ρ bars!`, `Надішли щонайменше ${n()} кубітів крізь H → H (центр храму порожній). Стеж за стовпчиками ρ!`), {
         easy: () => tr(`📤 ${n()} qubitov · H → H`, `📤 ${n()} qubits · H → H`, `📤 ${n()} кубітів · H → H`), hard: () => `|0⟩ → H → H → M<sub>Z</sub> · N ≥ ${n()} · ρ₀₁ ?` });
@@ -52,8 +53,8 @@ class L4Interference extends Level {
 
   withMeasure() {
     this.mode = 'meas'; this.resetHist();
-    this.ask({ q: DL('l4.withMeasure.1.q'), options: [DL('l4.withMeasure.1.options.0'), DL('l4.withMeasure.1.options.1'), DL('l4.withMeasure.1.options.2')], correct: 0,
-      why: DL('l4.withMeasure.1.why') }, () => {
+    this.lockPrediction(QZ('l4.withMeasure.1'), (pr) => {
+      this.wPred = pr;
       const n = () => byDiff(30, 50, 100);
       this.quest(() => tr(`Pošli aspoň ${n()} qubitov s meraním v strede. Pozri, čo sa stane s mimodiagonálnymi stĺpcami ρ.`, `Send at least ${n()} qubits with the measurement in the centre. See what happens to the off-diagonal ρ bars.`, `Надішли щонайменше ${n()} кубітів із вимірюванням у центрі. Подивися, що станеться з позадіагональними стовпчиками ρ.`), {
         easy: () => tr(`📤 ${n()} qubitov · 👁 meranie v strede`, `📤 ${n()} qubits · 👁 measurement in the middle`, `📤 ${n()} кубітів · 👁 вимірювання посередині`), hard: () => `H → M<sub>Z</sub>(${tr('zabudnuté', 'forgotten', 'забуте')}) → H · N ≥ ${n()} · ρ₀₁ → 0` });
@@ -63,7 +64,8 @@ class L4Interference extends Level {
 
   deco() {
     this.mode = 'deco'; this.p = 0; this.phi = 0; this.resetHist();
-    this.target = byDiff(0.75, 0.75, [0.6, 0.65, 0.7, 0.8, 0.85, 0.9][Math.floor(rand() * 6)]);
+    // náhodný cieľ na každej obťažnosti (ľahká: len okrúhle hodnoty)
+    this.target = byDiff(pickR([0.6, 0.75, 0.9]), pickR([0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9]), pickR([0.6, 0.65, 0.7, 0.8, 0.85, 0.9]));
     const T = Fmt.pct(this.target), n = () => byDiff(30, 50, 100); // počet závisí od obťažnosti — prepočíta sa pri jej zmene
     this.say([
       DL('l4.deco.1.0'),
@@ -125,12 +127,12 @@ class L4Interference extends Level {
     if (this.stepIdx === 1 && !this.f.a) {
       this.f.a = true;
       this.grant(['feynman', 'coh']);
-      this.say([DL('l4.check.1')], () => this.next());
+      this.say([DL('l4.check.1')], () => this.revealPrediction(this.pPred, () => this.explainWhy('l4.explain', () => this.next())));
     } else if (this.stepIdx === 2 && !this.f.b) {
       this.f.b = true;
       this.grant(['rho', 'mix', 'supmix']);
       this.say([DL('l4.check.2.0'),
-        DL('l4.check.2.1')], () => this.next());
+        DL('l4.check.2.1')], () => this.revealPrediction(this.wPred, () => this.next()));
     } else if (this.stepIdx === 3 && !this.f.c && this.mode === 'deco' && Math.abs(this.P0() - this.target) < byDiff(0.06, 0.03, 0.015)) {
       this.f.c = true;
       // správne: p sa dosunie presne tak, aby teória dala P(0) = cieľ (pri danej fáze φ); histogram ostane

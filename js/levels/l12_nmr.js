@@ -66,7 +66,7 @@ class L12Nmr extends Level {
     UI.snapSlider(this.slNu, this.nu0);
     this.grant(['larmortune']);
     this.say([DL('l12.tune.ok', this.nu0.toFixed(3))], () => {
-      this.ask({ q: DL('l12.tune.q.q'), options: [DL('l12.tune.q.options.0'), DL('l12.tune.q.options.1'), DL('l12.tune.q.options.2')], correct: 0, why: DL('l12.tune.q.why') }, () => this.next());
+      this.ask(QZ('l12.tune.q'), () => this.next());
     });
   }
 
@@ -150,7 +150,7 @@ class L12Nmr extends Level {
         this.f.seqDone = true;
         this.grant(['fid']);
         this.say([DL('l12.sequence.ok')], () => {
-          this.ask({ q: DL('l12.sequence.q.q'), options: [DL('l12.sequence.q.options.0'), DL('l12.sequence.q.options.1'), DL('l12.sequence.q.options.2')], correct: 0, why: DL('l12.sequence.q.why') }, () => this.next());
+          this.ask(QZ('l12.sequence.q'), () => this.next());
         });
       }
     };
@@ -242,7 +242,7 @@ class L12Nmr extends Level {
       this.solvedE = true;
       this.grant(['spinecho', 'shim']);
       this.say([DL('l12.echo.ok', Fmt.pct(S)), DL('l12.echo.chain')], () => {
-        this.ask({ q: DL('l12.echo.q.q'), options: [DL('l12.echo.q.options.0'), DL('l12.echo.q.options.1'), DL('l12.echo.q.options.2')], correct: 0, why: DL('l12.echo.q.why') }, () => this.next());
+        this.ask(QZ('l12.echo.q'), () => this.next());
       });
     } else UI.toast(tr(`Signál v 10 ms je len ${Fmt.pct(S)}. Samotný shim nestačí — refokusuj izochromaty echom (180° v čase τ, echo v 2τ).`, `The signal at 10 ms is only ${Fmt.pct(S)}. Shimming alone is not enough — refocus the isochromats with an echo (180° at τ, echo at 2τ).`, `Сигнал у 10 мс лише ${Fmt.pct(S)}. Самого шиму замало — перефокусуй ізохромати відлунням (180° у τ, відлуння в 2τ).`), 3600);
   }

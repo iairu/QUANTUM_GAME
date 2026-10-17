@@ -24,7 +24,19 @@ const BLOCH_PUZZLES = [
 
 class L3Bloch extends Level {
   get steps() { return [this.intro, this.puzzles, this.measure, this.lab]; }
-  puzzleList() { return BLOCH_PUZZLES.filter((p) => !p.hard || Settings.hard); }
+  // hádanky: 1. je riešený príklad (mentor ju najprv ukáže), 2.–3. s nakreslenými osami povolených hradiel,
+  // potom samostatne a nakoniec 🎲 náhodná hádanka (prenos: tie isté hradlá, nová situácia)
+  puzzleList() { return [...BLOCH_PUZZLES.filter((p) => !p.hard || Settings.hard), this.randomPuzzle()]; }
+  randomPuzzle() {
+    const G = ['X', 'Y', 'Z', 'H', 'S'], names = Object.keys(KET_VEC), rot = (v, g) => V3.rotate(v, V3.norm(GateAxis[g][0]), GateAxis[g][1]);
+    for (let k = 0; k < 80; k++) {
+      const from = pickR(names), to = pickR(names.filter((x) => x !== from)), v0 = KET_VEC[from], vt = KET_VEC[to];
+      const d = G.some((g) => V3.dot(rot(v0, g), vt) > 0.999) ? 1 : G.some((g) => G.some((h) => V3.dot(rot(rot(v0, g), h), vt) > 0.999)) ? 2 : 0;
+      if (d === 2 || (d === 1 && rand() < 0.3)) return { from, to, gates: G, max: d, rnd: true, grant: [], msg: DL('l3.transfer.ok'),
+        title: tr(`🎲 Nová hádanka: ${KETS[from]} → ${KETS[to]}`, `🎲 A new puzzle: ${KETS[from]} → ${KETS[to]}`, `🎲 Нова головоломка: ${KETS[from]} → ${KETS[to]}`) };
+    }
+    return { from: '0', to: '-', gates: G, max: 2, rnd: true, grant: [], msg: DL('l3.transfer.ok'), title: tr('🎲 Nová hádanka: |0⟩ → |−⟩', '🎲 A new puzzle: |0⟩ → |−⟩', '🎲 Нова головоломка: |0⟩ → |−⟩') };
+  }
 
   setup() {
     this.cam = new OrbitCam([0, 0, 0], 7, 0.75, 0.32, 3.5, 14);
@@ -62,9 +74,19 @@ class L3Bloch extends Level {
       UI.row(UI.button(tr('↺ Znova', '↺ Again', '↺ Знову'), () => this.loadPuzzle(i))),
       this.readout,
       UI.info(`${tr('Povolené', 'Allowed', 'Дозволено')}: ${P.gates.join(', ')}`, 'tip'),
-      Settings.hard ? null : UI.info(tr('X, Y, Z: 180° okolo osí x, y, z · H: 180° okolo osi (x+z) · S: 90° okolo z · T: 45° okolo z', 'X, Y, Z: 180° about the x, y, z axes · H: 180° about the (x+z) axis · S: 90° about z · T: 45° about z', 'X, Y, Z: 180° навколо осей x, y, z · H: 180° навколо осі (x+z) · S: 90° навколо z · T: 45° навколо z'), 'tip'),
+      Settings.hard || (i >= 3 && !Settings.easy) ? null : UI.info(tr('X, Y, Z: 180° okolo osí x, y, z · H: 180° okolo osi (x+z) · S: 90° okolo z · T: 45° okolo z', 'X, Y, Z: 180° about the x, y, z axes · H: 180° about the (x+z) axis · S: 90° about z · T: 45° about z', 'X, Y, Z: 180° навколо осей x, y, z · H: 180° навколо осі (x+z) · S: 90° навколо z · T: 45° навколо z'), 'tip'),
     ].filter(Boolean));
     this.updReadout();
+    // riešený príklad: pri prvej hádanke mentor hradlo najprv sám použije a okomentuje rotáciu, potom to zopakuješ ty
+    if (i === 0 && !this.f.demo && !Settings.hard) {
+      this.f.demo = true;
+      this.say([DL('l3.demo.1')], () => {
+        this.demoing = true;
+        const [axis, ang] = GateAxis.X;
+        this.anim = { v0: Q.bloch(this.psi), axis: V3.norm(axis), ang, t: 0, g: 'X' };
+        this.psi = Q.apply(Gate.X, this.psi);
+      });
+    }
   }
 
   applyGate(g) {
@@ -87,15 +109,16 @@ class L3Bloch extends Level {
   onAnimDone() {
     this.updReadout();
     if (this.step === 'lab') return this.updLab();
+    if (this.demoing) { this.demoing = false; return this.say([DL('l3.demo.2')], () => this.loadPuzzle(0)); }
     const P = this.plist[this.pi];
     if (Q.fidelity(this.psi, Q.named(P.to)) > 0.999) {
       this.solved = true;
       this.grant(P.grant);
       this.say([`✅ ${P.msg}`], () => {
         if (this.pi === 2) {
-          this.ask({ q: DL('l3.onAnimDone.1.q'), options: [DL('l3.onAnimDone.1.options.0'), DL('l3.onAnimDone.1.options.1'), DL('l3.onAnimDone.1.options.2')], correct: 0,
-            why: DL('l3.onAnimDone.1.why') }, () => this.advance());
-        } else this.advance();
+          this.ask(QZ('l3.onAnimDone.1'), () => this.advance());
+        } else if (P.grant.includes('unitary')) this.explainWhy('l3.explain', () => this.advance()); // H·Z·H = X: prečo?
+        else this.advance();
       });
     } else if (this.moves >= this.maxMoves) UI.toast(tr('Ešte to nie je ono. Klikni ↺ Znova a skús iné poradie.', 'Not quite yet. Click ↺ Again and try a different order.', 'Ще не зовсім. Натисни ↺ Знову і спробуй інший порядок.'));
   }
@@ -111,9 +134,10 @@ class L3Bloch extends Level {
       + `<br>θ = ${Fmt.angle(th)}${Math.abs(Math.sin(th)) > 1e-3 ? ', φ = ' + Fmt.angle((ph + 2 * Math.PI) % (2 * Math.PI)) : ''}`
       + (this.moves !== undefined && !this.step ? `<br>${tr('Použité hradlá', 'Gates used', 'Використані гейти')}: ${this.moves}` : '');
     const P = !this.step && this.plist && this.plist[this.pi];
-    if (P && Settings.easy) {
-      const t = Q.bloch(Q.named(P.to)), tth = Math.acos(clamp(t[2], -1, 1)), tph = (Math.atan2(t[1], t[0]) + 2 * Math.PI) % (2 * Math.PI);
-      this.readout.innerHTML += `<br><small>💡 ${tr('cieľ', 'target', 'ціль')}: θ = ${Fmt.angle(tth)}${Math.abs(Math.sin(tth)) > 1e-3 ? ', φ = ' + Fmt.angle(tph) : ''}</small>`;
+    if (P && Settings.easy) { // ľahká: kde cieľ leží (smer), nie jeho čísla
+      const t = Q.bloch(Q.named(P.to)), where = t[2] > 0.99 ? tr('severný pól', 'the north pole', 'північний полюс') : t[2] < -0.99 ? tr('južný pól', 'the south pole', 'південний полюс')
+        : tr(`rovník, smerom k osi ${t[0] > 0.9 ? '+x' : t[0] < -0.9 ? '−x' : t[1] > 0 ? '+y' : '−y'}`, `the equator, towards the ${t[0] > 0.9 ? '+x' : t[0] < -0.9 ? '−x' : t[1] > 0 ? '+y' : '−y'} axis`, `екватор, у напрямку осі ${t[0] > 0.9 ? '+x' : t[0] < -0.9 ? '−x' : t[1] > 0 ? '+y' : '−y'}`);
+      this.readout.innerHTML += `<br><small>💡 ${tr('cieľ leží na', 'the target lies on', 'ціль лежить на')}: ${where}</small>`;
     }
   }
 
@@ -125,10 +149,11 @@ class L3Bloch extends Level {
       easy: tr('📏 Meraj |+⟩: 1× a 100×', '📏 Measure |+⟩: 1× and 100×', '📏 Виміряй |+⟩: 1× і 100×'),
       hard: tr('|+⟩ → M<sub>Z</sub> ×1, ×100 · porovnaj s |+i⟩', '|+⟩ → M<sub>Z</sub> ×1, ×100 · compare with |+i⟩', '|+⟩ → M<sub>Z</sub> ×1, ×100 · порівняй із |+i⟩'),
     });
+    // 🔮 najprv predpoveď pre 100 kópií (uzamkne sa), vyhodnotí sa po meraní
     this.say([
       DL('l3.measure.1.0'),
       DL('l3.measure.1.1'),
-    ]);
+    ], () => this.lockPrediction(QZ('l3.predict'), (pr) => { this.mPred = pr; }));
     this.readout = UI.info('');
     UI.panelSet(tr('Meranie v Z-báze', 'Measurement in the Z basis', 'Вимірювання в базисі Z'), [
       UI.row(UI.button(tr('Priprav |+⟩', 'Prepare |+⟩', 'Приготувати |+⟩'), () => { this.psi = Q.named('+'); this.updReadout(); }), UI.button(tr('Priprav |+i⟩', 'Prepare |+i⟩', 'Приготувати |+i⟩'), () => { this.psi = Q.named('+i'); this.updReadout(); })),
@@ -155,8 +180,7 @@ class L3Bloch extends Level {
   checkMeasure() {
     if (!(this.f.m1 && this.f.m100) || this.f.mdone) return;
     this.f.mdone = true;
-    this.ask({ q: DL('l3.checkMeasure.1.q'), options: [DL('l3.checkMeasure.1.options.0'), DL('l3.checkMeasure.1.options.1'), DL('l3.checkMeasure.1.options.2')], correct: 0,
-      why: DL('l3.checkMeasure.1.why') }, () => this.next());
+    this.revealPrediction(this.mPred, () => this.ask(QZ('l3.checkMeasure.1'), () => this.next()));
   }
 
   // ---------- geometrické laboratórium (voľné skúmanie) ----------
@@ -185,8 +209,8 @@ class L3Bloch extends Level {
         UI.slider(tr('os n: θ<sub>n</sub>', 'axis n: θ<sub>n</sub>', 'вісь n: θ<sub>n</sub>'), 0, 180, 15, L.nth, (v) => { L.nth = v; return deg(v); }),
         UI.slider(tr('os n: φ<sub>n</sub>', 'axis n: φ<sub>n</sub>', 'вісь n: φ<sub>n</sub>'), 0, 345, 15, L.nph, (v) => { L.nph = v; return deg(v); }),
         UI.slider(tr('uhol α', 'angle α', 'кут α'), -180, 180, 15, L.ang, (v) => { L.ang = v; return deg(v); }, tr('Kladný uhol = proti smeru hodinových ručičiek pri pohľade z hrotu osi n.', 'Positive angle = counter-clockwise when looking from the tip of n.', 'Додатний кут = проти годинникової стрілки, якщо дивитися з вістря n.')),
-        UI.button(tr('↻ Otoč', '↻ Rotate', '↻ Повернути'), () => { const a = L.ang * Math.PI / 180; this.rotate(this.labN(), a, Gate.R(this.labN(), a), 'n'); }, 'big'),
-        UI.row(...['X', 'Y', 'Z', 'H', 'S', 'T'].map((g) => UI.button(g, () => this.applyGate(g), 'gate'))),
+        UI.button(tr('↻ Otoč', '↻ Rotate', '↻ Повернути'), () => { const a = L.ang * Math.PI / 180; if (a) { this.f.labR = true; this.updLabGate(); } this.rotate(this.labN(), a, Gate.R(this.labN(), a), 'n'); }, 'big'),
+        UI.row(...['X', 'Y', 'Z', 'H', 'S', 'T'].map((g) => UI.button(g, () => { this.f.labR = true; this.updLabGate(); this.applyGate(g); }, 'gate'))),
       ], true),
       det(tr('3 · Meranie pozdĺž osi m', '3 · Measurement along the axis m', '3 · Вимірювання вздовж осі m'), [
         UI.slider(tr('os m: θ<sub>m</sub>', 'axis m: θ<sub>m</sub>', 'вісь m: θ<sub>m</sub>'), 0, 180, 15, L.mth, (v) => { L.mth = v; this.updLab(); return deg(v); }),
@@ -194,12 +218,22 @@ class L3Bloch extends Level {
         UI.row(UI.button(tr('Meraj 1×', 'Measure 1×', 'Виміряти 1×'), () => this.labMeasure(1)), UI.button(tr('Meraj 100 kópií', 'Measure 100 copies', 'Виміряти 100 копій'), () => this.labMeasure(100))),
         this.labInfo, this.labChart,
       ], true),
-      UI.button(tr('Pokračovať na záverečnú skúšku ▸', 'Continue to the final exam ▸', 'Перейти до підсумкового іспиту ▸'), () => this.next(), 'primary'),
+      this.labGo = UI.button(tr('Pokračovať na záverečnú skúšku ▸', 'Continue to the final exam ▸', 'Перейти до підсумкового іспиту ▸'), () => { if (this.f.labR && this.f.labM) this.next(); }, 'primary',
+        tr('Najprv aspoň raz otoč stav a raz zmeraj pozdĺž osi, ktorá nie je z.', 'First rotate the state at least once and measure once along an axis that is not z.', 'Спершу хоча б раз поверни стан і раз виміряй уздовж осі, що не є z.')),
+      this.labNeed = UI.info('', 'tip'),
     ]);
+    this.updLabGate();
     this.updReadout(); this.updLab();
+  }
+  // laboratórium sa nedá preskočiť: pokračovať možno až po jednej rotácii a jednom meraní mimo osi z
+  updLabGate() {
+    if (!this.labGo) return;
+    this.labGo.disabled = !(this.f.labR && this.f.labM);
+    this.labNeed.innerHTML = `${this.f.labR ? '✅' : '⬜'} ${tr('otoč stav (krok 2)', 'rotate the state (step 2)', 'поверни стан (крок 2)')} · ${this.f.labM ? '✅' : '⬜'} ${tr('zmeraj pozdĺž osi m ≠ z (krok 3)', 'measure along an axis m ≠ z (step 3)', 'виміряй уздовж осі m ≠ z (крок 3)')}`;
   }
   labMeasure(n) {
     if (this.anim) return;
+    if (this.L.mth % 180 !== 0) { this.f.labM = true; this.updLabGate(); }
     const m = this.labM(), p = Q.probAlong(Q.bloch(this.psi), m);
     if (n === 1) {
       const plus = rand() < p, a = this.L.mth * Math.PI / 180, b = this.L.mph * Math.PI / 180;
@@ -248,6 +282,15 @@ class L3Bloch extends Level {
       const ax = qToWorld(this.anim.axis);
       r.rod(V3.scale(ax, -2.6), V3.scale(ax, 2.6), [1, 1, 0.5], 0.02, { emissive: 0.6 });
       UI.label('gate', V3.scale(ax, 2.9), tr('os ', 'axis ', 'вісь ') + this.anim.g, 'prompt');
+    }
+    if (P && !this.anim && this.pi >= 1 && this.pi <= 2 && !Settings.hard) { // čiastočná pomoc: osi povolených hradiel
+      const seen = new Set();
+      for (const g of P.gates) {
+        const ax = qToWorld(V3.norm(GateAxis[g][0])), k = ax.map((x) => x.toFixed(2)).join();
+        if (seen.has(k)) continue; seen.add(k);
+        r.dash(V3.scale(ax, -2.5), V3.scale(ax, 2.5), [1, 1, 0.5], { alpha: 0.55 });
+        UI.label('pax' + g, V3.scale(ax, 2.75), P.gates.filter((h) => GateAxis[h][0].join() === GateAxis[g][0].join()).join(', '), 'axis', tr('Os rotácie povolených hradiel.', 'Rotation axis of the allowed gates.', 'Вісь обертання дозволених гейтів.'));
+      }
     }
     Bloch.draw(r, [0, 0, 0], 2, v, { target: P ? Q.bloch(Q.named(P.to)) : null, trail: this.trail, labelFn: UI.label.bind(UI), key: 'b', axisNames: true, bars: true });
     if (this.step === 'lab') { // os rotácie n (žltá, prerušovaná) a os merania m (zelená)

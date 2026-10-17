@@ -481,9 +481,8 @@ class L0Symbols extends Level {
       UI.quizSeries(list, (m) => {
         this.mistakes += m;
         const total = list.length + this.ex.length * 2, k = this.mistakes / total;
-        const stars = byDiff(k <= 0.1 ? 3 : k <= 0.25 ? 2 : 1, k <= 0.05 ? 3 : k <= 0.15 ? 2 : 1, k === 0 ? 3 : k <= 0.08 ? 2 : 1);
-        Game.completeLevel(0, stars);
-        const rating = '★'.repeat(stars) + '☆'.repeat(3 - stars);
+        const res = Learn.finish(this, byDiff(k <= 0.1 ? 3 : k <= 0.25 ? 2 : 1, k <= 0.05 ? 3 : k <= 0.15 ? 2 : 1, k === 0 ? 3 : k <= 0.08 ? 2 : 1));
+        const rating = res.reviewed ? '📖' : '★'.repeat(res.stars) + '☆'.repeat(3 - res.stars);
         this.say([DL('l0.finale.done', rating, this.mistakes, total)], () => Game.backToHub());
       }));
   }

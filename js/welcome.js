@@ -23,8 +23,8 @@ const DIFF_TAG = {
 };
 // „normálna“ má v nastaveniach len krátky popis; tu ju treba porovnať s ostatnými
 const WELCOME_DESC = {
-  normal: tr('pôvodná hra: štandardné tolerancie, počet pokusov aj hviezdičky — presne medzi ľahkou a ťažkou; pred každou úlohou najprv doplníš chýbajúce časti jej rovnice; rovnice v klasickej sadzbe bez farieb a glyfov',
-    'the original game: standard tolerances, number of trials and stars — right between easy and hard; before every task you first fill in the missing parts of its equation; equations in classic type without colours or glyphs', 'оригінальна гра: стандартні допуски, кількість спроб і зірки — рівно посередині між легкою та складною; перед кожним завданням спершу доповниш пропущені частини його рівняння; рівняння класичним шрифтом без кольорів і гліфів'),
+  normal: tr('pôvodná hra: štandardné tolerancie, počet pokusov aj hviezdičky — presne medzi ľahkou a ťažkou; po každej úlohe doplníš chýbajúce časti rovnice, ktorú si práve videl(a); rovnice v klasickej sadzbe bez farieb a glyfov',
+    'the original game: standard tolerances, number of trials and stars — right between easy and hard; after every task you fill in the missing parts of the equation you just saw; equations in classic type without colours or glyphs', 'оригінальна гра: стандартні допуски, кількість спроб і зірки — рівно посередині між легкою та складною; після кожного завдання доповниш пропущені частини рівняння, яке щойно побачив(-ла); рівняння класичним шрифтом без кольорів і гліфів'),
   layman: tr('ľahká, ale všetko bežnými slovami: pred každou úlohou vysvetlenie „po ľudsky“, odborné slová s prekladom v zátvorke, jednoduché vysvetlivky; rovnice sa ukážu hneď — bez kvízov „doplň rovnicu“',
     'easy, but everything in everyday words: a plain-language explanation before every task, technical words translated in brackets, simple tooltips; equations are shown right away — no “complete the equation” quizzes',
     'легка, але все звичайними словами: перед кожним завданням пояснення «по-людськи», фахові слова з перекладом у дужках, прості підказки; рівняння показуються одразу — без вікторин «доповни рівняння»'),

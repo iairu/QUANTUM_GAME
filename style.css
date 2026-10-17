@@ -900,3 +900,17 @@ html[data-theme="menu"] .lbl.portal.menu { min-width: 150px; max-width: 205px; w
 html[data-theme="menu"] .lbl.portal.menu.hover { border-color: var(--accent); box-shadow: 0 0 14px rgba(95, 227, 255, 0.45); }
 body.c-ptr #gl { cursor: pointer; }
 #welcome .wdlrow { margin-top: 14px; } /* medzera medzi riadkom histórie a dialógov */
+
+/* ---------- učenie (js/learn.js): sebadôvera, predpovede, ciele, precvičovanie ---------- */
+.choice.sel { border-color: var(--accent); background: rgba(95, 227, 255, 0.14); opacity: 1 !important; }
+#dialog .conf { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 10px; font-size: 13px; }
+#dialog .conf span { color: var(--muted); margin-right: 4px; }
+#dialog .conf .confb { padding: 5px 10px; font-size: 13px; }
+#dialog .calib { margin-top: 6px; font-size: 13px; color: var(--muted); }
+.why.lock { background: rgba(185, 140, 255, 0.14); }
+ul.goals { margin: 6px 0 4px 0; padding: 0; list-style: none; }
+ul.goals li { margin: 3px 0; line-height: 1.4; }
+#tip .pgoals ul.goals { font-size: 0.95em; }
+#tip .pgoals { margin: 6px 0 4px; }
+.card button.testme { margin-top: 8px; font-size: 12px; padding: 4px 9px; }
+.card.drillcard .sym { font-size: 22px; }

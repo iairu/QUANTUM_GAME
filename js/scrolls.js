@@ -129,17 +129,17 @@ const SCROLLS = [
 
 // jedna otázka z histórie na konci každého levelu (pri zapnutých historických zvitkoch)
 const TRAPS_ANCIENT = {
-  1: { q: DL('traps.ancient.1.q'), options: [DL('traps.ancient.1.options.0'), DL('traps.ancient.1.options.1'), DL('traps.ancient.1.options.2')], correct: 0, why: DL('traps.ancient.1.why') },
-  2: { q: DL('traps.ancient.2.q'), options: [DL('traps.ancient.2.options.0'), DL('traps.ancient.2.options.1'), DL('traps.ancient.2.options.2')], correct: 0, why: DL('traps.ancient.2.why') },
-  3: { q: DL('traps.ancient.3.q'), options: [DL('traps.ancient.3.options.0'), DL('traps.ancient.3.options.1'), DL('traps.ancient.3.options.2')], correct: 0, why: DL('traps.ancient.3.why') },
-  4: { q: DL('traps.ancient.4.q'), options: [DL('traps.ancient.4.options.0'), DL('traps.ancient.4.options.1'), DL('traps.ancient.4.options.2')], correct: 0, why: DL('traps.ancient.4.why') },
-  5: { q: DL('traps.ancient.5.q'), options: [DL('traps.ancient.5.options.0'), DL('traps.ancient.5.options.1'), DL('traps.ancient.5.options.2')], correct: 0, why: DL('traps.ancient.5.why') },
-  6: { q: DL('traps.ancient.6.q'), options: [DL('traps.ancient.6.options.0'), DL('traps.ancient.6.options.1'), DL('traps.ancient.6.options.2')], correct: 0, why: DL('traps.ancient.6.why') },
-  7: { q: DL('traps.ancient.7.q'), options: [DL('traps.ancient.7.options.0'), DL('traps.ancient.7.options.1'), DL('traps.ancient.7.options.2')], correct: 0, why: DL('traps.ancient.7.why') },
-  8: { q: DL('traps.ancient.8.q'), options: [DL('traps.ancient.8.options.0'), DL('traps.ancient.8.options.1'), DL('traps.ancient.8.options.2')], correct: 0, why: DL('traps.ancient.8.why') },
-  9: { q: DL('traps.ancient.9.q'), options: [DL('traps.ancient.9.options.0'), DL('traps.ancient.9.options.1'), DL('traps.ancient.9.options.2')], correct: 0, why: DL('traps.ancient.9.why') },
-  10: { q: DL('traps.ancient.10.q'), options: [DL('traps.ancient.10.options.0'), DL('traps.ancient.10.options.1'), DL('traps.ancient.10.options.2')], correct: 0, why: DL('traps.ancient.10.why') },
-  11: { q: DL('traps.ancient.11.q'), options: [DL('traps.ancient.11.options.0'), DL('traps.ancient.11.options.1'), DL('traps.ancient.11.options.2')], correct: 0, why: DL('traps.ancient.11.why') },
+  1: QZ('traps.ancient.1'),
+  2: QZ('traps.ancient.2'),
+  3: QZ('traps.ancient.3'),
+  4: QZ('traps.ancient.4'),
+  5: QZ('traps.ancient.5'),
+  6: QZ('traps.ancient.6'),
+  7: QZ('traps.ancient.7'),
+  8: QZ('traps.ancient.8'),
+  9: QZ('traps.ancient.9'),
+  10: QZ('traps.ancient.10'),
+  11: QZ('traps.ancient.11'),
 };
 
 function scrollFor(num, step) { return Settings.scrolls ? SCROLLS.filter((s) => s.level === num && s.step === step) : []; }

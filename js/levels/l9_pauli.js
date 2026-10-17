@@ -46,7 +46,7 @@ class L9Pauli extends Level {
   intro() {
     this.quest(tr('Vypočuj si Wolfganga Pauliho', 'Listen to Wolfgang Pauli', 'Послухай Вольфганга Паулі'), { easy: tr('💬 Pauli', '💬 Pauli', '💬 Паулі'), hard: tr('|ψ⟩ ↔ (θ, φ) ↔ r · U ↔ R', '|ψ⟩ ↔ (θ, φ) ↔ r · U ↔ R', '|ψ⟩ ↔ (θ, φ) ↔ r · U ↔ R') });
     this.say([DL('l9.intro.1.0'), DL('l9.intro.1.1'), DL('l9.intro.1.2'), DL('l9.intro.1.3')], () => {
-      this.ask({ q: DL('l9.intro.2.q'), options: [DL('l9.intro.2.options.0'), DL('l9.intro.2.options.1'), DL('l9.intro.2.options.2')], correct: 0, why: DL('l9.intro.2.why') }, () => {
+      this.ask(QZ('l9.intro.2'), () => {
         this.grant(['pauli', 'notphysball']);
         this.next();
       });
@@ -54,7 +54,15 @@ class L9Pauli extends Level {
   }
 
   // ---------- 1 · súradnice θ, φ ----------
-  coordList() { return PAULI_COORDS.filter((c) => (!c.hard || Settings.hard) && (!c.normal || !Settings.easy)); }
+  // pevné ciele + 🎲 jeden náhodný na konci (prenos: stav zapísaný vzorcom, uhly treba vyčítať samostatne)
+  coordList() { return [...PAULI_COORDS.filter((c) => (!c.hard || Settings.hard) && (!c.normal || !Settings.easy)), this.randomCoord()]; }
+  randomCoord() {
+    if (this.sub.rc) return this.sub.rc;
+    const [th, ph] = Settings.easy ? pickR([[90, 90], [90, 180], [0, 0], [90, 270]]) : [pickR([45, 90, 135]), pickR([0, 45, 90, 135, 180, 225, 270, 315])];
+    const ket = th === 90 && ph % 90 === 0 ? `(|0⟩ ${['+', '+ i', '−', '− i'][ph / 90]}|1⟩)/√2` : th === 0 ? '|0⟩'
+      : `cos(${piStr(th / 2)})|0⟩ + e<sup>i${piStr(ph)}</sup> sin(${piStr(th / 2)})|1⟩`;
+    return (this.sub.rc = { ket: '🎲 ' + ket, th, ph, rnd: true });
+  }
   coords() { this.stage = 'coords'; this.clist = this.coordList(); this.loadCoord(Math.min(this.sub.ci || 0, this.clist.length - 1)); }
   loadCoord(i) {
     this.ci = i; this.sub.ci = i;
@@ -138,7 +146,7 @@ class L9Pauli extends Level {
         this.solved = true; this.r = P.to.slice();
         if (this.slAng) UI.snapSlider(this.slAng, this.ang, false); // bez animácie: ďalšia úloha nastaví vlastný uhol
         this.say([DL('l9.rotations.' + P.key)], () => {
-          if (P.key === 'r1') this.ask({ q: DL('l9.rotations.q1.q'), options: [DL('l9.rotations.q1.options.0'), DL('l9.rotations.q1.options.1'), DL('l9.rotations.q1.options.2')], correct: 0, why: DL('l9.rotations.q1.why') }, () => this.advRot());
+          if (P.key === 'r1') this.ask(QZ('l9.rotations.q1'), () => this.advRot());
           else this.advRot();
         });
       } else if (this.moves >= this.maxMoves) UI.toast(tr('Ešte to nie je ono — ↺ Znova a skús inú os alebo uhol.', 'Not quite — ↺ Again and try another axis or angle.', 'Ще не те — ↺ Знову і спробуй іншу вісь або кут.'));
@@ -202,7 +210,7 @@ class L9Pauli extends Level {
       UI.snapSlider(this.slGuess, this.sub.ph);
       this.grant(['phitomo']);
       this.say([DL('l9.measureAxis.ok', this.sub.ph, Fmt.num(Math.cos(this.sub.th * D2R) / 2, 2))], () => {
-        this.ask({ q: DL('l9.measureAxis.q.q'), options: [DL('l9.measureAxis.q.options.0'), DL('l9.measureAxis.q.options.1'), DL('l9.measureAxis.q.options.2')], correct: 0, why: DL('l9.measureAxis.q.why') }, () => this.next());
+        this.ask(QZ('l9.measureAxis.q'), () => this.next());
       });
     } else {
       this.mistakes++; Sound.sfx('bad');
@@ -264,7 +272,7 @@ class L9Pauli extends Level {
         this.say([DL('l9.unitaryVsDeco.done.0'), DL('l9.unitaryVsDeco.done.1')], () => {
           this.bell = true;
           this.say([DL('l9.unitaryVsDeco.bell')], () => {
-            this.ask({ q: DL('l9.unitaryVsDeco.q.q'), options: [DL('l9.unitaryVsDeco.q.options.0'), DL('l9.unitaryVsDeco.q.options.1'), DL('l9.unitaryVsDeco.q.options.2')], correct: 0, why: DL('l9.unitaryVsDeco.q.why') }, () => this.next());
+            this.ask(QZ('l9.unitaryVsDeco.q'), () => this.next());
           });
         });
       }

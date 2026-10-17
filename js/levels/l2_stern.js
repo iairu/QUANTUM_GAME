@@ -31,8 +31,7 @@ class L2Stern extends Level {
       const need = byDiff(30, 50, 80);
       if (this.f.s1 || this.seen.q < need || this.seen.c < need) return;
       this.f.s1 = true;
-      this.ask({ q: DL('l2.twoSpots.1.q'), options: [DL('l2.twoSpots.1.options.0'), DL('l2.twoSpots.1.options.1'), DL('l2.twoSpots.1.options.2')], correct: 0,
-        why: DL('l2.twoSpots.1.why') }, () => {
+      this.ask(QZ('l2.twoSpots.1'), () => {
         this.grant(['stern', 'gerlach', 'Sz', 'hbar', 'spinhalf']);
         this.say([
           { who: DL('l2.twoSpots.2.0.who'), face: '🧲', text: DL('l2.twoSpots.2.0.text') },
@@ -58,8 +57,7 @@ class L2Stern extends Level {
       if (sig === 'z+|x+|z' && tot >= need && !this.f.B) { this.f.B = true; UI.toast(tr(`✅ Zostava B: hore ${Fmt.pct(this.cnt.up / tot)} — znova 50/50!`, `✅ Setup B: up ${Fmt.pct(this.cnt.up / tot)} — 50/50 again!`, `✅ Схема B: угору ${Fmt.pct(this.cnt.up / tot)} — знову 50/50!`)); }
       if (this.f.A && this.f.B && !this.f.s2) {
         this.f.s2 = true;
-        setTimeout(() => this.ask({ q: DL('l2.sequences.2.q'), options: [DL('l2.sequences.2.options.0'), DL('l2.sequences.2.options.1'), DL('l2.sequences.2.options.2')], correct: 0,
-          why: DL('l2.sequences.2.why') }, () => {
+        setTimeout(() => this.ask(QZ('l2.sequences.2'), () => {
           this.grant(['basisq', 'ket0']);
           this.next();
         }), 600);
@@ -70,24 +68,23 @@ class L2Stern extends Level {
 
   // ---------- úloha 3: predpoveď ----------
   predict() {
-    const a = byDiff(60, 60, [30, 45, 120, 135][Math.floor(rand() * 4)]), p = Math.cos(a * Math.PI / 360) ** 2;
-    this.hideTheory = true; // teória v paneli by prezradila odpoveď
+    // náhodný uhol na každej obťažnosti (pri opakovaní levelu nová predpoveď, nie spomienka na číslo)
+    if (this.sub.a == null) this.sub.a = byDiff(pickR([60, 90, 120]), pickR([30, 45, 60, 90, 120, 135]), pickR([30, 45, 120, 135, 150]));
+    const a = this.sub.a, p = Math.cos(a * Math.PI / 360) ** 2, sigA = `z+|${a === 90 ? 'x' : a + '°'}`;
+    this.hideTheory = true; // teória v paneli by prezradila odpoveď — ostane skrytá až do vyhodnotenia
     this.preset([['z', '+'], [a, 'none'], null]);
     this.quest(tr(`Predpovedz výsledok a over ho: druhý magnet je otočený o ${a}°.`, `Predict the result and test it: the second magnet is rotated by ${a}°.`, `Передбач результат і перевір його: другий магніт повернуто на ${a}°.`), { easy: tr(`🤔 Tipni: magnet ${a}°`, `🤔 Guess: magnet ${a}°`, `🤔 Вгадай: магніт ${a}°`), hard: `P(+ | +z, ${a}°) = ?` });
-    const pc = (x) => Fmt.pct(x), opts = [p, 1 - p, 0.5, 1].map((x) => tr(`približne ${pc(x)}`, `about ${pc(x)}`, `приблизно ${pc(x)}`));
-    this.ask({
-      q: DL('l2.predict.1', a),
-      options: opts, correct: 0,
-      why: DL('l2.predict.2', a, pc(p)),
-    }, () => {
-      this.hideTheory = false; this.updStats();
+    const pc = (x) => Fmt.pct(x), opts = optsOf(pc(p), [pc(1 - p), pc(0.5), pc(1), pc(Math.cos(a * Math.PI / 180) ** 2), pc(0)]).map((x) => tr(`približne ${x}`, `about ${x}`, `приблизно ${x}`));
+    // 🔮 predpoveď sa uzamkne bez vyhodnotenia; správnosť ukáže až pokus
+    this.lockPrediction({ id: 'l2.predict', q: DL('l2.predict.1', a), options: opts, correct: 0, why: DL('l2.predict.2', a, pc(p)) }, (pr) => {
       const need = () => byDiff(60, 100, 200);
-      this.quest(() => tr(`Over predpoveď: na tienidlo musí dopadnúť aspoň ${need()} atómov (cos²(${a}°/2) = ${pc(p)}).`, `Test the prediction: at least ${need()} atoms must reach the screen (cos²(${a}°/2) = ${pc(p)}).`, `Перевір передбачення: на екран має потрапити щонайменше ${need()} атомів (cos²(${a}°/2) = ${pc(p)}).`), { easy: () => tr(`🔫 ${need()} atómov`, `🔫 ${need()} atoms`, `🔫 ${need()} атомів`), hard: () => `N ≥ ${need()} · cos²(${a}°/2)` });
+      this.quest(() => tr(`Over predpoveď: na tienidlo musí dopadnúť aspoň ${need()} atómov.`, `Test the prediction: at least ${need()} atoms must reach the screen.`, `Перевір передбачення: на екран має потрапити щонайменше ${need()} атомів.`), { easy: () => tr(`🔫 ${need()} atómov`, `🔫 ${need()} atoms`, `🔫 ${need()} атомів`), hard: () => `N ≥ ${need()} · P(+) = ?` });
       this.check = () => {
         const tot = this.cnt.up + this.cnt.down;
-        if (this.sig() === `z+|${a}°` && tot >= byDiff(60, 100, 200) && !this.f.s3) {
+        if (this.sig() === sigA && tot >= byDiff(60, 100, 200) && !this.f.s3) {
           this.f.s3 = true;
-          this.say([{ who: DL('l2.predict.3'), face: '🧲', text: DL('l2.predict.4', Fmt.pct(this.cnt.up / tot), pc(p)) }], () => this.next());
+          this.hideTheory = false; this.updStats();
+          this.say([{ who: DL('l2.predict.3'), face: '🧲', text: DL('l2.predict.4', Fmt.pct(this.cnt.up / tot), pc(p)) }], () => this.revealPrediction(pr, () => this.next()));
         }
       };
     });

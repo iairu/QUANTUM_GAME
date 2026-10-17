@@ -22,15 +22,19 @@ class Level {
     this.stepIdx = -1; this.mistakes = 0; this.t = 0; this.sub = {}; this.seenScrolls = new Set(); this.theoryOpen = false; // 📐 teória pri vstupe zbalená
     Game.r.fog = 0;
     this.setup();
+    Learn.begin(this);
     if (resume) {
       this.stepIdx = Math.max(-1, (resume.step | 0) - 1);
       this.mistakes = resume.mistakes | 0;
       this.sub = resume.sub || {};
       this.keepSub = true;
+      Learn.restore(this, resume.lrn);
+      this.resuming = true; // predchádzajúci krok bol hotový už pred znovunačítaním — jeho doplňovačky sa nepýtajú znova
     }
     UI.setHud(`${this.num} · ${this.title}`, '');
     Settings.wow && this.num > 0 && Wow.onEnterLevel(this); // Sieň symbolov (level 0) nie je inštancia s bossom
-    this.next();
+    // nový vstup: ✨ rozcvička z iných levelov, 🎯 ciele levelu, rozohrievacie otázky (prvý raz) — potom prvý krok
+    if (resume) this.next(); else Learn.intro(this, () => this.next());
   }
   exit() { UI.panelHide(); }
   setup() {}
@@ -47,38 +51,47 @@ class Level {
   }
   request() { if (this.questArgs) this.quest(...this.questArgs); }
   next() {
+    const prev = this.resuming ? null : this.steps[this.stepIdx]; // krok, ktorý sa práve dokončil
+    this.resuming = false;
+    if (prev) return this.afterStep(prev.name, () => this.advanceStep());
+    this.advanceStep();
+  }
+  // po kroku: ∑ doplň rovnicu k vzťahu, ktorý hráč práve videl (normálna a ťažká), potom historický zvitok ako odmena
+  afterStep(name, done) {
+    Learn.taskDone(this, name);
+    const blanks = this.seenScrolls.has('blank:' + name) ? [] : EqBlanks.for(this.num, name).map((q) => ({ who: this.mentor, face: this.face, ...q, lvl: this.num, step: name }));
+    this.seenScrolls.add('blank:' + name);
+    const scrolls = () => {
+      const sc = scrollFor(this.num, name).filter((x) => !this.seenScrolls.has(x.id));
+      sc.forEach((x) => { this.seenScrolls.add(x.id); Game.unlockScroll(x.id); });
+      const cards = sc.map((x) => ({ who: `${tr('Historický zvitok', 'Historic scroll', 'Історичний сувій')} · ${pick(x.title)}`, face: '📜', text: scrollHtml(x), raw: true, cls: 'scroll' }));
+      cards.length ? UI.say(cards, done) : done();
+    };
+    if (!blanks.length) return scrolls();
+    UI.blankSeries(blanks, (m) => { this.mistakes += m; scrolls(); });
+  }
+  advanceStep() {
     this.stepIdx++;
     if (!this.keepSub) this.sub = {}; // sub = rozpracovaný stav kroku (napr. číslo hádanky), ukladá sa
     this.keepSub = false;
     Game.save();
     Settings.wow && this.num > 0 && Wow.onStep(this); // MMO: dokončený krok = zásah bossa
+    if (this.lrn) this.lrn.stepT = performance.now();
     const s = this.steps[this.stepIdx], run = () => (s ? s.call(this) : this.finale()), name = s ? s.name : 'finale';
     const pre = [];
     if (Settings.glyphs && !Game.progress.eqIntroSeen) pre.push(...Game.eqIntroLines()); // mnemotechnika sa ešte nepredstavila (prepnuté počas rozhovoru)
-    // ∑ doplň rovnicu (normálna a ťažká, v oboch typoch hry): rovnica kroku sa neprezradí hneď — hráč najprv doplní
-    // jej chýbajúce časti z ponuky; ľahká a laická kvíz preskočia a rovnicu ukážu rovno
-    const blanks = this.seenScrolls.has('blank:' + name) ? [] : EqBlanks.for(this.num, name);
-    this.seenScrolls.add('blank:' + name);
-    // až potom: denník (rovnica úlohy v oboch typoch hry, aj do Kódexu → ∑ Rovnice) a pri „Jazyku rovníc“ karta s celou rovnicou
-    const reveal = () => {
-      const eqHtml = EqM.eqFor(this.num, name);
-      if (eqHtml && !this.seenScrolls.has('eqlog:' + name)) { this.seenScrolls.add('eqlog:' + name); UI.record({ kind: 'eq', html: eqHtml }); Game.progress.eqs.add(this.num + ':' + name); }
-      const cards = Settings.eq && !this.seenScrolls.has('eq:' + name) ? EqM.cardsFor(this.num, name, blanks.length > 0) : [];
-      this.seenScrolls.add('eq:' + name);
-      cards.length ? UI.say(cards, run) : run();
-    };
-    const quiz = () => (blanks.length ? UI.blankSeries(blanks.map((q) => ({ who: this.mentor, face: this.face, ...q })), (m) => { this.mistakes += m; reveal(); }) : reveal());
+    // denník (rovnica úlohy v oboch typoch hry, aj do Kódexu → ∑ Rovnice) a pri „Jazyku rovníc“ karta s rovnicou úlohy
+    const eqHtml = EqM.eqFor(this.num, name);
+    if (eqHtml && !this.seenScrolls.has('eqlog:' + name)) { this.seenScrolls.add('eqlog:' + name); UI.record({ kind: 'eq', html: eqHtml }); Game.progress.eqs.add(this.num + ':' + name); }
+    if (Settings.eq && !this.seenScrolls.has('eq:' + name)) pre.push(...EqM.cardsFor(this.num, name, false));
+    this.seenScrolls.add('eq:' + name);
     // laická obťažnosť: pred krokom ho sprievodkyňa vysvetlí bežnými slovami
     if (Settings.layman && !this.seenScrolls.has('plain:' + name)) {
       this.seenScrolls.add('plain:' + name);
       pre.push(...this.plainCards(name));
     }
-    // historické zvitky (nastavenie): pred krokom sa rozvinie zvitok s históriou
-    const sc = scrollFor(this.num, name).filter((x) => !this.seenScrolls.has(x.id));
-    sc.forEach((x) => { this.seenScrolls.add(x.id); Game.unlockScroll(x.id); });
-    pre.push(...sc.map((x) => ({ who: `${tr('Historický zvitok', 'Historic scroll', 'Історичний сувій')} · ${pick(x.title)}`, face: '📜', text: scrollHtml(x), raw: true, cls: 'scroll' })));
-    if (!pre.length) return quiz();
-    UI.say(pre, quiz);
+    if (!pre.length) return run();
+    UI.say(pre, run);
   }
   // karty „po ľudsky“ (laická obťažnosť) ku kroku
   plainCards(name) {
@@ -97,20 +110,35 @@ class Level {
     const who = (t) => (typeof t === 'string' ? { who: this.mentor, face: this.face, text: t } : t);
     UI.say(lines.map((t) => (typeof t === 'function' ? () => who(t()) : who(t))), done);
   }
-  ask(q, done) { UI.quiz({ who: this.mentor, face: this.face, ...q }, (ok) => { if (!ok) this.mistakes++; done && done(ok); }); }
+  // otázka v kroku: id = level.krok.poradie (ak ho nedáva CSV kľúč), cieľ sa odvodí z kroku; generovaná otázka pri chybe
+  // hneď ponúkne novú obmenu (Learn.ask). Preskočená otázka (null) nie je chyba.
+  ask(q, done) {
+    const step = Learn.stepName(this), k = this.lrn.askN[step] = (this.lrn.askN[step] || 0) + 1;
+    Learn.ask(this, { who: this.mentor, face: this.face, id: `L${this.num}.${step}.${k}`, ...q, lvl: this.num, step }, (ok) => { if (ok === false) this.mistakes++; done && done(ok); });
+  }
+  // 🔮 predpoveď pred pokusom (uzamkne sa), vyhodnotí sa až po pokuse: this.revealPrediction(p, done)
+  lockPrediction(q, cb) { Learn.predict(this, q, cb); }
+  revealPrediction(p, done) { Learn.reveal(this, p, done); }
+  // 🧠 „prečo to fungovalo?“ — krátka otázka na vysvetlenie vlastného riešenia (sebavysvetľovanie)
+  explainWhy(key, done) { this.ask(QZ(key), () => done && done()); }
   grant(ids) { Game.unlock(ids); }
+  // záverečná skúška: jazykové pasce + prenosové otázky s novými číslami (jedna ku každému cieľu)
+  // → 🔁 druhá šanca na chyby z levelu → hodnotenie (hviezdičky za presnosť, 🎯 ciele za zvládnutie)
   finale() {
     UI.panelHide();
-    const nq = TRAPS[this.num].length + hardTraps(this.num).length + ancientTraps(this.num).length;
-    this.quest(DL('main.finale.1'), { easy: DL('main.finale.2'), hard: DL('main.finale.3', nq) });
+    const traps = [...TRAPS[this.num], ...hardTraps(this.num), ...ancientTraps(this.num)];
+    const transfer = Learn.transfer(this.num, 4, { isPost: true, tag: tr('nové čísla', 'new numbers', 'нові числа') });
+    this.lrn.post = transfer.length ? { ok: 0, n: 0 } : null;
+    const list = [...traps.map((q) => ({ ...q, lvl: this.num, step: 'finale', _order: null })), ...transfer];
+    this.quest(DL('main.finale.1'), { easy: DL('main.finale.2'), hard: DL('main.finale.3', list.length) });
     this.say([DL('main.finale.4')], () => {
-      const traps = [...TRAPS[this.num], ...hardTraps(this.num), ...ancientTraps(this.num)];
-      UI.quizSeries(traps.map((q) => ({ who: this.mentor, face: this.face, ...q })), (m) => {
+      UI.quizSeries(list.map((q) => ({ who: this.mentor, face: this.face, ...q })), (m) => {
         this.mistakes += m;
-        const k = this.mistakes, stars = byDiff(k <= 1 ? 3 : k <= 3 ? 2 : 1, k === 0 ? 3 : k <= 2 ? 2 : 1, k === 0 ? 3 : k <= 1 ? 2 : 1);
-        Game.completeLevel(this.num, stars);
-        const rating = '★'.repeat(stars) + '☆'.repeat(3 - stars);
-        this.say([DL('main.finale.5', rating, this.mistakes, DIFF_NAME[Settings.diff])], () => Game.backToHub());
+        Learn.secondChance(this, () => {
+          const k = this.mistakes, res = Learn.finish(this, byDiff(k <= 1 ? 3 : k <= 3 ? 2 : 1, k === 0 ? 3 : k <= 2 ? 2 : 1, k === 0 ? 3 : k <= 1 ? 2 : 1));
+          const rating = res.reviewed ? '📖' : '★'.repeat(res.stars) + '☆'.repeat(3 - res.stars);
+          this.say([DL('main.finale.5', rating, this.mistakes, DIFF_NAME[Settings.diff]), res.card].filter(Boolean), () => Game.backToHub());
+        });
       });
     });
   }
@@ -221,7 +249,7 @@ const Hub = {
       else PortalArt.draw(r, L.num, art, dir, t + L.num, open);
       r.draw('torus', M4.orient(c, dir, 2.05 * s), col, { emissive: open ? (hv ? 0.9 : 0.5) : 0 });
       r.draw('disk', M4.orient(V3.add(c, [0, 0, -0.4]), dir, 1.95 * s), col, { alpha: open ? (hv ? 0.3 : 0.16) : 0.08, emissive: 0.8, unlit: 1 });
-      const dd = Game.progress.diff[L.num], st = (done ? ' ' + '★'.repeat(done) + '☆'.repeat(3 - done) : '') + (dd && dd !== 'normal' ? ` <small>(${DIFF_NAME[dd]})</small>` : '');
+      const st = Game.starLabel(L.num);
       UI.label('portal' + L.num, V3.add(c, [0, -2.75, 0]), `<b>${L.num} · ${L.title}</b>${st}<br><small>${open ? L.face + ' ' + L.mentor : tr('🔒 zamknuté', '🔒 locked', '🔒 закрито')}</small>`, 'portal menu' + (open ? '' : ' locked') + (hv ? ' hover' : ''));
       const tip = L.num === 0 ? tr('Všetky symboly, farby a tvary rovníc v 3D — s vysvetlením a kvízmi.', 'Every symbol, colour and shape of the equations in 3D — explained and quizzed.', 'Усі символи, кольори й форми рівнянь у 3D — з поясненнями та тестами.') : (Settings.layman ? LAYMAN_LEVEL_TIPS : LEVEL_TIPS)[L.num] + portalList(L.num);
       UI.hot(c, `<b>${tr('Portál', 'Portal', 'Портал')} ${L.num}: ${L.title}</b><br>${tip}${open ? '' : tr('<br>🔒 Najprv dokonči predchádzajúci level.', '<br>🔒 Complete the previous level first.', '<br>🔒 Спершу пройди попередній рівень.')}`, v.cell * 0.4);
@@ -357,7 +385,7 @@ const Hub = {
       const np = pt.npc;
       r.draw('cylinder', M4.trs(np, 0, [0.35, 1.1, 0.35]), V3.scale(L.color, 0.8));
       r.sphere(V3.add(np, [0, 1.45, 0]), 0.32, [0.95, 0.85, 0.75]);
-      const dd = Game.progress.diff[L.num], st = (done ? ' ' + '★'.repeat(done) + '☆'.repeat(3 - done) : '') + (dd && dd !== 'normal' ? ` <small>(${DIFF_NAME[dd]})</small>` : '');
+      const st = Game.starLabel(L.num);
       UI.hot(c, `<b>${tr('Portál', 'Portal', 'Портал')} ${L.num}: ${L.title}</b><br>${(Settings.layman ? LAYMAN_LEVEL_TIPS : LEVEL_TIPS)[L.num]}${portalList(L.num)}${open ? '' : tr('<br>🔒 Najprv dokonči predchádzajúci level.', '<br>🔒 Complete the previous level first.', '<br>🔒 Спершу пройди попередній рівень.')}`, 60);
       UI.hot(V3.add(np, [0, 1.2, 0]), tr(`<b>${L.mentor}</b> — mentor levelu ${L.num}.`, `<b>${L.mentor}</b> — mentor of level ${L.num}.`, `<b>${L.mentor}</b> — наставник рівня ${L.num}.`), 30);
       UI.label('portal' + L.num, V3.add(c, [0, 2.9, 0]), `<b>${L.num} · ${L.title}</b>${st}<br><small>${open ? L.face + ' ' + L.mentor : tr('🔒 zamknuté', '🔒 locked', '🔒 закрито')}</small>`, 'portal' + (open ? '' : ' locked'));
@@ -423,7 +451,7 @@ const Hub = {
       const a = t * 0.8 + k * Math.PI / 4;
       r.sphere(V3.add(c, V3.add(V3.scale(side, Math.cos(a) * 2.45), [0, Math.sin(a) * 2.45, 0])), 0.13, col, { emissive: 0.7 });
     });
-    const st = done ? ' ' + '★'.repeat(done) + '☆'.repeat(3 - done) : '';
+    const st = Game.starLabel(0);
     UI.hot(c, `<b>${tr('Portál', 'Portal', 'Портал')} 0: ${L.title}</b><br>${tr('Všetky symboly, farby a tvary rovníc v 3D — s vysvetlením a kvízmi. Odporúčaný začiatok.', 'Every symbol, colour and shape of the equations in 3D — explained and quizzed. A recommended start.', 'Усі символи, кольори й форми рівнянь у 3D — з поясненнями та тестами. Рекомендований початок.')}`, 60);
     UI.label('portal0', V3.add(c, [0, 2.9, 0]), `<b>0 · ${L.title}</b>${st}<br><small>${L.face} ${L.mentor} · ∑ 🔑</small>`, 'portal');
   },
@@ -466,7 +494,7 @@ const Hub = {
     Wow.humanoid(r, np, face, { robe: V3.scale(L.color, 0.75), trim: [0.92, 0.8, 0.45], hat: ['hood', 'top', 'wizard', null][L.num % 4], hatCol: V3.scale(L.color, 0.55), hair: [0.75, 0.72, 0.7], staff: L.num % 2 === 1, orb: L.color });
     const next = open && done === undefined;
     if (next) UI.label('qm' + L.num, V3.add(np, [0, 2.75, 0]), '!', 'qmark', tr(`${L.mentor} má pre teba úlohu: dokonči level ${L.num}.`, `${L.mentor} has a quest for you: complete level ${L.num}.`, `${L.mentor} має для тебе завдання: пройди рівень ${L.num}.`));
-    const dd = Game.progress.diff[L.num], st = (done ? ' ' + '★'.repeat(done) + '☆'.repeat(3 - done) : '') + (dd && dd !== 'normal' ? ` <small>(${DIFF_NAME[dd]})</small>` : '');
+    const st = Game.starLabel(L.num);
     const lo = Math.min(L.num * 2 - 1, 18), hi = Math.min(L.num * 2 + 1, 20); // MMO úroveň končí na 20
     const rec = L.boss ? tr('Nájazd · úr. 20', 'Raid · lvl 20', 'Рейд · рів. 20') : tr(`Dungeon · úr. ${lo}–${hi}`, `Dungeon · lvl ${lo}–${hi}`, `Підземелля · рів. ${lo}–${hi}`);
     UI.hot(c, `<b>${tr('Inštancia', 'Instance', 'Інстанс')} ${L.num}: ${L.title}</b> <small>(${rec})</small><br>${(Settings.layman ? LAYMAN_LEVEL_TIPS : LEVEL_TIPS)[L.num]}${portalList(L.num)}${tr('Boss', 'Boss', 'Бос')}: <b>${BOSSES[L.num].icon} ${BOSSES[L.num].name}</b>${open ? '' : tr('<br>🔒 Najprv dokonči predchádzajúci level.', '<br>🔒 Complete the previous level first.', '<br>🔒 Спершу пройди попередній рівень.')}`, 60);
@@ -564,7 +592,9 @@ const PORTAL_CONTENTS = tr({
   13: ['покроковий бій: захист = кубіт, удар = вимірювання'],
   12: ['налаштування передавача на ν₀', 'імпульс струму в РЧ-котушці', 'вимірювальні послідовності та FID', 'калібрування імпульсу', 'шим і спінове відлуння'],
 });
-const portalList = (n) => (PORTAL_CONTENTS[n] ? `<ol class="plist">${PORTAL_CONTENTS[n].map((x) => `<li>${x}</li>`).join('')}</ol>` : '');
+// bublina portálu: 🎯 čo budeš vedieť (ciele so stavom zvládnutia) a zoznam úloh
+const portalList = (n) => (OBJECTIVES[n] ? `<div class="pgoals"><b>${tr('🎯 Budeš vedieť:', '🎯 You will be able to:', '🎯 Ти вмітимеш:')}</b>${Learn.goalsHtml(n)}</div>` : '')
+  + (PORTAL_CONTENTS[n] ? `<small>${tr('Úlohy:', 'Tasks:', 'Завдання:')}</small><ol class="plist">${PORTAL_CONTENTS[n].map((x) => `<li>${x}</li>`).join('')}</ol>` : '');
 
 // malá animovaná ukážka pokusu levelu vnútri portálu (u = doprava, w = hore v rovine portálu, d = smer k hráčovi)
 const PortalArt = {
@@ -629,9 +659,11 @@ const PortalArt = {
 // ------------------------------------------------------------------
 // Hra
 // ------------------------------------------------------------------
+// učenie (js/learn.js): opakovanie s odstupom, štatistiky otázok, zvládnuté ciele, testy pred/po, nápovedy, časy krokov
+const LEARN_PROGRESS = (d = {}) => ({ review: d.review || {}, stats: d.stats || {}, mastery: d.mastery || {}, assess: d.assess || {}, hints: d.hints || {}, times: d.times || {}, drill: d.drill || {}, clock: d.clock | 0, symSeen: d.symSeen || [] });
 const Game = {
   keys: {},
-  progress: { stars: {}, diff: {}, codex: new Set(), scrolls: new Set(), eqs: new Set(), introSeen: false, laymanSeen: false, allUnlocked: false, session: null, moved: false },
+  progress: { stars: {}, diff: {}, codex: new Set(), scrolls: new Set(), eqs: new Set(), introSeen: false, laymanSeen: false, allUnlocked: false, session: null, moved: false, ...LEARN_PROGRESS() },
   init() {
     const canvas = $('#gl');
     try { this.r = new Renderer(canvas); }
@@ -815,7 +847,7 @@ const Game = {
   snapshot() {
     const s = this.scene;
     if (!s || s === Hub) return { scene: 0, p: Hub.player.p, h: Hub.player.heading, yaw: Hub.cam.yaw };
-    return { scene: s.num === 0 ? 'L0' : s.num, step: s.stepIdx, sub: s.sub, mistakes: s.mistakes };
+    return { scene: s.num === 0 ? 'L0' : s.num, step: s.stepIdx, sub: s.sub, mistakes: s.mistakes, lrn: Learn.ser(s) };
   },
   restoreSession() {
     const ss = this.progress.session;
@@ -837,6 +869,14 @@ const Game = {
     this.save();
     UI.toast(tr('🔓 Všetky levely odomknuté — môžeš vstúpiť do ľubovoľného portálu.', '🔓 All levels unlocked — you can enter any portal.', '🔓 Усі рівні відкрито — можеш увійти в будь-який портал.'));
     if (this.scene === Hub) UI.setHud(tr('Hilbertov ostrov', 'Hilbert Island', 'Острів Гільберта'), this.nextQuestText());
+  },
+  // ★ za presnosť, 📖 = prejdené v režime opakovania (preskočené otázky), 🎓 = všetky ciele levelu zvládnuté
+  starLabel(n) {
+    const st = this.progress.stars[n], dd = this.progress.diff[n];
+    if (st === undefined) return '';
+    return ' ' + (st === 0 ? `<span data-tip="${tr('Prejdené v režime opakovania — bez hviezdičiek.', 'Done in review mode — no stars.', 'Пройдено в режимі повторення — без зірок.')}">📖</span>` : '★'.repeat(st) + '☆'.repeat(3 - st))
+      + (Learn.mastered(n) ? ` <span data-tip="${tr('Všetky ciele levelu zvládnuté.', 'All goals of the level mastered.', 'Усі цілі рівня опановано.')}">🎓</span>` : '')
+      + (dd && dd !== 'normal' ? ` <small>(${DIFF_NAME[dd]})</small>` : '');
   },
   completeLevel(n, stars) {
     const fresh = this.progress.stars[n] === undefined;
@@ -946,7 +986,7 @@ const Game = {
       if (this.scene === this.levelOf(pt.L.num)) { g.strokeStyle = '#5ff'; g.lineWidth = 3; g.beginPath(); g.arc(x, y, s * 2.4, 0, 7); g.stroke(); }
       g.fillStyle = '#fff';
       g.fillText(`${pt.L.num} ${pt.L.title}`, x, y - s * 2.6);
-      g.fillText(open ? (st !== undefined && st > 0 ? '★'.repeat(st) : pt.L.mentor) : '🔒', x, y + s * 3.6);
+      g.fillText(open ? (st === 0 ? '📖' : st > 0 ? '★'.repeat(st) + (Learn.mastered(pt.L.num) ? ' 🎓' : '') : pt.L.mentor) : '🔒', x, y + s * 3.6);
     }
     g.fillStyle = '#ffcf5a'; g.beginPath(); g.arc(cx, cy, s * 1.2, 0, 7); g.fill();
     if (Settings.wow) { // MMO: neutrálne omyly a obchodník
@@ -975,7 +1015,7 @@ const Game = {
         for (const k of ['stars', 'diff']) if (d[k]) { const a = d[k][12], b = d[k][13]; delete d[k][12]; delete d[k][13]; if (a !== undefined) d[k][13] = a; if (b !== undefined) d[k][12] = b; }
         if (d.session && (d.session.scene === 12 || d.session.scene === 13)) d.session.scene = 25 - d.session.scene;
       }
-      if (d) this.progress = { stars: d.stars || {}, diff: Object.fromEntries(Object.entries(d.diff || {}).map(([k, v]) => [k, v === 'ancient' ? 'hard' : v])), codex: new Set(d.codex || []), scrolls: new Set(d.scrolls || []), eqs: new Set(d.eqs || []), introSeen: !!d.introSeen, eqIntroSeen: !!d.eqIntroSeen, laymanSeen: !!d.laymanSeen, moved: !!d.moved, allUnlocked: !!d.allUnlocked, session: d.session || null, wow: d.wow || null };
+      if (d) this.progress = { stars: d.stars || {}, diff: Object.fromEntries(Object.entries(d.diff || {}).map(([k, v]) => [k, v === 'ancient' ? 'hard' : v])), codex: new Set(d.codex || []), scrolls: new Set(d.scrolls || []), eqs: new Set(d.eqs || []), introSeen: !!d.introSeen, eqIntroSeen: !!d.eqIntroSeen, laymanSeen: !!d.laymanSeen, moved: !!d.moved, allUnlocked: !!d.allUnlocked, session: d.session || null, wow: d.wow || null, ...LEARN_PROGRESS(d) };
     } catch (e) { /* čistý začiatok */ }
   },
 };
