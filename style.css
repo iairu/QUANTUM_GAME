@@ -55,6 +55,7 @@ canvas.plot { width: 100%; border-radius: 6px; margin-top: 6px; }
 #dialog.show { display: block; animation: pop .18s ease-out; }
 @keyframes pop { from { transform: translate(-50%, 12px); opacity: 0; } }
 #dialog .who { font-weight: 700; color: var(--gold); margin-bottom: 6px; }
+#dialog .who .bsrc { font-weight: 500; opacity: 0.75; cursor: help; }
 #dialog .txt { font-size: 16px; line-height: 1.55; }
 #dialog > button { float: right; margin-top: 10px; }
 #dialog .nav { display: flex; align-items: center; gap: 10px; margin-top: 12px; }

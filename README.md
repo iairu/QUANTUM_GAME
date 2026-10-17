@@ -94,6 +94,12 @@ Can be changed at any time from the selector in the top-right corner — the ope
 
 Layman and Easy skip the fill-in quizzes entirely.
 
+The fill-in quizzes cover every expression from the lecture PDFs and blackboards (about 300, lectures 1–5). Each quiz shows where its relation comes from (📄 L4, L1 · board) so you can check it in the lecture:
+- **▣ boxed in the lecture** — always asked (Normal and Hard);
+- **the task's own equations** — a random few each time;
+- **unboxed side relations** — Hard only, a random few;
+- **⤷ derivation steps** ("how did we get to the boxed result?") — Hard only, and only sometimes.
+
 ### 2 · History and dialogue
 **📜 Historic scrolls** (on by default): before level steps a scroll unrolls with the history of the discoveries — years, authors, their conversations and famous words — and every level ends with one history question. Collected scrolls stay in the Codex.
 

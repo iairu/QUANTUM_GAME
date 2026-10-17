@@ -313,7 +313,10 @@ const UI = {
     const M = (s) => { const h = EqG.colorMath(s); return Settings.eq ? EqG.glyphify(h, true) : h; };
     const full = q.eq.replace(/⟦(\d+)⟧/g, (m, i) => q.blanks[i][0]);
     if (!q._ord) { q._ord = q.blanks.map((o) => o.map((_, i) => i).sort(() => rand() - 0.5)); q._pick = q.blanks.map(() => null); }
-    this.dialog.appendChild(el('div', 'who', `${q.face || '∑'} ${q.who || ''} · ${tr('doplň rovnicu', 'complete the equation', 'доповни рівняння')}`));
+    // odkiaľ vzťah je (prednáška / tabuľa) a či bol v PDF zarámovaný — aby sa dal overiť v podkladoch
+    const src = q.src ? ` · <span class="bsrc" data-tip="${tr('Vzťah z PDF prednášky — over si ho tam.', 'A relation from the lecture PDF — check it there.', 'Співвідношення з PDF лекції — перевір його там.')}">📄 ${tr('P', 'L', 'Л')}${q.src.replace('T', ' · ' + tr('tabuľa', 'board', 'дошка'))}</span>` : '';
+    const tier = { box: ['▣', tr('V prednáške zarámované — kľúčový vzťah.', 'Boxed in the lecture — a key relation.', 'У лекції в рамці — ключове співвідношення.')], d: ['⤷', tr('Medzikrok odvodenia (len ťažká).', 'A derivation step (Hard only).', 'Проміжний крок виведення (лише складна).')] }[q.tier];
+    this.dialog.appendChild(el('div', 'who', `${q.face || '∑'} ${q.who || ''} · ${tr('doplň rovnicu', 'complete the equation', 'доповни рівняння')}${src}${tier ? ` <span class="bsrc" data-tip="${tier[1]}">${tier[0]}</span>` : ''}`));
     this.dialog.appendChild(el('div', 'txt', annotate(q.ctx || tr('Doplň chýbajúce časti rovnice.', 'Fill in the missing parts of the equation.', 'Доповни пропущені частини рівняння.'), true, true)));
     const eqEl = el('div', 'eq eqb blankeq', q.eq.split(/⟦(\d+)⟧/).map((p, k) => (k % 2 ? `<span class="blank" data-i="${p}"></span>` : M(p))).join(''));
     // ponuka sa otvára mimo bloku rovnice (ten má overflow), pod kliknutým prázdnym miestom
