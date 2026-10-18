@@ -966,8 +966,47 @@ html[data-skin="qiskit"][data-mode="light"] {
   --lbl-bg: rgba(255, 255, 255, 0.92);
   --tip-bg: #161616; --tip-fg: #f4f4f4;
   --shadow: rgba(22, 22, 22, 0.18);
+  /* svetlá tabuľa rovníc: jemne fialová, čitateľná na bielom pozadí */
+  --eq-grid: rgba(105, 41, 196, 0.08);
+  --eq-bg:
+    linear-gradient(var(--eq-grid) 1px, transparent 1px) 0 0 / 14px 14px,
+    linear-gradient(90deg, var(--eq-grid) 1px, transparent 1px) 0 0 / 14px 14px,
+    radial-gradient(120% 140% at 12% 0%, #f3edff 0%, #f6f4fb 52%, #f3f1f8 100%);
+  --eq-chip: linear-gradient(180deg, #f2ecfc, #ece6f8);
+  --eq-border: rgba(105, 41, 196, 0.26); --eq-accent: #6929c4;
+  --eq-glow: rgba(105, 41, 196, 0.1); --eq-ink: #1c1526;
   color-scheme: light;
 }
+/* svetlý režim: tmavú tabuľu z html[data-skin="qiskit"] vrátime na svetlú (vyššia špecifickosť) */
+html[data-skin="qiskit"][data-mode="light"] .eq:not(.eqb) { background: var(--eq-chip); border-color: var(--eq-border); color: var(--eq-ink); }
+html[data-skin="qiskit"][data-mode="light"] body.plaineq .eq.eqb { background: var(--eq-bg); border: 1px solid var(--eq-border); box-shadow: inset 0 0 20px rgba(105, 41, 196, 0.06); color: #1c1526 !important; }
+html[data-skin="qiskit"][data-mode="light"] body.plaineq .eq, html[data-skin="qiskit"][data-mode="light"] body.plaineq .eqi, html[data-skin="qiskit"][data-mode="light"] body.plaineq .expr, html[data-skin="qiskit"][data-mode="light"] body.plaineq .blankeq { color: #1c1526 !important; }
+/* farebná sadzba rovníc a mnemotechniky: na bielom pozadí tmavšie, sýtejšie odtiene (pôvodné sú ladené na tmavú tabuľu) */
+html[data-skin="qiskit"][data-mode="light"] {
+  --mn-a: #1552d0; --mn-b: #c2185b; --mn-ket: #0a7a93; --mn-op: #6929c4; --mn-th: #b4297a;
+  --mn-ph: #0f7a44; --mn-g: #8a6a00; --mn-P: #161616; --mn-k: #565b73; --mn-coh: #7b3fd0; --mn-m: #8a6a00;
+}
+html[data-skin="qiskit"][data-mode="light"] .m-num { color: #b45309; }
+html[data-skin="qiskit"][data-mode="light"] .m-rel { color: #8a6a00; }
+html[data-skin="qiskit"][data-mode="light"] .m-op, html[data-skin="qiskit"][data-mode="light"] .m-un { color: #1552d0; }
+html[data-skin="qiskit"][data-mode="light"] .m-br { color: #565b73; }
+html[data-skin="qiskit"][data-mode="light"] .m-fn { color: #0a7a66; }
+html[data-skin="qiskit"][data-mode="light"] .m-var { color: #1c1526; }
+html[data-skin="qiskit"][data-mode="light"] .m-opr { color: #6929c4; }
+html[data-skin="qiskit"][data-mode="light"] .m-prob { color: #161616; }
+html[data-skin="qiskit"][data-mode="light"] .m-ket { color: #0a7a93; }
+html[data-skin="qiskit"][data-mode="light"] .m-exp { color: #0f7a44; }
+html[data-skin="qiskit"][data-mode="light"] .ca { color: #1552d0; }
+html[data-skin="qiskit"][data-mode="light"] .cb { color: #c2185b; }
+html[data-skin="qiskit"][data-mode="light"] .cg { color: #8a6a00; }
+/* javisko „rovnice najprv“: tokeny majú tmavý text na svetlej tabuli */
+html[data-skin="qiskit"][data-mode="light"] .tk { --c: #1c1526; }
+html[data-skin="qiskit"][data-mode="light"] .t-c, html[data-skin="qiskit"][data-mode="light"] .t-n { --c: #1c1526; }
+html[data-skin="qiskit"][data-mode="light"] .tk .tv { text-shadow: none; }
+html[data-skin="qiskit"][data-mode="light"] .gly .glt { stroke: rgba(255, 255, 255, 0.85); }
+/* glyfy: predvolená (nekategorizovaná) farba je svetlá — na bielej tabuli aj v rozbaľovacej ponuke (.bmenu, mimo bloku rovnice) ju stmavíme */
+html[data-skin="qiskit"][data-mode="light"] .gly, html[data-skin="qiskit"][data-mode="light"] .g-c { color: #1c1526; }
+html[data-skin="qiskit"][data-mode="light"] .bmenu .bopt { color: #1c1526 !important; } /* prebije krémovú farbu z „body.plaineq .bmenu .bopt“ (má !important) */
 
 /* písmo a pozadie (pozadie presvitá cez priehľadné 3D plátno) */
 html[data-skin="qiskit"], html[data-skin="qiskit"] body { font-family: var(--font-ui); }
