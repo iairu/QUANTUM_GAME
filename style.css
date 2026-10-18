@@ -914,3 +914,141 @@ ul.goals li { margin: 3px 0; line-height: 1.4; }
 #tip .pgoals { margin: 6px 0 4px; }
 .card button.testme { margin-top: 8px; font-size: 12px; padding: 4px 9px; }
 .card.drillcard .sym { font-size: 22px; }
+
+/* ============================================================================
+   VZHĽAD „QISKIT“ — predvolená téma (🗂 výberové menu + 🔬 klasická) a uvítanie
+   Zapína sa cez html[data-skin="qiskit"] (nastavuje settings.js / welcome.js);
+   svetlý/tmavý režim cez html[data-mode="light"|"dark"]. Písmo IBM Plex Sans,
+   paleta IBM Carbon + fialová Qiskit (#6929c4 svetlá / #a56eff tmavá).
+   Severská (data-theme="nordic") a MMO (data-theme="wow") téma tento blok
+   zámerne obchádzajú (nemajú data-skin), takže ich vzhľad ostáva nedotknutý.
+   ============================================================================ */
+html[data-skin="qiskit"] {
+  /* tmavý režim = predvolený (Carbon Gray 100) */
+  --bg: #161616;
+  --bg-grad: linear-gradient(180deg, #1c1b22 0%, #161616 58%);
+  --surface: #262626; --surface-2: #363636; --sunken: #1b1b1b;
+  --panel: rgba(33, 33, 38, 0.94);
+  --text: #f4f4f4; --muted: #a8a8a8;
+  --line: rgba(244, 244, 244, 0.17); --line-strong: rgba(244, 244, 244, 0.32);
+  --accent: #a56eff; --gold: #f1c21b; --good: #42be65; --bad: #fa4d56;
+  --on-accent: #ffffff;
+  --btn-bg: #353a45; --btn-bg-hover: #454b59;
+  --btn-primary-bg: #8a3ffc; --btn-primary-hover: #a56eff;
+  --lbl-bg: rgba(27, 27, 33, 0.82);
+  --tip-bg: #393939; --tip-fg: #f4f4f4;
+  --shadow: rgba(0, 0, 0, 0.5);
+  --font-ui: "IBM Plex Sans", system-ui, "Segoe UI", Roboto, sans-serif;
+  /* tabuľa rovníc: tmavá (ako blok kódu v dokumentácii Qiskit) v oboch režimoch,
+     aby farebná rovnicová mnemotechnika a glyfy ostali čitateľné */
+  --eq-grid: rgba(166, 110, 255, 0.08);
+  --eq-bg:
+    linear-gradient(var(--eq-grid) 1px, transparent 1px) 0 0 / 14px 14px,
+    linear-gradient(90deg, var(--eq-grid) 1px, transparent 1px) 0 0 / 14px 14px,
+    radial-gradient(120% 140% at 12% 0%, #2b2444 0%, #1d1c26 52%, #16151d 100%);
+  --eq-chip: linear-gradient(180deg, #2b2b31, #1e1e24);
+  --eq-border: rgba(166, 110, 255, 0.42); --eq-accent: #a56eff;
+  --eq-glow: rgba(166, 110, 255, 0.14); --eq-ink: #f3f0ff;
+  color-scheme: dark;
+}
+html[data-skin="qiskit"][data-mode="light"] {
+  /* svetlý režim (Carbon White) — vzhľad webu qiskit.org */
+  --bg: #ffffff;
+  --bg-grad: linear-gradient(180deg, #f7f5fc 0%, #ffffff 56%);
+  --surface: #ffffff; --surface-2: #f4f4f4; --sunken: #f3f1f8;
+  --panel: rgba(255, 255, 255, 0.95);
+  --text: #161616; --muted: #525252;
+  --line: rgba(22, 22, 22, 0.14); --line-strong: rgba(22, 22, 22, 0.26);
+  --accent: #6929c4; --gold: #8e6a00; --good: #198038; --bad: #da1e28;
+  --on-accent: #ffffff;
+  --btn-bg: #ffffff; --btn-bg-hover: #f0ecfb;
+  --btn-primary-bg: #6929c4; --btn-primary-hover: #8a3ffc;
+  --lbl-bg: rgba(255, 255, 255, 0.92);
+  --tip-bg: #161616; --tip-fg: #f4f4f4;
+  --shadow: rgba(22, 22, 22, 0.18);
+  color-scheme: light;
+}
+
+/* písmo a pozadie (pozadie presvitá cez priehľadné 3D plátno) */
+html[data-skin="qiskit"], html[data-skin="qiskit"] body { font-family: var(--font-ui); }
+html[data-skin="qiskit"] body { background: var(--bg-grad); background-color: var(--bg); color: var(--text); }
+
+/* tlačidlá a rozbaľovacie zoznamy */
+html[data-skin="qiskit"] button { background: var(--btn-bg); color: var(--text); border: 1px solid var(--line); border-radius: 6px; }
+html[data-skin="qiskit"] button:hover:not(:disabled) { background: var(--btn-bg-hover); border-color: var(--accent); }
+html[data-skin="qiskit"] button.primary, html[data-skin="qiskit"] button.big { background: var(--btn-primary-bg); border-color: var(--btn-primary-bg); color: var(--on-accent); }
+html[data-skin="qiskit"] button.primary:hover:not(:disabled), html[data-skin="qiskit"] button.big:hover:not(:disabled) { background: var(--btn-primary-hover); border-color: var(--btn-primary-hover); }
+html[data-skin="qiskit"] #lang-select, html[data-skin="qiskit"] #diff-select { background: var(--btn-bg); color: var(--text); border: 1px solid var(--line); border-radius: 6px; }
+html[data-skin="qiskit"] #lang-select:hover, html[data-skin="qiskit"] #diff-select:hover { border-color: var(--accent); }
+html[data-skin="qiskit"] .station select, html[data-skin="qiskit"] #panel select { background: var(--surface-2); color: var(--text); border-color: var(--line); }
+html:not([data-skin="qiskit"]) #btn-appear { display: none; } /* svetlý/tmavý režim má len predvolená téma */
+
+/* panely, dialóg, pohľady, prekrytia, toasty, karty, denník */
+html[data-skin="qiskit"] #panel, html[data-skin="qiskit"] #views { border-color: var(--line); box-shadow: 0 10px 40px var(--shadow); }
+html[data-skin="qiskit"] #hud-title { text-shadow: 0 1px 3px var(--shadow); }
+html[data-skin="qiskit"] #hud-quest { background: color-mix(in srgb, var(--surface) 82%, transparent); }
+html[data-skin="qiskit"] #dialog { box-shadow: 0 10px 40px var(--shadow); }
+html[data-skin="qiskit"] .overlay { background: color-mix(in srgb, var(--bg) 58%, transparent); backdrop-filter: blur(2px); }
+html[data-skin="qiskit"] .overlay .box { background: var(--surface); border-color: var(--line); }
+html[data-skin="qiskit"] .toast { background: var(--surface); border-color: var(--accent); color: var(--text); }
+html[data-skin="qiskit"] .card { background: var(--surface-2); border-color: var(--line); }
+html[data-skin="qiskit"] #journal .entry { background: var(--surface-2); border-color: var(--line); }
+html[data-skin="qiskit"] #codex .tabs .on, html[data-skin="qiskit"] #views .vtabs button.on { background: var(--btn-primary-bg); border-color: var(--btn-primary-bg); color: var(--on-accent); }
+
+/* vysvetlivka (tooltip) — Carbon štýl */
+html[data-skin="qiskit"] #tip { background: var(--tip-bg); color: var(--tip-fg); border: 1px solid var(--line-strong); box-shadow: 0 6px 24px var(--shadow); }
+
+/* malý vzorec vo vete / v karte (tmavý čip v oboch režimoch) */
+html[data-skin="qiskit"] .eq:not(.eqb) { background: var(--eq-chip); border: 1px solid var(--eq-border); color: var(--eq-ink); }
+
+/* doplň rovnicu: rozbaľovacie prázdne miesta a ponuka */
+html[data-skin="qiskit"] .blankeq .bsel { background: var(--surface-2); color: var(--text); border-color: var(--accent); }
+html[data-skin="qiskit"] .blankeq .blank.open .bsel { background: color-mix(in srgb, var(--accent) 18%, var(--surface-2)); }
+html[data-skin="qiskit"] .blankeq .blank.good .bsel { background: color-mix(in srgb, var(--good) 22%, var(--surface-2)); border-color: var(--good); color: var(--text); }
+html[data-skin="qiskit"] .blankeq .blank.bad .bsel { background: color-mix(in srgb, var(--bad) 22%, var(--surface-2)); border-color: var(--bad); color: var(--text); }
+html[data-skin="qiskit"] .bmenu { background: var(--surface); border-color: var(--accent); box-shadow: 0 8px 30px var(--shadow); }
+html[data-skin="qiskit"] .bmenu .bopt { color: var(--text); }
+
+/* odpovede v dialógu */
+html[data-skin="qiskit"] .choice.good { background: color-mix(in srgb, var(--good) 18%, var(--surface)); border-color: var(--good); color: var(--text); }
+html[data-skin="qiskit"] .choice.bad { background: color-mix(in srgb, var(--bad) 18%, var(--surface)); border-color: var(--bad); color: var(--text); }
+html[data-skin="qiskit"] .choice.sel { background: color-mix(in srgb, var(--accent) 16%, var(--surface)); border-color: var(--accent); }
+
+/* normálna a ťažká obťažnosť: rovnice v klasickej sadzbe ostanú na tmavej tabuli v oboch režimoch */
+html[data-skin="qiskit"] body.plaineq .eq.eqb { background: var(--eq-bg); border: 1px solid var(--eq-border); box-shadow: inset 0 0 28px rgba(0, 0, 0, 0.5); color: #f3f0ff !important; }
+
+/* 3D menovky nad scénou */
+html[data-skin="qiskit"] .lbl.npc, html[data-skin="qiskit"] .lbl.portal { background: var(--lbl-bg); border-color: var(--line); color: var(--text); }
+/* vo svetlom režime presvitá svetlé pozadie — voľne plávajúce popisky dostanú svetlý lem a tmavší text */
+html[data-skin="qiskit"][data-mode="light"] .lbl { text-shadow: 0 1px 2px rgba(255, 255, 255, 0.95), 0 0 6px rgba(255, 255, 255, 0.8); }
+html[data-skin="qiskit"][data-mode="light"] .lbl.ket { color: #5a2ec2; }
+html[data-skin="qiskit"][data-mode="light"] .lbl.sym { color: #1150d4; }
+html[data-skin="qiskit"][data-mode="light"] .lbl.player { color: #8a6a00; }
+
+/* jemné posuvníky (Carbon) */
+html[data-skin="qiskit"] * { scrollbar-color: var(--line-strong) transparent; }
+html[data-skin="qiskit"] ::-webkit-scrollbar { width: 10px; height: 10px; }
+html[data-skin="qiskit"] ::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 6px; }
+html[data-skin="qiskit"] ::-webkit-scrollbar-track { background: transparent; }
+
+/* ---------- uvítacia obrazovka ---------- */
+html[data-skin="qiskit"] #welcome { background: radial-gradient(ellipse at 50% 50%, color-mix(in srgb, var(--bg) 8%, transparent), color-mix(in srgb, var(--bg) 78%, transparent)); }
+html[data-skin="qiskit"] #welcome .wbox { background: var(--panel); border-color: var(--line); box-shadow: 0 20px 60px var(--shadow); }
+html[data-skin="qiskit"] #welcome .wlang, html[data-skin="qiskit"] #welcome .wappear { background: var(--btn-bg); color: var(--text); border-color: var(--line); }
+html[data-skin="qiskit"] #welcome .wappear:hover, html[data-skin="qiskit"] #welcome .wlang:hover { border-color: var(--accent); }
+html[data-skin="qiskit"] #welcome h1 { font-family: var(--font-ui); font-weight: 600; letter-spacing: -0.01em; color: var(--text); }
+html[data-skin="qiskit"] #welcome .wpsi { color: var(--accent); text-shadow: 0 0 24px color-mix(in srgb, var(--accent) 42%, transparent); }
+html[data-skin="qiskit"] #welcome button.wtheme, html[data-skin="qiskit"] #welcome button.wdiff, html[data-skin="qiskit"] #welcome button.wmode { background: var(--surface-2); border-color: var(--line); }
+html[data-skin="qiskit"] #welcome button.wtheme:hover, html[data-skin="qiskit"] #welcome button.wdiff:hover, html[data-skin="qiskit"] #welcome button.wmode:hover { background: color-mix(in srgb, var(--accent) 10%, var(--surface-2)); }
+html[data-skin="qiskit"] #welcome button.on { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), 0 0 20px color-mix(in srgb, var(--accent) 26%, transparent); background: color-mix(in srgb, var(--accent) 14%, var(--surface-2)); }
+html[data-skin="qiskit"] #welcome .ticon { background: var(--surface); border-color: var(--line); }
+html[data-skin="qiskit"] #welcome .shot { background: var(--sunken); }
+html[data-skin="qiskit"] #welcome .shot.live { background: radial-gradient(ellipse at 50% 40%, color-mix(in srgb, var(--accent) 12%, var(--sunken)), var(--sunken) 75%); }
+html[data-skin="qiskit"] #welcome .shot.live .words { color: var(--text); }
+html[data-skin="qiskit"] #welcome .wgo { background: linear-gradient(transparent, color-mix(in srgb, var(--surface) 94%, transparent) 46%); }
+/* výstražný prúžok „prednášky sú hlavný zdroj“ — čitateľný aj na svetlom pozadí */
+html[data-skin="qiskit"][data-mode="light"] #welcome .wnotice { border-color: #d9a200; border-left-color: #d9a200; background: #fff8e6; color: #6b5200; }
+html[data-skin="qiskit"][data-mode="light"] #welcome .wnotice b { color: #8a6a00; }
+
+/* tlačidlo svetlého/tmavého režimu na uvítaní (zrkadlí výber jazyka vpravo) */
+#welcome .wappear { position: absolute; left: 16px; top: 16px; font: inherit; line-height: 1; color: var(--text); background: var(--btn-bg, #1b2550); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; cursor: pointer; }

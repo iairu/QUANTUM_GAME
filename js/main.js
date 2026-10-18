@@ -725,6 +725,7 @@ const Game = {
       if (e.code === 'KeyL') { UI.toggleLog(); return; }
       if (e.code === 'KeyV') { Views.toggle(); return; } // pohľady aj počas dialógu
       if (e.code === 'KeyN') { Sound.toggleMute(); return; }
+      if (e.code === 'KeyT') { UI.toggleAppearance(); return; } // svetlý / tmavý režim
       if (e.code === 'KeyM' && !Settings.menu) { this.toggleMap(); return; } // menu: bez mapy // mapa (a teleport) aj počas dialógu
       if (Settings.wow && UI.busy && /^Digit[89]$/.test(e.code)) { Wow.key(e); return; } // elixíry aj počas dialógu
       if (UI.busy) return;

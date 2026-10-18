@@ -34,6 +34,7 @@ const UI = {
       ['#btn-views', '👁', tr('Pohľady: ten istý stav ako obrázky — ručičky, Blochove rezy, bázy, matica ρ (V)', 'Views: the same state as pictures — hands, Bloch cuts, bases, ρ matrix (V)', 'Погляди: той самий стан у вигляді картинок — стрілки, перерізи Блоха, базиси, матриця ρ (V)')],
       ['#btn-settings', '⚙', tr('Nastavenia: vizualizácie a geometria (O)', 'Settings: visualizations and geometry (O)', 'Налаштування: візуалізації та геометрія (O)')],
       ['#btn-help', '❔', tr('Pomoc (H)', 'Help (H)', 'Довідка (H)')],
+      ['#btn-appear', Settings.appearance === 'light' ? '🌙' : '☀️', tr('Svetlý / tmavý režim (T)', 'Light / dark mode (T)', 'Світлий / темний режим (T)')],
       ['#btn-sound', Settings.audio.muted ? '🔇' : '🔊', tr('Hudba a zvuky: zapnúť / stlmiť (N). Hlasitosť nájdeš v nastaveniach.', 'Music and sounds: on / mute (N). Volume is in the settings.', 'Музика та звуки: увімкнути / вимкнути (N). Гучність — у налаштуваннях.')],
     ]) { $(id).textContent = text; $(id).title = title; }
     const ls = $('#lang-select');
@@ -59,6 +60,7 @@ const UI = {
     $('#btn-map').onclick = () => Game.toggleMap();
     $('#btn-help').onclick = () => this.toggleHelp();
     $('#btn-sound').onclick = () => Sound.toggleMute();
+    $('#btn-appear').onclick = () => this.toggleAppearance();
     $('#btn-hub').onclick = () => Game.backToHub();
     this.hubBtn = $('#btn-hub');
     $('#btn-log').onclick = () => this.toggleLog();
@@ -68,6 +70,20 @@ const UI = {
     for (const b of document.querySelectorAll('#topbar button')) b.dataset.tip = tipFor(b.textContent) || b.title;
     try { this.log = JSON.parse(localStorage.getItem('kvantp-game1-log') || '[]'); } catch (e) { this.log = []; }
     this.initTooltips();
+  },
+
+  // ---------- svetlý / tmavý režim (vzhľad „Qiskit“) ----------
+  appearUi() {
+    const b = document.getElementById('btn-appear'); if (!b) return;
+    b.textContent = Settings.appearance === 'light' ? '🌙' : '☀️';
+    b.dataset.tip = tr('Svetlý / tmavý režim (T)', 'Light / dark mode (T)', 'Світлий / темний режим (T)');
+  },
+  toggleAppearance() {
+    Settings.appearance = Settings.appearance === 'light' ? 'dark' : 'light';
+    Settings.save();
+    applyAppearance();
+    this.appearUi();
+    Sound.sfx('click');
   },
 
   // ---------- vysvetlivky pri prejdení myšou ----------
@@ -669,6 +685,21 @@ const UI = {
     }
     body.appendChild(th);
     body.appendChild(el('p', 'muted', tr('Zmena témy znovu načíta hru; postup, hudba a zvuky ostávajú.', 'Changing the theme reloads the game; progress, music and sounds stay.', 'Зміна теми перезавантажить гру; поступ, музика та звуки залишаться.')));
+    // svetlý / tmavý režim vzhľadu „Qiskit“ (len predvolená téma a uvítanie)
+    body.appendChild(el('h3', null, tr('🌗 Vzhľad (svetlý / tmavý)', '🌗 Appearance (light / dark)', '🌗 Вигляд (світлий / темний)')));
+    const appWrap = el('div', 'diffs');
+    for (const [k, name, desc] of [
+      ['dark', tr('🌙 Tmavý', '🌙 Dark', '🌙 Темний'), tr('tmavé rozhranie v štýle Qiskit (predvolené) — ladí s 3D scénou', 'a dark Qiskit-style interface (default) — matches the 3D scene', 'темний інтерфейс у стилі Qiskit (типово) — пасує до 3D-сцени')],
+      ['light', tr('☀️ Svetlý', '☀️ Light', '☀️ Світлий'), tr('svetlé rozhranie v štýle webu Qiskit.org', 'a light interface in the style of the Qiskit.org website', 'світлий інтерфейс у стилі сайту Qiskit.org')],
+    ]) {
+      const l = el('label'), r = el('input');
+      r.type = 'radio'; r.name = 'appearance'; r.checked = Settings.appearance === k;
+      r.onchange = () => { Settings.appearance = k; Settings.save(); applyAppearance(); this.appearUi(); };
+      l.append(r, el('b', null, name), el('small', null, desc));
+      appWrap.appendChild(l);
+    }
+    body.appendChild(appWrap);
+    body.appendChild(el('p', 'muted', tr('Platí pre predvolenú tému (Výberové menu a Klasická) a uvítaciu obrazovku; Severská a MMO téma majú vlastný vzhľad. Prepína sa aj klávesom T alebo ikonou ☀️/🌙 vpravo hore.', 'Applies to the default theme (Selection menu and Classic) and the welcome screen; the Nordic and MMO themes keep their own look. Also toggled with the T key or the ☀️/🌙 icon at the top right.', 'Стосується типової теми (Меню вибору та Класична) й екрана вітання; Північна та MMO теми зберігають власний вигляд. Перемикається також клавішею T або піктограмою ☀️/🌙 вгорі праворуч.')));
     body.appendChild(el('h3', null, tr('🎚 2 · Obťažnosť', '🎚 2 · Difficulty', '🎚 2 · Складність')));
     const diffs = el('div', 'diffs');
     for (const d of DIFFS) {

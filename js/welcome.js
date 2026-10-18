@@ -79,10 +79,13 @@ const Welcome = {
     try { slide = keep ? +(sessionStorage.getItem('kvantp-welcome-slide') || 0) : 0; this.unlock = !keep || sessionStorage.getItem('kvantp-welcome-unlock') === '1'; } catch (e) { /* bez úložiska */ }
     this.prevTheme = Settings.theme;
     document.documentElement.dataset.theme = 'classic'; // neutrálny vzhľad, kým nie je zvolená téma
+    document.documentElement.dataset.skin = 'qiskit'; // uvítanie používa vzhľad „Qiskit“
+    document.documentElement.dataset.mode = Settings.appearance; // svetlý / tmavý režim
     document.body.classList.add('welcoming');
     const el = this.el = document.createElement('div');
     el.id = 'welcome';
     el.innerHTML = `<div class="wbox">
+      <button class="wappear" type="button" title="${tr('Svetlý / tmavý režim', 'Light / dark mode', 'Світлий / темний режим')}">${Settings.appearance === 'light' ? '🌙' : '☀️'}</button>
       <select class="wlang"><option value="sk">SK</option><option value="en">EN</option><option value="uk">UA</option></select>
       <div class="whead">
         <div class="wpsi">ψ</div>
@@ -167,6 +170,11 @@ const Welcome = {
     // dve snímky: Ďalej / Späť; tlačidlo „Začať hru“ je len na poslednej
     const go = (k) => { slide = k; Sound.sfx('page'); sync(); el.querySelector('.wbox').scrollTop = 0; };
     el.querySelectorAll('.wnext, .wback').forEach((b) => { b.onclick = () => go(+b.dataset.go); }); // tri snímky: Ďalej / Späť
+    // svetlý / tmavý režim: platí hneď (data-mode na <html>), prežije aj znovunačítanie pri zmene jazyka
+    const ap = el.querySelector('.wappear');
+    const apUi = () => { ap.textContent = Settings.appearance === 'light' ? '🌙' : '☀️'; };
+    ap.onclick = () => { Settings.appearance = Settings.appearance === 'light' ? 'dark' : 'light'; Settings.save(); document.documentElement.dataset.mode = Settings.appearance; apUi(); Sound.sfx('click'); };
+    apUi();
     const ls = el.querySelector('.wlang');
     ls.value = LANG;
     ls.onchange = () => { Settings.theme = this.theme; Settings.diff = this.diff; Settings.mode = this.mode; Settings.scrolls = this.scrolls; Settings.skipDialog = this.skip; Settings.noBlanks = this.noBlanks; Settings.save(); try { sessionStorage.setItem('kvantp-welcome-keep', '1'); sessionStorage.setItem('kvantp-welcome-slide', slide); sessionStorage.setItem('kvantp-welcome-unlock', this.unlock ? '1' : '0'); } catch (e) { /* bez úložiska */ } setLang(ls.value); }; // voľby prežijú znovunačítanie
@@ -185,6 +193,7 @@ const Welcome = {
     this.el.remove();
     document.body.classList.remove('welcoming');
     document.documentElement.dataset.theme = Settings.theme;
+    applyAppearance(); // zosúladí data-skin / data-mode so zvolenou témou
     UI.diffUi && UI.diffUi();
     EqM.apply();
     this.done();
