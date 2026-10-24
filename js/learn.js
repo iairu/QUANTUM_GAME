@@ -522,11 +522,23 @@ const Learn = {
 
   // ---------- Kódex: precvič level ----------
   practice(num, n = 2) {
-    const own = Object.entries(this.P.review).filter(([, e]) => e.lvl === num && e.snap).slice(0, n)
+    const P = this.P, clock = P.clock;
+    const due = Object.entries(P.review)
+      .filter(([, e]) => e.due <= clock && e.snap)
+      .sort((a, b) => a[1].due - b[1].due);
+    const dueIds = new Set(due.map(([id]) => id));
+
+    const currentDue = due.filter(([, e]) => e.lvl === num).map(([, e]) => this.rebuild(e.snap, { inReview: true, tag: `↻ L${num}` }));
+    const otherDue = due.filter(([, e]) => e.lvl !== num).map(([, e]) => this.rebuild(e.snap, { inReview: true, tag: `↻ L${e.lvl}` }));
+
+    // vlastné otázky levelu, ktoré ešte nie sú „due“ (tie sú už v currentDue) — inak by sa zdvojili
+    const own = Object.entries(P.review).filter(([id, e]) => e.lvl === num && e.snap && !dueIds.has(id)).slice(0, n)
       .map(([, e]) => this.rebuild(e.snap, { inReview: true, tag: `↻ L${num}` }));
     const gen = this.transfer(num, 4, { practice: true, tag: `↻ L${num}` }).sort(() => rand() - 0.5);
     const traps = (TRAPS[num] || []).slice().sort(() => rand() - 0.5).map((q) => ({ ...q, practice: true, lvl: num, _order: null }));
-    return [...own, ...gen, ...traps].slice(0, n).map((q) => ({ ...q, ...this.spark() }));
+
+    const pool = [...currentDue, ...otherDue, ...own, ...gen, ...traps];
+    return pool.slice(0, n).map((q) => ({ ...q, ...this.spark() }));
   },
   testMe(num) {
     if (UI.busy) return UI.toast(tr('Najprv dokonči rozhovor.', 'Finish the conversation first.', 'Спершу заверши розмову.'));
@@ -561,5 +573,6 @@ const Learn = {
     a.download = `little-psi-progress-${new Date().toISOString().slice(0, 10)}.json`;
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    UI.toast(tr('Export successful!', 'Export successful!', 'Експорт успішний!'));
   },
 };

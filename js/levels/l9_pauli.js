@@ -119,6 +119,18 @@ class L9Pauli extends Level {
     this.quest(tr(`Rotácia ${i + 1}/${n}: ${P.title} (max. ${max})`, `Rotation ${i + 1}/${n}: ${P.title} (max. ${max})`, `Поворот ${i + 1}/${n}: ${P.title} (макс. ${max})`),
       { easy: `🔄 ${i + 1}/${n}: ${P.title}`, hard: `${i + 1}/${n} · R<sub>n</sub>(ϑ) = e<sup>−iϑ n·σ/2</sup> · n ∈ {${P.axes.join(', ')}} · ≤ ${max}` });
     this.buildRotPanel();
+
+    // riešený príklad: pri prvej hádanke mentor hradlo najprv sám použije a okomentuje rotáciu, potom to zopakuješ ty
+    if (i === 0 && !this.f.demo && !Settings.hard) {
+      this.f.demo = true;
+      this.say([DL('l9.demo.1')], () => {
+        this.demoing = true;
+        this.rotate(PAULI_AXES.x, Math.PI / 2, () => {
+          this.demoing = false;
+          this.say([DL('l9.demo.2')], () => this.loadRot(0));
+        });
+      });
+    }
   }
   buildRotPanel() {
     const P = this.rlist[this.ri];
