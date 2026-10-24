@@ -732,6 +732,7 @@ const Game = {
       if (Settings.wow && Wow.key(e)) return; // lišta kúziel 1 … =, Tab, B, skok
       if (e.code === 'KeyE' && this.scene === Hub) Hub.interact();
       if (e.code === 'KeyC') UI.toggleCodex();
+      if (e.code === 'KeyQ') this.enterSpinQ();
       if (e.code === 'KeyK' && Settings.glyphs) EqM.toggleKey(); // 🔑 kľúč (nie počas rozhovoru)
       if (e.code === 'KeyO') UI.toggleSettings();
       if (e.code === 'KeyH' || e.code === 'F1') { e.preventDefault(); UI.toggleHelp(); }
@@ -784,6 +785,20 @@ const Game = {
     this.scene = Hub;
     Hub.enter(from);
     Settings.wow && Wow.onHub();
+    this.save();
+  },
+  // SpinQ: voľná dielňa bez hodnotenia — dostupná z ostrova (tlačidlo), mapy aj nastavení, klávesom Q
+  enterSpinQ() {
+    if (this.scene === SpinQ) return;
+    if (this.scene !== Hub && !confirm(tr(`Prejsť do voľnej dielne SpinQ? Postup v aktuálnom leveli (${this.scene.num} · ${this.scene.title}) sa neuloží.`,
+      `Switch to the SpinQ free-play workshop? Progress in the current level (${this.scene.num} · ${this.scene.title}) will not be saved.`, `Перейти до вільної майстерні SpinQ? Поступ у поточному рівні (${this.scene.num} · ${this.scene.title}) не буде збережено.`))) return;
+    this.toggleMap(false);
+    UI.cancelDialog();
+    Sound.sfx('portal');
+    this.scene.exit();
+    UI.labelsClear();
+    this.scene = SpinQ;
+    SpinQ.enter();
     this.save();
   },
   levelOf(n) { return n === 0 ? this.level0 : this.levels.find((L) => L.num === n); },

@@ -29,6 +29,7 @@ const UI = {
     for (const [id, text, title] of [
       ['#btn-hub', tr('🏝 Ostrov', '🏝 Island', '🏝 Острів'), tr('Späť na ostrov', 'Back to the island', 'Назад на острів')],
       ['#btn-map', tr('🗺 Mapa', '🗺 Map', '🗺 Мапа'), tr('Mapa (M)', 'Map (M)', 'Мапа (M)')],
+      ['#btn-spinq', tr('🧪 SpinQ', '🧪 SpinQ', '🧪 SpinQ'), tr('SpinQ: voľná dielňa, bez hodnotenia (Q)', 'SpinQ: free play, no grading (Q)', 'SpinQ: вільна гра, без оцінювання (Q)')],
       ['#btn-codex', tr('📖 Kódex', '📖 Codex', '📖 Кодекс'), tr('Kódex symbolov (C)', 'Codex of symbols (C)', 'Кодекс символів (C)')],
       ['#btn-log', tr('📜 Denník', '📜 Journal', '📜 Щоденник'), tr('Denník rozhovorov (L)', 'Conversation journal (L)', 'Щоденник розмов (L)')],
       ['#btn-views', '👁', tr('Pohľady: ten istý stav ako obrázky — ručičky, Blochove rezy, bázy, matica ρ (V)', 'Views: the same state as pictures — hands, Bloch cuts, bases, ρ matrix (V)', 'Погляди: той самий стан у вигляді картинок — стрілки, перерізи Блоха, базиси, матриця ρ (V)')],
@@ -63,6 +64,7 @@ const UI = {
     $('#btn-appear').onclick = () => this.toggleAppearance();
     $('#btn-hub').onclick = () => Game.backToHub();
     this.hubBtn = $('#btn-hub');
+    $('#btn-spinq').onclick = () => Game.enterSpinQ();
     $('#btn-log').onclick = () => this.toggleLog();
     $('#codex .close').onclick = () => this.toggleCodex(false);
     $('#help .close').onclick = () => this.toggleHelp(false);
@@ -725,6 +727,9 @@ const UI = {
       modes.appendChild(l);
     }
     body.appendChild(modes);
+    body.appendChild(el('h3', null, tr('🧪 SpinQ: voľná dielňa', '🧪 SpinQ: free play', '🧪 SpinQ: вільна гра')));
+    body.appendChild(el('p', 'muted', tr('Vyskúšaj hradlá, presety aj prúdový RF impulz na Blochovej sfére — bez hviezdičiek a bez otázok, kedykoľvek.', 'Try the gates, presets and the current RF pulse on the Bloch sphere — no stars, no questions, any time.', 'Спробуй гейти, заготовки й імпульс струму на сфері Блоха — без зірок і питань, будь-коли.')));
+    body.appendChild(this.row(this.plainButton(tr('🧪 Otvoriť SpinQ', '🧪 Open SpinQ', '🧪 Відкрити SpinQ'), () => { this.toggleSettings(false); Game.enterSpinQ(); })));
     body.appendChild(el('h3', null, tr('📊 Vizualizácie', '📊 Visualizations', '📊 Візуалізації')));
     const g1 = el('div', 'grid2');
     for (const [k, label, tip] of [
@@ -800,12 +805,13 @@ const UI = {
     const list = $('#codex .list'), got = Game.progress.codex;
     list.innerHTML = '';
     const tabs = $('#codex .tabs'); tabs.innerHTML = '';
-    for (const [k, n] of [['all', tr('Všetko', 'All', 'Усе')], ['symbol', tr('🔣 Symboly', '🔣 Symbols', '🔣 Символи')], ['osobnost', tr('👤 Osobnosti', '👤 People', '👤 Особистості')], ['pojem', tr('💡 Pojmy', '💡 Concepts', '💡 Поняття')], ['scroll', tr('📜 Zvitky', '📜 Scrolls', '📜 Сувої')], ['eq', tr('∑ Rovnice', '∑ Equations', '∑ Рівняння')], ['drill', tr('📄 Prednášky', '📄 Lecture drill', '📄 Лекції')]]) {
+    for (const [k, n] of [['all', tr('Všetko', 'All', 'Усе')], ['symbol', tr('🔣 Symboly', '🔣 Symbols', '🔣 Символи')], ['osobnost', tr('👤 Osobnosti', '👤 People', '👤 Особистості')], ['pojem', tr('💡 Pojmy', '💡 Concepts', '💡 Поняття')], ['scroll', tr('📜 Zvitky', '📜 Scrolls', '📜 Сувої')], ['eq', tr('∑ Rovnice', '∑ Equations', '∑ Рівняння')], ['drill', tr('📄 Prednášky', '📄 Lecture drill', '📄 Лекції')], ['facts', tr('✨ Fakty', '✨ Facts', '✨ Факти')]]) {
       const b = el('button', filter === k ? 'on' : '', n); b.onclick = () => this.renderCodex(k); tabs.appendChild(b);
     }
     if (filter === 'scroll') return this.renderScrolls(list);
     if (filter === 'eq') return this.renderEquations(list);
     if (filter === 'drill') return this.renderDrill(list);
+    if (filter === 'facts') return this.renderFacts(list);
     const entries = CODEX.filter((e) => filter === 'all' || e.type === filter);
     $('#codex .count').textContent = `${got.size} / ${CODEX.length} ${tr('odomknutých', 'unlocked', 'відкрито')}`;
     for (const e of entries) {
@@ -864,6 +870,15 @@ const UI = {
       card.innerHTML = have
         ? `<div class="sym">📜 ${s.year}</div>${scrollHtml(s)}<div class="src">${tr('Level', 'Level', 'Рівень')} ${s.level}</div>`
         : `<div class="sym">📜 ?</div><div class="nm">${tr('zvinutý zvitok', 'a rolled-up scroll', 'згорнутий сувій')}</div><div class="ds">${tr(`Level ${s.level} so zapnutými historickými zvitkami.`, `Level ${s.level} with Historic scrolls on.`, `Рівень ${s.level} з увімкненими історичними сувоями.`)}</div>`;
+      list.appendChild(card);
+    }
+  },
+  // ✨ zaujímavosti o reálnych kvantových počítačoch — vždy odomknuté, nezávisle od postupu v leveloch
+  renderFacts(list) {
+    $('#codex .count').textContent = `${FACTS.length} ${tr('faktov · dostupné kedykoľvek, bez súvisu s postupom v leveloch', 'facts · available any time, independent of level progress', 'фактів · доступні будь-коли, незалежно від поступу в рівнях')}`;
+    for (const f of FACTS) {
+      const card = el('div', 'card');
+      card.innerHTML = `<div class="sym">${f.sym}${f.year ? ' ' + f.year : ''}</div><div class="nm">${f.name}</div><div class="ds">${annotate(f.text)}</div>`;
       list.appendChild(card);
     }
   },
