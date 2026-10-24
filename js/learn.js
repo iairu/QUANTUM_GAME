@@ -573,6 +573,6 @@ const Learn = {
     a.download = `little-psi-progress-${new Date().toISOString().slice(0, 10)}.json`;
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(a.href), 2000);
-    UI.toast(tr('Export successful!', 'Export successful!', 'Експорт успішний!'));
+    UI.toast(tr('Export úspešný!', 'Export successful!', 'Експорт успішний!'));
   },
 };

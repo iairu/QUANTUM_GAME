@@ -37,7 +37,7 @@ const UI = {
       ['#btn-help', '❔', tr('Pomoc (H)', 'Help (H)', 'Довідка (H)')],
       ['#btn-appear', Settings.appearance === 'light' ? '🌙' : '☀️', tr('Svetlý / tmavý režim (T)', 'Light / dark mode (T)', 'Світлий / темний режим (T)')],
       ['#btn-sound', Settings.audio.muted ? '🔇' : '🔊', tr('Hudba a zvuky: zapnúť / stlmiť (N). Hlasitosť nájdeš v nastaveniach.', 'Music and sounds: on / mute (N). Volume is in the settings.', 'Музика та звуки: увімкнути / вимкнути (N). Гучність — у налаштуваннях.')],
-    ]) { $(id).textContent = text; $(id).title = title; }
+    ]) { $(id).textContent = text; $(id).title = title; $(id).setAttribute('aria-label', title.replace(/<[^>]+>/g, '')); }
     const ls = $('#lang-select');
     ls.value = LANG;
     ls.dataset.tip = tr('Jazyk / Language — zmena znovu načíta hru (postup zostane uložený).', 'Language / Jazyk — switching reloads the game (your progress stays saved).', 'Мова / Language — зміна перезавантажить гру (поступ залишиться збереженим).');
@@ -70,6 +70,10 @@ const UI = {
     $('#help .close').onclick = () => this.toggleHelp(false);
     $('#journal .close').onclick = () => this.toggleLog(false);
     for (const b of document.querySelectorAll('#topbar button')) b.dataset.tip = tipFor(b.textContent) || b.title;
+    // prístupnosť: čítačky obrazovky inak prečítajú len emoji / ✕
+    for (const b of document.querySelectorAll('.close')) b.setAttribute('aria-label', tr('Zavrieť', 'Close', 'Закрити'));
+    ds.setAttribute('aria-label', tr('Obťažnosť', 'Difficulty', 'Складність'));
+    ls.setAttribute('aria-label', tr('Jazyk', 'Language', 'Мова'));
     try { this.log = JSON.parse(localStorage.getItem('kvantp-game1-log') || '[]'); } catch (e) { this.log = []; }
     this.initTooltips();
   },
@@ -814,18 +818,26 @@ const UI = {
     if (filter === 'facts') return this.renderFacts(list);
     const entries = CODEX.filter((e) => filter === 'all' || e.type === filter);
     $('#codex .count').textContent = `${got.size} / ${CODEX.length} ${tr('odomknutých', 'unlocked', 'відкрито')}`;
+    // koľko otázok z každého levelu je práve na rade v opakovaní (↻) — aby Kódex ukázal, čo si treba zopakovať
+    const P = Learn.P, dueByLevel = {};
+    for (const r of Object.values(P.review)) if (r.snap && r.due <= P.clock) dueByLevel[r.lvl] = (dueByLevel[r.lvl] || 0) + 1;
     for (const e of entries) {
       const have = got.has(e.id), card = el('div', 'card ' + (have ? '' : 'locked'));
+      const due = have ? (dueByLevel[e.level] || 0) : 0;
+      const status = Learn.mastered(e.level) ? tr('🎓 zvládnuté', '🎓 mastered', '🎓 опановано') : tr('👁 videné', '👁 seen', '👁 бачено');
       card.innerHTML = have
         ? `<div class="sym">${e.sym}</div><div class="nm">${e.name}</div><div class="ds">${annotate(e.text)}</div>`
           + (e.do ? `<div class="do">✅ ${e.do}</div>` : '') + (e.dont ? `<div class="dont">❌ ${e.dont}</div>` : '')
-          + `<div class="src">${tr('Level', 'Level', 'Рівень')} ${e.level} · ${Learn.mastered(e.level) ? tr('🎓 zvládnuté', '🎓 mastered', '🎓 опановано') : tr('👁 videné', '👁 seen', '👁 бачено')}</div>`
+          + `<div class="src">${tr('Level', 'Level', 'Рівень')} ${e.level} · ${status}${due ? ` · <b class="due">↻ ${due}</b>` : ''}</div>`
         : `<div class="sym">?</div><div class="nm">${tr('zamknuté', 'locked', 'закрито')}</div><div class="ds">${tr(`Odomkneš v leveli ${e.level}.`, `Unlocked in level ${e.level}.`, `Відкриється в рівні ${e.level}.`)}</div>`;
       if (!have) card.dataset.tip = tr(`Dokonči level ${e.level} (${LEVELS[e.level - 1].title}).`, `Complete level ${e.level} (${LEVELS[e.level - 1].title}).`, `Пройди рівень ${e.level} (${LEVELS[e.level - 1].title}).`);
       // „precvič ma“: 1–2 otázky z tohto levelu (najprv tie, ktoré sú na rade v opakovaní) — kartu tak treba aj použiť
       if (have && (TRANSFER[e.level] || TRAPS[e.level])) {
-        const b = this.plainButton(tr('🧪 Precvič ma', '🧪 Test me', '🧪 Перевір мене'), () => Learn.testMe(e.level));
-        b.className = 'testme'; b.dataset.tip = tr('Dve krátke otázky k tomuto levelu. Chyby sa vrátia v opakovaní.', 'Two short questions on this level. Mistakes come back in your reviews.', 'Два короткі питання з цього рівня. Помилки повернуться в повтореннях.');
+        const label = due ? tr(`🧪 Precvič ma (↻ ${due})`, `🧪 Test me (↻ ${due})`, `🧪 Перевір мене (↻ ${due})`) : tr('🧪 Precvič ma', '🧪 Test me', '🧪 Перевір мене');
+        const b = this.plainButton(label, () => Learn.testMe(e.level));
+        b.className = due ? 'testme due' : 'testme'; b.dataset.tip = due
+          ? tr(`${due} otázok z tohto levelu je na rade v opakovaní. Klikni a zopakuj si ich.`, `${due} questions from this level are due for review. Click to go through them.`, `${due} питань із цього рівня чекають на повторення. Натисни, щоб пройти їх.`)
+          : tr('Dve krátke otázky k tomuto levelu. Chyby sa vrátia v opakovaní.', 'Two short questions on this level. Mistakes come back in your reviews.', 'Два короткі питання з цього рівня. Помилки повернуться в повтореннях.');
         card.appendChild(b);
       }
       list.appendChild(card);
@@ -876,7 +888,9 @@ const UI = {
   // ✨ zaujímavosti o reálnych kvantových počítačoch — vždy odomknuté, nezávisle od postupu v leveloch
   renderFacts(list) {
     $('#codex .count').textContent = `${FACTS.length} ${tr('faktov · dostupné kedykoľvek, bez súvisu s postupom v leveloch', 'facts · available any time, independent of level progress', 'фактів · доступні будь-коли, незалежно від поступу в рівнях')}`;
-    for (const f of FACTS) {
+    // zoradené podľa roku (fakty bez roku na koniec), aby tvorili časovú os
+    const facts = FACTS.slice().sort((a, b) => (a.year || 9999) - (b.year || 9999));
+    for (const f of facts) {
       const card = el('div', 'card');
       card.innerHTML = `<div class="sym">${f.sym}${f.year ? ' ' + f.year : ''}</div><div class="nm">${f.name}</div><div class="ds">${annotate(f.text)}</div>`;
       list.appendChild(card);

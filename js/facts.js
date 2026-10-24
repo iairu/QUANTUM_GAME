@@ -36,6 +36,18 @@ const FACTS = [
     text: 'Richard Feynman na konferencii v MIT navrhol, že najlepší spôsob, ako simulovať prírodu, je počítač postavený na pravidlách kvantovej mechaniky — jedna z prvých formulácií myšlienky kvantového počítača.' },
   { id: 'topological', sym: '🧵', year: 2025, name: 'Topologické qubity — sľub aj spor',
     text: 'Microsoft dlhé roky vyvíja „topologický“ qubit založený na exotických kvázičasticiach (Majoranove fermióny), ktorý by mal byť prirodzene odolný voči chybám. V roku 2025 firma oznámila čip Majorana 1, ale dôkazy o skutočnej topologickej ochrane vyvolali vedeckú diskusiu.' },
+  { id: 'nocloning', sym: '🚫', year: 1982, name: 'Veta o neklonovateľnosti',
+    text: 'Wootters, Zurek a Dieks dokázali, že neznámy kvantový stav sa nedá presne skopírovať. Práve preto sa ψ správa ako pravidlo pre predpovede, nie ako dáta, ktoré možno rozmnožiť — a vďaka tomu vie kvantová kryptografia odhaliť odpočúvanie.' },
+  { id: 'bb84', sym: '🔑', year: 1984, name: 'BB84: prvá kvantová kryptografia',
+    text: 'Charles Bennett a Gilles Brassard navrhli prvý protokol kvantovej distribúcie kľúča. Keďže meranie neznámy stav naruší a stavy sa nedajú klonovať, každý odpočúvajúci zanechá zistiteľné stopy — bezpečnosť stojí na fyzike, nie na náročnosti výpočtu.' },
+  { id: 'teleport', sym: '📡', year: 1993, name: 'Kvantová teleportácia',
+    text: 'Bennett a kolegovia ukázali, že neznámy stav qubitu sa dá preniesť na vzdialený qubit pomocou zdieľaného zapleteného páru a dvoch klasických bitov. Pôvodný stav meranie zničí a nič sa nešíri rýchlejšie než svetlo — klasická správa je stále nutná.' },
+  { id: 'divincenzo', sym: '✅', year: 2000, name: 'DiVincenzove kritériá',
+    text: 'David DiVincenzo spísal, čo potrebuje každý skutočný kvantový počítač: dobre definované qubity, schopnosť ich nastaviť a prečítať, dostatočne dlhú koherenciu a univerzálnu sadu hradiel. Tento zoznam dodnes usmerňuje každú hardvérovú platformu.' },
+  { id: 'bellloophole', sym: '🔗', year: 2015, name: 'Bellov test bez medzier',
+    text: 'Skupiny v Delfte, vo Viedni a v NIST naraz uzavreli posledné experimentálne medzery v Bellovom teste. Výsledok vylučuje lokálne skryté premenné: korelácie, ktoré meriaš v hre CHSH na Bellovom moste, sú skutočné, nie trik aparatúry.' },
+  { id: 'willow', sym: '🍃', year: 2024, name: 'Korekcia chýb pod prahom',
+    text: 'Čip Willow od Googlu ukázal, že logický qubit zakódovaný v povrchovom kóde je spoľahlivejší, nie menej spoľahlivý, keď kód rastie — prvá jasná ukážka kvantovej korekcie chýb pod prahom. Je to kľúčový krok od NISQ strojov k strojom odolným voči chybám.' },
 ];
 
 const FACTS_EN = {
@@ -71,6 +83,18 @@ const FACTS_EN = {
     text: 'At an MIT conference, Richard Feynman suggested that the best way to simulate nature is a computer built on the rules of quantum mechanics itself — one of the earliest formulations of the idea of a quantum computer.' },
   topological: { name: 'Topological qubits — promise and controversy',
     text: 'Microsoft has spent years developing a "topological" qubit based on exotic quasiparticles (Majorana fermions), which should be naturally resistant to errors. In 2025 the company announced the Majorana 1 chip, though evidence for genuine topological protection sparked scientific debate.' },
+  nocloning: { name: 'The no-cloning theorem',
+    text: 'Wootters, Zurek and Dieks proved that an unknown quantum state cannot be copied exactly. This is why ψ behaves as a rule for predictions, not as data you can duplicate — and it is why quantum cryptography can detect an eavesdropper.' },
+  bb84: { name: 'BB84: the first quantum cryptography',
+    text: 'Charles Bennett and Gilles Brassard designed the first quantum key-distribution protocol. Because measuring an unknown state disturbs it and states cannot be cloned, any eavesdropper leaves detectable traces — the security rests on physics, not on the hardness of a calculation.' },
+  teleport: { name: 'Quantum teleportation',
+    text: 'Bennett and colleagues showed that an unknown qubit state can be transferred to a distant qubit using a shared entangled pair and two classical bits. The original is destroyed by the measurement, and nothing travels faster than light — the classical message is still needed.' },
+  divincenzo: { name: 'The DiVincenzo criteria',
+    text: 'David DiVincenzo listed what any real quantum computer needs: well-defined qubits, the ability to initialise and read them out, long enough coherence, and a universal set of gates. The checklist still guides every hardware platform today.' },
+  bellloophole: { name: 'A loophole-free Bell test',
+    text: 'Groups in Delft, Vienna and at NIST closed the last experimental loopholes in the Bell test in the same year. The result rules out local hidden variables: the correlations you measure in the CHSH game on Bell’s Bridge are real, not a trick of the apparatus.' },
+  willow: { name: 'Error correction below threshold',
+    text: 'Google’s Willow chip showed that a logical qubit encoded in the surface code becomes more reliable, not less, as the code grows — the first clear demonstration of quantum error correction working below the threshold. It is a key step from NISQ machines toward fault-tolerant ones.' },
 };
 
 const FACTS_UK = {
@@ -106,6 +130,18 @@ const FACTS_UK = {
     text: 'На конференції в MIT Річард Фейнман припустив, що найкращий спосіб моделювати природу — це комп’ютер, побудований на правилах квантової механіки. Це одне з найперших формулювань ідеї квантового комп’ютера.' },
   topological: { name: 'Топологічні кубіти — обіцянка і суперечка',
     text: 'Microsoft роками розробляє «топологічний» кубіт на основі екзотичних квазічастинок (фермионів Майорани), який мав би бути природно стійким до помилок. У 2025 році компанія анонсувала чип Majorana 1, однак доказ справжнього топологічного захисту викликав наукову дискусію.' },
+  nocloning: { name: 'Теорема про неклонованість',
+    text: 'Воттерс, Зурек і Дікс довели, що невідомий квантовий стан не можна точно скопіювати. Саме тому ψ поводиться як правило для передбачень, а не як дані, які можна розмножити — і завдяки цьому квантова криптографія може виявити підслуховування.' },
+  bb84: { name: 'BB84: перша квантова криптографія',
+    text: 'Чарльз Беннетт і Жиль Брассар розробили перший протокол квантового розподілу ключа. Оскільки вимірювання збурює невідомий стан, а стани не можна клонувати, будь-який підслуховувач залишає помітні сліди — безпека тримається на фізиці, а не на складності обчислення.' },
+  teleport: { name: 'Квантова телепортація',
+    text: 'Беннетт і колеги показали, що невідомий стан кубіта можна перенести на віддалений кубіт за допомогою спільної заплутаної пари та двох класичних бітів. Оригінал руйнується вимірюванням, і ніщо не рухається швидше за світло — класичне повідомлення все одно потрібне.' },
+  divincenzo: { name: 'Критерії ДіВінченцо',
+    text: 'Девід ДіВінченцо перелічив, що потрібно кожному справжньому квантовому комп’ютеру: чітко визначені кубіти, здатність їх ініціалізувати та зчитати, достатньо довгу когерентність і універсальний набір гейтів. Цей перелік і досі скеровує кожну апаратну платформу.' },
+  bellloophole: { name: 'Тест Белла без лазівок',
+    text: 'Групи в Делфті, Відні та в NIST одного року закрили останні експериментальні лазівки в тесті Белла. Результат виключає локальні приховані змінні: кореляції, які ти вимірюєш у грі CHSH на Мості Белла, справжні, а не трюк апаратури.' },
+  willow: { name: 'Корекція помилок нижче порога',
+    text: 'Чип Willow від Google показав, що логічний кубіт, закодований у поверхневому коді, стає надійнішим, а не менш надійним, коли код росте — перша чітка демонстрація квантової корекції помилок нижче порога. Це ключовий крок від NISQ-машин до відмовостійких.' },
 };
 
 const FACTS_TR = tr(null, FACTS_EN, FACTS_UK);
